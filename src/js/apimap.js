@@ -6,7 +6,9 @@ function bootApiMap(root, onNav, embed) {
 /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated, q query (* = required), a auth, b body, r responses}] */
 /*@data APIMAP*/
 const METHODS = ["GET","POST","PUT","PATCH","DELETE"];
-const SCOPES = [["pvt","pvt"],["pub","pub"],["other","inne"],["open","tylko OPEN"]];
+const SCOPES = [["pvt","pvt","Ścieżki z /pvt/: prywatne, wymagają klucza API albo tokenu"],["pub","pub","Ścieżki z /pub/: publiczne, wołane m.in. ze sklepu"],
+  ["other","inne","Ścieżki bez /pvt/ i /pub/ w adresie"],["open","tylko OPEN","Tylko endpointy bez autoryzacji w schemacie"]];
+const LIMIT = 150;
 const KEY = "apimap.v1";
 const KEYS = ["all", ...APIMAP.map(a => a.key)];
 let LIST = APIMAP;
@@ -18,9 +20,10 @@ const REF = "https://developers.vtex.com/docs/api-reference/";
 const apiRef = a => REF + a.ref;
 const epRef = ep => apiRef(ep.api) + "#" + ep.m.toLowerCase() + "-" + ep.p.replace(/\{([^}]+)\}/g, "-$1-");
 const refLink = (url, label, text) => `<a class="ref" href="${esc(url)}" target="_blank" rel="noopener" data-label="${esc(label)}">${text} ↗</a>`;
+const plural = (n, one, few, many) => { const t=n%10, h=n%100; return n+" "+(n===1 ? one : t>=2 && t<=4 && (h<12 || h>14) ? few : many); };
 const scopeOf = p => p.includes("/pvt/") || p.endsWith("/pvt") ? "pvt" : p.includes("/pub/") ? "pub" : "other";
 
-const state = { api: "catalog", depth: 2, q: "", methods: new Set(METHODS), scopes: new Set(["pvt","pub","other"]), onlyOpen: false, open: new Map() };
+const state = { api: "catalog", depth: 2, q: "", qAll: true, methods: new Set(METHODS), scopes: new Set(["pvt","pub","other"]), onlyOpen: false, open: new Map() };
 if (!embed) try {
   const p = JSON.parse(localStorage.getItem(KEY) || "{}");
   if (p && KEYS.includes(p.api)) state.api = p.api;
@@ -38,8 +41,8 @@ function buildApis(){
 function buildControls(){
   buildApis();
   if (embed) root.querySelector(".top").hidden = true;
-  $("methods").innerHTML = METHODS.map(m=>`<button type="button" data-m="${m}" style="--c:var(--${m.toLowerCase()})">${m}</button>`).join("");
-  $("scopes").innerHTML = SCOPES.map(([k,l])=>`<button type="button" data-s="${k}">${l}</button>`).join("");
+  $("methods").innerHTML = METHODS.map(m=>`<button type="button" data-m="${m}" style="--c:var(--${m.toLowerCase()})">${m}<span class="mc"></span></button>`).join("");
+  $("scopes").innerHTML = SCOPES.map(([k,l,t])=>`<button type="button" data-s="${k}" title="${esc(t)}" aria-label="${esc(l+": "+t)}">${l}</button>`).join("");
   $("depth").innerHTML = [["0","zwiń"],["1","1"],["2","2"],["3","3"],["99","wszystko"]].map(([d,l])=>`<button type="button" data-d="${d}">${l}</button>`).join("");
 
   $("apis").onclick = e => { const b=e.target.closest(".chip"); if(!b || b.dataset.k===state.api) return; show(b.dataset.k); if(onNav) onNav(state.api); };
@@ -55,19 +58,52 @@ function buildControls(){
   $("depth").onclick = e => { const b=e.target.closest("button"); if(!b) return; state.depth=+b.dataset.d; state.open.clear(); save(); render(); };
   /* Read the value now: after dispatch, e.target is retargeted to the shadow host. */
   let t; $("q").oninput = e => { const v=e.target.value; clearTimeout(t); t=setTimeout(()=>{ state.q=v.trim().toLowerCase(); render(); },120); };
+  $("q").onkeydown = e => { if (e.key==="Escape" && e.target.value){ e.preventDefault(); e.stopPropagation(); e.target.value=""; state.q=""; render(); } };
+  /* The toggle is rebuilt by render(), so put focus back on the button that was used. */
+  $("qin").onclick = e => { const b=e.target.closest("button"); if(!b) return; const k=b.dataset.q; state.qAll = k==="all"; render(); const n=root.querySelector(`#qin [data-q="${k}"]`); if(n) n.focus(); };
+  const apisEl = $("apis");
+  $("apis-l").onclick = () => { apisEl.scrollLeft -= apisEl.clientWidth*.7; };
+  $("apis-r").onclick = () => { apisEl.scrollLeft += apisEl.clientWidth*.7; };
+  apisEl.addEventListener("scroll", edges, { passive:true });
+  window.addEventListener("resize", edges);
 }
+/* Arrows show only on the side where chips are hidden. */
+function edges(){
+  const a = $("apis"), w = $("apis-wrap");
+  w.classList.toggle("can-l", a.scrollLeft > 2);
+  w.classList.toggle("can-r", a.scrollLeft + a.clientWidth < a.scrollWidth - 2);
+}
+function revealChip(){
+  const a = $("apis"), b = a.querySelector('[aria-pressed="true"]');
+  if (b && a.scrollWidth > a.clientWidth){
+    const prev = a.style.scrollBehavior; a.style.scrollBehavior = "auto";
+    a.scrollLeft = b.offsetLeft - a.offsetLeft - (a.clientWidth - b.offsetWidth)/2;
+    a.style.scrollBehavior = prev;
+  }
+  edges();
+}
+/* "/" jumps to search, as on GitHub and MDN, but only in the copy that is on screen. */
+document.addEventListener("keydown", e => {
+  if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || !root.host.getClientRects().length) return;
+  const t = e.composedPath()[0];
+  if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+  e.preventDefault(); $("q").focus();
+});
 function syncControls(){
   root.querySelectorAll("#apis .chip").forEach(b=>b.setAttribute("aria-pressed", b.dataset.k===state.api));
   const allM = state.methods.size===METHODS.length;
   root.querySelectorAll("#methods button").forEach(b=>b.setAttribute("aria-pressed", !allM && state.methods.has(b.dataset.m)));
   root.querySelectorAll("#scopes button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.s==="open" ? state.onlyOpen : (state.scopes.size<3 && state.scopes.has(b.dataset.s))));
   root.querySelectorAll("#depth button").forEach(b=>b.setAttribute("aria-pressed", +b.dataset.d===state.depth));
+  /* Search shows a flat list, so tree depth has nothing to act on. */
+  $("depth-pair").hidden = !!state.q;
 }
 
 /* ---------- tree ---------- */
 const words = () => state.q ? state.q.split(/\s+/) : [];
-function match(ep){
-  if (!state.methods.has(ep.m)) return false;
+/* anyMethod: count per method buttons ignores the method filter itself. */
+function match(ep, anyMethod){
+  if (!anyMethod && !state.methods.has(ep.m)) return false;
   if (!state.scopes.has(scopeOf(ep.p))) return false;
   if (state.onlyOpen && ep.a) return false;
   if (state.q){ const hay=(ep.p+" "+ep.s+" "+ep.t+" "+ep.m).toLowerCase(); if(!words().every(w=>hay.includes(w))) return false; }
@@ -121,24 +157,61 @@ function renderNode(n, depth, isApiRoot){
   return h + "</div></details>";
 }
 
+const pathHtml = p => hl(p).replace(/\{[^}<]*\}/g, m=>`<span class="param">${m}</span>`);
+function hitRow(ep, many){
+  return `<button type="button" class="ep hit" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span>` +
+    `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s||"(brak opisu)")} · ${esc(ep.t||"—")}${many?" · "+esc(ep.api.name):""}</span></span>` +
+    `${ep.a?"":'<span class="flag open">OPEN</span>'}${ep.d?'<span class="flag dep">DEPR</span>':""}</button>`;
+}
+/* While searching, each API chip shows its own number of hits, so results in another API are never invisible. */
+function chipCounts(){
+  const n = new Map(LIST.map(a=>[a.key, state.q ? a.eps.filter(ep=>match(ep)).length : a.eps.length]));
+  n.set("all", [...n.values()].reduce((x,y)=>x+y,0));
+  root.querySelectorAll("#apis .chip").forEach(b=>{ const k=n.get(b.dataset.k); b.querySelector("span").textContent=k; b.classList.toggle("zero", !!state.q && !k); });
+  return n;
+}
+
 let EPS = new Map();
 function render(){
   syncControls();
-  const apis = state.api==="all" ? LIST : LIST.filter(a=>a.key===state.api);
+  const sel = state.api==="all" ? LIST : LIST.filter(a=>a.key===state.api);
+  const wide = !!state.q && state.qAll;
+  const apis = wide ? LIST : sel;
   EPS = new Map();
   let html="", tot=0, open=0;
-  const c={GET:0,POST:0,PUT:0,PATCH:0,DELETE:0};
-  for (const a of apis){
+  const c={GET:0,POST:0,PUT:0,PATCH:0,DELETE:0}, mc={GET:0,POST:0,PUT:0,PATCH:0,DELETE:0};
+  for (const a of apis) for (const ep of a.eps) if (match(ep, true)) mc[ep.m]++;
+  root.querySelectorAll("#methods button").forEach(b=>{ b.querySelector(".mc").textContent = mc[b.dataset.m]; });
+  const hits = chipCounts();
+  const showIn = !!state.q && LIST.length > 1 && state.api !== "all";
+  $("qscope").hidden = !showIn;
+  if (showIn){
+    const name = LIST.find(a=>a.key===state.api).name;
+    $("qin").innerHTML = `<button type="button" data-q="all" aria-pressed="${state.qAll}">wszędzie <span class="mc">${hits.get("all")}</span></button>` +
+      `<button type="button" data-q="one" aria-pressed="${!state.qAll}">${esc(name)} <span class="mc">${hits.get(state.api)}</span></button>`;
+  }
+  if (state.q){
+    const found = [];
+    for (const a of apis) for (const ep of a.eps) if (match(ep)) found.push({...ep, api:a});
+    found.sort((x,y)=>x.p.localeCompare(y.p) || ord(x.m)-ord(y.m));
+    found.forEach(ep=>{ EPS.set(idOf(ep), ep); c[ep.m]++; tot++; if(!ep.a) open++; });
+    const many = apis.length > 1;
+    if (found.length) html = `<div class="hits">${found.slice(0,LIMIT).map(ep=>hitRow(ep, many)).join("")}</div>` +
+      (found.length>LIMIT ? `<div class="more">Pokazano ${LIMIT} z ${found.length}. Doprecyzuj wyszukiwanie albo zawęź metody.</div>` : "");
+  }
+  else for (const a of apis){
     const top = trieFor(a);
     const walk = n => { n.eps.forEach(ep=>{ EPS.set(idOf(ep), ep); c[ep.m]++; tot++; if(!ep.a) open++; }); n.kids.forEach(walk); };
     walk(top);
     if (state.api==="all") html += renderNode(top, 0, true);
     else html += [...top.kids.values()].sort((x,y)=>x.name.localeCompare(y.name)).map(k=>renderNode(k,0,false)).join("");
   }
-  $("tree").innerHTML = html || `<div class="empty">Nic nie pasuje do filtrów. Wyczyść wyszukiwanie albo włącz więcej metod.</div>`;
-  $("stats").innerHTML = `<span><b>${tot}</b> endpointów</span>` + METHODS.filter(m=>c[m]).map(m=>`<span><span class="m ${m}" style="width:auto">${m}</span> <b>${c[m]}</b></span>`).join("") + (open?`<span><b>${open}</b> OPEN</span>`:"");
-  if (state.api==="all") $("server").innerHTML = `Auth (wszystkie API): <code>X-VTEX-API-AppKey</code> + <code>X-VTEX-API-AppToken</code> lub <code>VtexIdclientAutCookie</code>`;
-  else { const a=apis[0]; $("server").innerHTML = `Base URL: <code>${esc(a.server)}</code> · schemat: <code>${esc(a.file)}</code> · ${refLink(apiRef(a), a.name+" API", "API Reference")}`; }
+  $("tree").innerHTML = html || `<div class="empty">Nic nie pasuje do filtrów. Wyczyść wyszukiwanie (Esc) albo włącz więcej metod.</div>`;
+  $("tree").classList.toggle("flat", !!state.q);
+  const inApis = wide ? new Set([...EPS.values()].map(ep=>ep.api.key)).size : 0;
+  $("stats").innerHTML = `<span><b>${plural(tot,"endpoint","endpointy","endpointów")}</b>${inApis>1?" w "+inApis+" API":""}</span>` + METHODS.filter(m=>c[m]).map(m=>`<span><span class="m ${m}" style="width:auto">${m}</span> <b>${c[m]}</b></span>`).join("") + (open?`<span><b>${open}</b> OPEN</span>`:"");
+  if (state.api==="all" || inApis > 1) $("server").innerHTML = `Auth (wszystkie API): <code>X-VTEX-API-AppKey</code> + <code>X-VTEX-API-AppToken</code> lub <code>VtexIdclientAutCookie</code>`;
+  else { const a=sel[0]; $("server").innerHTML = `Base URL: <code>${esc(a.server)}</code> · schemat: <code>${esc(a.file)}</code> · ${refLink(apiRef(a), a.name+" API", "API Reference")}`; }
 }
 
 /* ---------- endpoint detail ---------- */
@@ -216,16 +289,17 @@ async function copy(btn, text){
 
 function show(api){
   if (!(api==="all" || LIST.some(a=>a.key===api)) || api===state.api && $("tree").childElementCount) return;
-  state.api = api; state.open.clear(); save(); render();
+  /* Picking an API while searching means "search here". */
+  state.api = api; state.open.clear(); if (state.q) state.qAll = api==="all"; save(); render(); revealChip();
 }
 
 /* list: [[apiKey, tags?]]; tags keep only the endpoints with those tags. */
 function scope(list){
   LIST = list.map(([k, tags]) => { const a = APIMAP.find(x=>x.key===k); return tags ? {...a, eps: a.eps.filter(e=>tags.includes(e.t))} : a; });
   state.api = LIST.length > 1 ? "all" : LIST[0].key; state.open.clear(); state.q = ""; $("q").value = "";
-  buildApis(); render();
+  buildApis(); render(); revealChip();
 }
 
-buildControls(); render();
+buildControls(); render(); requestAnimationFrame(revealChip);
 return { show: api => show(api), api: () => state.api, scope };
 }
