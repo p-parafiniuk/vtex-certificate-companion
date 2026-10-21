@@ -473,6 +473,10 @@ body[data-view="focus"] .toast { bottom: calc(88px + env(safe-area-inset-bottom,
 .setg { gap: 0; padding-block: 6px 10px; }
 .setg h3 { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); margin: 10px 0 2px; }
 .setg .lead, .setg .row { margin-top: 10px; }
+.imp-box:empty { display: none; }
+.imp-box { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.imp-box.bad { border-color: var(--bad); background: var(--bad-soft); }
+.imp-box p { margin: 0; flex: 1 1 220px; }
 .setrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 10px 0; min-height: 44px; border-bottom: 1px solid var(--line); cursor: pointer; }
 .setrow:last-child { border-bottom: 0; }
 div.setrow { cursor: default; }

@@ -483,6 +483,10 @@ body[data-view="focus"] .toast { bottom: calc(88px + env(safe-area-inset-bottom,
 .setg { gap: 0; padding-block: 6px 10px; }
 .setg h3 { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); margin: 10px 0 2px; }
 .setg .lead, .setg .row { margin-top: 10px; }
+.imp-box:empty { display: none; }
+.imp-box { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 0.9rem; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.imp-box.bad { border-color: var(--bad); background: var(--bad-soft); }
+.imp-box p { margin: 0; flex: 1 1 220px; }
 .setrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; padding: 10px 0; min-height: 44px; border-bottom: 1px solid var(--line); cursor: pointer; }
 .setrow:last-child { border-bottom: 0; }
 div.setrow { cursor: default; }
@@ -632,7 +636,13 @@ div.setrow { cursor: default; }
     </section>
     <section class="card setg" aria-labelledby="set-h-data">
       <h3 id="set-h-data">Dane</h3>
-      <p class="lead">Postęp, seria i odznaki są zapisane lokalnie. Resetu nie da się cofnąć. Ustawienia zostają.</p>
+      <p class="lead">Postęp, seria i odznaki są zapisane tylko w tej przeglądarce. Plik eksportu przeniesie je na inne urządzenie. Reset nie rusza ustawień i nie da się go cofnąć.</p>
+      <div class="row">
+        <button type="button" class="btn small" id="exp-prog">Eksportuj postęp do pliku</button>
+        <button type="button" class="btn small" id="imp-prog">Importuj postęp z pliku</button>
+        <input type="file" id="imp-file" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+      </div>
+      <div class="imp-box" id="imp-box" role="status" aria-live="polite"></div>
       <div class="row">
         <button type="button" class="btn small" id="clear-ans">Wyczyść odpowiedzi</button>
         <button type="button" class="btn small danger" id="reset-all">Zresetuj cały postęp</button>
@@ -3340,6 +3350,63 @@ return { show: api => show(api), api: () => state.api, scope };
     S.days = {}; S.tday = { d: "", ids: {} }; S.total = 0; S.combo = 0; S.comboBest = 0; S.best = 0; S.badges = {};
     save(); renderStats(); renderGrids(); header(true);
   });
+
+  /* ---------- Eksport / import: one file with the app, Koty and API Map stores ----------
+     Import writes the raw stores back and reloads, so every value goes through the same defensive load as normal startup. */
+  var STORES = [KEY, "httpkoty.v1", "apimap.v1"], IMP = null;
+  function isObj(x) { return !!x && typeof x === "object" && !Array.isArray(x); }
+  function impMsg(html, bad) { var el = $("#imp-box"); el.className = "imp-box" + (bad ? " bad" : ""); el.innerHTML = html; }
+  $("#exp-prog").addEventListener("click", function () {
+    var data = {};
+    data[KEY] = S;
+    STORES.slice(1).forEach(function (k) {
+      try { var v = JSON.parse(localStorage.getItem(k) || "null"); if (isObj(v)) data[k] = v; } catch (e) { /* skip */ }
+    });
+    var day = new Date().toISOString().slice(0, 10);
+    var url = URL.createObjectURL(new Blob([JSON.stringify({ app: "vtex-api-drill", v: 1, at: Date.now(), data: data })], { type: "application/json" }));
+    var a = document.createElement("a");
+    a.href = url; a.download = "vtex-drill-postep-" + day + ".json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    impMsg("<p>Zapisano plik <strong>" + esc(a.download) + "</strong>. Otwórz go tutaj na innym urządzeniu lub w innej przeglądarce.</p>");
+  });
+  $("#imp-prog").addEventListener("click", function () { $("#imp-file").click(); });
+  $("#imp-file").addEventListener("change", function (ev) {
+    var f = ev.target.files[0];
+    ev.target.value = "";
+    if (!f) return;
+    if (f.size > 5e6) return impMsg("<p>Ten plik jest za duży jak na eksport postępu.</p>", true);
+    var r = new FileReader();
+    r.onload = function () {
+      var p = null;
+      try { p = JSON.parse(r.result); } catch (e) { /* handled below */ }
+      if (!isObj(p) || p.app !== "vtex-api-drill" || !isObj(p.data) || !isObj(p.data[KEY])) {
+        IMP = null;
+        return impMsg("<p>To nie jest plik eksportu z VTEX API Drill. Wybierz plik zapisany przyciskiem „Eksportuj postęp do pliku”.</p>", true);
+      }
+      IMP = p.data;
+      var d = p.data[KEY], cnt = function (o) { return isObj(o) ? Object.keys(o).length : 0; };
+      var when = +p.at > 0 ? new Date(+p.at).toLocaleDateString("pl-PL") : "nieznana data";
+      impMsg("<p>Plik z " + esc(when) + ". Opanowane pytania: " + cnt(d.known) + ", fiszki: " + cnt(d.fknown) + ", odpowiedzi: " +
+        (Math.floor(+d.total) || 0) + ". Import zastąpi obecny postęp.</p>" +
+        '<button type="button" class="btn small danger" id="imp-ok">Zastąp postęp</button><button type="button" class="btn small" id="imp-no">Anuluj</button>');
+      $("#imp-ok").focus();
+    };
+    r.onerror = function () { impMsg("<p>Nie udało się odczytać pliku.</p>", true); };
+    r.readAsText(f);
+  });
+  $("#imp-box").addEventListener("click", function (ev) {
+    if (ev.target.closest("#imp-no")) { IMP = null; impMsg(""); $("#imp-prog").focus(); return; }
+    if (!ev.target.closest("#imp-ok") || !IMP) return;
+    try {
+      STORES.forEach(function (k) { if (isObj(IMP[k])) localStorage.setItem(k, JSON.stringify(IMP[k])); else localStorage.removeItem(k); });
+      try { sessionStorage.setItem(KEY + "-imported", "1"); } catch (e) { /* message only */ }
+    } catch (e) { return impMsg("<p>Przeglądarka blokuje zapis lokalny, więc nie da się zaimportować postępu.</p>", true); }
+    location.reload();
+  });
+  try {
+    if (sessionStorage.getItem(KEY + "-imported")) { sessionStorage.removeItem(KEY + "-imported"); impMsg("<p>Postęp zaimportowany.</p>"); }
+  } catch (e) { /* no message */ }
 
   /* ---------- Focus: one card at a time across questions, flashcards and practical tasks ----------
      The deck is ordered by area (questions, then flashcards, then practical tasks) or shuffled with a stored seed.
