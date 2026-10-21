@@ -229,12 +229,19 @@ h3 { font: 600 1rem/1.3 var(--f-body); margin: 0; }
 .src { font-size: 0.86rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 .src p { margin: 0; max-width: 72ch; }
 .src-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
-.info { display: contents; }
-.info summary { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; list-style: none; cursor: pointer; color: var(--muted); border-radius: 999px; padding: 4px 10px 4px 6px; min-height: 32px; box-sizing: border-box; }
-.info summary::-webkit-details-marker { display: none; }
-.info summary:hover, .info[open] summary { color: var(--accent); background: var(--accent-soft); }
-.info summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.info-body { flex-basis: 100%; display: grid; gap: 6px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.info-btn { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; font: inherit; cursor: pointer; color: var(--muted); border-radius: 999px; padding: 4px 10px 4px 6px; min-height: 32px; }
+.info-btn:hover { color: var(--accent); background: var(--accent-soft); }
+.info-btn:focus-visible, .info-x:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.info-dlg { width: min(680px, calc(100vw - 32px)); max-height: min(80vh, 760px); padding: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); box-shadow: 0 18px 48px var(--kshadow); overflow: hidden; }
+.info-dlg[open] { display: flex; flex-direction: column; }
+.info-dlg::backdrop { background: rgb(12 8 16 / 0.55); }
+.info-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px 12px 20px; border-bottom: 1px solid var(--line); }
+.info-head h2 { margin: 0; font: 700 1.1rem var(--f-display); }
+.info-x { border: 0; background: none; color: var(--muted); font-size: 1.05rem; width: 36px; height: 36px; border-radius: 8px; cursor: pointer; flex: none; }
+.info-x:hover { background: var(--code); color: var(--ink); }
+.info-body { overflow-y: auto; display: grid; gap: 10px; padding: 16px 20px 20px; font-size: 0.9rem; line-height: 1.55; color: var(--muted); }
+.info-body strong { color: var(--ink); }
+body:has(.info-dlg[open]) { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
 
 /* Focus: one card at a time. The top strip picks deck and area, the header keeps deck progress and accuracy in view,
@@ -648,17 +655,18 @@ div.setrow { cursor: default; }
   <footer class="src">
     <div class="src-row">
       <span>© qlogic 2026</span>
-      <details class="info">
-        <summary aria-label="Informacje o pytaniach i źródłach" title="Informacje o pytaniach i źródłach"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Info</span></summary>
-        <div class="info-body">
+      <button type="button" class="info-btn" id="info-open" aria-haspopup="dialog" aria-controls="info-dlg" title="O pytaniach i źródłach"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Info</span></button>
+    </div>
+    <dialog class="info-dlg" id="info-dlg" aria-labelledby="info-h">
+      <div class="info-head"><h2 id="info-h">O pytaniach i źródłach</h2><button type="button" class="info-x" id="info-close" aria-label="Zamknij">✕</button></div>
+      <div class="info-body">
     <p><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
     <p><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
     <p><strong>Format:</strong> 9 października 2026 baza została przebudowana na wielokrotny wybór (jedna lub kilka poprawnych). Każda dodana poprawna odpowiedź powtarza fakt potwierdzony w dokumentacji albo w API Reference VTEX.</p>
     <p><strong>Linki przy pytaniach i fiszkach</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
     <p>Źródła: <a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys">API keys</a> · <a href="https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens">User tokens</a> · <a href="https://developers.vtex.com/docs/guides/catalog-integration">Catalog</a> · <a href="https://developers.vtex.com/docs/guides/skus">SKUs</a> · <a href="https://developers.vtex.com/docs/api-reference/pricing-api">Pricing API</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-inventory">Inventory</a> · <a href="https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api">Checkout order</a> · <a href="https://developers.vtex.com/docs/guides/orders-feed">Feed v3 i Hook</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration">Order integration</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider">Payment provider</a> · <a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api">Master Data pagination</a> · <a href="https://developers.vtex.com/docs/guides/external-seller-integration-connector">External seller</a> · <a href="https://developers.vtex.com/docs/guides/api-response-codes">Status codes</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog">ERP: catalog</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-products">ERP: products</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing">ERP: order processing</a> · <a href="https://developers.vtex.com/docs/guides/change-order">Change order</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-purchase-flows">Purchase flows</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-secure-proxy">Secure Proxy</a> · <a href="https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works">Anti-fraud</a> · <a href="https://developers.vtex.com/docs/guides/login-integration-guide">Login (SSO)</a> · <a href="https://developers.vtex.com/docs/guides/sessions-system-overview">Sessions</a> · <a href="https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2">MD triggers</a> · <a href="https://developers.vtex.com/docs/api-reference/search-api">Search API</a> · <a href="https://developers.vtex.com/docs/api-reference/checkout-api">Checkout API</a> · <a href="https://developers.vtex.com/docs/api-reference/orders-api">Orders API</a> · <a href="https://developers.vtex.com/docs/api-reference/logistics-api">Logistics API</a> · <a href="https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api">Promotions &amp; Taxes API</a> · <a href="https://developers.vtex.com/docs/api-reference/giftcard-api">Giftcard API</a> · <a href="https://developers.vtex.com/docs/api-reference/payment-provider-protocol">Payment Provider Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/marketplace-protocol">Marketplace Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/vtex-id-api">VTEX ID API</a> · <a href="https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196">Order flow and status</a> · <a href="https://github.com/vtex/openapi-schemas">vtex/openapi-schemas</a></p>
-        </div>
-      </details>
-    </div>
+      </div>
+    </dialog>
   </footer>
   <div class="toast" id="gx-toast" role="status" hidden></div>
   <p class="sr" id="gx-live" aria-live="polite"></p>
@@ -3918,6 +3926,12 @@ return { show: api => show(api), api: () => state.api, scope };
     if (b && b.dataset.tab !== CUR) go(b.dataset.tab === "pytania" && S.dom !== "all" ? { tab: "pytania", cat: S.dom } : { tab: b.dataset.tab });
     else if (b) window.scrollTo(0, 0);
   });
+
+  var infoDlg = $("#info-dlg");
+  $("#info-open").addEventListener("click", function () { infoDlg.showModal(); });
+  $("#info-close").addEventListener("click", function () { infoDlg.close(); });
+  /* A click on the backdrop lands on the dialog element itself, never on its content. */
+  infoDlg.addEventListener("click", function (ev) { if (ev.target === infoDlg) infoDlg.close(); });
 
   header(true);
   if (S.sim && !S.sim.done) startTick();
