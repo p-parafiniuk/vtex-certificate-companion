@@ -226,8 +226,15 @@ h3 { font: 600 1rem/1.3 var(--f-body); margin: 0; }
 .hist { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font: 500 0.86rem var(--f-mono); font-variant-numeric: tabular-nums; }
 .hist .p { color: var(--ok); }
 .hist .f { color: var(--bad); }
-.src { font-size: 0.86rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 6px; }
+.src { font-size: 0.86rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; }
 .src p { margin: 0; max-width: 72ch; }
+.src-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.info { display: contents; }
+.info summary { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; list-style: none; cursor: pointer; color: var(--muted); border-radius: 999px; padding: 4px 10px 4px 6px; min-height: 32px; box-sizing: border-box; }
+.info summary::-webkit-details-marker { display: none; }
+.info summary:hover, .info[open] summary { color: var(--accent); background: var(--accent-soft); }
+.info summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.info-body { flex-basis: 100%; display: grid; gap: 6px; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
 @media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
 
 /* Focus: one card at a time. The top strip picks deck and area, the header keeps deck progress and accuracy in view,
@@ -336,8 +343,8 @@ kbd { font: 500 0.72rem var(--f-mono); border: 1px solid currentColor; border-ra
   --surface-2: var(--code); --c1: var(--k1); --c2: var(--ok); --c3: var(--k3); --c4: var(--bad); --c5: var(--k5);
   --vtex: var(--accent); --on-accent: var(--surface); --shadow: var(--kshadow);
   --font-display: var(--f-display); --font-body: var(--f-body); --font-mono: var(--f-mono); }
-body[data-view="http"] .brand, body[data-view="http"] .prog, body[data-view="http"] .src,
-body[data-view="api"] .brand, body[data-view="api"] .prog, body[data-view="api"] .src { display: none; }
+body[data-view="http"] .brand, body[data-view="http"] .prog,
+body[data-view="api"] .brand, body[data-view="api"] .prog { display: none; }
 body[data-view="http"] .bar-in, body[data-view="http"] .wrap,
 body[data-view="api"] .bar-in, body[data-view="api"] .wrap { max-width: 1112px; }
 body[data-view="http"] .wrap, body[data-view="api"] .wrap { padding-block: 0 48px; }
@@ -508,11 +515,19 @@ body[data-view="pytania"] .bar-in, body[data-view="pytania"] .wrap { max-width: 
   </section>
 
   <footer class="src">
+    <div class="src-row">
+      <span>© qlogic 2026</span>
+      <details class="info">
+        <summary aria-label="Informacje o pytaniach i źródłach" title="Informacje o pytaniach i źródłach"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Info</span></summary>
+        <div class="info-body">
     <p><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
     <p><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
     <p><strong>Format:</strong> 9 października 2026 baza została przebudowana na wielokrotny wybór (jedna lub kilka poprawnych). Każda dodana poprawna odpowiedź powtarza fakt potwierdzony w dokumentacji albo w API Reference VTEX.</p>
     <p><strong>Linki przy pytaniach i fiszkach</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
     <p>Źródła: <a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys">API keys</a> · <a href="https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens">User tokens</a> · <a href="https://developers.vtex.com/docs/guides/catalog-integration">Catalog</a> · <a href="https://developers.vtex.com/docs/guides/skus">SKUs</a> · <a href="https://developers.vtex.com/docs/api-reference/pricing-api">Pricing API</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-inventory">Inventory</a> · <a href="https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api">Checkout order</a> · <a href="https://developers.vtex.com/docs/guides/orders-feed">Feed v3 i Hook</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration">Order integration</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider">Payment provider</a> · <a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api">Master Data pagination</a> · <a href="https://developers.vtex.com/docs/guides/external-seller-integration-connector">External seller</a> · <a href="https://developers.vtex.com/docs/guides/api-response-codes">Status codes</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog">ERP: catalog</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-products">ERP: products</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing">ERP: order processing</a> · <a href="https://developers.vtex.com/docs/guides/change-order">Change order</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-purchase-flows">Purchase flows</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-secure-proxy">Secure Proxy</a> · <a href="https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works">Anti-fraud</a> · <a href="https://developers.vtex.com/docs/guides/login-integration-guide">Login (SSO)</a> · <a href="https://developers.vtex.com/docs/guides/sessions-system-overview">Sessions</a> · <a href="https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2">MD triggers</a> · <a href="https://developers.vtex.com/docs/api-reference/search-api">Search API</a> · <a href="https://developers.vtex.com/docs/api-reference/checkout-api">Checkout API</a> · <a href="https://developers.vtex.com/docs/api-reference/orders-api">Orders API</a> · <a href="https://developers.vtex.com/docs/api-reference/logistics-api">Logistics API</a> · <a href="https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api">Promotions &amp; Taxes API</a> · <a href="https://developers.vtex.com/docs/api-reference/giftcard-api">Giftcard API</a> · <a href="https://developers.vtex.com/docs/api-reference/payment-provider-protocol">Payment Provider Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/marketplace-protocol">Marketplace Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/vtex-id-api">VTEX ID API</a> · <a href="https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196">Order flow and status</a> · <a href="https://github.com/vtex/openapi-schemas">vtex/openapi-schemas</a></p>
+        </div>
+      </details>
+    </div>
   </footer>
 </main>
 <template id="koty-tpl">
