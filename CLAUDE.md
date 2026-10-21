@@ -14,6 +14,7 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 | `npm run build` | validate, then write `vtex-api-drill.html` |
 | `npm run check` | validate, then confirm the built file matches `src/`. Run it before every commit. |
 | `npm run stats` | table of questions per domain × round, to find gaps |
+| `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json` |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
 
@@ -48,6 +49,9 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 - Short, plain sentences. Inline markup is only `` `code` `` and `**bold**`, plus `\n` in flashcard answers. Everything else is escaped (`esc`, then `fmt`).
 - Distractors must be plausible VTEX-isms: real header names, real endpoints, wrong numbers. They must not be obviously absurd.
 - The code style follows the file you are in. `app.js` is ES5 (`var`, `function`), `koty.js` is ES2015+. Comment density is low, and comments explain why, not what.
+
+## Skills and reviewers
+`/feature`, `/fix`, `/ux`, `/security` do the work. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.
 
 ## Verifying a change
 1. Run `npm run check`. It must be green, with no warnings you didn't expect.

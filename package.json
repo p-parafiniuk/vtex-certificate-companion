@@ -10,7 +10,10 @@
     "lock": "node scripts/validate.mjs --update-lock",
     "stats": "node scripts/stats.mjs",
     "extract": "node scripts/extract.mjs",
-    "serve": "node scripts/serve.mjs 8000"
+    "serve": "node scripts/serve.mjs 8000",
+    "review-scope": "node scripts/review-scope.mjs"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

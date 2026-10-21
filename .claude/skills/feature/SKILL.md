@@ -31,4 +31,5 @@ Read `CLAUDE.md` first if it is not already in context. Work in `src/` only.
 ## 4. Verify
 - `npm run check` must be green.
 - Preview through the `drill` launch config, open the affected tab, use the feature, then reload and confirm the state persisted. The console must be clean.
-- Report what was added (count per domain, or the behaviour), with the sources used.
+- Run `/review` (the review skill). It picks the needed reviewers from the diff and does at most one round of fixes.
+- Report what was added (count per domain, or the behaviour), with the sources used and the review verdicts.
