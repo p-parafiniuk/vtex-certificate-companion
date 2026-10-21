@@ -1,0 +1,111 @@
+/* Data checks. Exit 1 on any error; warnings only print.
+   Usage: node scripts/validate.mjs [--update-lock]
+   The lock (tests/ids.lock.json) guards stable ids: saved progress is keyed by array index of Q and F. */
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { LOCK, CATS, loadData, hash } from "./lib.mjs";
+
+const D = loadData();
+const err = [], warn = [];
+const E = (w, m) => err.push(w + ": " + m), W = (w, m) => warn.push(w + ": " + m);
+const doms = new Set(D.DOMS.map(d => d[0]));
+const isStr = s => typeof s === "string" && s.trim() !== "";
+
+function markup(w, s) {
+  if (typeof s !== "string") return;
+  if ((s.match(/`/g) || []).length % 2) E(w, "unbalanced backtick");
+  if ((s.match(/\*\*/g) || []).length % 2) E(w, "unbalanced **");
+}
+function common(w, x, allowed) {
+  for (const k of Object.keys(x)) if (!allowed.includes(k)) E(w, "unknown field `" + k + "`");
+  if (!doms.has(x.d)) E(w, "d=" + JSON.stringify(x.d) + " not in DOMS");
+  if (x.r !== 1 && x.r !== 2) E(w, "r must be 1 or 2");
+  if (!isStr(x.q)) E(w, "empty q");
+  if (!Array.isArray(x.l) || !x.l.length) E(w, "l must list at least one DOCS key");
+  else x.l.forEach(k => { if (!D.DOCS[k]) E(w, "l key `" + k + "` not in DOCS"); });
+  if (x.h !== undefined) {
+    if (!Array.isArray(x.h)) E(w, "h must be an array of codes");
+    else x.h.forEach(c => { if (!D.HN[c]) E(w, "h code " + c + " not in HN"); });
+  }
+  markup(w, x.q);
+}
+
+D.Q.forEach((x, i) => {
+  const w = "Q[" + i + "]";
+  common(w, x, ["d", "r", "q", "o", "e", "l", "n", "h"]);
+  if (!Array.isArray(x.o) || x.o.length < 2) E(w, "needs at least 2 options");
+  else {
+    if (new Set(x.o).size !== x.o.length) E(w, "duplicate options");
+    x.o.forEach((o, j) => { if (!isStr(o)) E(w, "empty option " + j); markup(w + ".o[" + j + "]", o); });
+    const n = x.n === undefined ? 1 : x.n;
+    if (x.n !== undefined && x.n < 2) E(w, "n given but < 2 (omit n for single answer)");
+    if (!Number.isInteger(n) || n >= x.o.length) E(w, "n=" + n + " must be < options (" + x.o.length + ")");
+    if (x.o.length > 7) E(w, "more than 7 options (letters A-G)");
+  }
+  if (!isStr(x.e)) E(w, "empty explanation e"); else markup(w + ".e", x.e);
+});
+
+D.F.forEach((x, i) => {
+  const w = "F[" + i + "]";
+  common(w, x, ["d", "r", "q", "a", "l", "h"]);
+  if (!isStr(x.a)) E(w, "empty answer a"); else markup(w + ".a", x.a);
+});
+
+/* duplicates by question text */
+for (const [name, arr] of [["Q", D.Q], ["F", D.F]]) {
+  const seen = new Map();
+  arr.forEach((x, i) => { const k = String(x.q).trim().toLowerCase(); if (seen.has(k)) W(name + "[" + i + "]", "same q as " + name + "[" + seen.get(k) + "]"); else seen.set(k, i); });
+}
+
+/* DOCS */
+const used = new Set([...D.Q, ...D.F].flatMap(x => x.l || []));
+for (const [k, v] of Object.entries(D.DOCS)) {
+  if (!Array.isArray(v) || v.length !== 2 || !isStr(v[1])) E("DOCS." + k, "must be [url, label]");
+  else if (!/^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\//.test(v[0])) W("DOCS." + k, "url outside vtex.com docs: " + v[0]);
+  if (!used.has(k)) W("DOCS." + k, "unused");
+}
+
+/* HTTP Koty */
+const codes = new Set();
+D.CODES.forEach((d, i) => {
+  const w = "CODES[" + i + "]";
+  if (!Number.isInteger(d.c) || d.c < 100 || d.c > 599) E(w, "bad code");
+  if (codes.has(d.c)) E(w, "duplicate code " + d.c);
+  codes.add(d.c);
+  if (i && d.c < D.CODES[i - 1].c) E(w, "codes must be sorted ascending");
+  if (!isStr(d.n) || !isStr(d.pl) || !isStr(d.fun)) E(w, "n, pl and fun are required");
+  [d.pl, d.fun, d.v].forEach(s => markup(w, s));
+});
+const imgs = new Set(readdirSync(CATS).map(f => parseInt(f)));
+codes.forEach(c => { if (!imgs.has(c)) E("CODES " + c, "no image in src/img/cats"); });
+imgs.forEach(c => { if (!codes.has(c)) W("img " + c, "image without a CODES entry"); });
+const ids = new Set();
+D.QUESTIONS.forEach((q, i) => {
+  const w = "QUESTIONS[" + i + "]";
+  if (ids.has(q.id)) E(w, "duplicate id " + q.id);
+  ids.add(q.id);
+  if (!["VTEX", "HTTP"].includes(q.tag)) E(w, "tag must be VTEX or HTTP");
+  if (!Array.isArray(q.o) || !Number.isInteger(q.a) || q.a < 0 || q.a >= q.o.length) E(w, "a out of range");
+  if (!isStr(q.why)) E(w, "empty why");
+});
+
+/* append-only lock */
+const now = { Q: D.Q.map(x => hash(x.q)), F: D.F.map(x => hash(x.q)) };
+if (process.argv.includes("--update-lock") || !existsSync(LOCK)) {
+  if (existsSync(LOCK)) {
+    const old = JSON.parse(readFileSync(LOCK, "utf8"));
+    for (const k of ["Q", "F"]) if (now[k].length < old[k].length) E("lock", k + " shrank; refusing to update the lock");
+  }
+  if (!err.length) { writeFileSync(LOCK, JSON.stringify(now, null, 0).replace(/\],/g, "],\n") + "\n"); console.log("lock written: Q=" + now.Q.length + " F=" + now.F.length); }
+} else {
+  const old = JSON.parse(readFileSync(LOCK, "utf8"));
+  for (const k of ["Q", "F"]) {
+    if (now[k].length < old[k].length) E("lock", k + " has " + now[k].length + " items, lock has " + old[k].length + ". Never delete: saved progress is keyed by index.");
+    old[k].forEach((h, i) => { if (now[k][i] !== undefined && now[k][i] !== h) W(k + "[" + i + "]", "q text changed since lock. Typo fix is fine; moved or replaced items break saved progress."); });
+    if (now[k].length > old[k].length) W("lock", (now[k].length - old[k].length) + " new " + k + " items. Run: npm run lock");
+  }
+}
+
+warn.forEach(m => console.warn("warn  " + m));
+err.forEach(m => console.error("ERROR " + m));
+console.log("validate: " + D.Q.length + " questions, " + D.F.length + " flashcards, " + D.CODES.length + " codes, " + D.QUESTIONS.length + " koty quiz; " + err.length + " errors, " + warn.length + " warnings");
+process.exit(err.length ? 1 : 0);

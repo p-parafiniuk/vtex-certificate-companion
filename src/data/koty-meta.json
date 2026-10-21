@@ -1,0 +1,4 @@
+{
+  "KLASS": {"1":"Informacyjne","2":"Sukces","3":"Przekierowania","4":"Błąd klienta","5":"Błąd serwera"},
+  "IANA_NO_CAT": {"104":"Upload Resumption Supported (rejestracja tymczasowa)","306":"(Unused), dawny Switch Proxy","505":"HTTP Version Not Supported"}
+}
