@@ -1,0 +1,35 @@
+<style>
+<!--@include styles/apimap.css-->
+</style>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Suplement · drzewo endpointów</p>
+      <h1>VTEX <b>API</b> Map</h1>
+    </div>
+    <div class="src">Źródło: <a href="https://github.com/vtex/openapi-schemas" target="_blank" rel="noopener">vtex/openapi-schemas</a> · stan z 20.10.2026</div>
+  </header>
+
+  <div class="deck">
+    <div class="apis" id="apis" role="group" aria-label="API"></div>
+    <div class="row">
+      <input id="q" class="search" type="search" placeholder="Szukaj: ścieżka, opis, tag… np. orderForm, {skuId}, invoice" aria-label="Szukaj">
+      <div class="group" id="methods" role="group" aria-label="Metody"></div>
+    </div>
+    <div class="row">
+      <span class="lbl">Zakres</span>
+      <div class="group" id="scopes" role="group" aria-label="Zakres"></div>
+      <span class="lbl">Rozwiń</span>
+      <div class="group" id="depth" role="group" aria-label="Głębokość"></div>
+    </div>
+  </div>
+
+  <div class="stats" id="stats" aria-live="polite"></div>
+  <div class="server" id="server"></div>
+  <div class="tree" id="tree"></div>
+  <div class="legend">
+    <span><b class="flag open">OPEN</b> bez autoryzacji w schemacie</span>
+    <span><b class="flag dep">DEPR</b> deprecated</span>
+    <span>Kliknij endpoint, żeby zobaczyć pełny URL, auth, query params, przykładowe body, kody odpowiedzi i curl.</span>
+  </div>
+</div>

@@ -31,6 +31,7 @@
         <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki">Fiszki <span class="num">35</span></button>
         <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep">Postęp</button>
         <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP">HTTP</button>
+        <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
       </nav>
       <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
     </div>
@@ -97,6 +98,10 @@
     <div id="koty"></div>
   </section>
 
+  <section class="panel" id="p-api" role="tabpanel" aria-labelledby="t-api" hidden>
+    <div id="apimap"></div>
+  </section>
+
   <footer class="src">
     <p><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
     <p><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
@@ -107,6 +112,9 @@
 </main>
 <template id="koty-tpl">
 <!--@include koty/template.html-->
+</template>
+<template id="apimap-tpl">
+<!--@include apimap/template.html-->
 </template>
 <script>
 /*@data DOMS*/
@@ -122,11 +130,15 @@
 
 /*@data F*/
 </script>
-<script>
-/*@include js/app.js*/
-</script>
+<!-- The view modules only define boot functions; they come first so a deep link to #http or #api can mount on first paint. -->
 <script>
 /*@include js/koty.js*/
+</script>
+<script>
+/*@include js/apimap.js*/
+</script>
+<script>
+/*@include js/app.js*/
 </script>
 
 </html>
