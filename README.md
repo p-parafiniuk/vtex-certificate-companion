@@ -12,4 +12,4 @@ npm run check   # validate + verify the built file is up to date
 npm run stats   # questions per domain and round
 npm run serve   # preview at http://localhost:8000
 ```
-See `CLAUDE.md` for the content schema and rules. Claude Code skills: `/feature`, `/fix`, `/ux`, `/security`.
+See `CLAUDE.md` for the content schema and rules. Claude Code skills: `/feature`, `/fix`, `/ux`, `/security`, and `/review` (a targeted review gate with Sonnet subagents).
