@@ -1,12 +1,12 @@
 {
   "auth": {"api":[["license"]],"ref":[["license-manager-api","License Manager API"],["vtex-id-api","VTEX ID API"]]},
   "catalog": {"api":[["catalog"]],"ref":[["catalog-api","Catalog API"]]},
-  "search": {"api":[],"ref":[["search-api","Legacy Search API"],["intelligent-search-api","Intelligent Search API"],["session-manager-api","Session Manager API"]]},
+  "search": {"api":[["search"],["intelligent-search"],["session"]],"ref":[["search-api","Legacy Search API"],["intelligent-search-api","Intelligent Search API"],["session-manager-api","Session Manager API"]]},
   "pricing": {"api":[["pricing"],["promotions"],["promotions-v2"]],"ref":[["pricing-api","Pricing API"],["promotions-and-taxes-api","Promotions & Taxes API"],["promotions-and-taxes-api-v2","Promotions & Taxes API v2"]]},
   "logistics": {"api":[["logistics"]],"ref":[["logistics-api","Logistics API"]]},
   "checkout": {"api":[["checkout"]],"ref":[["checkout-api","Checkout API"]]},
   "orders": {"api":[["orders"]],"ref":[["orders-api","Orders API"]]},
   "payments": {"api":[["payments"],["giftcard"],["giftcard-hub"]],"ref":[["payments-gateway-api","Payments Gateway API"],["payment-provider-protocol","Payment Provider Protocol"],["antifraud-provider-protocol","Anti-fraud Provider Protocol"],["giftcard-api","Giftcard API"],["giftcard-hub-api","GiftCard Hub API"]]},
-  "md": {"api":[],"ref":[["master-data-api-v2","Master Data API v2"],["masterdata-api","Master Data API v1"]]},
+  "md": {"api":[["masterdata-v2"]],"ref":[["master-data-api-v2","Master Data API v2"],["masterdata-api","Master Data API v1"]]},
   "mkt": {"api":[["catalog",["Seller","SKU seller"]],["checkout",["Fulfillment"]],["orders",["Change seller"]]],"ref":[["marketplace-apis","Marketplace API"],["marketplace-protocol-external-marketplace-orders","Marketplace Protocol: external marketplace orders"]]}
 }
