@@ -3,23 +3,28 @@
 </style>
 <div class="wrap">
   <header class="top">
-    <div>
-      <p class="eyebrow">Suplement · drzewo endpointów</p>
-      <h1>VTEX <b>API</b> Map</h1>
-    </div>
-    <div class="src">Źródło: <a href="https://github.com/vtex/openapi-schemas" target="_blank" rel="noopener">vtex/openapi-schemas</a> · stan z 20.10.2026</div>
+    <h1>VTEX <b>API</b> Map</h1>
+    <p class="src"><span class="src-l">Drzewo endpointów z </span><a href="https://github.com/vtex/openapi-schemas" target="_blank" rel="noopener">vtex/openapi-schemas</a> · stan z 20.10.2026</p>
   </header>
 
   <div class="deck">
-    <div class="apis" id="apis" role="group" aria-label="API"></div>
+    <div class="apis-wrap" id="apis-wrap">
+      <button type="button" class="scr l" id="apis-l" tabindex="-1" aria-label="Przewiń listę API w lewo">‹</button>
+      <div class="apis" id="apis" role="group" aria-label="API"></div>
+      <button type="button" class="scr r" id="apis-r" tabindex="-1" aria-label="Przewiń listę API w prawo">›</button>
+    </div>
     <div class="row">
-      <input id="q" class="search" type="search" placeholder="Szukaj: ścieżka, opis, tag… np. orderForm, {skuId}, invoice" aria-label="Szukaj">
+      <span class="sbox"><input id="q" class="search" type="search" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Szukaj: ścieżka, opis, tag… np. orderForm, {skuId}, invoice" aria-label="Szukaj endpointów" aria-keyshortcuts="/"><kbd class="kb" aria-hidden="true">/</kbd></span>
       <div class="group" id="methods" role="group" aria-label="Metody"></div>
+    </div>
+    <div class="row" id="qscope" hidden>
+      <span class="pair"><span class="lbl" id="qin-l">Szukaj w</span>
+      <span class="group" id="qin" role="group" aria-labelledby="qin-l"></span></span>
     </div>
     <div class="row">
       <span class="pair"><span class="lbl">Zakres</span>
       <span class="group" id="scopes" role="group" aria-label="Zakres"></span></span>
-      <span class="pair"><span class="lbl">Rozwiń</span>
+      <span class="pair" id="depth-pair"><span class="lbl">Rozwiń</span>
       <span class="group" id="depth" role="group" aria-label="Głębokość"></span></span>
     </div>
   </div>
