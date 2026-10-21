@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<title>VTEX API Drill</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+<!--@include styles/app.css-->
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <div class="brand">
+      <h1>VTEX API Drill</h1>
+      <span class="total" title="Opanowane pytania i fiszki razem"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> opanowane</span>
+    </div>
+    <div class="prog" aria-label="Postęp nauki">
+      <div class="pg" title="Pytania oznaczone jako Umiem"><span class="pg-k">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
+      <div class="pg" title="Fiszki oznaczone jako Umiem"><span class="pg-k">Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
+      <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%"><span class="pg-k">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
+      <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%"><span class="pg-k">Symulacja</span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
+    </div>
+    <button type="button" class="btn small" id="back-q" hidden></button>
+    <nav class="tabs" role="tablist" aria-label="Sekcje">
+      <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania">Pytania <span class="num">161</span></button>
+      <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja">Symulacja <span class="num">36+4</span></button>
+      <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki">Fiszki <span class="num">35</span></button>
+      <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep">Postęp</button>
+      <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP">HTTP</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="notice" id="storage-warn" hidden>Przeglądarka blokuje zapis lokalny. Postęp zniknie po zamknięciu tej strony.</p>
+
+  <section class="panel" id="p-pytania" role="tabpanel" aria-labelledby="t-pytania" hidden>
+    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how"><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
+    <p class="lead"><strong>Jedna baza do APIs &amp; Integrations Badge: 161 pytań wielokrotnego wyboru.</strong> W każdym pytaniu poprawna może być <strong>jedna odpowiedź albo kilka</strong>. Zaznacz wszystkie pasujące i kliknij <strong>Sprawdź odpowiedź</strong>. Liczy się tylko komplet. Po błędzie dostajesz link do dokumentacji VTEX. Zaznacz <strong>Umiem</strong>, gdy pytanie masz opanowane.</p>
+    <div class="toolbar">
+      <div class="chips" id="sets" role="group" aria-label="Filtr rundy"></div>
+      <div class="chips" id="chips" role="group" aria-label="Filtr obszaru"></div>
+      <div class="row"><label class="check" for="hide-known"><input type="checkbox" id="hide-known"> Ukryj opanowane</label>
+      <label class="check" for="hint-on"><input type="checkbox" id="hint-on"> Pokazuj, ile odpowiedzi jest poprawnych</label></div>
+    </div>
+    <div class="list" id="qlist"></div>
+  </section>
+
+  <section class="panel" id="p-symulacja" role="tabpanel" aria-labelledby="t-symulacja" hidden>
+    <h2>Symulacja egzaminu</h2>
+    <ul class="facts" aria-label="Format prawdziwego egzaminu">
+      <li>36 pytań wielokrotnego wyboru</li><li>4 zadania praktyczne</li><li>2 h na całość</li><li>próg 80%</li>
+    </ul>
+    <div id="simroot" class="simroot"></div>
+  </section>
+
+  <section class="panel" id="p-fiszki" role="tabpanel" aria-labelledby="t-fiszki" hidden>
+    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how"><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
+    <p class="lead"><strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce.</strong> Dopiero potem odsłoń odpowiedź. Fiszki „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body. Pod każdą odpowiedzią jest link do dokumentacji VTEX. F1–20 to runda 1, F21–35 to runda 2.</p>
+    <div class="row"><button type="button" class="btn small" id="f-hide-all">Ukryj wszystkie odpowiedzi</button></div>
+    <div class="list" id="flist"></div>
+  </section>
+
+  <section class="panel" id="p-postep" role="tabpanel" aria-labelledby="t-postep" hidden>
+    <dl class="stats" id="stats"></dl>
+    <h3>Obszary</h3>
+    <div class="domrows" id="domrows"></div>
+    <h3>Pytania 1–161</h3>
+    <ul class="legend">
+      <li><span class="sw k"></span>opanowane</li>
+      <li><span class="sw r"></span>ostatnio dobrze</li>
+      <li><span class="sw w"></span>ostatnio źle</li>
+      <li><span class="sw"></span>nieruszone</li>
+    </ul>
+    <div class="grid" id="qgrid"></div>
+    <h3>Fiszki 1–35</h3>
+    <div class="grid" id="fgrid"></div>
+    <h3>Ostatnie symulacje</h3>
+    <ul class="hist" id="hist"></ul>
+    <div class="row">
+      <button type="button" class="btn small" id="clear-ans">Wyczyść odpowiedzi</button>
+      <button type="button" class="btn small danger" id="reset-all">Zresetuj cały postęp</button>
+    </div>
+  </section>
+
+  <section class="panel focus" id="p-focus" aria-label="Tryb Focus: jedna karta naraz" hidden>
+    <div id="focusroot" class="simroot focus"></div>
+  </section>
+
+  <section class="panel" id="p-http" role="tabpanel" aria-labelledby="t-http" hidden>
+    <div id="koty"></div>
+  </section>
+
+  <footer class="src">
+    <p><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
+    <p><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
+    <p><strong>Format:</strong> 9 października 2026 baza została przebudowana na wielokrotny wybór (jedna lub kilka poprawnych). Każda dodana poprawna odpowiedź powtarza fakt potwierdzony w dokumentacji albo w API Reference VTEX.</p>
+    <p><strong>Linki przy pytaniach i fiszkach</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
+    <p>Źródła: <a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys">API keys</a> · <a href="https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens">User tokens</a> · <a href="https://developers.vtex.com/docs/guides/catalog-integration">Catalog</a> · <a href="https://developers.vtex.com/docs/guides/skus">SKUs</a> · <a href="https://developers.vtex.com/docs/api-reference/pricing-api">Pricing API</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-inventory">Inventory</a> · <a href="https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api">Checkout order</a> · <a href="https://developers.vtex.com/docs/guides/orders-feed">Feed v3 i Hook</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration">Order integration</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider">Payment provider</a> · <a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api">Master Data pagination</a> · <a href="https://developers.vtex.com/docs/guides/external-seller-integration-connector">External seller</a> · <a href="https://developers.vtex.com/docs/guides/api-response-codes">Status codes</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog">ERP: catalog</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-products">ERP: products</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing">ERP: order processing</a> · <a href="https://developers.vtex.com/docs/guides/change-order">Change order</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-purchase-flows">Purchase flows</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-secure-proxy">Secure Proxy</a> · <a href="https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works">Anti-fraud</a> · <a href="https://developers.vtex.com/docs/guides/login-integration-guide">Login (SSO)</a> · <a href="https://developers.vtex.com/docs/guides/sessions-system-overview">Sessions</a> · <a href="https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2">MD triggers</a> · <a href="https://developers.vtex.com/docs/api-reference/search-api">Search API</a> · <a href="https://developers.vtex.com/docs/api-reference/checkout-api">Checkout API</a> · <a href="https://developers.vtex.com/docs/api-reference/orders-api">Orders API</a> · <a href="https://developers.vtex.com/docs/api-reference/logistics-api">Logistics API</a> · <a href="https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api">Promotions &amp; Taxes API</a> · <a href="https://developers.vtex.com/docs/api-reference/giftcard-api">Giftcard API</a> · <a href="https://developers.vtex.com/docs/api-reference/payment-provider-protocol">Payment Provider Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/marketplace-protocol">Marketplace Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/vtex-id-api">VTEX ID API</a> · <a href="https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196">Order flow and status</a> · <a href="https://github.com/vtex/openapi-schemas">vtex/openapi-schemas</a></p>
+  </footer>
+</main>
+<template id="koty-tpl">
+<!--@include koty/template.html-->
+</template>
+<script>
+/*@data DOMS*/
+
+/* Stable ids: questions 0-99 = round 1, 100-160 = round 2; flashcards 0-19 and 20-34. Saved progress is keyed by index, so only ever append.
+   Multi-select: the first n options of a question are correct (n defaults to 1); options shuffle on load. */
+/* Documentation targets: key -> [url, label]. Every item carries l: [keys]. Each URL was fetched twice and matched to its items on 2026-10-09. */
+/*@data DOCS*/
+
+/*@data HN*/
+
+/*@data Q*/
+
+/*@data F*/
+</script>
+<script>
+/*@include js/app.js*/
+</script>
+<script>
+/*@include js/koty.js*/
+</script>
+
+</html>

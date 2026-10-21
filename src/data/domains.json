@@ -1,0 +1,12 @@
+[
+  ["auth","Auth, kody, SSO"],
+  ["catalog","Catalog"],
+  ["search","Search i Session"],
+  ["pricing","Pricing i promocje"],
+  ["logistics","Logistics"],
+  ["checkout","Checkout"],
+  ["orders","Orders, Feed, Hook"],
+  ["payments","Payments i anti-fraud"],
+  ["md","Master Data"],
+  ["mkt","Marketplace / Seller"]
+]

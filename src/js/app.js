@@ -1,0 +1,1140 @@
+(function () {
+  "use strict";
+
+  var KEY = "vtex-drill-v1";
+  var SIM_Q = 36, SIM_P = 4;
+  var TABS = ["pytania", "symulacja", "fiszki", "postep", "http"];
+  var VIEWS = TABS.concat(["focus"]);
+  var LET = "ABCDEFG";
+  var DOM_NAME = {};
+  DOMS.forEach(function (d) { DOM_NAME[d[0]] = d[1]; });
+
+  function $(sel) { return document.querySelector(sel); }
+
+  /* ---------- state ---------- */
+  /* v2: answers are arrays of selected option indexes (multi-select). Older single-index answers are dropped, "Umiem" marks stay. */
+  var S = { v: 2, known: {}, fknown: {}, ans: {}, sims: [], hide: false, dom: "all", set: "all", hint: false, sim: null, simMin: 120, simPrac: true,
+    fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "" } };
+  try {
+    var raw = JSON.parse(localStorage.getItem(KEY) || "{}");
+    if (raw && typeof raw === "object") {
+      ["known", "fknown"].forEach(function (k) {
+        if (raw[k] && typeof raw[k] === "object" && !Array.isArray(raw[k])) S[k] = raw[k];
+      });
+      if (raw.v === 2 && raw.ans && typeof raw.ans === "object" && !Array.isArray(raw.ans)) {
+        Object.keys(raw.ans).forEach(function (k) { if (Array.isArray(raw.ans[k]) && Q[k]) S.ans[k] = raw.ans[k]; });
+      }
+      if (Array.isArray(raw.sims)) S.sims = raw.sims;
+      S.hide = !!raw.hide;
+      S.hint = !!raw.hint;
+      if (raw.dom === "all" || DOM_NAME[raw.dom]) S.dom = raw.dom;
+      if (raw.set === "1" || raw.set === "2") S.set = raw.set;
+      if (raw.simMin > 0 && raw.simMin <= 600) S.simMin = Math.round(raw.simMin);
+      if (raw.simPrac === false) S.simPrac = false;
+      if (raw.fans && typeof raw.fans === "object" && !Array.isArray(raw.fans)) {
+        Object.keys(raw.fans).forEach(function (k) { if (F[k]) S.fans[k] = raw.fans[k] ? 1 : 0; });
+      }
+      if (raw.ptxt && typeof raw.ptxt === "object" && !Array.isArray(raw.ptxt)) {
+        Object.keys(raw.ptxt).forEach(function (k) { if (F[k] && typeof raw.ptxt[k] === "string") S.ptxt[k] = raw.ptxt[k]; });
+      }
+      var rf = raw.fo;
+      if (rf && typeof rf === "object") {
+        if (["all", "q", "f", "p"].indexOf(rf.deck) > -1) S.fo.deck = rf.deck;
+        if (["all", "todo", "wrong"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
+        S.fo.shuf = rf.shuf >>> 0;
+        if (typeof rf.id === "string") S.fo.id = rf.id;
+      }
+      var rs = raw.sim;
+      if (raw.v === 2 && rs && Array.isArray(rs.ids) && Array.isArray(rs.pr) && rs.ids.every(function (i) { return Q[i]; }) && rs.pr.every(function (i) { return F[i]; })) {
+        S.sim = { ids: rs.ids, pr: rs.pr, ans: rs.ans || {}, txt: rs.txt || {}, flag: rs.flag || {}, self: rs.self || {}, cur: rs.cur | 0,
+          start: +rs.start || Date.now(), endAt: +rs.endAt || Date.now(), dur: +rs.dur || 120, done: !!rs.done, used: rs.used | 0, timeUp: !!rs.timeUp, only: rs.only === "wrong" ? "wrong" : "all" };
+      }
+    }
+  } catch (e) { /* start empty */ }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(S)); }
+    catch (e) { $("#storage-warn").hidden = false; }
+  }
+  try { localStorage.setItem(KEY + "-probe", "1"); localStorage.removeItem(KEY + "-probe"); }
+  catch (e) { $("#storage-warn").hidden = false; }
+
+  /* ---------- helpers ---------- */
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+  function fmt(s) {
+    return esc(s)
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+      .replace(/\n/g, "<br>");
+  }
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  var PERM = Q.map(function (q) { return shuffle(q.o.map(function (_, i) { return i; })); });
+  var DRAFT = {};
+  var DOM_POS = {};
+  DOMS.forEach(function (d, n) { DOM_POS[d[0]] = n; });
+  var ORDER = Q.map(function (_, i) { return i; }).sort(function (a, b) { return DOM_POS[Q[a].d] - DOM_POS[Q[b].d] || a - b; });
+  var PRACTICAL = [];
+  F.forEach(function (f, i) { if (/^Practical:/.test(f.q)) PRACTICAL.push(i); });
+
+  function pTitle(f) { var t = f.q.replace(/^Practical:\s*/, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function nRight(q) { return q.n || 1; }
+  /* An answer is right only when the selected set equals the correct set (the first n options). */
+  function isRight(i, sel) {
+    var n = nRight(Q[i]);
+    return Array.isArray(sel) && sel.length === n && sel.every(function (o) { return o < n; });
+  }
+  function inSet(x) { return S.set === "all" || String(x.r) === S.set; }
+  function httpChips(x) {
+    var cs = x.h || [];
+    if (!cs.length) return "";
+    return '<p class="doc"><span class="doc-k">Te kody w HTTP Kotach:</span> ' + cs.map(function (c) {
+      return '<button type="button" class="hchip" data-code="' + c + '">' + c + " " + esc(HN[c]) + "</button>";
+    }).join(" ") + "</p>";
+  }
+  function docLinks(x) {
+    var ks = x.l || [];
+    if (!ks.length) return "";
+    return '<p class="doc"><span class="doc-k">Sprawdź w dokumentacji VTEX:</span> ' + ks.map(function (k) {
+      return '<a href="' + esc(DOCS[k][0]) + '" target="_blank" rel="noopener">' + esc(DOCS[k][1]) + "</a>";
+    }).join(" · ") + "</p>";
+  }
+
+  function counts() {
+    var per = {};
+    DOMS.forEach(function (d) { per[d[0]] = { t: 0, k: 0, a: 0, r: 0 }; });
+    var kq = 0, ans = 0, right = 0, kf = 0;
+    Q.forEach(function (q, i) {
+      var p = per[q.d];
+      p.t++;
+      if (S.known[i]) { p.k++; kq++; }
+      if (S.ans[i] !== undefined) { p.a++; ans++; if (isRight(i, S.ans[i])) { p.r++; right++; } }
+    });
+    F.forEach(function (f, i) { if (S.fknown[i]) kf++; });
+    return { per: per, kq: kq, kf: kf, ans: ans, right: right };
+  }
+
+  /* ---------- question card ----------
+     mode "learn": pick, then "Sprawdź". mode "sim": pick only. mode "review": finished simulation. */
+  function qCard(i, mode, sel, head) {
+    var q = Q[i], n = i + 1, need = nRight(q);
+    var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined);
+    sel = sel || [];
+    var rightLetters = [], opts = "";
+    PERM[i].forEach(function (oi, pos) {
+      var letter = LET.charAt(pos);
+      var on = sel.indexOf(oi) > -1, good = oi < need;
+      var cls = "opt", mark = "";
+      if (good) rightLetters.push(letter);
+      if (reveal) {
+        if (good && on) { cls += " is-right"; mark = '<span class="mark">dobrze</span>'; }
+        else if (good) { cls += " is-missed"; mark = '<span class="mark">pominięta</span>'; }
+        else if (on) { cls += " is-wrong"; mark = '<span class="mark">błędna</span>'; }
+      } else if (on) { cls += " is-picked"; }
+      opts += '<button type="button" role="checkbox" class="' + cls + '" data-o="' + oi + '"' + (reveal ? " disabled" : "") +
+        ' aria-checked="' + on + '"><span class="let">' + letter + '</span><span class="otxt">' +
+        fmt(q.o[oi]) + "</span>" + mark + "</button>";
+    });
+
+    var tail = "";
+    if (reveal) {
+      var ok = isRight(i, sel);
+      var word = need > 1 ? "Poprawne: " : "Poprawna: ";
+      var verdict = ok
+        ? '<span class="verdict ok">Dobrze.</span>'
+        : '<span class="verdict no">' + (sel.length ? "Źle. " : "Brak odpowiedzi. ") + word + rightLetters.join(", ") + ".</span>";
+      tail = '<div class="exp"><p>' + verdict + " " + fmt(q.e) + "</p>" + (ok ? "" : docLinks(q) + httpChips(q)) +
+        (mode === "learn" ? '<button type="button" class="btn small retry">Spróbuj jeszcze raz</button>' : "") + "</div>";
+    } else if (mode === "learn") {
+      tail = '<div class="row"><button type="button" class="btn primary chk"' + (sel.length ? "" : " disabled") + ">Sprawdź odpowiedź</button></div>";
+    }
+
+    var know = mode === "learn"
+      ? '<label class="check" for="kq-' + n + '"><input type="checkbox" class="kn" id="kq-' + n + '"' +
+        (S.known[i] ? " checked" : "") + "> Umiem</label>"
+      : "";
+    var top = head !== undefined ? head
+      : '<span class="num">#' + n + '</span><span class="dom">' + esc(DOM_NAME[q.d]) + '</span><span class="rnd">R' + q.r + "</span>";
+    var how = reveal ? "" : '<p class="how">Zaznacz wszystkie poprawne odpowiedzi' + (S.hint ? " <strong>(poprawnych: " + need + ")</strong>" : "") + ".</p>";
+
+    return '<article class="q' + (mode === "learn" && S.known[i] ? " is-known" : "") + '" id="' +
+      (mode === "learn" ? "q-" : "s-") + n + '" data-i="' + i + '">' +
+      '<div class="q-head">' + top + know + "</div>" +
+      '<p class="qt">' + fmt(q.q) + "</p>" + how +
+      '<div class="opts">' + opts + "</div>" + tail + "</article>";
+  }
+  function learnSel(i) {
+    if (S.ans[i] !== undefined) return S.ans[i];
+    return DRAFT[i] || [];
+  }
+  /* Toggle one option in place, without re-rendering the card. */
+  function toggleOpt(btn, list) {
+    var o = +btn.dataset.o, at = list.indexOf(o);
+    if (at > -1) list.splice(at, 1); else list.push(o);
+    btn.classList.toggle("is-picked", at < 0);
+    btn.setAttribute("aria-checked", at < 0);
+  }
+
+  /* ---------- Pytania ---------- */
+  function renderChips() {
+    var per = {}, sets = { all: [0, 0], "1": [0, 0], "2": [0, 0] }, tot = [0, 0];
+    DOMS.forEach(function (d) { per[d[0]] = [0, 0]; });
+    Q.forEach(function (q, i) {
+      var k = S.known[i] ? 1 : 0;
+      sets.all[0] += k; sets.all[1]++;
+      sets[q.r][0] += k; sets[q.r][1]++;
+      if (!inSet(q)) return;
+      per[q.d][0] += k; per[q.d][1]++;
+      tot[0] += k; tot[1]++;
+    });
+    $("#sets").innerHTML = [["all", "Obie rundy"], ["1", "Runda 1"], ["2", "Runda 2 (luki)"]].map(function (s) {
+      return '<button type="button" class="chip" data-set="' + s[0] + '" aria-pressed="' + (S.set === s[0]) +
+        '">' + s[1] + " <small>" + sets[s[0]][0] + "/" + sets[s[0]][1] + "</small></button>";
+    }).join("");
+    var html = '<button type="button" class="chip" data-dom="all" aria-pressed="' + (S.dom === "all") +
+      '">Wszystkie obszary <small>' + tot[0] + "/" + tot[1] + "</small></button>";
+    DOMS.forEach(function (d) {
+      var p = per[d[0]];
+      if (!p[1]) return;
+      html += '<button type="button" class="chip" data-dom="' + d[0] + '" aria-pressed="' + (S.dom === d[0]) +
+        '">' + esc(d[1]) + " <small>" + p[0] + "/" + p[1] + "</small></button>";
+    });
+    $("#chips").innerHTML = html;
+  }
+  function renderQ() {
+    var html = "";
+    ORDER.forEach(function (i) {
+      var q = Q[i];
+      if (!inSet(q)) return;
+      if (S.dom !== "all" && q.d !== S.dom) return;
+      if (S.hide && S.known[i]) return;
+      html += qCard(i, "learn", learnSel(i));
+    });
+    $("#qlist").innerHTML = html || (S.hide
+      ? '<p class="empty">Wszystko w tym filtrze masz opanowane. Odznacz „Ukryj opanowane”, aby zobaczyć pytania.</p>'
+      : '<p class="empty">W tej rundzie nie ma pytań z tego obszaru. Wybierz inny obszar albo „Obie rundy”.</p>');
+    $("#hide-known").checked = S.hide;
+    $("#hint-on").checked = S.hint;
+    renderChips();
+  }
+  function swapCard(card, i, focusSel) {
+    card.insertAdjacentHTML("afterend", qCard(i, "learn", learnSel(i)));
+    var fresh = card.nextElementSibling;
+    card.remove();
+    var f = fresh.querySelector(focusSel);
+    if (f) f.focus({ preventScroll: true });
+  }
+
+  $("#qlist").addEventListener("click", function (ev) {
+    var card = ev.target.closest(".q");
+    if (!card) return;
+    var i = +card.dataset.i;
+    var opt = ev.target.closest(".opt");
+    if (opt && !opt.disabled) {
+      if (!DRAFT[i]) DRAFT[i] = [];
+      toggleOpt(opt, DRAFT[i]);
+      card.querySelector(".chk").disabled = !DRAFT[i].length;
+      return;
+    }
+    if (ev.target.closest(".chk")) {
+      if (!DRAFT[i] || !DRAFT[i].length) return;
+      S.ans[i] = DRAFT[i].slice().sort(); delete DRAFT[i]; save();
+      swapCard(card, i, ".retry");
+      header(); return;
+    }
+    if (ev.target.closest(".retry")) {
+      delete S.ans[i]; delete DRAFT[i]; save();
+      swapCard(card, i, ".opt");
+      header();
+    }
+  });
+  $("#qlist").addEventListener("change", function (ev) {
+    if (!ev.target.classList.contains("kn")) return;
+    var card = ev.target.closest(".q"), i = +card.dataset.i;
+    if (ev.target.checked) S.known[i] = true; else delete S.known[i];
+    save();
+    card.classList.toggle("is-known", !!S.known[i]);
+    if (S.hide && S.known[i]) card.hidden = true;
+    renderChips(); header();
+  });
+  $("#chips").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".chip");
+    if (!b) return;
+    S.dom = b.dataset.dom; save(); renderQ();
+  });
+  $("#sets").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".chip");
+    if (!b) return;
+    S.set = b.dataset.set;
+    if (S.dom !== "all" && !Q.some(function (q) { return q.d === S.dom && inSet(q); })) S.dom = "all";
+    save(); renderQ();
+  });
+  $("#hide-known").addEventListener("change", function (ev) {
+    S.hide = ev.target.checked; save(); renderQ();
+  });
+  $("#hint-on").addEventListener("change", function (ev) {
+    S.hint = ev.target.checked; save(); renderQ();
+  });
+
+  /* ---------- Symulacja: one card at a time, countdown, 36 questions + 4 practical tasks ---------- */
+  var TICK = null, SAVE_T = null, ARM = null;
+  function simLen() { return S.sim.ids.length + S.sim.pr.length; }
+  function simAnswered(pos) {
+    var m = S.sim;
+    if (pos < m.ids.length) { var a = m.ans[m.ids[pos]]; return !!(a && a.length); }
+    return !!String(m.txt[m.pr[pos - m.ids.length]] || "").trim();
+  }
+  function simDoneCount() { var n = 0; for (var p = 0; p < simLen(); p++) if (simAnswered(p)) n++; return n; }
+  function simScore() {
+    var m = S.sim;
+    return m.ids.filter(function (i) { return isRight(i, m.ans[i]); }).length;
+  }
+  function clock(ms) {
+    var s = Math.max(0, Math.ceil(ms / 1000)), h = Math.floor(s / 3600), mi = Math.floor(s % 3600 / 60), se = s % 60;
+    return (h ? h + ":" + (mi < 10 ? "0" : "") : "") + mi + ":" + (se < 10 ? "0" : "") + se;
+  }
+  function tick() {
+    var m = S.sim;
+    if (!m || m.done) { stopTick(); return; }
+    var left = m.endAt - Date.now();
+    var el = $("#sim-timer");
+    if (el) { el.textContent = clock(left); el.classList.toggle("low", left < 600000); }
+    if (left <= 0) finishSim(true);
+  }
+  function startTick() { stopTick(); TICK = setInterval(tick, 1000); tick(); }
+  function stopTick() { if (TICK) { clearInterval(TICK); TICK = null; } }
+
+  function simSetup() {
+    var presets = [[120, "2 h, jak na egzaminie"], [60, "60 min"], [30, "30 min"]];
+    return '<p class="lead">Losuję <strong>' + SIM_Q + " pytań z " + Q.length + "</strong> i <strong>" + SIM_P +
+      " zadania praktyczne</strong> z fiszek „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
+      "Wynik i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.</p>" +
+      '<div class="setup">' +
+      '<div class="fs"><h3 id="sim-time-h">Czas</h3><div class="chips" role="group" aria-labelledby="sim-time-h">' + presets.map(function (p) {
+        return '<button type="button" class="chip" data-min="' + p[0] + '" aria-pressed="' + (S.simMin === p[0]) + '">' + p[1] + "</button>";
+      }).join("") + "</div>" +
+      '<label class="inl" for="sim-min">Własny czas <input type="number" id="sim-min" min="1" max="600" step="1" inputmode="numeric" value="' + S.simMin + '"> min</label></div>' +
+      '<label class="check" for="sim-prac"><input type="checkbox" id="sim-prac"' + (S.simPrac ? " checked" : "") + "> Dołącz " + SIM_P + " zadania praktyczne (pole tekstowe, ocena własna)</label>" +
+      '<label class="check" for="sim-hint"><input type="checkbox" id="sim-hint"' + (S.hint ? " checked" : "") + "> Pokazuj, ile odpowiedzi jest poprawnych</label>" +
+      '<div class="row"><button type="button" class="btn primary" id="sim-start">Rozpocznij symulację</button></div></div>';
+  }
+  function simRun() {
+    var m = S.sim, total = simLen(), pos = Math.min(Math.max(m.cur, 0), total - 1), nq = m.ids.length;
+    m.cur = pos;
+    var card;
+    if (pos < nq) {
+      var i = m.ids[pos];
+      card = qCard(i, "sim", m.ans[i] || [], '<span class="num">Pytanie ' + (pos + 1) + " z " + nq + "</span>");
+    } else {
+      var k = pos - nq, fi = m.pr[k];
+      card = '<article class="q prac" data-f="' + fi + '"><div class="q-head"><span class="num">Zadanie praktyczne ' + (k + 1) + " z " + m.pr.length + "</span></div>" +
+        '<p class="qt">' + fmt(pTitle(F[fi])) + "</p>" +
+        '<label class="how" for="ta-' + fi + '">Twoja odpowiedź: metoda, ścieżka, nagłówki, body. Zapisuje się sama.</label>' +
+        '<textarea class="ta" id="ta-' + fi + '" rows="10" spellcheck="false" autocapitalize="off" autocomplete="off">' + esc(m.txt[fi] || "") + "</textarea></article>";
+    }
+    var pal = "";
+    for (var p = 0; p < total; p++) {
+      pal += '<button type="button" class="pc' + (p === pos ? " is-cur" : "") + (simAnswered(p) ? " is-ans" : "") + (m.flag[p] ? " is-flag" : "") +
+        '" data-pos="' + p + '" aria-label="' + (p < nq ? "Pytanie " + (p + 1) : "Zadanie praktyczne " + (p - nq + 1)) +
+        (simAnswered(p) ? ", z odpowiedzią" : ", bez odpowiedzi") + (m.flag[p] ? ", oznaczone do powrotu" : "") + '"' + (p === pos ? ' aria-current="true"' : "") + ">" +
+        (p < nq ? p + 1 : "P" + (p - nq + 1)) + "</button>";
+    }
+    return '<div class="simtop"><button type="button" class="btn small" id="sim-flag" aria-pressed="' + !!m.flag[pos] + '">' +
+      (m.flag[pos] ? "Oznaczone do powrotu" : "Oznacz do powrotu") + "</button>" +
+      '<span class="simleft" id="sim-count"></span></div>' + card +
+      '<div class="pal" role="group" aria-label="Nawigacja po kartach">' + pal + "</div>" +
+      '<ul class="legend"><li><span class="sw k"></span>z odpowiedzią</li><li><span class="sw f"></span>do powrotu</li><li><span class="sw"></span>bez odpowiedzi</li></ul>' +
+      '<div class="simbar"><button type="button" class="btn" id="sim-prev"' + (pos === 0 ? " disabled" : "") + ">← Poprzednia</button>" +
+      '<button type="button" class="btn" id="sim-next"' + (pos === total - 1 ? " disabled" : "") + ">Następna →</button>" +
+      '<span class="timer" id="sim-timer" role="timer" aria-label="Pozostały czas">' + clock(m.endAt - Date.now()) + "</span>" +
+      '<button type="button" class="btn primary" id="sim-finish">Zakończ i oceń</button></div>';
+  }
+  function simResult() {
+    var m = S.sim, nq = m.ids.length, score = simScore(), pass = Math.ceil(nq * 0.8), ok = score >= pass;
+    var miss = {};
+    m.ids.forEach(function (i) { if (!isRight(i, m.ans[i])) miss[Q[i].d] = (miss[Q[i].d] || 0) + 1; });
+    var weak = DOMS.filter(function (d) { return miss[d[0]]; })
+      .sort(function (a, b) { return miss[b[0]] - miss[a[0]]; })
+      .map(function (d) { return esc(d[1]) + " (" + miss[d[0]] + ")"; }).join(" · ");
+    var pOk = 0, pSet = 0;
+    m.pr.forEach(function (fi) { if (m.self[fi] !== undefined) { pSet++; if (m.self[fi]) pOk++; } });
+    var all = nq + m.pr.length;
+    var prLine = "";
+    if (m.pr.length) {
+      prLine = pSet === m.pr.length
+        ? "<p><strong>Razem z zadaniami praktycznymi:</strong> " + (score + pOk) + " / " + all + " · " + Math.round((score + pOk) / all * 100) +
+          "% (praktyczne " + pOk + " / " + m.pr.length + " według Twojej oceny, każda karta liczona za 1 punkt).</p>"
+        : "<p><strong>Zadania praktyczne:</strong> oceń je poniżej, porównując z wzorcem (" + pSet + " / " + m.pr.length + " ocenione).</p>";
+    }
+    var html = '<div class="result ' + (ok ? "pass" : "fail") + '" tabindex="-1" id="sim-res-box">' +
+      '<p class="score">' + score + " / " + nq + " · " + Math.round(score / nq * 100) + "%</p>" +
+      '<p class="verdict ' + (ok ? "ok" : "no") + '">Część testowa: ' + (ok ? "zdane." : "niezdane.") + " Próg to " + pass + " z " + nq + " (80%).</p>" + prLine +
+      "<p>Czas: " + Math.max(1, Math.round(m.used / 60000)) + " min z " + m.dur + (m.timeUp ? ". <strong>Czas się skończył</strong>, symulacja zamknęła się sama" : "") + ".</p>" +
+      (weak ? "<p><strong>Do powtórki:</strong> " + weak + "</p>" : "<p>Bez błędów w części testowej.</p>") +
+      '<div class="row"><button type="button" class="btn primary" id="sim-new">Nowa symulacja</button></div></div>';
+
+    if (m.pr.length) {
+      html += "<h3>Zadania praktyczne: porównaj z wzorcem</h3>" + m.pr.map(function (fi, k) {
+        var f = F[fi], mine = String(m.txt[fi] || "").trim(), v = m.self[fi];
+        return '<article class="q prac" data-f="' + fi + '"><div class="q-head"><span class="num">Zadanie praktyczne ' + (k + 1) + '</span><span class="dom">' + esc(DOM_NAME[f.d]) + "</span></div>" +
+          '<p class="qt">' + fmt(pTitle(f)) + "</p>" +
+          '<div class="cmp"><div><p class="how">Twoja odpowiedź</p>' + (mine ? '<pre class="mine">' + esc(mine) + "</pre>" : '<p class="empty">Brak odpowiedzi.</p>') + "</div>" +
+          '<div><p class="how">Wzorzec</p><div class="model">' + fmt(f.a) + "</div></div></div>" + docLinks(f) +
+          '<div class="row" role="group" aria-label="Ocena własna"><button type="button" class="btn small self" data-v="1" aria-pressed="' + (v === true) + '">Zaliczam</button>' +
+          '<button type="button" class="btn small self" data-v="0" aria-pressed="' + (v === false) + '">Nie zaliczam</button></div></article>';
+      }).join("");
+    }
+    var wrong = m.ids.filter(function (i) { return !isRight(i, m.ans[i]); });
+    html += "<h3>Pytania</h3>" +
+      '<div class="chips" role="group" aria-label="Filtr przeglądu"><button type="button" class="chip" data-only="all" aria-pressed="' + (m.only !== "wrong") + '">Wszystkie <small>' + nq + "</small></button>" +
+      '<button type="button" class="chip" data-only="wrong" aria-pressed="' + (m.only === "wrong") + '">Tylko błędne <small>' + wrong.length + "</small></button></div>" +
+      '<div class="list">' + ((m.only === "wrong" ? wrong : m.ids).map(function (i) {
+        return qCard(i, "review", m.ans[i] || [], '<span class="num">Pytanie ' + (m.ids.indexOf(i) + 1) + '</span><span class="dom">' + esc(DOM_NAME[Q[i].d]) + '</span><span class="rnd">#' + (i + 1) + "</span>");
+      }).join("") || '<p class="empty">Brak błędnych odpowiedzi.</p>') + "</div>";
+    return html;
+  }
+  function renderSim() {
+    var root = $("#simroot");
+    $("#p-symulacja").dataset.state = !S.sim ? "setup" : S.sim.done ? "done" : "run";
+    if (!S.sim) { stopTick(); root.innerHTML = simSetup(); return; }
+    if (S.sim.done) { stopTick(); root.innerHTML = simResult(); return; }
+    root.innerHTML = simRun();
+    simCount();
+    if (!TICK) startTick();
+  }
+  function simCount() {
+    var el = $("#sim-count");
+    if (el) el.textContent = "Odpowiedzi: " + simDoneCount() + " / " + simLen();
+  }
+  function paintPal() {
+    var m = S.sim;
+    document.querySelectorAll("#simroot .pc").forEach(function (b) {
+      var p = +b.dataset.pos;
+      b.classList.toggle("is-ans", simAnswered(p));
+      b.classList.toggle("is-flag", !!m.flag[p]);
+    });
+    simCount();
+  }
+  function goTo(pos) {
+    ARM = null;
+    go({ tab: "symulacja", pos: pos });
+    var c = $("#simroot .q");
+    if (c) { var f = c.querySelector(".opt, .ta"); if (f) f.focus({ preventScroll: true }); }
+  }
+  function startSim() {
+    var minEl = $("#sim-min"), min = Math.round(+minEl.value);
+    if (!(min >= 1 && min <= 600)) { minEl.focus(); minEl.setAttribute("aria-invalid", "true"); return; }
+    S.simMin = min; S.simPrac = $("#sim-prac").checked; S.hint = $("#sim-hint").checked;
+    var now = Date.now();
+    S.sim = { ids: shuffle(Q.map(function (_, i) { return i; })).slice(0, SIM_Q),
+      pr: S.simPrac ? shuffle(PRACTICAL.slice()).slice(0, SIM_P) : [],
+      ans: {}, txt: {}, flag: {}, self: {}, cur: 0, start: now, endAt: now + min * 60000, dur: min, done: false, used: 0, timeUp: false, only: "all" };
+    save(); go({ tab: "symulacja", pos: 0 }, true);
+  }
+  function finishSim(timeUp) {
+    var m = S.sim;
+    if (!m || m.done) return;
+    m.done = true; m.timeUp = !!timeUp; m.used = Math.min(Date.now(), m.endAt) - m.start;
+    S.sims.unshift({ t: m.start, s: simScore(), n: m.ids.length, pn: m.pr.length });
+    S.sims = S.sims.slice(0, 10);
+    ARM = null; stopTick(); save(); header();
+    if ($("#p-symulacja").hidden) return;
+    delete NAV.cur.pos; delete NAV.cur.sid; writeState(NAV.cur, false);
+    renderSim();
+    var box = $("#sim-res-box");
+    if (box) { window.scrollTo(0, 0); box.focus({ preventScroll: true }); }
+  }
+
+  $("#simroot").addEventListener("click", function (ev) {
+    var t = ev.target, m = S.sim, b;
+    if (!m) {
+      b = t.closest("[data-min]");
+      if (b) {
+        $("#sim-min").value = b.dataset.min; S.simMin = +b.dataset.min; save();
+        document.querySelectorAll("#simroot [data-min]").forEach(function (c) { c.setAttribute("aria-pressed", c === b); });
+        return;
+      }
+      if (t.closest("#sim-start")) startSim();
+      return;
+    }
+    if (m.done) {
+      if (t.closest("#sim-new")) { S.sim = null; save(); go({ tab: "symulacja" }, true); return; }
+      b = t.closest(".self");
+      if (b) {
+        var fi = +b.closest(".prac").dataset.f, v = b.dataset.v === "1";
+        if (m.self[fi] === v) delete m.self[fi]; else m.self[fi] = v;
+        var h = S.sims.filter(function (x) { return x.t === m.start; })[0];
+        if (h) { h.p = m.pr.filter(function (x) { return m.self[x] === true; }).length; h.pd = m.pr.every(function (x) { return m.self[x] !== undefined; }); }
+        var y = window.scrollY; save(); renderSim(); window.scrollTo(0, y); header();
+        return;
+      }
+      b = t.closest("[data-only]");
+      if (b) { m.only = b.dataset.only; save(); var y2 = window.scrollY; renderSim(); window.scrollTo(0, y2); }
+      return;
+    }
+    b = t.closest(".opt");
+    if (b) {
+      var i = +b.closest(".q").dataset.i;
+      if (!m.ans[i]) m.ans[i] = [];
+      toggleOpt(b, m.ans[i]);
+      if (!m.ans[i].length) delete m.ans[i];
+      save(); paintPal(); return;
+    }
+    b = t.closest(".pc");
+    if (b) return goTo(+b.dataset.pos);
+    if (t.closest("#sim-prev")) return goTo(m.cur - 1);
+    if (t.closest("#sim-next")) return goTo(m.cur + 1);
+    b = t.closest("#sim-flag");
+    if (b) {
+      if (m.flag[m.cur]) delete m.flag[m.cur]; else m.flag[m.cur] = true;
+      b.setAttribute("aria-pressed", !!m.flag[m.cur]);
+      b.textContent = m.flag[m.cur] ? "Oznaczone do powrotu" : "Oznacz do powrotu";
+      save(); paintPal(); return;
+    }
+    b = t.closest("#sim-finish");
+    if (b) {
+      var open = simLen() - simDoneCount();
+      if (!ARM) {
+        b.textContent = open ? "Bez odpowiedzi: " + open + ". Kliknij ponownie, aby zakończyć" : "Na pewno? Kliknij ponownie";
+        ARM = setTimeout(function () { ARM = null; var x = $("#sim-finish"); if (x) x.textContent = "Zakończ i oceń"; }, 5000);
+        return;
+      }
+      clearTimeout(ARM); finishSim(false);
+    }
+  });
+  $("#simroot").addEventListener("input", function (ev) {
+    var t = ev.target, m = S.sim;
+    if (t.id === "sim-min") {
+      t.removeAttribute("aria-invalid");
+      var v = Math.round(+t.value);
+      document.querySelectorAll("#simroot [data-min]").forEach(function (c) { c.setAttribute("aria-pressed", +c.dataset.min === v); });
+      return;
+    }
+    if (!m || m.done || !t.classList.contains("ta")) return;
+    m.txt[+t.closest(".prac").dataset.f] = t.value;
+    clearTimeout(SAVE_T); SAVE_T = setTimeout(function () { save(); paintPal(); }, 300);
+  });
+  /* Typed text must survive a reload or a closed tab even inside the debounce window. */
+  window.addEventListener("pagehide", function () { if (S.sim && !S.sim.done) save(); });
+
+  /* ---------- Fiszki ---------- */
+  function renderF() {
+    $("#flist").innerHTML = F.map(function (f, i) {
+      var n = i + 1;
+      return '<article class="fc' + (S.fknown[i] ? " is-known" : "") + '" id="f-' + n + '" data-i="' + i + '">' +
+        '<div class="q-head"><span class="num">F' + n + '</span><span class="dom">' + esc(DOM_NAME[f.d]) + '</span><span class="rnd">R' + f.r + "</span>" +
+        '<label class="check" for="kf-' + n + '"><input type="checkbox" class="kn" id="kf-' + n + '"' +
+        (S.fknown[i] ? " checked" : "") + "> Umiem</label></div>" +
+        '<p class="qt">' + fmt(f.q) + "</p>" +
+        '<button type="button" class="btn rev" aria-expanded="false" aria-controls="fa-' + n + '">Pokaż odpowiedź</button>' +
+        '<div class="ans" id="fa-' + n + '" hidden>' + fmt(f.a) + docLinks(f) + httpChips(f) + "</div></article>";
+    }).join("");
+  }
+  function setRev(btn, open) {
+    var ans = document.getElementById(btn.getAttribute("aria-controls"));
+    ans.hidden = !open;
+    btn.setAttribute("aria-expanded", open);
+    btn.textContent = open ? "Ukryj odpowiedź" : "Pokaż odpowiedź";
+  }
+  $("#flist").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".rev");
+    if (b) setRev(b, b.getAttribute("aria-expanded") !== "true");
+  });
+  $("#flist").addEventListener("change", function (ev) {
+    if (!ev.target.classList.contains("kn")) return;
+    var card = ev.target.closest(".fc"), i = +card.dataset.i;
+    if (ev.target.checked) S.fknown[i] = true; else delete S.fknown[i];
+    save();
+    card.classList.toggle("is-known", !!S.fknown[i]);
+    header();
+  });
+  $("#f-hide-all").addEventListener("click", function () {
+    document.querySelectorAll("#flist .rev").forEach(function (b) { setRev(b, false); });
+  });
+
+  /* ---------- Postęp ---------- */
+  function simLine(x) {
+    var n = x.n || SIM_Q, ok = x.s >= Math.ceil(n * 0.8), d = new Date(x.t);
+    return '<li><span class="' + (ok ? "p" : "f") + '">' + x.s + " / " + n + " · " + Math.round(x.s / n * 100) + "% · " + (ok ? "zdane" : "niezdane") + "</span>" +
+      (x.pn ? " · praktyczne " + (x.pd ? x.p + " / " + x.pn : "bez oceny") : "") + " · " +
+      esc(d.toLocaleDateString("pl-PL") + " " + d.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })) + "</li>";
+  }
+  function renderStats() {
+    var c = counts();
+    var acc = c.ans ? Math.round(c.right / c.ans * 100) + "%" : "–";
+    var multi = Q.filter(function (q) { return nRight(q) > 1; }).length;
+    $("#stats").innerHTML =
+      "<div><dt>Pytania opanowane</dt><dd>" + c.kq + " <small>/ " + Q.length + "</small></dd></div>" +
+      "<div><dt>Fiszki opanowane</dt><dd>" + c.kf + " <small>/ " + F.length + "</small></dd></div>" +
+      "<div><dt>Trafność odpowiedzi</dt><dd>" + acc + " <small>" + c.right + " / " + c.ans + "</small></dd></div>" +
+      [1, 2].map(function (r) {
+        var k = 0, t = 0;
+        Q.forEach(function (q, i) { if (q.r === r) { t++; if (S.known[i]) k++; } });
+        return "<div><dt>Runda " + r + (r === 2 ? " (luki)" : "") + "</dt><dd>" + k + " <small>/ " + t + " pytań</small></dd></div>";
+      }).join("") +
+      "<div><dt>Format bazy</dt><dd>" + multi + " <small>z kilkoma poprawnymi, " + (Q.length - multi) + " z jedną</small></dd></div>";
+    $("#domrows").innerHTML = DOMS.map(function (d) {
+      var p = c.per[d[0]];
+      return '<div class="domrow"><span class="nm">' + esc(d[1]) + '</span><div class="meter"><i style="width:' +
+        (p.k / p.t * 100) + '%"></i></div><span class="ct">' + p.k + " / " + p.t + "</span></div>";
+    }).join("");
+    $("#hist").innerHTML = S.sims.length ? S.sims.map(simLine).join("") : "<li>Jeszcze żadnej. Uruchom ją w zakładce Symulacja.</li>";
+  }
+  function renderGrids() {
+    $("#qgrid").innerHTML = Q.map(function (q, i) {
+      var st = S.ans[i] === undefined ? "" : isRight(i, S.ans[i]) ? " st-right" : " st-wrong";
+      return '<label class="cell' + st + '" for="gq-' + (i + 1) + '" title="' + esc(DOM_NAME[q.d]) + " · runda " + q.r +
+        '"><input type="checkbox" class="sr" id="gq-' + (i + 1) + '" data-q="' + i + '"' + (S.known[i] ? " checked" : "") +
+        ' aria-label="Pytanie ' + (i + 1) + ' opanowane"><span>' + (i + 1) + "</span></label>";
+    }).join("");
+    $("#fgrid").innerHTML = F.map(function (f, i) {
+      return '<label class="cell" for="gf-' + (i + 1) + '" title="' + esc(DOM_NAME[f.d]) +
+        '"><input type="checkbox" class="sr" id="gf-' + (i + 1) + '" data-f="' + i + '"' + (S.fknown[i] ? " checked" : "") +
+        ' aria-label="Fiszka ' + (i + 1) + ' opanowana"><span>F' + (i + 1) + "</span></label>";
+    }).join("");
+  }
+  $("#p-postep").addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.dataset.q !== undefined) { if (t.checked) S.known[t.dataset.q] = true; else delete S.known[t.dataset.q]; }
+    else if (t.dataset.f !== undefined) { if (t.checked) S.fknown[t.dataset.f] = true; else delete S.fknown[t.dataset.f]; }
+    else return;
+    save(); renderStats(); header();
+  });
+  $("#clear-ans").addEventListener("click", function () {
+    S.ans = {}; S.fans = {}; DRAFT = {}; save(); renderStats(); renderGrids(); header();
+  });
+  var armed = null;
+  $("#reset-all").addEventListener("click", function (ev) {
+    var b = ev.currentTarget;
+    if (!armed) {
+      b.textContent = "Na pewno? Kliknij jeszcze raz";
+      armed = setTimeout(function () { armed = null; b.textContent = "Zresetuj cały postęp"; }, 4000);
+      return;
+    }
+    clearTimeout(armed); armed = null;
+    b.textContent = "Zresetuj cały postęp";
+    S.known = {}; S.fknown = {}; S.ans = {}; S.sims = []; S.sim = null; DRAFT = {}; stopTick();
+    S.fans = {}; S.ptxt = {}; S.fo = { deck: "all", flt: "all", shuf: 0, id: "" };
+    save(); renderStats(); renderGrids(); header();
+  });
+
+  /* ---------- Focus: one card at a time across questions, flashcards and practical tasks ----------
+     The deck is ordered by area (questions, then flashcards, then practical tasks) or shuffled with a stored seed.
+     Progress counts the whole deck: a question is "right" on an exact answer, a flashcard on the learner's own grade. */
+  var CARDS = [], BY_ID = {};
+  DOMS.forEach(function (d) {
+    Q.forEach(function (q, i) { if (q.d === d[0]) CARDS.push({ id: "q" + (i + 1), t: "q", i: i, d: q.d, r: q.r }); });
+    ["f", "p"].forEach(function (t) {
+      F.forEach(function (f, i) {
+        if (f.d === d[0] && (PRACTICAL.indexOf(i) > -1) === (t === "p")) CARDS.push({ id: "f" + (i + 1), t: t, i: i, d: f.d, r: f.r });
+      });
+    });
+  });
+  CARDS.forEach(function (c, n) { c.n = n; BY_ID[c.id] = c; });
+  var FOC = { id: null, open: false, set: false, t: null, dirty: false };
+  var DECKS = [["all", "Wszystko"], ["q", "Pytania"], ["f", "Fiszki"], ["p", "Praktyczne"]];
+  function svg(p) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>"; }
+  var ICON = {
+    psec: svg('<path d="M6 5v14M19 5l-9 7 9 7z"/>'),
+    nsec: svg('<path d="M18 5v14M5 5l9 7-9 7z"/>'),
+    gear: svg('<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/>'),
+    x: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
+    flip: svg('<path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/>')
+  };
+
+  /* 0 = not answered yet, 1 = right, 2 = wrong */
+  function cState(c) {
+    if (c.t === "q") return S.ans[c.i] === undefined ? 0 : isRight(c.i, S.ans[c.i]) ? 1 : 2;
+    return S.fans[c.i] === undefined ? 0 : S.fans[c.i] ? 1 : 2;
+  }
+  function cKnown(c) { return c.t === "q" ? !!S.known[c.i] : !!S.fknown[c.i]; }
+  function cLabel(c) { return c.t === "q" ? String(c.i + 1) : "F" + (c.i + 1); }
+  function mix(n) {
+    var x = (S.fo.shuf ^ Math.imul(n + 1, 2654435761)) >>> 0;
+    x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5;
+    return x >>> 0;
+  }
+  function fBase() { return CARDS.filter(function (c) { return (S.fo.deck === "all" || c.t === S.fo.deck) && inSet(c); }); }
+  function fPass(c) {
+    if (S.fo.flt === "todo") return !cKnown(c) && cState(c) !== 1;
+    if (S.fo.flt === "wrong") return cState(c) === 2;
+    return true;
+  }
+  /* The card on screen stays in the deck even after it stops matching the filter, so it does not vanish mid-answer. */
+  function fDeck(cur) {
+    var list = fBase().filter(function (c) { return c.id === cur || fPass(c); });
+    if (S.fo.shuf) list.sort(function (a, b) { return mix(a.n) - mix(b.n); });
+    return list;
+  }
+  function fResume() {
+    var strict = fDeck(null), c = BY_ID[S.fo.id];
+    if (c && strict.indexOf(c) > -1) return c.id;
+    return strict.length ? strict[0].id : "";
+  }
+
+  function fFlash(c) {
+    var f = F[c.i], prac = c.t === "p", open = FOC.open, g = S.fans[c.i];
+    var head = '<div class="q-head"><span class="num">F' + (c.i + 1) + '</span><span class="dom">' + esc(DOM_NAME[f.d]) + '</span><span class="rnd">R' + f.r + "</span>" +
+      '<span class="rnd">' + (prac ? "zadanie praktyczne" : "fiszka") + "</span>" + (S.fknown[c.i] ? '<span class="kbadge">Umiem</span>' : "") + "</div>";
+    var grade = '<div class="fgrade" role="group" aria-label="Ocena własna"><span class="how">' + (prac ? "Zaliczasz swoją odpowiedź?" : "Znałeś odpowiedź?") + "</span>" +
+      '<button type="button" class="btn grade ok" data-g="1" aria-pressed="' + (g === 1) + '">Umiem <kbd>U</kbd></button>' +
+      '<button type="button" class="btn grade no" data-g="0" aria-pressed="' + (g === 0) + '">Jeszcze nie <kbd>N</kbd></button></div>';
+    /* One bar, one place: the strip at the bottom edge of the card flips the card both ways. */
+    var bar = '<button type="button" class="fhint fbar" id="' + (open ? "fo-hide" : "fo-flip") + '" aria-expanded="' + open + '">' + ICON.flip +
+      "Kliknij, aby " + (open ? "ukryć " : "odsłonić ") + (prac ? "wzorzec" : "odpowiedź") + "</button>";
+    if (prac) {
+      return '<article class="fc fcard prac' + (S.fknown[c.i] ? " is-known" : "") + '" data-f="' + c.i + '">' + head +
+        '<div class="fbody"><p class="qt">' + fmt(pTitle(f)) + "</p>" +
+        '<label class="how" for="fo-ta">Twoja odpowiedź: metoda, ścieżka, nagłówki, body. Zapisuje się sama.</label>' +
+        '<textarea class="ta" id="fo-ta" rows="8" spellcheck="false" autocapitalize="off" autocomplete="off">' + esc(S.ptxt[c.i] || "") + "</textarea>" +
+        (open ? '<div id="fo-ans" tabindex="-1"><p class="how">Wzorzec</p><div class="model">' + fmt(f.a) + "</div></div>" + docLinks(f) + httpChips(f) + grade : "") +
+        "</div>" + bar + "</article>";
+    }
+    return '<article class="fc fcard' + (S.fknown[c.i] ? " is-known" : "") + '" data-f="' + c.i + '">' + head +
+      (open
+        ? '<div class="fbody"><p class="qt">' + fmt(f.q) + '</p><div class="ans" id="fo-ans" tabindex="-1">' + fmt(f.a) + docLinks(f) + httpChips(f) + "</div>" + grade + "</div>" + bar
+        : '<button type="button" class="fface" id="fo-flip" aria-expanded="false"><span class="fq">' + fmt(f.q) + '</span><span class="fhint">' + ICON.flip + "Kliknij, aby odsłonić odpowiedź</span></button>") +
+      "</article>";
+  }
+  function fSettings(base) {
+    var todo = 0, wrong = 0;
+    base.forEach(function (c) { var s = cState(c); if (s === 2) wrong++; if (!cKnown(c) && s !== 1) todo++; });
+    function chip(attr, val, label, n, on) {
+      return '<button type="button" class="chip" data-' + attr + '="' + val + '" aria-pressed="' + on + '">' + label + (n === null ? "" : " <small>" + n + "</small>") + "</button>";
+    }
+    return '<div class="setup fset" id="fo-set"' + (FOC.set ? "" : " hidden") + ">" +
+      '<div class="fs"><h3 id="fo-h-flt">Które karty</h3><div class="chips" role="group" aria-labelledby="fo-h-flt">' +
+      chip("flt", "all", "Wszystkie", base.length, S.fo.flt === "all") + chip("flt", "todo", "Do nauki", todo, S.fo.flt === "todo") + chip("flt", "wrong", "Tylko błędne", wrong, S.fo.flt === "wrong") +
+      '</div><p class="how">„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem.</p></div>' +
+      '<div class="fs"><h3 id="fo-h-set">Runda</h3><div class="chips" role="group" aria-labelledby="fo-h-set">' +
+      chip("set", "all", "Obie rundy", null, S.set === "all") + chip("set", "1", "Runda 1", null, S.set === "1") + chip("set", "2", "Runda 2 (luki)", null, S.set === "2") + "</div></div>" +
+      '<div class="fs"><h3 id="fo-h-ord">Kolejność</h3><div class="chips" role="group" aria-labelledby="fo-h-ord">' +
+      chip("ord", "dom", "Po obszarach", null, !S.fo.shuf) + chip("ord", "rnd", "Losowa", null, !!S.fo.shuf) +
+      (S.fo.shuf ? '<button type="button" class="btn small" id="fo-reshuffle">Przetasuj</button>' : "") + "</div></div>" +
+      '<label class="check" for="fo-hint"><input type="checkbox" id="fo-hint"' + (S.hint ? " checked" : "") + "> Pokazuj, ile odpowiedzi jest poprawnych</label>" +
+      '<p class="how keys"><strong>Skróty:</strong> <kbd>←</kbd> <kbd>→</kbd> karta · <kbd>A</kbd>–<kbd>E</kbd> zaznacz · <kbd>Enter</kbd> sprawdź, potem dalej · <kbd>Spacja</kbd> odsłoń / ukryj · <kbd>U</kbd> umiem · <kbd>N</kbd> jeszcze nie · <kbd>Esc</kbd> lista</p>' +
+      "</div>";
+  }
+  function renderFocus() {
+    var id = NAV.cur.id, c = BY_ID[id], deck = fDeck(id), base = fBase();
+    var right = 0, wrong = 0;
+    base.forEach(function (x) { var s = cState(x); if (s === 1) right++; else if (s === 2) wrong++; });
+    var total = base.length, done = right + wrong, acc = done ? Math.round(right / done * 100) : 0;
+    var pos = c ? deck.indexOf(c) : -1;
+    var secs = [], sec = deck, sp = pos, si = -1;
+    if (!S.fo.shuf) {
+      DOMS.forEach(function (d) {
+        var list = deck.filter(function (x) { return x.d === d[0]; });
+        if (list.length) { if (c && c.d === d[0]) { si = secs.length; sec = list; sp = list.indexOf(c); } secs.push({ d: d, list: list }); }
+      });
+    }
+
+    var top = '<div class="ftop">' +
+      '<div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="false">Lista</button>' +
+      '<button type="button" class="seg-b" data-mode="focus" aria-pressed="true">Focus</button></div>' +
+      '<span class="ftop-r"><button type="button" class="icn" id="fo-gear" aria-label="Ustawienia trybu Focus" aria-expanded="' + FOC.set + '" aria-controls="fo-set">' + ICON.gear + "</button>" +
+      '<button type="button" class="icn" id="fo-close" aria-label="Zamknij tryb Focus i wróć do listy">' + ICON.x + "</button></span>" +
+      '<label class="sr" for="fo-deck">Talia</label><select id="fo-deck" class="fsel deck">' + DECKS.map(function (d) {
+        return '<option value="' + d[0] + '"' + (S.fo.deck === d[0] ? " selected" : "") + ">" + d[1] + "</option>";
+      }).join("") + "</select>" +
+      '<div class="fpick">' +
+      '<button type="button" class="icn" id="fo-psec" aria-label="Poprzedni obszar"' + (si > 0 ? "" : " disabled") + ">" + ICON.psec + "</button>" +
+      '<button type="button" class="icn" id="fo-nsec" aria-label="Następny obszar"' + (si > -1 && si < secs.length - 1 ? "" : " disabled") + ">" + ICON.nsec + "</button>" +
+      '<label class="sr" for="fo-sec">Obszar</label><select id="fo-sec" class="fsel big"' + (secs.length ? "" : " disabled") + ">" +
+      (secs.length ? secs.map(function (s, k) {
+        var d = s.list.filter(function (x) { return cState(x) > 0; }).length;
+        return '<option value="' + k + '"' + (k === si ? " selected" : "") + ">" + esc(s.d[1]) + " · " + d + "/" + s.list.length + "</option>";
+      }).join("") : "<option>" + (S.fo.shuf && deck.length ? "Losowa kolejność" : "Brak kart") + "</option>") + "</select></div></div>";
+
+    var C = 2 * Math.PI * 27;
+    var head = '<div class="fhead"><div class="fh-t"><h2>' + (c ? (S.fo.shuf ? "Losowa kolejność" : esc(DOM_NAME[c.d])) : "Brak kart") + "</h2>" +
+      "<p>" + (c ? "Karta <strong>" + (sp + 1) + " z " + sec.length + "</strong>" + (S.fo.shuf ? " w talii" : " w tym obszarze") : "Zmień filtr, aby zobaczyć karty.") + "</p></div>" +
+      '<div class="fh-p"><div class="fh-pl"><span class="fh-k">Postęp talii</span><span class="fh-v"><span><b class="g">' + right + "</b> z " + done + " dobrze</span><span><b>" + (total - done) + "</b> zostało</span><span>" + total + " razem</span></span></div>" +
+      '<div class="meter2" role="img" aria-label="Poprawne ' + right + ", błędne " + wrong + ", zostało " + (total - done) + '"><i class="r" style="width:' + (total ? right / total * 100 : 0) + '%"></i><i class="w" style="width:' + (total ? wrong / total * 100 : 0) + '%"></i></div></div>' +
+      '<div class="ring' + (done && acc < 80 ? " no" : "") + '"><div class="ring-w"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="tr" cx="32" cy="32" r="27"/>' +
+      (acc ? '<circle class="ar" cx="32" cy="32" r="27" stroke-dasharray="' + (acc / 100 * C).toFixed(1) + " " + C.toFixed(1) + '"/>' : "") + '</svg><span class="ring-v">' + (done ? acc + "%" : "–") + "</span></div>" +
+      '<span class="fh-k">Trafność</span></div></div>';
+
+    var card = !c
+      ? '<p class="empty">W tej talii nie ma kart pasujących do filtra. <button type="button" class="btn small" id="fo-reset">Pokaż wszystkie karty</button></p>'
+      : c.t === "q" ? qCard(c.i, "learn", learnSel(c.i)) : fFlash(c);
+
+    var strip = "";
+    if (c && sec.length <= 60) {
+      strip = '<div class="fstrip" role="group" aria-label="' + (S.fo.shuf ? "Karty w talii" : "Karty w tym obszarze") + '">' + sec.map(function (x) {
+        var s = cState(x);
+        return '<button type="button" class="fd' + (s ? " s" + s : "") + (cKnown(x) ? " kn" : "") + '" data-id="' + x.id + '"' + (x === c ? ' aria-current="true"' : "") +
+          ' aria-label="' + (x.t === "q" ? "Pytanie " + (x.i + 1) : "Fiszka " + (x.i + 1)) + (s === 1 ? ", dobrze" : s === 2 ? ", źle" : ", bez odpowiedzi") + (cKnown(x) ? ", opanowane" : "") + '">' + cLabel(x) + "</button>";
+      }).join("") + "</div>" +
+      '<ul class="legend fleg"><li><span class="sw r"></span>dobrze</li><li><span class="sw w"></span>źle</li><li><span class="sw u"></span>opanowane</li><li><span class="sw"></span>bez odpowiedzi</li></ul>';
+    }
+    var nav = '<div class="fnav"><button type="button" class="btn big" id="fo-prev"' + (pos > 0 ? "" : " disabled") + ">‹ Poprzednia</button>" +
+      '<span class="fpos">' + (c ? (pos + 1) + " / " + deck.length : "") + "</span>" +
+      '<button type="button" class="btn primary big" id="fo-next"' + (pos > -1 && pos < deck.length - 1 ? "" : " disabled") + ">Następna ›</button></div>";
+
+    $("#focusroot").innerHTML = top + fSettings(base) + head + '<div class="fstage" id="fo-stage" tabindex="-1">' + card + "</div>" + nav + strip;
+  }
+
+  function goCard(id) {
+    go({ tab: "focus", id: id });
+    var st = $("#fo-stage");
+    if (st) st.focus({ preventScroll: true });
+  }
+  function fStep(dir) {
+    var deck = fDeck(NAV.cur.id), c = BY_ID[NAV.cur.id], t = deck[deck.indexOf(c) + dir];
+    if (c && t) goCard(t.id);
+  }
+  /* Deck or filter changed: stay on the current card when it still fits, otherwise move to the first one that does. */
+  function refocus() {
+    var strict = fDeck(null), c = BY_ID[NAV.cur.id];
+    var id = c && strict.indexOf(c) > -1 ? c.id : (strict.length ? strict[0].id : "");
+    S.fo.id = id; save();
+    go({ tab: "focus", id: id }, true);
+  }
+  function fGrade(v) {
+    var c = BY_ID[NAV.cur.id];
+    if (!c || c.t === "q") return;
+    var deck = fDeck(c.id), next = deck[deck.indexOf(c) + 1];
+    S.fans[c.i] = v ? 1 : 0;
+    if (v) S.fknown[c.i] = true; else delete S.fknown[c.i];
+    FOC.dirty = false; save(); header();
+    if (next) goCard(next.id); else renderFocus();
+  }
+  function fReveal(open) {
+    FOC.open = open; renderFocus();
+    var el = $(open ? "#fo-ans" : "#fo-flip");
+    if (el) el.focus({ preventScroll: true });
+  }
+  function enterFocus(from) {
+    var flash = from === "fiszki";
+    if (S.fo.deck !== "all" && (S.fo.deck === "q") === flash) S.fo.deck = flash ? "f" : "q";
+    var strict = fDeck(null), c = BY_ID[S.fo.id];
+    function fits(x) { return (x.t === "q") !== flash && (flash || S.dom === "all" || x.d === S.dom); }
+    if (!(c && strict.indexOf(c) > -1 && fits(c))) c = strict.filter(fits)[0] || strict[0];
+    go({ tab: "focus", id: c ? c.id : "" });
+  }
+  function exitFocus() {
+    var c = BY_ID[NAV.cur.id];
+    var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
+    go({ tab: flash ? "fiszki" : "pytania" });
+    var el = c && document.getElementById((flash ? "f-" : "q-") + (c.i + 1));
+    if (el && !el.hidden) { el.scrollIntoView({ block: "center" }); remember(); }
+  }
+
+  $("#focusroot").addEventListener("click", function (ev) {
+    var t = ev.target, b;
+    if (t.closest("#fo-close")) return exitFocus();
+    b = t.closest("#fo-gear");
+    if (b) { FOC.set = !FOC.set; $("#fo-set").hidden = !FOC.set; b.setAttribute("aria-expanded", FOC.set); return; }
+    if (t.closest("#fo-prev")) return fStep(-1);
+    if (t.closest("#fo-next")) return fStep(1);
+    b = t.closest("#fo-psec, #fo-nsec");
+    if (b) {
+      var cur = BY_ID[NAV.cur.id], deck = fDeck(NAV.cur.id), order = [];
+      deck.forEach(function (x) { if (order.indexOf(x.d) < 0) order.push(x.d); });
+      var d = order[order.indexOf(cur.d) + (b.id === "fo-psec" ? -1 : 1)];
+      var first = deck.filter(function (x) { return x.d === d; })[0];
+      if (first) goCard(first.id);
+      return;
+    }
+    b = t.closest(".fd");
+    if (b) { if (b.dataset.id !== NAV.cur.id) goCard(b.dataset.id); return; }
+    if (t.closest("#fo-flip")) return fReveal(true);
+    if (t.closest("#fo-hide")) return fReveal(false);
+    b = t.closest(".grade");
+    if (b) return fGrade(b.dataset.g === "1");
+    if (t.closest("#fo-reset")) { S.fo.flt = "all"; return refocus(); }
+    b = t.closest("[data-flt]");
+    if (b) { S.fo.flt = b.dataset.flt; return refocus(); }
+    b = t.closest("[data-set]");
+    if (b) { S.set = b.dataset.set; if (!fBase().length) S.fo.deck = "all"; return refocus(); }
+    b = t.closest("[data-ord]");
+    if (b) { S.fo.shuf = b.dataset.ord === "rnd" ? (S.fo.shuf || 1 + Math.floor(Math.random() * 4e9)) : 0; return refocus(); }
+    if (t.closest("#fo-reshuffle")) { S.fo.shuf = 1 + Math.floor(Math.random() * 4e9); return refocus(); }
+
+    var card = t.closest(".q");
+    if (!card) return;
+    var i = +card.dataset.i;
+    b = t.closest(".opt");
+    if (b && !b.disabled) {
+      if (!DRAFT[i]) DRAFT[i] = [];
+      toggleOpt(b, DRAFT[i]);
+      card.querySelector(".chk").disabled = !DRAFT[i].length;
+      return;
+    }
+    if (t.closest(".chk")) {
+      if (!DRAFT[i] || !DRAFT[i].length) return;
+      S.ans[i] = DRAFT[i].slice().sort(); delete DRAFT[i]; save(); header(); renderFocus();
+      var nx = $("#fo-next");
+      (nx.disabled ? $("#fo-stage") : nx).focus({ preventScroll: true });
+      return;
+    }
+    if (t.closest(".retry")) {
+      delete S.ans[i]; delete DRAFT[i]; save(); header(); renderFocus();
+      $("#fo-stage").focus({ preventScroll: true });
+    }
+  });
+  $("#focusroot").addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.id === "fo-deck") { S.fo.deck = t.value; return refocus(); }
+    if (t.id === "fo-sec") {
+      var deck = fDeck(NAV.cur.id), order = [];
+      deck.forEach(function (x) { if (order.indexOf(x.d) < 0) order.push(x.d); });
+      var first = deck.filter(function (x) { return x.d === order[+t.value]; })[0];
+      if (first && first.id !== NAV.cur.id) goCard(first.id);
+      return;
+    }
+    if (t.id === "fo-hint") { S.hint = t.checked; save(); renderFocus(); $("#fo-hint").focus({ preventScroll: true }); return; }
+    if (t.classList.contains("kn")) {
+      var i = +t.closest(".q").dataset.i;
+      if (t.checked) S.known[i] = true; else delete S.known[i];
+      save(); header(); renderFocus();
+      var k = document.getElementById(t.id);
+      if (k) k.focus({ preventScroll: true });
+    }
+  });
+  $("#focusroot").addEventListener("input", function (ev) {
+    var t = ev.target;
+    if (!t.classList.contains("ta")) return;
+    S.ptxt[+t.closest(".prac").dataset.f] = t.value;
+    FOC.dirty = true;
+    clearTimeout(FOC.t); FOC.t = setTimeout(function () { FOC.dirty = false; save(); }, 300);
+  });
+  window.addEventListener("pagehide", function () { if (FOC.dirty) save(); });
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest(".seg-b") : null;
+    if (!b || b.getAttribute("aria-pressed") === "true") return;
+    if (b.dataset.mode === "focus") enterFocus(CUR); else exitFocus();
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (CUR !== "focus" || ev.altKey || ev.ctrlKey || ev.metaKey || ev.defaultPrevented) return;
+    var t = ev.target, tag = t.tagName, k = ev.key;
+    if (tag === "TEXTAREA" || tag === "SELECT" || tag === "INPUT") { if (k === "Escape") t.blur(); return; }
+    var c = BY_ID[NAV.cur.id], isBtn = tag === "BUTTON" || tag === "A";
+    if (k === "ArrowRight") { ev.preventDefault(); return fStep(1); }
+    if (k === "ArrowLeft") { ev.preventDefault(); return fStep(-1); }
+    if (k === "Escape") {
+      if (FOC.set) { FOC.set = false; $("#fo-set").hidden = true; $("#fo-gear").setAttribute("aria-expanded", "false"); }
+      else exitFocus();
+      return;
+    }
+    if (!c) return;
+    if (c.t === "q") {
+      var at = k.length === 1 ? "abcde".indexOf(k.toLowerCase()) : -1;
+      if (at < 0 && k >= "1" && k <= "5") at = +k - 1;
+      if (at > -1) {
+        var o = document.querySelectorAll("#fo-stage .opt")[at];
+        if (o && !o.disabled) { ev.preventDefault(); o.click(); o.focus({ preventScroll: true }); }
+        return;
+      }
+      if (k === "Enter" && (!isBtn || t.classList.contains("opt"))) {
+        var chk = $("#fo-stage .chk");
+        ev.preventDefault();
+        if (chk) { if (!chk.disabled) chk.click(); } else fStep(1);
+      }
+      return;
+    }
+    if ((k === " " || k === "Enter") && !isBtn) { ev.preventDefault(); if (k === " ") fReveal(!FOC.open); else if (!FOC.open) fReveal(true); else fStep(1); return; }
+    if (FOC.open && (k === "u" || k === "U")) { ev.preventDefault(); return fGrade(true); }
+    if (FOC.open && (k === "n" || k === "N")) { ev.preventDefault(); return fGrade(false); }
+  });
+
+  /* ---------- header + tabs ---------- */
+  function bar(id, pct, cls) {
+    var el = $(id);
+    el.style.width = pct + "%";
+    el.className = cls || "";
+  }
+  function header() {
+    var c = counts(), total = Q.length + F.length, done = c.kq + c.kf;
+    $("#m-all-pct").textContent = Math.round(done / total * 100) + "%";
+    $("#m-all-label").textContent = done + " / " + total;
+    $("#pg-q").textContent = c.kq + "/" + Q.length;
+    bar("#pm-q", c.kq / Q.length * 100);
+    $("#pg-f").textContent = c.kf + "/" + F.length;
+    bar("#pm-f", c.kf / F.length * 100);
+    if (c.ans) {
+      var acc = c.right / c.ans * 100;
+      $("#pg-a").textContent = Math.round(acc) + "%";
+      bar("#pm-a", acc, acc >= 80 ? "ok" : "no");
+    } else { $("#pg-a").textContent = "–"; bar("#pm-a", 0); }
+    if (S.sims.length) {
+      var last = S.sims[0], n = last.n || SIM_Q;
+      $("#pg-s").textContent = last.s + "/" + n;
+      bar("#pm-s", last.s / n * 100, last.s >= Math.ceil(n * 0.8) ? "ok" : "no");
+    } else { $("#pg-s").textContent = "–"; bar("#pm-s", 0); }
+  }
+  /* ---------- HTTP Koty view ---------- */
+  var KOTY = null, CUR = "pytania";
+  function kotyTop() {
+    var host = $("#koty"), bar = document.querySelector(".bar");
+    if (host && bar) host.style.setProperty("--koty-top", bar.offsetHeight + "px");
+  }
+  function openKoty() {
+    if (!KOTY) {
+      var root = $("#koty").attachShadow({ mode: "open" });
+      root.appendChild($("#koty-tpl").content.cloneNode(true));
+      /* A module picked inside HTTP Koty becomes its own history entry; the view is already switched. */
+      KOTY = bootKoty(root, function (sub) { if (!NAV.mute) go({ tab: "http", sub: sub }, false, true); });
+      window.addEventListener("resize", kotyTop);
+    }
+    kotyTop();
+  }
+  function paintBack() {
+    var b = $("#back-q"), from = NAV.cur.from;
+    b.hidden = !(CUR === "http" && from);
+    if (from) b.textContent = "← Wróć do " + from;
+    if (CUR === "http") kotyTop();
+  }
+  document.addEventListener("click", function (ev) {
+    var c = ev.target.closest ? ev.target.closest(".hchip") : null;
+    if (!c) return;
+    var card = c.closest(".q, .fc"), from = "";
+    if (card) {
+      var num = card.querySelector(".num").textContent;
+      from = /^F\d/.test(num) ? "fiszki " + num : /^#/.test(num) ? "pytania " + num : "symulacji";
+    }
+    go({ tab: "http", sub: "kody", code: +c.dataset.code, from: from });
+  });
+  $("#back-q").addEventListener("click", function () {
+    if (NAV.ok) { history.back(); return; }
+    var r = NAV.prev;
+    if (!r) return;
+    NAV.cur = r; apply(r, true); window.scrollTo(0, r.y || 0);
+  });
+
+  /* ---------- navigation ----------
+     Each tab, HTTP Koty module, jumped-to status code, simulator card and Focus card is a history entry, so the
+     browser's Back and Forward move between them and return to the same scroll position. The hash stays a bare
+     token (#fiszki, #http-kody, #symulacja-12, #focus-q12); everything else rides in history.state. */
+  var NAV = { cur: { tab: "pytania", i: 0 }, prev: null, ok: true, mute: false, t: null };
+  try { history.scrollRestoration = "manual"; } catch (e) { /* older browsers restore on their own */ }
+  function hashOf(r) {
+    if (r.tab === "http" && r.sub) return "http-" + r.sub;
+    if (r.tab === "symulacja" && r.pos !== undefined) return "symulacja-" + (r.pos + 1);
+    if (r.tab === "focus" && r.id) return "focus-" + r.id;
+    return r.tab;
+  }
+  function parseHash(h) {
+    var m = /^#?([a-z]+)(?:-([a-z0-9]+))?$/.exec(h || "");
+    if (!m || VIEWS.indexOf(m[1]) < 0) return { tab: "pytania" };
+    var r = { tab: m[1] };
+    if (m[2] && r.tab === "http") r.sub = m[2];
+    if (m[2] && r.tab === "symulacja" && +m[2] > 0) r.pos = +m[2] - 1;
+    if (m[2] && r.tab === "focus") r.id = m[2];
+    return r;
+  }
+  function writeState(r, push) {
+    var fn = push ? "pushState" : "replaceState";
+    try { history[fn](r, "", "#" + hashOf(r)); return true; }
+    catch (e) {
+      try { history[fn](r, ""); return true; } catch (e2) { return false; }
+    }
+  }
+  function remember() {
+    NAV.cur.y = Math.round(window.scrollY);
+    writeState(NAV.cur, false);
+  }
+  /* A simulator-card entry is stale once that simulation is finished or replaced. */
+  function stale(r) {
+    return r.tab === "symulacja" && r.pos !== undefined && !(S.sim && !S.sim.done && r.sid === S.sim.start);
+  }
+  function go(r, replace, applied) {
+    if (!replace) { if (!applied) remember(); NAV.prev = NAV.cur; }
+    r.y = 0;
+    r.i = replace ? (NAV.cur.i || 0) : (NAV.cur.i || 0) + 1;
+    NAV.cur = r;
+    if (!applied) {
+      apply(r, false);
+      if (!(r.tab === "http" && r.code)) window.scrollTo(0, 0);
+    }
+    NAV.ok = writeState(r, !replace);
+  }
+  function apply(r, restore) {
+    var tab = VIEWS.indexOf(r.tab) < 0 ? "pytania" : r.tab;
+    r.tab = tab;
+    TABS.forEach(function (t) {
+      $("#p-" + t).hidden = t !== tab;
+      $("#t-" + t).setAttribute("aria-selected", t === tab);
+    });
+    $("#p-focus").hidden = tab !== "focus";
+    /* Focus reuses the list's card markup and ids, so only one of the two is ever in the document. */
+    if (tab !== "focus") $("#focusroot").innerHTML = "";
+    document.body.dataset.view = tab;
+    CUR = tab;
+    if (tab === "pytania") renderQ();
+    else if (tab === "symulacja") {
+      if (S.sim && !S.sim.done) {
+        if (r.pos === undefined || (r.sid && r.sid !== S.sim.start)) r.pos = S.sim.cur;
+        r.pos = Math.min(Math.max(r.pos, 0), simLen() - 1);
+        r.sid = S.sim.start;
+        if (S.sim.cur !== r.pos) { S.sim.cur = r.pos; save(); }
+      } else { delete r.pos; delete r.sid; }
+      ARM = null;
+      renderSim();
+    }
+    else if (tab === "fiszki") renderF();
+    else if (tab === "focus") {
+      $("#qlist").innerHTML = ""; $("#flist").innerHTML = "";
+      if (!BY_ID[r.id]) r.id = fResume();
+      var fc = BY_ID[r.id];
+      if (fc) {
+        if (S.fo.deck !== "all" && S.fo.deck !== fc.t) S.fo.deck = "all";
+        if (!inSet(fc)) S.set = "all";
+      }
+      if (FOC.id !== r.id) FOC.open = false;
+      FOC.id = r.id;
+      if (S.fo.id !== r.id) { S.fo.id = r.id; save(); }
+      renderFocus();
+    }
+    else if (tab === "http") {
+      openKoty();
+      NAV.mute = true;
+      if (r.sub) KOTY.show(r.sub);
+      r.sub = KOTY.tab();
+      if (r.code && !restore && KOTY.has(r.code)) KOTY.jump(r.code);
+      NAV.mute = false;
+    }
+    else { renderStats(); renderGrids(); }
+    paintBack();
+  }
+  window.addEventListener("popstate", function (ev) {
+    var r = ev.state && ev.state.tab ? ev.state : parseHash(location.hash);
+    var dir = (r.i || 0) < (NAV.cur.i || 0) ? -1 : 1;
+    var skip = stale(r);
+    NAV.prev = NAV.cur; NAV.cur = r;
+    apply(r, true);
+    window.scrollTo(0, r.y || 0);
+    /* Finished simulation: step over its old card entries instead of showing the result once per card. */
+    if (skip) { try { history.go(dir); } catch (e) { /* stay on the rendered view */ } }
+  });
+  window.addEventListener("scroll", function () {
+    clearTimeout(NAV.t); NAV.t = setTimeout(remember, 250);
+  }, { passive: true });
+  document.querySelector(".tabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".tab");
+    if (b && b.dataset.tab !== CUR) go({ tab: b.dataset.tab });
+    else if (b) window.scrollTo(0, 0);
+  });
+
+  header();
+  if (S.sim && !S.sim.done) startTick();
+  /* First paint: a reload comes back to the same entry and scroll position; a fresh open follows the hash. */
+  var first = null;
+  try { first = history.state; } catch (e) { /* no access to history */ }
+  if (!first || !first.tab) first = parseHash(location.hash);
+  first.i = first.i || 0;
+  NAV.cur = first;
+  apply(first, true);
+  NAV.ok = writeState(first, false);
+  if (first.y) window.scrollTo(0, first.y);
+})();
