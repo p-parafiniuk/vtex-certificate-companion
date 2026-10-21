@@ -123,10 +123,49 @@
   function docLinks(x) {
     var ks = x.l || [];
     if (!ks.length) return "";
-    return '<p class="doc"><span class="doc-k">Sprawdź w dokumentacji VTEX:</span> ' + ks.map(function (k) {
-      return '<a href="' + esc(DOCS[k][0]) + '" target="_blank" rel="noopener">' + esc(DOCS[k][1]) + "</a>";
-    }).join(" · ") + "</p>";
+    return '<p class="doc"><span class="doc-k">Dokumentacja VTEX:</span> ' + ks.map(function (k) {
+      return '<span class="doci"><a href="' + esc(DOCS[k][0]) + '" target="_blank" rel="noopener">' + esc(DOCS[k][1]) + " ↗</a>" +
+        (FRAMEABLE.test(DOCS[k][0]) ? '<button type="button" class="docf" data-doc="' + esc(k) + '" aria-expanded="false" aria-label="' + esc(docfLabel(DOCS[k][1], false)) + '">Czytaj tutaj</button>' : "") + "</span>";
+    }).join("") + "</p>";
   }
+  /* Only official VTEX pages ever go into a frame (the same hosts DOCS may use). */
+  var FRAMEABLE = /^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\//;
+  function docFrame(url, label, closer) {
+    return '<div class="docbar"><span class="docurl">' + esc(url.replace(/^https:\/\//, "")) + "</span>" +
+      '<span class="docacts"><a class="btn small" href="' + esc(url) + '" target="_blank" rel="noopener">Otwórz w nowej karcie ↗</a>' +
+      (closer ? '<button type="button" class="btn small docx">Zamknij</button>' : "") + "</span></div>" +
+      (FRAMEABLE.test(url) ? '<iframe class="docframe" src="' + esc(url) + '" title="' + esc(label) +
+        '" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>' : "") +
+      '<p class="how">Pusta ramka? Ta strona VTEX blokuje osadzanie. Otwórz ją w nowej karcie.</p>';
+  }
+  /* The accessible name has to start with the visible label, so it changes with the toggle. */
+  function docfLabel(label, open) { return open ? "Zwiń „" + label + "”" : "Czytaj tutaj „" + label + "”, bez wychodzenia z nauki"; }
+  var PANE_N = 0;
+  /* Inline reading: one frame under the doc line, so the question and its explanation stay in view. */
+  function setDocPane(line, btn) {
+    var pane = line.nextElementSibling && line.nextElementSibling.classList.contains("docpane") ? line.nextElementSibling : null;
+    if (pane) pane.remove();
+    line.querySelectorAll(".docf").forEach(function (b) {
+      b.setAttribute("aria-expanded", "false"); b.removeAttribute("aria-controls"); b.textContent = "Czytaj tutaj";
+      b.setAttribute("aria-label", docfLabel(DOCS[b.dataset.doc][1], false));
+    });
+    if (!btn) return;
+    var d = DOCS[btn.dataset.doc], id = "docpane-" + (++PANE_N);
+    btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-controls", id); btn.textContent = "Zwiń";
+    btn.setAttribute("aria-label", docfLabel(d[1], true));
+    line.insertAdjacentHTML("afterend", '<div class="docpane docview" id="' + id + '" role="region" aria-label="' + esc(d[1]) + '">' + docFrame(d[0], d[1], true) + "</div>");
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest(".docf, .docx") : null;
+    if (!b) return;
+    if (b.classList.contains("docx")) {
+      var line = b.closest(".docpane").previousElementSibling, open = line.querySelector('.docf[aria-expanded="true"]');
+      setDocPane(line, null);
+      if (open) open.focus({ preventScroll: true });
+      return;
+    }
+    setDocPane(b.closest(".doc"), b.getAttribute("aria-expanded") === "true" ? null : b);
+  });
 
   function counts() {
     var per = {};
@@ -316,12 +355,7 @@
         "<span>" + esc(x.label) + "</span>" + (x.n ? '<small title="Pytania i fiszki z tym linkiem">' + x.n + "</small>" : "") + "</a>";
     });
     el.innerHTML = '<div class="docs"><nav class="doclist" aria-label="Strony dokumentacji tej kategorii">' + html + "</nav>" +
-      '<div class="docview"><div class="docbar"><span class="docurl">' + esc(cur.url.replace(/^https:\/\//, "")) + "</span>" +
-      '<a class="btn small" href="' + esc(cur.url) + '" target="_blank" rel="noopener">Otwórz w nowej karcie ↗</a></div>' +
-      (/^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\//.test(cur.url)
-        ? '<iframe class="docframe" src="' + esc(cur.url) + '" title="' + esc(cur.label) + '" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>'
-        : "") +
-      '<p class="how">Strona ładuje się z serwera VTEX, więc potrzebny jest internet. Jeśli ramka zostanie pusta, serwis nie pozwala się osadzić: użyj „Otwórz w nowej karcie”.</p></div></div>';
+      '<div class="docview">' + docFrame(cur.url, cur.label, false) + "</div></div>";
   }
   $("#ctabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".ctab");
@@ -1047,6 +1081,9 @@
     if (k === "ArrowRight") { ev.preventDefault(); return fStep(1); }
     if (k === "ArrowLeft") { ev.preventDefault(); return fStep(-1); }
     if (k === "Escape") {
+      /* An open docs frame closes first, so Esc never throws the learner out of Focus mid-reading. */
+      var pane = $("#fo-stage .docpane");
+      if (pane) { var tg = pane.previousElementSibling.querySelector('.docf[aria-expanded="true"]'); setDocPane(pane.previousElementSibling, null); if (tg) tg.focus({ preventScroll: true }); return; }
       if (FOC.set) { FOC.set = false; $("#fo-set").hidden = true; $("#fo-gear").setAttribute("aria-expanded", "false"); }
       else exitFocus();
       return;
