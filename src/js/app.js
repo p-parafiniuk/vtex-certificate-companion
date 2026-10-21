@@ -3,7 +3,7 @@
 
   var KEY = "vtex-drill-v1";
   var SIM_Q = 36, SIM_P = 4;
-  var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api"];
+  var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
   var VIEWS = TABS.concat(["focus"]);
   var LET = "ABCDEFG";
   /* No prototype: keys come from the URL and storage, and "constructor" must not count as a category. */
@@ -19,7 +19,27 @@
   /* ---------- state ---------- */
   /* v2: answers are arrays of selected option indexes (multi-select). Older single-index answers are dropped, "Umiem" marks stay. */
   var S = { v: 2, known: {}, fknown: {}, ans: {}, sims: [], hide: false, dom: "all", set: "all", hint: false, sim: null, simMin: 120, simPrac: true,
-    fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" }, theme: "auto" };
+    fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" }, theme: "auto",
+    days: {}, tday: { d: "", ids: {} }, total: 0, combo: 0, comboBest: 0, best: 0, badges: {}, goal: 20, gx: { head: true, combo: true, toast: true } };
+  var GOALS = [10, 20, 40];
+  var DAY_RE = /^\d{4}-\d\d-\d\d$/;
+  /* Append only: unlock dates are stored by id. */
+  var BADGES = [
+    { id: "first", n: "Pierwszy krok", d: "Pierwsza odpowiedź", ok: function (x) { return x.total >= 1; }, p: function () { return "Odpowiedz na dowolne pytanie"; } },
+    { id: "a100", n: "Setka", d: "100 odpowiedzi", ok: function (x) { return x.total >= 100; }, p: function (x) { return x.total + " / 100 odpowiedzi"; } },
+    { id: "goal", n: "Cel dnia", d: "Cel dzienny osiągnięty", ok: function (x) { return x.goalHit; }, p: function (x) { return "Dziś " + x.today + " / " + x.goal; } },
+    { id: "s3", n: "Seria 3 dni", d: "3 dni nauki z rzędu", ok: function (x) { return x.best >= 3; }, p: function (x) { return x.streak + " / 3 dni"; } },
+    { id: "s7", n: "Seria 7 dni", d: "Tydzień nauki z rzędu", ok: function (x) { return x.best >= 7; }, p: function (x) { return x.streak + " / 7 dni"; } },
+    { id: "s14", n: "Seria 14 dni", d: "Dwa tygodnie z rzędu", ok: function (x) { return x.best >= 14; }, p: function (x) { return x.streak + " / 14 dni"; } },
+    { id: "c10", n: "Combo 10", d: "10 dobrych odpowiedzi z rzędu", ok: function (x) { return x.comboBest >= 10; }, p: function (x) { return "Rekord " + x.comboBest + " z rzędu"; } },
+    { id: "c25", n: "Combo 25", d: "25 dobrych odpowiedzi z rzędu", ok: function (x) { return x.comboBest >= 25; }, p: function (x) { return "Rekord " + x.comboBest + " z rzędu"; } },
+    { id: "sim", n: "Zdana symulacja", d: "Co najmniej 80% w symulacji", ok: function (x) { return x.simPass; }, p: function (x) { return x.simBest; } },
+    { id: "dom", n: "Obszar na 100%", d: "Wszystkie pytania z obszaru opanowane", ok: function (x) { return x.domFull; }, p: function (x) { return "Najbliżej: " + x.domNear; } },
+    { id: "fall", n: "Wszystkie fiszki", d: "Każda fiszka oznaczona Umiem", ok: function (x) { return x.kf >= F.length; }, p: function (x) { return x.kf + " / " + F.length + " fiszek"; } },
+    { id: "ready", n: "Gotowy", d: "Gotowość co najmniej 80", ok: function (x) { return x.ready >= 80; }, p: function (x) { return "Gotowość " + x.ready + " / 80"; } }
+  ];
+  var BADGE_ID = Object.create(null);
+  BADGES.forEach(function (b) { BADGE_ID[b.id] = true; });
   try {
     var raw = JSON.parse(localStorage.getItem(KEY) || "{}");
     if (raw && typeof raw === "object") {
@@ -37,6 +57,20 @@
       if (raw.simMin > 0 && raw.simMin <= 600) S.simMin = Math.round(raw.simMin);
       if (raw.simPrac === false) S.simPrac = false;
       if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
+      if (raw.days && typeof raw.days === "object" && !Array.isArray(raw.days)) {
+        Object.keys(raw.days).forEach(function (k) { var n = raw.days[k] >>> 0; if (DAY_RE.test(k) && n > 0) S.days[k] = Math.min(n, 9999); });
+      }
+      var rt = raw.tday;
+      if (rt && typeof rt === "object" && DAY_RE.test(rt.d) && rt.ids && typeof rt.ids === "object" && !Array.isArray(rt.ids)) {
+        S.tday.d = rt.d;
+        Object.keys(rt.ids).forEach(function (k) { if (/^[qf]\d+$/.test(k)) S.tday.ids[k] = 1; });
+      }
+      ["total", "combo", "comboBest", "best"].forEach(function (k) { S[k] = Math.max(0, Math.min(Math.floor(+raw[k]) || 0, 1e6)); });
+      if (raw.badges && typeof raw.badges === "object" && !Array.isArray(raw.badges)) {
+        Object.keys(raw.badges).forEach(function (k) { if (BADGE_ID[k] && +raw.badges[k] > 0) S.badges[k] = +raw.badges[k]; });
+      }
+      if (GOALS.indexOf(raw.goal) > -1) S.goal = raw.goal;
+      if (raw.gx && typeof raw.gx === "object") ["head", "combo", "toast"].forEach(function (k) { S.gx[k] = raw.gx[k] !== false; });
       if (raw.fans && typeof raw.fans === "object" && !Array.isArray(raw.fans)) {
         Object.keys(raw.fans).forEach(function (k) { if (F[k]) S.fans[k] = raw.fans[k] ? 1 : 0; });
       }
@@ -404,7 +438,8 @@
     }
     if (ev.target.closest(".chk")) {
       if (!DRAFT[i] || !DRAFT[i].length) return;
-      S.ans[i] = DRAFT[i].slice().sort(); delete DRAFT[i]; save();
+      S.ans[i] = DRAFT[i].slice().sort(); delete DRAFT[i];
+      recordAnswer("q" + (i + 1), isRight(i, S.ans[i])); save();
       swapCard(card, i, ".retry");
       header(); return;
     }
@@ -712,6 +747,170 @@
     document.querySelectorAll("#flist .rev").forEach(function (b) { setRev(b, false); });
   });
 
+  /* ---------- Grywalizacja: streak, daily goal, readiness, badges, combo ----------
+     A card counts once per day, so retrying cannot farm the counters. */
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function dayKey(d) { return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
+  function daysAgo(n) { var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return d; }
+  function todayN() { return S.days[dayKey(new Date())] || 0; }
+  function live(msg) { var el = $("#gx-live"); el.textContent = ""; setTimeout(function () { el.textContent = msg; }, 50); }
+  function recordAnswer(id, ok) {
+    var t = dayKey(new Date());
+    if (S.tday.d !== t) {
+      S.tday = { d: t, ids: {} };
+      var old = dayKey(daysAgo(120));
+      Object.keys(S.days).forEach(function (k) { if (k < old) delete S.days[k]; });
+    }
+    if (S.tday.ids[id]) return;
+    S.tday.ids[id] = 1;
+    S.days[t] = (S.days[t] || 0) + 1;
+    S.total++;
+    S.combo = ok ? S.combo + 1 : 0;
+    if (S.combo > S.comboBest) S.comboBest = S.combo;
+    if (S.gx.combo && [5, 10, 25, 50].indexOf(S.combo) > -1) live("Combo: " + S.combo + " dobrych odpowiedzi z rzędu");
+    if (S.days[t] === S.goal) live("Cel dzienny osiągnięty: " + S.goal + " odpowiedzi");
+  }
+  /* Today does not count against the streak until it is over, and one missing day a week is forgiven. */
+  function streak() {
+    var n = 0, frozeAt = -99, k = S.days[dayKey(daysAgo(0))] ? 0 : 1;
+    for (; k < 400; k++) {
+      if (S.days[dayKey(daysAgo(k))]) { n++; continue; }
+      if (k - frozeAt >= 7 && S.days[dayKey(daysAgo(k + 1))] && n + k > 1) { frozeAt = k; continue; }
+      break;
+    }
+    return n;
+  }
+  function readiness(c) {
+    var m = 0, weak = null;
+    DOMS.forEach(function (d) {
+      var p = c.per[d[0]], r = p.t ? p.k / p.t : 0;
+      m += r;
+      if (p.t && (!weak || r < weak.r)) weak = { d: d, r: r, p: p };
+    });
+    m /= DOMS.length;
+    var acc = c.ans >= 20 ? c.right / c.ans : 0;
+    var sim = 0;
+    S.sims.slice(0, 3).forEach(function (x) { sim = Math.max(sim, x.s / (x.n || SIM_Q)); });
+    return { v: Math.round(50 * m + 30 * acc + 20 * sim), m: m, acc: acc, accOk: c.ans >= 20, sim: sim, weak: weak };
+  }
+  function gxCtx(c) {
+    var rd = readiness(c), st = streak(), near = null, simBest = null;
+    DOMS.forEach(function (d) {
+      var p = c.per[d[0]];
+      if (p.t && p.k < p.t && (!near || p.k / p.t > near.k / near.t)) near = { n: d[1], k: p.k, t: p.t };
+    });
+    S.sims.forEach(function (x) { if (!simBest || x.s / (x.n || SIM_Q) > simBest.s / (simBest.n || SIM_Q)) simBest = x; });
+    if (st > S.best) S.best = st;
+    return {
+      total: S.total, today: todayN(), goal: S.goal, streak: st, best: S.best, comboBest: S.comboBest, kf: c.kf, ready: rd.v, rd: rd,
+      goalHit: Object.keys(S.days).some(function (k) { return S.days[k] >= S.goal; }),
+      simPass: S.sims.some(function (x) { var n = x.n || SIM_Q; return x.s >= Math.ceil(n * 0.8); }),
+      simBest: simBest ? "Najlepiej " + simBest.s + " / " + (simBest.n || SIM_Q) + ", próg " + Math.ceil((simBest.n || SIM_Q) * 0.8) : "Jeszcze żadnej symulacji",
+      domFull: DOMS.some(function (d) { var p = c.per[d[0]]; return p.t && p.k === p.t; }),
+      domNear: near ? near.n + " " + near.k + " / " + near.t : "–"
+    };
+  }
+  var TOAST_T = null;
+  function checkBadges(c, quiet) {
+    var x = gxCtx(c), fresh = [];
+    BADGES.forEach(function (b) {
+      if (!S.badges[b.id] && b.ok(x)) { S.badges[b.id] = Date.now(); fresh.push(b); }
+    });
+    if (!fresh.length) return;
+    save();
+    if (quiet || !S.gx.toast) return;
+    var b = fresh[fresh.length - 1], el = $("#gx-toast");
+    el.innerHTML = '<span class="toast-i" aria-hidden="true">' + ICON.medal + '</span><span class="toast-t"><strong>Nowa odznaka: ' + esc(b.n) + "</strong><span>" +
+      esc(fresh.length > 1 ? b.d + " (i " + (fresh.length - 1) + " więcej)" : b.d) + '</span></span><button type="button" class="linkbtn" data-go="postep">Zobacz</button>';
+    el.hidden = false;
+    clearTimeout(TOAST_T); TOAST_T = setTimeout(function () { el.hidden = true; }, 6000);
+  }
+  function paintGx() {
+    $("#gx-head").hidden = !S.gx.head;
+    if (!S.gx.head) return;
+    var st = streak(), t = todayN();
+    $("#gx-streak").innerHTML = ICON.flame + st + " " + (st === 1 ? "dzień" : "dni");
+    $("#gx-streak").setAttribute("aria-label", "Seria: " + st + " " + (st === 1 ? "dzień" : "dni") + " nauki z rzędu");
+    $("#gx-gv").textContent = t + "/" + S.goal;
+    bar("#gx-gm", Math.min(t / S.goal, 1) * 100, t >= S.goal ? "ok" : "");
+  }
+  function fmtDay(d) { return pad(d.getDate()) + "." + pad(d.getMonth() + 1); }
+  function renderGx(c) {
+    var x = gxCtx(c), rd = x.rd, w = rd.weak;
+    $("#gx-ready").innerHTML =
+      '<div class="cardh"><h2 id="gx-ready-h">Gotowość do egzaminu</h2><span class="meter-label">próg 80</span></div>' +
+      '<p class="bign"><b>' + rd.v + "</b> <small>/ 100</small></p>" +
+      '<div class="meter th big" role="img" aria-label="Gotowość ' + rd.v + ' na 100, próg 80"><i class="' + (rd.v >= 80 ? "ok" : "") + '" style="width:' + rd.v + '%"></i></div>' +
+      '<dl class="rdl"><dt>Opanowanie obszarów · 50%</dt><dd>' + Math.round(rd.m * 100) + "%</dd>" +
+      "<dt>Trafność · 30%</dt><dd>" + (rd.accOk ? Math.round(rd.acc * 100) + "%" : "od 20 odpowiedzi") + "</dd>" +
+      "<dt>Najlepsza z 3 symulacji · 20%</dt><dd>" + (S.sims.length ? Math.round(rd.sim * 100) + "%" : "–") + "</dd></dl>" +
+      (w && w.r < 1 ? '<p class="weak">Najsłabiej: <strong>' + esc(w.d[1]) + "</strong> · " + w.p.k + " / " + w.p.t +
+        ' <button type="button" class="linkbtn" data-go-dom="' + esc(w.d[0]) + '">Ćwicz ten obszar</button></p>' : "");
+    var t = x.today, heat = "";
+    for (var k = 83; k >= 0; k--) {
+      var d = daysAgo(k), n = S.days[dayKey(d)] || 0;
+      var lv = !n ? 0 : n >= S.goal ? 3 : n * 2 >= S.goal ? 2 : 1;
+      heat += '<i class="h' + lv + '" title="' + fmtDay(d) + ": " + n + '"></i>';
+    }
+    $("#gx-days").innerHTML =
+      '<div class="cardh"><h2 id="gx-days-h">Seria i cel dzienny</h2><span class="meter-label">rekord ' + x.best + " " + (x.best === 1 ? "dzień" : "dni") + "</span></div>" +
+      '<div class="dayrow"><p class="bign"><b>' + x.streak + "</b> <small>" + (x.streak === 1 ? "dzień" : "dni") + "</small></p>" +
+      '<div class="dayg"><div class="dayl"><span>Dziś</span><span class="meter-label">' + t + " / " + S.goal + "</span></div>" +
+      '<div class="meter big" aria-hidden="true"><i class="' + (t >= S.goal ? "ok" : "") + '" style="width:' + Math.min(t / S.goal, 1) * 100 + '%"></i></div>' +
+      '<p class="seth">' + (t >= S.goal ? "Cel na dziś osiągnięty." : "Jeszcze " + (S.goal - t) + " do celu.") + "</p></div></div>" +
+      '<div class="heat" role="img" aria-label="Aktywność z ostatnich 12 tygodni, dziś ' + t + ' odpowiedzi">' + heat + "</div>" +
+      '<div class="heatl" aria-hidden="true"><span>12 tygodni temu</span><span>mniej <i class="h0"></i><i class="h1"></i><i class="h2"></i><i class="h3"></i> cel</span><span>dziś</span></div>' +
+      '<p class="seth">Jeden dzień przerwy w tygodniu nie zrywa serii. Każda karta liczy się raz dziennie.</p>';
+    var got = BADGES.filter(function (b) { return S.badges[b.id]; }).length;
+    $("#gx-badges").innerHTML =
+      '<div class="cardh"><h2 id="gx-badges-h">Odznaki</h2><span class="meter-label">' + got + " / " + BADGES.length + "</span></div>" +
+      '<ul class="badges">' + BADGES.map(function (b) {
+        var at = S.badges[b.id];
+        return '<li class="badge' + (at ? " on" : "") + '"><span class="badge-i" aria-hidden="true">' + (at ? ICON.check : ICON.lock) + "</span>" +
+          '<span class="badge-t"><strong>' + esc(b.n) + '</strong><span>' + esc(at ? b.d + " · " + fmtDay(new Date(at)) : b.p(x)) + "</span>" +
+          '<span class="sr">' + (at ? "zdobyta" : "do zdobycia") + "</span></span></li>";
+      }).join("") + "</ul>";
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest("[data-go], [data-go-dom]") : null;
+    if (!b) return;
+    if (b.dataset.goDom && DOM_NAME[b.dataset.goDom]) go({ tab: "pytania", cat: b.dataset.goDom });
+    else if (TABS.indexOf(b.dataset.go) > -1) go({ tab: b.dataset.go });
+    if (b.closest("#gx-toast")) $("#gx-toast").hidden = true;
+  });
+
+  /* ---------- Ustawienia: the same fields the toggles in each view write ---------- */
+  function renderSettings() {
+    $("#set-goal").querySelectorAll(".seg-b").forEach(function (b) { b.setAttribute("aria-pressed", +b.dataset.goal === S.goal); });
+    $("#set-theme").querySelectorAll(".seg-b").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.themeSet === S.theme); });
+    $("#set-hint").checked = S.hint;
+    $("#set-hide").checked = S.hide;
+    $("#set-min").value = S.simMin;
+    $("#set-prac").checked = S.simPrac;
+    ["head", "combo", "toast"].forEach(function (k) { $("#set-gx-" + k).checked = S.gx[k]; });
+  }
+  $("#p-ustawienia").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".seg-b");
+    if (!b || b.getAttribute("aria-pressed") === "true") return;
+    if (b.dataset.goal) { S.goal = +b.dataset.goal; save(); header(); }
+    else if (b.dataset.themeSet) { S.theme = b.dataset.themeSet; save(); paintTheme(); }
+    renderSettings();
+  });
+  $("#p-ustawienia").addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.id === "set-hint") S.hint = t.checked;
+    else if (t.id === "set-hide") S.hide = t.checked;
+    else if (t.id === "set-prac") S.simPrac = t.checked;
+    else if (t.id === "set-min") {
+      var m = Math.round(+t.value);
+      if (!(m >= 1 && m <= 600)) { t.setAttribute("aria-invalid", "true"); return; }
+      t.removeAttribute("aria-invalid"); S.simMin = m;
+    }
+    else if (t.dataset.gx) { S.gx[t.dataset.gx] = t.checked; paintGx(); kotyTop(); }
+    else return;
+    save();
+  });
+
   /* ---------- Postęp ---------- */
   function simLine(x) {
     var n = x.n || SIM_Q, ok = x.s >= Math.ceil(n * 0.8), d = new Date(x.t);
@@ -721,6 +920,7 @@
   }
   function renderStats() {
     var c = counts();
+    renderGx(c);
     var acc = c.ans ? Math.round(c.right / c.ans * 100) + "%" : "–";
     var multi = Q.filter(function (q) { return nRight(q) > 1; }).length;
     $("#stats").innerHTML =
@@ -775,7 +975,8 @@
     b.textContent = "Zresetuj cały postęp";
     S.known = {}; S.fknown = {}; S.ans = {}; S.sims = []; S.sim = null; DRAFT = {}; stopTick();
     S.fans = {}; S.ptxt = {}; S.fo = { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" };
-    save(); renderStats(); renderGrids(); header();
+    S.days = {}; S.tday = { d: "", ids: {} }; S.total = 0; S.combo = 0; S.comboBest = 0; S.best = 0; S.badges = {};
+    save(); renderStats(); renderGrids(); header(true);
   });
 
   /* ---------- Focus: one card at a time across questions, flashcards and practical tasks ----------
@@ -797,6 +998,11 @@
   var ICON = {
     psec: svg('<path d="M6 5v14M19 5l-9 7 9 7z"/>'),
     nsec: svg('<path d="M18 5v14M5 5l9 7-9 7z"/>'),
+    flame: svg('<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 .8 1.2 1.5 1.6 2.3 1.6C11 7 11 5 12 3z"/>'),
+    medal: svg('<circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 21l5-2.5 5 2.5-1.5-7.5"/>'),
+    check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+    lock: svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
+    bolt: svg('<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>'),
     gear: svg('<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/>'),
     x: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
     flip: svg('<path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/>')
@@ -895,7 +1101,8 @@
     var top = '<div class="ftop">' +
       '<div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="false">Lista</button>' +
       '<button type="button" class="seg-b" data-mode="focus" aria-pressed="true">Focus</button></div>' +
-      '<span class="ftop-r"><button type="button" class="icn" id="fo-gear" aria-label="Ustawienia trybu Focus" aria-expanded="' + FOC.set + '" aria-controls="fo-set">' + ICON.gear + "</button>" +
+      '<span class="ftop-r">' + (S.gx.combo && S.combo >= 3 ? '<span class="combo" title="Dobre odpowiedzi z rzędu">' + ICON.bolt + "Combo ×" + S.combo + "</span>" : "") +
+      '<button type="button" class="icn" id="fo-gear" aria-label="Ustawienia trybu Focus" aria-expanded="' + FOC.set + '" aria-controls="fo-set">' + ICON.gear + "</button>" +
       '<button type="button" class="icn" id="fo-close" aria-label="Zamknij tryb Focus i wróć do listy">' + ICON.x + "</button></span>" +
       '<label class="sr" for="fo-deck">Talia</label><select id="fo-deck" class="fsel deck">' + DECKS.map(function (d) {
         return '<option value="' + d[0] + '"' + (S.fo.deck === d[0] ? " selected" : "") + ">" + d[1] + "</option>";
@@ -960,6 +1167,7 @@
     var deck = fDeck(c.id), next = deck[deck.indexOf(c) + 1];
     S.fans[c.i] = v ? 1 : 0;
     if (v) S.fknown[c.i] = true; else delete S.fknown[c.i];
+    recordAnswer("f" + (c.i + 1), !!v);
     FOC.dirty = false; save(); header();
     if (next) goCard(next.id); else renderFocus();
   }
@@ -1031,7 +1239,8 @@
     }
     if (t.closest(".chk")) {
       if (!DRAFT[i] || !DRAFT[i].length) return;
-      S.ans[i] = DRAFT[i].slice().sort(); delete DRAFT[i]; save(); header(); renderFocus();
+      S.ans[i] = DRAFT[i].slice().sort(); delete DRAFT[i];
+      recordAnswer("q" + (i + 1), isRight(i, S.ans[i])); save(); header(); renderFocus();
       var nx = $("#fo-next");
       (nx.disabled ? $("#fo-stage") : nx).focus({ preventScroll: true });
       return;
@@ -1069,7 +1278,7 @@
   });
   window.addEventListener("pagehide", function () { if (FOC.dirty) save(); });
   document.addEventListener("click", function (ev) {
-    var b = ev.target.closest ? ev.target.closest(".seg-b") : null;
+    var b = ev.target.closest ? ev.target.closest(".seg-b[data-mode]") : null;
     if (!b || b.getAttribute("aria-pressed") === "true") return;
     if (b.dataset.mode === "focus") enterFocus(CUR); else exitFocus();
   });
@@ -1115,8 +1324,10 @@
     el.style.width = pct + "%";
     el.className = cls || "";
   }
-  function header() {
+  function header(quiet) {
     var c = counts(), total = Q.length + F.length, done = c.kq + c.kf;
+    checkBadges(c, quiet);
+    paintGx();
     $("#m-all-pct").textContent = Math.round(done / total * 100) + "%";
     $("#m-all-label").textContent = done + " / " + total;
     $("#pg-q").textContent = c.kq + "/" + Q.length;
@@ -1305,6 +1516,7 @@
       if (r.sub) APIM.show(r.sub);
       r.sub = APIM.api();
     }
+    else if (tab === "ustawienia") renderSettings();
     else { renderStats(); renderGrids(); }
     paintBack();
   }
@@ -1342,6 +1554,7 @@
     S.theme = THEME_NEXT[S.theme];
     save();
     paintTheme();
+    if (CUR === "ustawienia") renderSettings();
   });
   paintTheme();
 
@@ -1351,7 +1564,7 @@
     else if (b) window.scrollTo(0, 0);
   });
 
-  header();
+  header(true);
   if (S.sim && !S.sim.done) startTick();
   /* First paint: a reload comes back to the same entry and scroll position; a fresh open follows the hash. */
   var first = null;

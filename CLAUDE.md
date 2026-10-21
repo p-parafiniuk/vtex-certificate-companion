@@ -63,7 +63,7 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 ## Always show it
 Every answer that changes or proposes UI ends with a visualization the user can see without running anything:
 - **Change made**: run `npm run build`, then `npm run shots -- <hash of each touched view>`, look at the PNGs yourself, and send the relevant ones to the user (SendUserFile, or attach them to the PR). At least 375 px dark and desktop light.
-- **Change proposed, not made yet**: a small ASCII wireframe or a Mermaid diagram of the layout or flow, before writing code.
+- **Change proposed, not made yet**: a **Claude Design** mockup, before writing code. Use the Artifact tool (`quickstart` with intent `design`, then the Design type), build the screens from the tokens in `src/styles/app.css` (no other design system unless the user names one), with at least 390 px dark and desktop light, and give the user the link. When the user says "vis" or "dawaj vis", this is what they mean. ASCII or Mermaid is fine for a data flow, never as the only picture of a UI.
 - **Data or structure change**: a short table or diagram of what maps to what (e.g. category → APIs → doc pages).
 A report without a picture of a UI change is not finished.
 
@@ -75,7 +75,7 @@ A report without a picture of a UI change is not finished.
 - PR title in English, imperative. The body lists what changed, how it was verified (`npm run check`, the shots), and includes the screenshots.
 
 ## Skills and reviewers
-`/feature`, `/fix`, `/ux`, `/security` do the work. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.
+`/feature`, `/fix`, `/ux`, `/security`, `/gamify` do the work. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.
 
 ## Verifying a change
 1. Run `npm run check`. It must be green, with no warnings you didn't expect.

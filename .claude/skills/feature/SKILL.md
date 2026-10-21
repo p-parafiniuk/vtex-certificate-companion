@@ -8,7 +8,7 @@ description: Add a feature to VTEX API Drill, either app behaviour (a new mode, 
 Read `CLAUDE.md` first if it is not already in context. Work in `src/` only.
 
 ## 0. Plan and branch
-- Before code, show the plan: for UI, an ASCII wireframe of the new layout; for data, a table of what maps to what. Say which views (hashes) change.
+- Before code, show the plan: for UI, a Claude Design mockup of the new screens (`CLAUDE.md` › Always show it), with its link; for data, a table of what maps to what. Say which views (hashes) change.
 - Create the branch as `CLAUDE.md` › Branches and PRs says (e.g. `feat/<topic>`), unless the session already dictates one.
 
 ## 1. Decide the type
