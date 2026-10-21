@@ -42,15 +42,32 @@
   <p class="notice" id="storage-warn" hidden>Przeglądarka blokuje zapis lokalny. Postęp zniknie po zamknięciu tej strony.</p>
 
   <section class="panel" id="p-pytania" role="tabpanel" aria-labelledby="t-pytania" hidden>
-    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how"><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
-    <p class="lead"><strong>Jedna baza do APIs &amp; Integrations Badge: 161 pytań wielokrotnego wyboru.</strong> W każdym pytaniu poprawna może być <strong>jedna odpowiedź albo kilka</strong>. Zaznacz wszystkie pasujące i kliknij <strong>Sprawdź odpowiedź</strong>. Liczy się tylko komplet. Po błędzie dostajesz link do dokumentacji VTEX. Zaznacz <strong>Umiem</strong>, gdy pytanie masz opanowane.</p>
-    <div class="toolbar">
-      <div class="chips" id="sets" role="group" aria-label="Filtr rundy"></div>
-      <div class="chips" id="chips" role="group" aria-label="Filtr obszaru"></div>
-      <div class="row"><label class="check" for="hide-known"><input type="checkbox" id="hide-known"> Ukryj opanowane</label>
-      <label class="check" for="hint-on"><input type="checkbox" id="hint-on"> Pokazuj, ile odpowiedzi jest poprawnych</label></div>
+    <div class="cats-layout">
+      <nav class="cats" id="cats" aria-label="Kategorie pytań"></nav>
+      <div class="cat-main">
+        <div class="cat-head" id="cat-head"></div>
+        <div class="ctabs" id="ctabs" role="tablist" aria-label="Sekcje kategorii">
+          <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania">Pytania</button>
+          <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api">Ścieżki API</button>
+          <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
+        </div>
+        <div class="csec" id="cs-pytania" role="tabpanel" aria-labelledby="ct-pytania">
+          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how"><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
+          <p class="lead" id="q-lead"><strong>Jedna baza do APIs &amp; Integrations Badge: 161 pytań wielokrotnego wyboru.</strong> W każdym pytaniu poprawna może być <strong>jedna odpowiedź albo kilka</strong>. Zaznacz wszystkie pasujące i kliknij <strong>Sprawdź odpowiedź</strong>. Liczy się tylko komplet. Po błędzie dostajesz link do dokumentacji VTEX. Zaznacz <strong>Umiem</strong>, gdy pytanie masz opanowane. Kategorie po lewej zawężają bazę do jednego obszaru.</p>
+          <div class="toolbar">
+            <div class="chips" id="sets" role="group" aria-label="Filtr rundy"></div>
+            <div class="row"><label class="check" for="hide-known"><input type="checkbox" id="hide-known"> Ukryj opanowane</label>
+            <label class="check" for="hint-on"><input type="checkbox" id="hint-on"> Pokazuj, ile odpowiedzi jest poprawnych</label></div>
+          </div>
+          <div class="list" id="qlist"></div>
+        </div>
+        <div class="csec" id="cs-api" role="tabpanel" aria-labelledby="ct-api" hidden>
+          <p class="lead" id="api-lead"></p>
+          <div id="catapi"></div>
+        </div>
+        <div class="csec" id="cs-docs" role="tabpanel" aria-labelledby="ct-docs" hidden></div>
+      </div>
     </div>
-    <div class="list" id="qlist"></div>
   </section>
 
   <section class="panel" id="p-symulacja" role="tabpanel" aria-labelledby="t-symulacja" hidden>
@@ -125,6 +142,9 @@
 /*@data DOCS*/
 
 /*@data HN*/
+
+/* Category views: APIs of the embedded API Map ([apiKey, tags?]) and API Reference pages ([slug, label]) per domain. */
+/*@data CATMAP*/
 
 /*@data Q*/
 

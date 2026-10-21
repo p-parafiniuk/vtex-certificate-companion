@@ -1,5 +1,7 @@
-/* VTEX API Map, mounted on demand into the shadow root of #apimap. Data: vtex/openapi-schemas, one API per item. */
-function bootApiMap(root, onNav) {
+/* VTEX API Map, mounted on demand into the shadow root of #apimap. Data: vtex/openapi-schemas, one API per item.
+   embed: a second copy inside a category view, { onDoc(url, label) }. It shows only the APIs given to scope(), keeps nothing
+   in storage, and opens API Reference links through onDoc (the category's docs frame) instead of a new tab. */
+function bootApiMap(root, onNav, embed) {
 "use strict";
 /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated, q query (* = required), a auth, b body, r responses}] */
 /*@data APIMAP*/
@@ -7,24 +9,35 @@ const METHODS = ["GET","POST","PUT","PATCH","DELETE"];
 const SCOPES = [["pvt","pvt"],["pub","pub"],["other","inne"],["open","tylko OPEN"]];
 const KEY = "apimap.v1";
 const KEYS = ["all", ...APIMAP.map(a => a.key)];
+let LIST = APIMAP;
 
 const $ = id => root.getElementById(id);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+/* API Reference anchors are the method plus the schema path, with {param} written as -param-. */
+const REF = "https://developers.vtex.com/docs/api-reference/";
+const apiRef = a => REF + a.ref;
+const epRef = ep => apiRef(ep.api) + "#" + ep.m.toLowerCase() + "-" + ep.p.replace(/\{([^}]+)\}/g, "-$1-");
+const refLink = (url, label, text) => `<a class="ref" href="${esc(url)}" target="_blank" rel="noopener" data-label="${esc(label)}">${text} ↗</a>`;
 const scopeOf = p => p.includes("/pvt/") || p.endsWith("/pvt") ? "pvt" : p.includes("/pub/") ? "pub" : "other";
 
 const state = { api: "catalog", depth: 2, q: "", methods: new Set(METHODS), scopes: new Set(["pvt","pub","other"]), onlyOpen: false, open: new Map() };
-try {
+if (!embed) try {
   const p = JSON.parse(localStorage.getItem(KEY) || "{}");
   if (p && KEYS.includes(p.api)) state.api = p.api;
   if (p && [0,1,2,3,99].includes(p.depth)) state.depth = p.depth;
 } catch(e){ /* defaults */ }
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify({api: state.api, depth: state.depth})); }catch(e){ /* not persisted */ } }
+function save(){ if (embed) return; try{ localStorage.setItem(KEY, JSON.stringify({api: state.api, depth: state.depth})); }catch(e){ /* not persisted */ } }
 
 /* ---------- controls ---------- */
-function buildControls(){
-  const total = APIMAP.reduce((n,a)=>n+a.eps.length,0);
+function buildApis(){
+  const total = LIST.reduce((n,a)=>n+a.eps.length,0);
+  $("apis").hidden = LIST.length < 2;
   $("apis").innerHTML = [`<button type="button" class="chip" data-k="all">Wszystkie <span>${total}</span></button>`,
-    ...APIMAP.map(a=>`<button type="button" class="chip" data-k="${esc(a.key)}">${esc(a.name)} <span>${a.eps.length}</span></button>`)].join("");
+    ...LIST.map(a=>`<button type="button" class="chip" data-k="${esc(a.key)}">${esc(a.name)} <span>${a.eps.length}</span></button>`)].join("");
+}
+function buildControls(){
+  buildApis();
+  if (embed) root.querySelector(".top").hidden = true;
   $("methods").innerHTML = METHODS.map(m=>`<button type="button" data-m="${m}" style="--c:var(--${m.toLowerCase()})">${m}</button>`).join("");
   $("scopes").innerHTML = SCOPES.map(([k,l])=>`<button type="button" data-s="${k}">${l}</button>`).join("");
   $("depth").innerHTML = [["0","zwiń"],["1","1"],["2","2"],["3","3"],["99","wszystko"]].map(([d,l])=>`<button type="button" data-d="${d}">${l}</button>`).join("");
@@ -111,7 +124,7 @@ function renderNode(n, depth, isApiRoot){
 let EPS = new Map();
 function render(){
   syncControls();
-  const apis = state.api==="all" ? APIMAP : APIMAP.filter(a=>a.key===state.api);
+  const apis = state.api==="all" ? LIST : LIST.filter(a=>a.key===state.api);
   EPS = new Map();
   let html="", tot=0, open=0;
   const c={GET:0,POST:0,PUT:0,PATCH:0,DELETE:0};
@@ -125,10 +138,15 @@ function render(){
   $("tree").innerHTML = html || `<div class="empty">Nic nie pasuje do filtrów. Wyczyść wyszukiwanie albo włącz więcej metod.</div>`;
   $("stats").innerHTML = `<span><b>${tot}</b> endpointów</span>` + METHODS.filter(m=>c[m]).map(m=>`<span><span class="m ${m}" style="width:auto">${m}</span> <b>${c[m]}</b></span>`).join("") + (open?`<span><b>${open}</b> OPEN</span>`:"");
   if (state.api==="all") $("server").innerHTML = `Auth (wszystkie API): <code>X-VTEX-API-AppKey</code> + <code>X-VTEX-API-AppToken</code> lub <code>VtexIdclientAutCookie</code>`;
-  else { const a=apis[0]; $("server").innerHTML = `Base URL: <code>${esc(a.server)}</code> · schemat: <code>${esc(a.file)}</code>`; }
+  else { const a=apis[0]; $("server").innerHTML = `Base URL: <code>${esc(a.server)}</code> · schemat: <code>${esc(a.file)}</code> · ${refLink(apiRef(a), a.name+" API", "API Reference")}`; }
 }
 
 /* ---------- endpoint detail ---------- */
+if (embed) root.addEventListener("click", e => {
+  const a = e.target.closest("a.ref");
+  if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+  e.preventDefault(); embed.onDoc(a.href, a.dataset.label);
+});
 $("tree").addEventListener("toggle", e => { const d=e.target; if (d.tagName==="DETAILS" && d.dataset.key && !state.q) state.open.set(d.dataset.key, d.open); }, true);
 $("tree").addEventListener("click", e => {
   const b = e.target.closest(".ep");
@@ -165,7 +183,7 @@ function detailHtml(ep){
     ${qs}
     ${bodyHtml(ep)}
     ${respHtml(ep)}
-    <div class="acts"><button type="button" data-copy="url">Kopiuj URL</button><button type="button" data-copy="curl">Kopiuj curl</button>${ep.b&&ep.b.ex?'<button type="button" data-copy="body">Kopiuj body</button>':""}</div>
+    <div class="acts">${refLink(epRef(ep), ep.m+" "+ep.p, "Dokumentacja endpointu")}<button type="button" data-copy="url">Kopiuj URL</button><button type="button" data-copy="curl">Kopiuj curl</button>${ep.b&&ep.b.ex?'<button type="button" data-copy="body">Kopiuj body</button>':""}</div>
   </div>`;
 }
 const srcNote = s => s==="schema" ? "przykład ze schematu" : s==="gen" ? "złożone z przykładów pól w schemacie" : "";
@@ -197,10 +215,17 @@ async function copy(btn, text){
 }
 
 function show(api){
-  if (!KEYS.includes(api) || api===state.api && $("tree").childElementCount) return;
+  if (!(api==="all" || LIST.some(a=>a.key===api)) || api===state.api && $("tree").childElementCount) return;
   state.api = api; state.open.clear(); save(); render();
 }
 
+/* list: [[apiKey, tags?]]; tags keep only the endpoints with those tags. */
+function scope(list){
+  LIST = list.map(([k, tags]) => { const a = APIMAP.find(x=>x.key===k); return tags ? {...a, eps: a.eps.filter(e=>tags.includes(e.t))} : a; });
+  state.api = LIST.length > 1 ? "all" : LIST[0].key; state.open.clear(); state.q = ""; $("q").value = "";
+  buildApis(); render();
+}
+
 buildControls(); render();
-return { show: api => show(api), api: () => state.api };
+return { show: api => show(api), api: () => state.api, scope };
 }

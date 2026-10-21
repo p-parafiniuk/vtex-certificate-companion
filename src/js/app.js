@@ -6,15 +6,20 @@
   var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api"];
   var VIEWS = TABS.concat(["focus"]);
   var LET = "ABCDEFG";
-  var DOM_NAME = {};
-  DOMS.forEach(function (d) { DOM_NAME[d[0]] = d[1]; });
+  /* No prototype: keys come from the URL and storage, and "constructor" must not count as a category. */
+  var DOM_NAME = Object.create(null), DOM_ICO = Object.create(null);
+  DOMS.forEach(function (d) { DOM_NAME[d[0]] = d[1]; DOM_ICO[d[0]] = d[2]; });
+  var REF = "https://developers.vtex.com/docs/api-reference/";
+  /* An endpoint page opened from the embedded API Map. It lives in history.state, so it is checked before it reaches the frame. */
+  var EP_URL = /^https:\/\/developers\.vtex\.com\/docs\/api-reference\/[a-z0-9-]+(#[A-Za-z0-9_\-\/.@]*)?$/;
+
 
   function $(sel) { return document.querySelector(sel); }
 
   /* ---------- state ---------- */
   /* v2: answers are arrays of selected option indexes (multi-select). Older single-index answers are dropped, "Umiem" marks stay. */
   var S = { v: 2, known: {}, fknown: {}, ans: {}, sims: [], hide: false, dom: "all", set: "all", hint: false, sim: null, simMin: 120, simPrac: true,
-    fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "" }, theme: "auto" };
+    fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" }, theme: "auto" };
   try {
     var raw = JSON.parse(localStorage.getItem(KEY) || "{}");
     if (raw && typeof raw === "object") {
@@ -44,6 +49,7 @@
         if (["all", "todo", "wrong"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
         S.fo.shuf = rf.shuf >>> 0;
         if (typeof rf.id === "string") S.fo.id = rf.id;
+        if (rf.dom === "all" || DOM_NAME[rf.dom]) S.fo.dom = rf.dom;
       }
       var rs = raw.sim;
       if (raw.v === 2 && rs && Array.isArray(rs.ids) && Array.isArray(rs.pr) && rs.ids.every(function (i) { return Q[i]; }) && rs.pr.every(function (i) { return F[i]; })) {
@@ -86,6 +92,18 @@
   var ORDER = Q.map(function (_, i) { return i; }).sort(function (a, b) { return DOM_POS[Q[a].d] - DOM_POS[Q[b].d] || a - b; });
   var PRACTICAL = [];
   F.forEach(function (f, i) { if (/^Practical:/.test(f.q)) PRACTICAL.push(i); });
+
+  /* Doc pages per category, most cited first: [key, number of items linking to it]. */
+  var CAT_DOCS = {};
+  DOMS.forEach(function (d) {
+    var n = {};
+    Q.concat(F).forEach(function (x) { if (x.d === d[0]) (x.l || []).forEach(function (k) { n[k] = (n[k] || 0) + 1; }); });
+    CAT_DOCS[d[0]] = Object.keys(n).sort(function (a, b) { return n[b] - n[a] || (a < b ? -1 : 1); }).map(function (k) { return [k, n[k]]; });
+  });
+  function plural(n, one, few, many) {
+    var t = n % 10, h = n % 100;
+    return n + " " + (n === 1 ? one : t >= 2 && t <= 4 && (h < 12 || h > 14) ? few : many);
+  }
 
   function pTitle(f) { var t = f.q.replace(/^Practical:\s*/, ""); return t.charAt(0).toUpperCase() + t.slice(1); }
   function nRight(q) { return q.n || 1; }
@@ -186,30 +204,40 @@
   }
 
   /* ---------- Pytania ---------- */
+  function catHref(d, sec) {
+    return "#" + hashOf({ tab: "pytania", cat: d === "all" ? undefined : d, sec: sec });
+  }
   function renderChips() {
-    var per = {}, sets = { all: [0, 0], "1": [0, 0], "2": [0, 0] }, tot = [0, 0];
+    var per = { all: [0, 0] }, sets = { all: [0, 0], "1": [0, 0], "2": [0, 0] };
     DOMS.forEach(function (d) { per[d[0]] = [0, 0]; });
     Q.forEach(function (q, i) {
       var k = S.known[i] ? 1 : 0;
-      sets.all[0] += k; sets.all[1]++;
-      sets[q.r][0] += k; sets[q.r][1]++;
+      if (S.dom === "all" || q.d === S.dom) { sets.all[0] += k; sets.all[1]++; sets[q.r][0] += k; sets[q.r][1]++; }
       if (!inSet(q)) return;
       per[q.d][0] += k; per[q.d][1]++;
-      tot[0] += k; tot[1]++;
+      per.all[0] += k; per.all[1]++;
     });
     $("#sets").innerHTML = [["all", "Obie rundy"], ["1", "Runda 1"], ["2", "Runda 2 (luki)"]].map(function (s) {
       return '<button type="button" class="chip" data-set="' + s[0] + '" aria-pressed="' + (S.set === s[0]) +
         '">' + s[1] + " <small>" + sets[s[0]][0] + "/" + sets[s[0]][1] + "</small></button>";
     }).join("");
-    var html = '<button type="button" class="chip" data-dom="all" aria-pressed="' + (S.dom === "all") +
-      '">Wszystkie obszary <small>' + tot[0] + "/" + tot[1] + "</small></button>";
-    DOMS.forEach(function (d) {
+    /* Switching category keeps the open section, so API paths can be compared across areas. */
+    var sec = S.dom === "all" ? undefined : NAV.cur.sec;
+    $("#cats").innerHTML = [["all", "Wszystkie pytania", "📚"]].concat(DOMS).map(function (d) {
       var p = per[d[0]];
-      if (!p[1]) return;
-      html += '<button type="button" class="chip" data-dom="' + d[0] + '" aria-pressed="' + (S.dom === d[0]) +
-        '">' + esc(d[1]) + " <small>" + p[0] + "/" + p[1] + "</small></button>";
-    });
-    $("#chips").innerHTML = html;
+      return '<a class="cat" data-nav href="' + catHref(d[0], d[0] === "all" ? undefined : sec) + '"' + (S.dom === d[0] ? ' aria-current="page"' : "") +
+        ' title="Opanowane w tej kategorii: ' + p[0] + " z " + p[1] + '"><span class="cat-i" aria-hidden="true">' + esc(d[2]) + '</span><span class="cat-n">' + esc(d[1]) +
+        "</span><small>" + p[0] + "/" + p[1] + "</small></a>";
+    }).join("");
+    /* On phones the panel is one scrolling row: keep the open category in view. */
+    var cats = $("#cats"), on = cats.querySelector('[aria-current="page"]');
+    if (on && cats.scrollWidth > cats.clientWidth) cats.scrollLeft = on.offsetLeft - cats.offsetLeft - (cats.clientWidth - on.offsetWidth) / 2;
+    var all = S.dom === "all", nq = 0, kq = 0, nf = 0;
+    Q.forEach(function (q, i) { if (all || q.d === S.dom) { nq++; if (S.known[i]) kq++; } });
+    F.forEach(function (f) { if (all || f.d === S.dom) nf++; });
+    $("#cat-head").innerHTML = '<h2><span class="cat-i" aria-hidden="true">' + esc(all ? "📚" : DOM_ICO[S.dom]) + "</span>" + esc(all ? "Wszystkie pytania" : DOM_NAME[S.dom]) + "</h2>" +
+      '<p class="cat-sub">' + plural(nq, "pytanie", "pytania", "pytań") + " · " + plural(nf, "fiszka", "fiszki", "fiszek") +
+      (all ? "" : " · " + plural(catDocs(S.dom, {}).length, "strona", "strony", "stron") + " dokumentacji") + " · opanowane " + kq + "/" + nq + "</p>";
   }
   function renderQ() {
     var html = "";
@@ -222,11 +250,105 @@
     });
     $("#qlist").innerHTML = html || (S.hide
       ? '<p class="empty">Wszystko w tym filtrze masz opanowane. Odznacz „Ukryj opanowane”, aby zobaczyć pytania.</p>'
-      : '<p class="empty">W tej rundzie nie ma pytań z tego obszaru. Wybierz inny obszar albo „Obie rundy”.</p>');
+      : '<p class="empty">W tej rundzie nie ma pytań z tej kategorii. Wybierz „Obie rundy” albo inną kategorię.</p>');
+    $("#q-lead").hidden = S.dom !== "all";
     $("#hide-known").checked = S.hide;
     $("#hint-on").checked = S.hint;
     renderChips();
   }
+  /* ---------- Kategoria: questions, API paths from the OpenAPI schemas, documentation in a frame ---------- */
+  var CATAPI = null, CATAPI_D = null;
+  function renderCat() {
+    var all = S.dom === "all", sec = all ? "pytania" : NAV.cur.sec || "pytania";
+    $("#ctabs").hidden = all;
+    ["pytania", "api", "docs"].forEach(function (k) {
+      $("#cs-" + k).hidden = k !== sec;
+      $("#ct-" + k).setAttribute("aria-selected", k === sec);
+      $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
+    });
+    $("#ct-docs").innerHTML = "Dokumentacja" + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
+    if (sec !== "docs") clearDocs();
+    if (sec === "pytania") renderQ(); else renderChips();
+    if (sec === "api") renderCatApi(S.dom);
+    if (sec === "docs") renderDocs(S.dom, NAV.cur);
+  }
+  function renderCatApi(d) {
+    var list = CATMAP[d].api;
+    $("#api-lead").innerHTML = list.length
+      ? "Ścieżki z publicznych schematów OpenAPI VTEX (vtex/openapi-schemas) dla tej kategorii. Kliknij endpoint: pełny URL, auth, query, body, odpowiedzi i curl. Wszystkie API są w zakładce <a data-nav href=\"#api\">API Map</a>."
+      : 'W mapie nie ma schematu OpenAPI dla tej kategorii. Ścieżki i przykłady znajdziesz w sekcji <a data-nav href="' + catHref(d, "docs") + '">Dokumentacja</a>.';
+    $("#catapi").hidden = !list.length;
+    if (!list.length) return;
+    if (!CATAPI) {
+      var root = $("#catapi").attachShadow({ mode: "open" });
+      root.appendChild($("#apimap-tpl").content.cloneNode(true));
+      CATAPI = bootApiMap(root, null, { onDoc: function (url, label) {
+        go({ tab: "pytania", cat: S.dom, sec: "docs", doc: "ep", url: url, lbl: String(label || "").slice(0, 300) });
+      } });
+    }
+    if (CATAPI_D !== d) { CATAPI.scope(list); CATAPI_D = d; }
+    kotyTop();
+  }
+  /* The frame loads only while the Docs section is open; leaving it drops the frame so nothing keeps loading in the background. */
+  function clearDocs() {
+    var el = $("#cs-docs");
+    if (el.dataset.k) { el.innerHTML = ""; el.dataset.k = ""; }
+  }
+  /* The category's pages: the endpoint opened from its API map, its API Reference pages, then the pages its questions and flashcards cite. */
+  function catDocs(d, r) {
+    var out = [];
+    if (r.doc === "ep" && EP_URL.test(r.url || "")) out.push({ id: "ep", url: r.url, label: r.lbl || "Endpoint", g: "Otwarty endpoint" });
+    CATMAP[d].ref.forEach(function (x) { out.push({ id: "r-" + x[0], url: REF + x[0], label: x[1], g: "API Reference" }); });
+    CAT_DOCS[d].forEach(function (x) { out.push({ id: x[0], url: DOCS[x[0]][0], label: DOCS[x[0]][1], n: x[1], g: "Z pytań i fiszek" }); });
+    return out;
+  }
+  function renderDocs(d, r) {
+    var list = catDocs(d, r), el = $("#cs-docs"), cur = null;
+    list.forEach(function (x) { if (x.id === r.doc) cur = x; });
+    cur = cur || list[0];
+    if (!cur) { el.innerHTML = '<p class="empty">Ta kategoria nie ma jeszcze linków do dokumentacji.</p>'; return; }
+    if (el.dataset.k === d + " " + cur.url) return;
+    el.dataset.k = d + " " + cur.url;
+    var g = "", html = "";
+    list.forEach(function (x) {
+      if (x.g !== g) { g = x.g; html += '<p class="docg">' + esc(g) + "</p>"; }
+      html += '<a class="docb" data-nav href="' + catHref(d, "docs") + "-" + esc(x.id) + '"' + (x === cur ? ' aria-current="page"' : "") + ">" +
+        "<span>" + esc(x.label) + "</span>" + (x.n ? '<small title="Pytania i fiszki z tym linkiem">' + x.n + "</small>" : "") + "</a>";
+    });
+    el.innerHTML = '<div class="docs"><nav class="doclist" aria-label="Strony dokumentacji tej kategorii">' + html + "</nav>" +
+      '<div class="docview"><div class="docbar"><span class="docurl">' + esc(cur.url.replace(/^https:\/\//, "")) + "</span>" +
+      '<a class="btn small" href="' + esc(cur.url) + '" target="_blank" rel="noopener">Otwórz w nowej karcie ↗</a></div>' +
+      (/^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\//.test(cur.url)
+        ? '<iframe class="docframe" src="' + esc(cur.url) + '" title="' + esc(cur.label) + '" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>'
+        : "") +
+      '<p class="how">Strona ładuje się z serwera VTEX, więc potrzebny jest internet. Jeśli ramka zostanie pusta, serwis nie pozwala się osadzić: użyj „Otwórz w nowej karcie”.</p></div></div>';
+  }
+  $("#ctabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".ctab");
+    if (!b || b.getAttribute("aria-selected") === "true") return;
+    go({ tab: "pytania", cat: S.dom, sec: b.dataset.sec === "pytania" ? undefined : b.dataset.sec });
+  });
+  /* Tabs pattern: arrows move between sections, only the selected tab is in the Tab order. */
+  $("#ctabs").addEventListener("keydown", function (ev) {
+    var tabs = [].slice.call(document.querySelectorAll("#ctabs .ctab")), at = tabs.indexOf(ev.target);
+    var k = ev.key, to = k === "ArrowRight" ? at + 1 : k === "ArrowLeft" ? at - 1 : k === "Home" ? 0 : k === "End" ? tabs.length - 1 : null;
+    if (at < 0 || to === null) return;
+    ev.preventDefault();
+    var t = tabs[(to + tabs.length) % tabs.length];
+    t.click(); t.focus();
+  });
+  /* In-app links (side panel, docs list) are real hrefs, so a new tab or a copied link opens the same view. */
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest ? ev.target.closest("a[data-nav]") : null;
+    if (!a || ev.ctrlKey || ev.metaKey || ev.shiftKey || ev.altKey || ev.button) return;
+    ev.preventDefault();
+    var href = a.getAttribute("href"), r = parseHash(href);
+    if (hashOf(r) !== hashOf(NAV.cur)) go(r);
+    /* The lists re-render on navigation; keep keyboard focus on the link that was used. */
+    var again = document.querySelector('a[data-nav][href="' + href.replace(/["\\]/g, "") + '"]');
+    if (again) again.focus({ preventScroll: true });
+  });
+
   function swapCard(card, i, focusSel) {
     card.insertAdjacentHTML("afterend", qCard(i, "learn", learnSel(i)));
     var fresh = card.nextElementSibling;
@@ -267,16 +389,10 @@
     if (S.hide && S.known[i]) card.hidden = true;
     renderChips(); header();
   });
-  $("#chips").addEventListener("click", function (ev) {
-    var b = ev.target.closest(".chip");
-    if (!b) return;
-    S.dom = b.dataset.dom; save(); renderQ();
-  });
   $("#sets").addEventListener("click", function (ev) {
     var b = ev.target.closest(".chip");
     if (!b) return;
     S.set = b.dataset.set;
-    if (S.dom !== "all" && !Q.some(function (q) { return q.d === S.dom && inSet(q); })) S.dom = "all";
     save(); renderQ();
   });
   $("#hide-known").addEventListener("change", function (ev) {
@@ -624,7 +740,7 @@
     clearTimeout(armed); armed = null;
     b.textContent = "Zresetuj cały postęp";
     S.known = {}; S.fknown = {}; S.ans = {}; S.sims = []; S.sim = null; DRAFT = {}; stopTick();
-    S.fans = {}; S.ptxt = {}; S.fo = { deck: "all", flt: "all", shuf: 0, id: "" };
+    S.fans = {}; S.ptxt = {}; S.fo = { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" };
     save(); renderStats(); renderGrids(); header();
   });
 
@@ -664,7 +780,7 @@
     x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5;
     return x >>> 0;
   }
-  function fBase() { return CARDS.filter(function (c) { return (S.fo.deck === "all" || c.t === S.fo.deck) && inSet(c); }); }
+  function fBase() { return CARDS.filter(function (c) { return (S.fo.deck === "all" || c.t === S.fo.deck) && (S.fo.dom === "all" || c.d === S.fo.dom) && inSet(c); }); }
   function fPass(c) {
     if (S.fo.flt === "todo") return !cKnown(c) && cState(c) !== 1;
     if (S.fo.flt === "wrong") return cState(c) === 2;
@@ -706,13 +822,16 @@
         : '<button type="button" class="fface" id="fo-flip" aria-expanded="false"><span class="fq">' + fmt(f.q) + '</span><span class="fhint">' + ICON.flip + "Kliknij, aby odsłonić odpowiedź</span></button>") +
       "</article>";
   }
-  function fSettings(base) {
+  function fSettings(base, cur) {
     var todo = 0, wrong = 0;
     base.forEach(function (c) { var s = cState(c); if (s === 2) wrong++; if (!cKnown(c) && s !== 1) todo++; });
     function chip(attr, val, label, n, on) {
       return '<button type="button" class="chip" data-' + attr + '="' + val + '" aria-pressed="' + on + '">' + label + (n === null ? "" : " <small>" + n + "</small>") + "</button>";
     }
+    var fd = S.fo.dom !== "all" ? S.fo.dom : cur ? cur.d : "";
     return '<div class="setup fset" id="fo-set"' + (FOC.set ? "" : " hidden") + ">" +
+      (fd ? '<div class="fs"><h3 id="fo-h-dom">Kategoria</h3><div class="chips" role="group" aria-labelledby="fo-h-dom">' +
+        chip("fdom", fd, esc(DOM_ICO[fd] + " " + DOM_NAME[fd]), null, S.fo.dom !== "all") + chip("fdom", "all", "Wszystkie kategorie", null, S.fo.dom === "all") + "</div></div>" : "") +
       '<div class="fs"><h3 id="fo-h-flt">Które karty</h3><div class="chips" role="group" aria-labelledby="fo-h-flt">' +
       chip("flt", "all", "Wszystkie", base.length, S.fo.flt === "all") + chip("flt", "todo", "Do nauki", todo, S.fo.flt === "todo") + chip("flt", "wrong", "Tylko błędne", wrong, S.fo.flt === "wrong") +
       '</div><p class="how">„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem.</p></div>' +
@@ -757,7 +876,7 @@
       }).join("") : "<option>" + (S.fo.shuf && deck.length ? "Losowa kolejność" : "Brak kart") + "</option>") + "</select></div></div>";
 
     var C = 2 * Math.PI * 27;
-    var head = '<div class="fhead"><div class="fh-t"><h2>' + (c ? (S.fo.shuf ? "Losowa kolejność" : esc(DOM_NAME[c.d])) : "Brak kart") + "</h2>" +
+    var head = '<div class="fhead"><div class="fh-t"><h2>' + (c ? (S.fo.shuf ? "Losowa kolejność" : esc(DOM_ICO[c.d] + " " + DOM_NAME[c.d])) : "Brak kart") + "</h2>" +
       "<p>" + (c ? "Karta <strong>" + (sp + 1) + " z " + sec.length + "</strong>" + (S.fo.shuf ? " w talii" : " w tym obszarze") : "Zmień filtr, aby zobaczyć karty.") + "</p></div>" +
       '<div class="fh-p"><div class="fh-pl"><span class="fh-k">Postęp talii</span><span class="fh-v"><span><b class="g">' + right + "</b> z " + done + " dobrze</span><span><b>" + (total - done) + "</b> zostało</span><span>" + total + " razem</span></span></div>" +
       '<div class="meter2" role="img" aria-label="Poprawne ' + right + ", błędne " + wrong + ", zostało " + (total - done) + '"><i class="r" style="width:' + (total ? right / total * 100 : 0) + '%"></i><i class="w" style="width:' + (total ? wrong / total * 100 : 0) + '%"></i></div></div>' +
@@ -782,7 +901,7 @@
       '<span class="fpos">' + (c ? (pos + 1) + " / " + deck.length : "") + "</span>" +
       '<button type="button" class="btn primary big" id="fo-next"' + (pos > -1 && pos < deck.length - 1 ? "" : " disabled") + ">Następna ›</button></div>";
 
-    $("#focusroot").innerHTML = top + fSettings(base) + head + '<div class="fstage" id="fo-stage" tabindex="-1">' + card + "</div>" + nav + strip;
+    $("#focusroot").innerHTML = top + fSettings(base, c) + head + '<div class="fstage" id="fo-stage" tabindex="-1">' + card + "</div>" + nav + strip;
   }
 
   function goCard(id) {
@@ -817,6 +936,8 @@
   }
   function enterFocus(from) {
     var flash = from === "fiszki";
+    /* From a category the deck holds only that category; from the flashcard list it spans all of them. */
+    S.fo.dom = flash ? "all" : S.dom;
     if (S.fo.deck !== "all" && (S.fo.deck === "q") === flash) S.fo.deck = flash ? "f" : "q";
     var strict = fDeck(null), c = BY_ID[S.fo.id];
     function fits(x) { return (x.t === "q") !== flash && (flash || S.dom === "all" || x.d === S.dom); }
@@ -826,7 +947,7 @@
   function exitFocus() {
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
-    go({ tab: flash ? "fiszki" : "pytania" });
+    go(flash ? { tab: "fiszki" } : { tab: "pytania", cat: S.fo.dom === "all" ? undefined : S.fo.dom });
     var el = c && document.getElementById((flash ? "f-" : "q-") + (c.i + 1));
     if (el && !el.hidden) { el.scrollIntoView({ block: "center" }); remember(); }
   }
@@ -854,6 +975,8 @@
     b = t.closest(".grade");
     if (b) return fGrade(b.dataset.g === "1");
     if (t.closest("#fo-reset")) { S.fo.flt = "all"; return refocus(); }
+    b = t.closest("[data-fdom]");
+    if (b) { S.fo.dom = b.dataset.fdom; return refocus(); }
     b = t.closest("[data-flt]");
     if (b) { S.fo.flt = b.dataset.flt; return refocus(); }
     b = t.closest("[data-set]");
@@ -981,6 +1104,8 @@
     if (!bar) return;
     $("#koty").style.setProperty("--koty-top", bar.offsetHeight + "px");
     $("#apimap").style.setProperty("--apimap-top", bar.offsetHeight + "px");
+    $("#catapi").style.setProperty("--apimap-top", bar.offsetHeight + "px");
+    $("#cats").style.setProperty("--apimap-top", bar.offsetHeight + "px");
   }
   window.addEventListener("resize", kotyTop);
   function openKoty() {
@@ -1007,7 +1132,7 @@
     var b = $("#back-q"), from = NAV.cur.from;
     b.hidden = !(CUR === "http" && from);
     if (from) b.textContent = "← Wróć do " + from;
-    if (CUR === "http" || CUR === "api") kotyTop();
+    if (CUR === "http" || CUR === "api" || CUR === "pytania") kotyTop();
   }
   document.addEventListener("click", function (ev) {
     var c = ev.target.closest ? ev.target.closest(".hchip") : null;
@@ -1029,22 +1154,31 @@
   /* ---------- navigation ----------
      Each tab, HTTP Koty module, jumped-to status code, simulator card and Focus card is a history entry, so the
      browser's Back and Forward move between them and return to the same scroll position. The hash stays a bare
-     token (#fiszki, #http-kody, #symulacja-12, #focus-q12); everything else rides in history.state. */
+     token (#fiszki, #http-kody, #symulacja-12, #focus-q12, #pytania-catalog-docs-skus); everything else rides in history.state. */
   var NAV = { cur: { tab: "pytania", i: 0 }, prev: null, ok: true, mute: false, t: null };
   try { history.scrollRestoration = "manual"; } catch (e) { /* older browsers restore on their own */ }
   function hashOf(r) {
     if ((r.tab === "http" || r.tab === "api") && r.sub) return r.tab + "-" + r.sub;
     if (r.tab === "symulacja" && r.pos !== undefined) return "symulacja-" + (r.pos + 1);
     if (r.tab === "focus" && r.id) return "focus-" + r.id;
+    if (r.tab === "pytania" && r.cat) return "pytania-" + r.cat + (r.sec ? "-" + r.sec + (r.sec === "docs" && r.doc ? "-" + r.doc : "") : "");
     return r.tab;
   }
   function parseHash(h) {
-    var m = /^#?([a-z]+)(?:-([a-z0-9-]+))?$/.exec(h || "");
+    var m = /^#?([a-z]+)(?:-([a-z0-9_-]+))?$/.exec(h || "");
     if (!m || VIEWS.indexOf(m[1]) < 0) return { tab: "pytania" };
     var r = { tab: m[1] };
     if (m[2] && (r.tab === "http" || r.tab === "api")) r.sub = m[2];
     if (m[2] && r.tab === "symulacja" && +m[2] > 0) r.pos = +m[2] - 1;
     if (m[2] && r.tab === "focus") r.id = m[2];
+    if (m[2] && r.tab === "pytania") {
+      var p = m[2].split("-");
+      if (DOM_NAME[p[0]]) {
+        r.cat = p[0];
+        if (p[1] === "api" || p[1] === "docs") r.sec = p[1];
+        if (r.sec === "docs" && p[2]) r.doc = p.slice(2).join("-");
+      }
+    }
     return r;
   }
   function writeState(r, push) {
@@ -1083,9 +1217,19 @@
     $("#p-focus").hidden = tab !== "focus";
     /* Focus reuses the list's card markup and ids, so only one of the two is ever in the document. */
     if (tab !== "focus") $("#focusroot").innerHTML = "";
+    if (tab !== "pytania") clearDocs();
     document.body.dataset.view = tab;
     CUR = tab;
-    if (tab === "pytania") renderQ();
+    if (tab === "pytania") {
+      /* history.state is stored data: keep only a known category and section. */
+      if (!DOM_NAME[r.cat]) { delete r.cat; delete r.sec; }
+      if (r.sec !== "api" && r.sec !== "docs") delete r.sec;
+      if (r.sec !== "docs" || !/^[a-z0-9_-]+$/.test(r.doc || "")) delete r.doc;
+      if (r.doc !== "ep" || !EP_URL.test(r.url || "")) { delete r.url; delete r.lbl; }
+      var dom = r.cat || "all";
+      if (S.dom !== dom) { S.dom = dom; save(); }
+      renderCat();
+    }
     else if (tab === "symulacja") {
       if (S.sim && !S.sim.done) {
         if (r.pos === undefined || (r.sid && r.sid !== S.sim.start)) r.pos = S.sim.cur;
@@ -1104,6 +1248,7 @@
       if (fc) {
         if (S.fo.deck !== "all" && S.fo.deck !== fc.t) S.fo.deck = "all";
         if (!inSet(fc)) S.set = "all";
+        if (S.fo.dom !== "all" && fc.d !== S.fo.dom) S.fo.dom = "all";
       }
       if (FOC.id !== r.id) FOC.open = false;
       FOC.id = r.id;
@@ -1165,7 +1310,7 @@
 
   document.querySelector(".tabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".tab");
-    if (b && b.dataset.tab !== CUR) go({ tab: b.dataset.tab });
+    if (b && b.dataset.tab !== CUR) go(b.dataset.tab === "pytania" && S.dom !== "all" ? { tab: "pytania", cat: S.dom } : { tab: b.dataset.tab });
     else if (b) window.scrollTo(0, 0);
   });
 

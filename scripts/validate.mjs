@@ -9,6 +9,8 @@ const err = [], warn = [];
 const E = (w, m) => err.push(w + ": " + m), W = (w, m) => warn.push(w + ": " + m);
 const doms = new Set(D.DOMS.map(d => d[0]));
 const isStr = s => typeof s === "string" && s.trim() !== "";
+/* [key, name, emoji]: the emoji labels the category in the side panel */
+D.DOMS.forEach((d, i) => { if (!Array.isArray(d) || d.length !== 3 || !d.every(isStr)) E("DOMS[" + i + "]", "must be [key, name, emoji]"); });
 
 function markup(w, s) {
   if (typeof s !== "string") return;
@@ -63,6 +65,26 @@ for (const [k, v] of Object.entries(D.DOCS)) {
   else if (!/^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\//.test(v[0])) W("DOCS." + k, "url outside vtex.com docs: " + v[0]);
   if (!used.has(k)) W("DOCS." + k, "unused");
 }
+
+/* Categories */
+const apis = new Map(D.APIMAP.map(a => [a.key, a]));
+for (const d of doms) if (!D.CATMAP[d]) E("CATMAP", "missing category " + d);
+for (const [k, c] of Object.entries(D.CATMAP)) {
+  const w = "CATMAP." + k;
+  if (!doms.has(k)) E(w, "not in DOMS");
+  (c.api || []).forEach(([a, tags]) => {
+    if (!apis.has(a)) E(w, "api `" + a + "` not in APIMAP");
+    else if (tags && !tags.every(t => apis.get(a).eps.some(e => e.t === t))) E(w, "a tag of `" + a + "` matches no endpoint");
+  });
+  (c.ref || []).forEach(r => { if (!/^[a-z0-9-]+$/.test(r[0]) || !isStr(r[1])) E(w, "ref must be [slug, label]"); });
+}
+D.APIMAP.forEach(a => { if (!/^[a-z0-9-]+$/.test(a.ref || "")) E("APIMAP." + a.key, "ref must be the api-reference slug"); });
+/* Endpoint doc links must pass EP_URL in app.js, or the docs frame would silently show another page. */
+const EP_URL = /^https:\/\/developers\.vtex\.com\/docs\/api-reference\/[a-z0-9-]+(#[A-Za-z0-9_\-\/.@]*)?$/;
+D.APIMAP.forEach(a => a.eps.forEach(ep => {
+  const u = "https://developers.vtex.com/docs/api-reference/" + a.ref + "#" + ep.m.toLowerCase() + "-" + ep.p.replace(/\{([^}]+)\}/g, "-$1-");
+  if (!EP_URL.test(u)) W("APIMAP." + a.key, "endpoint doc link not accepted by EP_URL: " + ep.m + " " + ep.p);
+}));
 
 /* HTTP Koty */
 const codes = new Set();

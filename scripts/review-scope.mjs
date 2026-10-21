@@ -34,7 +34,7 @@ const SEC = [
   [/localStorage|sessionStorage|JSON\.parse/, "stored state"],
   [/location\.|parseHash|hashchange|URLSearchParams/, "URL input"],
   [/\besc\(|\bfmt\(/, "escaping helpers"],
-  [/<script|<link|<meta|http-equiv|https?:\/\/(?!developers\.vtex|help\.vtex|learn\.vtex)/, "head or external resource"],
+  [/<script|<link|<meta|<iframe|http-equiv|https?:\/\/(?!developers\.vtex|help\.vtex|learn\.vtex)/, "head, frame or external resource"],
   [/target="_blank"|\.href\s*=|\.src\s*=/, "links or resource URLs"]
 ];
 for (const [re, why] of SEC) if (re.test(added)) reasons["security-reviewer"].push(why);

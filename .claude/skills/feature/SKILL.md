@@ -7,6 +7,10 @@ description: Add a feature to VTEX API Drill, either app behaviour (a new mode, 
 
 Read `CLAUDE.md` first if it is not already in context. Work in `src/` only.
 
+## 0. Plan and branch
+- Before code, show the plan: for UI, an ASCII wireframe of the new layout; for data, a table of what maps to what. Say which views (hashes) change.
+- Create the branch as `CLAUDE.md` › Branches and PRs says (e.g. `feat/<topic>`), unless the session already dictates one.
+
 ## 1. Decide the type
 - **Content** (questions, flashcards, Koty entries, DOCS): go to section 3.
 - **Behaviour** (UI or logic in `src/js`, `src/styles`, templates): go to section 2.
@@ -31,5 +35,6 @@ Read `CLAUDE.md` first if it is not already in context. Work in `src/` only.
 ## 4. Verify
 - `npm run check` must be green.
 - Preview through the `drill` launch config, open the affected tab, use the feature, then reload and confirm the state persisted. The console must be clean.
+- Run `npm run shots -- <hashes>` for every touched view, look at the images, and send the user the 375 px dark and desktop light shots.
 - Run `/review` (the review skill). It picks the needed reviewers from the diff and does at most one round of fixes.
-- Report what was added (count per domain, or the behaviour), with the sources used and the review verdicts.
+- Report what was added (count per domain, or the behaviour), with the sources used, the review verdicts and the screenshots.
