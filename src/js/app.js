@@ -3,7 +3,7 @@
 
   var KEY = "vtex-drill-v1";
   var SIM_Q = 36, SIM_P = 4;
-  var TABS = ["pytania", "symulacja", "fiszki", "postep", "http"];
+  var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api"];
   var VIEWS = TABS.concat(["focus"]);
   var LET = "ABCDEFG";
   var DOM_NAME = {};
@@ -977,16 +977,29 @@
   /* ---------- HTTP Koty view ---------- */
   var KOTY = null, CUR = "pytania";
   function kotyTop() {
-    var host = $("#koty"), bar = document.querySelector(".bar");
-    if (host && bar) host.style.setProperty("--koty-top", bar.offsetHeight + "px");
+    var bar = document.querySelector(".bar");
+    if (!bar) return;
+    $("#koty").style.setProperty("--koty-top", bar.offsetHeight + "px");
+    $("#apimap").style.setProperty("--apimap-top", bar.offsetHeight + "px");
   }
+  window.addEventListener("resize", kotyTop);
   function openKoty() {
     if (!KOTY) {
       var root = $("#koty").attachShadow({ mode: "open" });
       root.appendChild($("#koty-tpl").content.cloneNode(true));
       /* A module picked inside HTTP Koty becomes its own history entry; the view is already switched. */
       KOTY = bootKoty(root, function (sub) { if (!NAV.mute) go({ tab: "http", sub: sub }, false, true); });
-      window.addEventListener("resize", kotyTop);
+    }
+    kotyTop();
+  }
+  /* ---------- VTEX API Map view ---------- */
+  var APIM = null;
+  function openApiMap() {
+    if (!APIM) {
+      var root = $("#apimap").attachShadow({ mode: "open" });
+      root.appendChild($("#apimap-tpl").content.cloneNode(true));
+      /* Picking an API is its own history entry, as with HTTP Koty modules. */
+      APIM = bootApiMap(root, function (api) { if (!NAV.mute) go({ tab: "api", sub: api }, false, true); });
     }
     kotyTop();
   }
@@ -994,7 +1007,7 @@
     var b = $("#back-q"), from = NAV.cur.from;
     b.hidden = !(CUR === "http" && from);
     if (from) b.textContent = "← Wróć do " + from;
-    if (CUR === "http") kotyTop();
+    if (CUR === "http" || CUR === "api") kotyTop();
   }
   document.addEventListener("click", function (ev) {
     var c = ev.target.closest ? ev.target.closest(".hchip") : null;
@@ -1020,16 +1033,16 @@
   var NAV = { cur: { tab: "pytania", i: 0 }, prev: null, ok: true, mute: false, t: null };
   try { history.scrollRestoration = "manual"; } catch (e) { /* older browsers restore on their own */ }
   function hashOf(r) {
-    if (r.tab === "http" && r.sub) return "http-" + r.sub;
+    if ((r.tab === "http" || r.tab === "api") && r.sub) return r.tab + "-" + r.sub;
     if (r.tab === "symulacja" && r.pos !== undefined) return "symulacja-" + (r.pos + 1);
     if (r.tab === "focus" && r.id) return "focus-" + r.id;
     return r.tab;
   }
   function parseHash(h) {
-    var m = /^#?([a-z]+)(?:-([a-z0-9]+))?$/.exec(h || "");
+    var m = /^#?([a-z]+)(?:-([a-z0-9-]+))?$/.exec(h || "");
     if (!m || VIEWS.indexOf(m[1]) < 0) return { tab: "pytania" };
     var r = { tab: m[1] };
-    if (m[2] && r.tab === "http") r.sub = m[2];
+    if (m[2] && (r.tab === "http" || r.tab === "api")) r.sub = m[2];
     if (m[2] && r.tab === "symulacja" && +m[2] > 0) r.pos = +m[2] - 1;
     if (m[2] && r.tab === "focus") r.id = m[2];
     return r;
@@ -1104,6 +1117,11 @@
       r.sub = KOTY.tab();
       if (r.code && !restore && KOTY.has(r.code)) KOTY.jump(r.code);
       NAV.mute = false;
+    }
+    else if (tab === "api") {
+      openApiMap();
+      if (r.sub) APIM.show(r.sub);
+      r.sub = APIM.api();
     }
     else { renderStats(); renderGrids(); }
     paintBack();

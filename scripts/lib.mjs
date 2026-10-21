@@ -22,7 +22,8 @@ export const BLOCKS = {
   QUESTIONS:   { file: "data/koty-quiz.json",  keys: "js",   layout: "lines", indent: "" },
   KLASS:       { file: "data/koty-meta.json",  pick: "KLASS",       keys: "js", layout: "inline" },
   IANA_NO_CAT: { file: "data/koty-meta.json",  pick: "IANA_NO_CAT", keys: "js", layout: "inline" },
-  KCAT:        { images: true, keys: "json", layout: "inline" }
+  KCAT:        { images: true, keys: "json", layout: "inline" },
+  APIMAP:      { file: "data/apimap.json", keys: "json", layout: "lines", indent: "" }
 };
 
 export const MARKER = /^\s*(?:<!--|\/\*)\s*@(include|data)\s+(\S+)\s*(?:-->|\*\/)\s*$/;

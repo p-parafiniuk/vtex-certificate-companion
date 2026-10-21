@@ -22,11 +22,13 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 ```
 src/index.html          skeleton with markers: <!--@include path--> and /*@data NAME*/
 src/styles/app.css      main app styles (tokens on :root, dark mode via prefers-color-scheme + [data-theme])
-src/js/app.js           main app IIFE: state S, tabs pytania|symulacja|fiszki|postep|http, focus mode, hash routing
+src/js/app.js           main app IIFE: state S, tabs pytania|symulacja|fiszki|postep|http|api, focus mode, hash routing
 src/koty/template.html  HTTP Koty markup, mounted lazily into a shadow root (#koty)
 src/styles/koty.css     HTTP Koty styles (scoped by the shadow root)
 src/js/koty.js          bootKoty(root, onNav), with its own state under localStorage "httpkoty.v1"
-src/data/*.json         all content, one item per line
+src/apimap/template.html, src/styles/apimap.css, src/js/apimap.js
+                        VTEX API Map, same pattern in #apimap: bootApiMap(root, onNav), state in "apimap.v1"
+src/data/*.json         all content, one item per line (apimap.json: one API per line, from vtex/openapi-schemas)
 src/img/cats/<code>.jpg http.cat images, inlined as KCAT at build time
 scripts/                lib (block formats), build, extract, validate, stats. Zero deps, Node >= 18.
 ```
