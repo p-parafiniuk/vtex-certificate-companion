@@ -145,18 +145,19 @@ $("tree").addEventListener("click", e => {
     copy(act, k==="curl" ? curl(ep) : k==="body" ? (ep.b&&ep.b.ex||"") : k.startsWith("r:") ? (ep.r[+k.slice(2)].ex||"") : fullUrl(ep)); }
 });
 const fullUrl = ep => ep.api.server.replace(/\/$/,"") + ep.p;
+const shq = s => String(s).replace(/'/g,"'\\''");
 function curl(ep){
   const q = ep.q.filter(x=>x.endsWith("*")).map(x=>x.slice(0,-1)+"=").join("&");
-  let s = `curl -X ${ep.m} '${fullUrl(ep)}${q?"?"+q:""}'`;
+  let s = `curl -X ${ep.m} '${shq(fullUrl(ep)+(q?"?"+q:""))}'`;
   if (ep.a) s += ` \\\n  -H 'X-VTEX-API-AppKey: $APP_KEY' \\\n  -H 'X-VTEX-API-AppToken: $APP_TOKEN'`;
   s += ` \\\n  -H 'Accept: application/json'`;
-  if (ep.b){ const body = ep.b.ex ? ep.b.ex.replace(/\n… \(ucięte[^)]*\)$/,"") : "{}"; s += ` \\\n  -H 'Content-Type: ${ep.b.ct}' \\\n  -d '${body.replace(/'/g,"'\\''")}'`; }
+  if (ep.b){ const body = ep.b.ex ? ep.b.ex.replace(/\n… \(ucięte[^)]*\)$/,"") : "{}"; s += ` \\\n  -H 'Content-Type: ${shq(ep.b.ct)}' \\\n  -d '${shq(body)}'`; }
   return s;
 }
 function detailHtml(ep){
   const url = esc(fullUrl(ep)).replace(/\{[^}]+\}/g, m=>`<i>${m}</i>`);
   const qs = ep.q.length ? `<div><span class="k">query</span><span class="qs">${ep.q.map(x=>`<span class="${x.endsWith("*")?"req":""}">${esc(x.replace(/\*$/,""))}${x.endsWith("*")?" *":""}</span>`).join("")}</span></div>` : "";
-  const auth = ep.a ? "X-VTEX-API-AppKey + X-VTEX-API-AppToken (lub VtexIdclientAutCookie)" : "brak wymaganej autoryzacji (security: [])";
+  const auth = ep.a ? "X-VTEX-API-AppKey + X-VTEX-API-AppToken (lub VtexIdclientAutCookie)" : "brak autoryzacji w schemacie";
   return `<div class="detail" data-id="${esc(idOf(ep))}">
     <div><span class="k">${ep.m}</span><span class="url">${url}</span></div>
     <div><span class="k">auth</span>${esc(auth)}</div>

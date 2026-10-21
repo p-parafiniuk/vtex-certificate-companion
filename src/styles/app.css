@@ -72,9 +72,9 @@ a { color: var(--accent); }
 .tabs { display: flex; gap: 4px; overflow-x: auto; }
 .tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .tab:hover { color: var(--ink); }
-@media (max-width: 480px) { .tab { padding: 8px 4px; font-size: 0.92rem; } .navrow { gap: 6px; } .theme-btn { width: 36px; } .tabs { justify-content: space-between; } }
+@media (max-width: 480px) { .tab { min-width: 44px; min-height: 44px; padding: 8px 4px; font-size: 0.92rem; } .navrow { gap: 6px; } .theme-btn { width: 36px; } .tabs { justify-content: space-between; } }
 /* Seven tabs: still one row without scrolling at 375 px. */
-@media (max-width: 400px) { .tab { padding: 8px 3px; font-size: 0.84rem; } .tabs { gap: 2px; } }
+@media (max-width: 400px) { .tab { min-width: 44px; min-height: 44px; padding: 8px 2px; font-size: 0.84rem; } .tabs { gap: 0; } }
 .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 
 /* page */

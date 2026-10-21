@@ -79,5 +79,8 @@ summary.apiroot .seg{font:700 15px var(--f-display);letter-spacing:.01em}
 .empty{padding:24px 8px;color:var(--muted);font-family:var(--f-body)}
 mark{background:var(--accent-soft);color:inherit;border-radius:2px}
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font:12px var(--f-body);color:var(--muted);padding-top:12px}
-@media (max-width:560px){ .ep .t{display:none} .detail{margin-left:8px} }
+.pair{display:inline-flex;gap:8px;align-items:center}
+/* Phones: the deck scrolls away so the tree keeps the screen, and summaries wrap instead of hiding off the right edge. */
+@media (max-width:560px){ .deck{position:static} .ep .t{display:none} .ep .s{white-space:normal} .detail{margin-left:8px} }
+@media (pointer:coarse),(max-width:560px){ .chip,.group button,.detail button{min-height:44px} .group button{min-width:44px} }
 @media (prefers-reduced-motion:reduce){ summary .caret{transition:none} }

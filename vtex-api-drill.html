@@ -82,9 +82,9 @@ a { color: var(--accent); }
 .tabs { display: flex; gap: 4px; overflow-x: auto; }
 .tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .tab:hover { color: var(--ink); }
-@media (max-width: 480px) { .tab { padding: 8px 4px; font-size: 0.92rem; } .navrow { gap: 6px; } .theme-btn { width: 36px; } .tabs { justify-content: space-between; } }
+@media (max-width: 480px) { .tab { min-width: 44px; min-height: 44px; padding: 8px 4px; font-size: 0.92rem; } .navrow { gap: 6px; } .theme-btn { width: 36px; } .tabs { justify-content: space-between; } }
 /* Seven tabs: still one row without scrolling at 375 px. */
-@media (max-width: 400px) { .tab { padding: 8px 3px; font-size: 0.84rem; } .tabs { gap: 2px; } }
+@media (max-width: 400px) { .tab { min-width: 44px; min-height: 44px; padding: 8px 2px; font-size: 0.84rem; } .tabs { gap: 0; } }
 .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 
 /* page */
@@ -1012,7 +1012,10 @@ summary.apiroot .seg{font:700 15px var(--f-display);letter-spacing:.01em}
 .empty{padding:24px 8px;color:var(--muted);font-family:var(--f-body)}
 mark{background:var(--accent-soft);color:inherit;border-radius:2px}
 .legend{display:flex;flex-wrap:wrap;gap:4px 14px;font:12px var(--f-body);color:var(--muted);padding-top:12px}
-@media (max-width:560px){ .ep .t{display:none} .detail{margin-left:8px} }
+.pair{display:inline-flex;gap:8px;align-items:center}
+/* Phones: the deck scrolls away so the tree keeps the screen, and summaries wrap instead of hiding off the right edge. */
+@media (max-width:560px){ .deck{position:static} .ep .t{display:none} .ep .s{white-space:normal} .detail{margin-left:8px} }
+@media (pointer:coarse),(max-width:560px){ .chip,.group button,.detail button{min-height:44px} .group button{min-width:44px} }
 @media (prefers-reduced-motion:reduce){ summary .caret{transition:none} }
 </style>
 <div class="wrap">
@@ -1031,10 +1034,10 @@ mark{background:var(--accent-soft);color:inherit;border-radius:2px}
       <div class="group" id="methods" role="group" aria-label="Metody"></div>
     </div>
     <div class="row">
-      <span class="lbl">Zakres</span>
-      <div class="group" id="scopes" role="group" aria-label="Zakres"></div>
-      <span class="lbl">Rozwiń</span>
-      <div class="group" id="depth" role="group" aria-label="Głębokość"></div>
+      <span class="pair"><span class="lbl">Zakres</span>
+      <span class="group" id="scopes" role="group" aria-label="Zakres"></span></span>
+      <span class="pair"><span class="lbl">Rozwiń</span>
+      <span class="group" id="depth" role="group" aria-label="Głębokość"></span></span>
     </div>
   </div>
 
@@ -1927,18 +1930,19 @@ $("tree").addEventListener("click", e => {
     copy(act, k==="curl" ? curl(ep) : k==="body" ? (ep.b&&ep.b.ex||"") : k.startsWith("r:") ? (ep.r[+k.slice(2)].ex||"") : fullUrl(ep)); }
 });
 const fullUrl = ep => ep.api.server.replace(/\/$/,"") + ep.p;
+const shq = s => String(s).replace(/'/g,"'\\''");
 function curl(ep){
   const q = ep.q.filter(x=>x.endsWith("*")).map(x=>x.slice(0,-1)+"=").join("&");
-  let s = `curl -X ${ep.m} '${fullUrl(ep)}${q?"?"+q:""}'`;
+  let s = `curl -X ${ep.m} '${shq(fullUrl(ep)+(q?"?"+q:""))}'`;
   if (ep.a) s += ` \\\n  -H 'X-VTEX-API-AppKey: $APP_KEY' \\\n  -H 'X-VTEX-API-AppToken: $APP_TOKEN'`;
   s += ` \\\n  -H 'Accept: application/json'`;
-  if (ep.b){ const body = ep.b.ex ? ep.b.ex.replace(/\n… \(ucięte[^)]*\)$/,"") : "{}"; s += ` \\\n  -H 'Content-Type: ${ep.b.ct}' \\\n  -d '${body.replace(/'/g,"'\\''")}'`; }
+  if (ep.b){ const body = ep.b.ex ? ep.b.ex.replace(/\n… \(ucięte[^)]*\)$/,"") : "{}"; s += ` \\\n  -H 'Content-Type: ${shq(ep.b.ct)}' \\\n  -d '${shq(body)}'`; }
   return s;
 }
 function detailHtml(ep){
   const url = esc(fullUrl(ep)).replace(/\{[^}]+\}/g, m=>`<i>${m}</i>`);
   const qs = ep.q.length ? `<div><span class="k">query</span><span class="qs">${ep.q.map(x=>`<span class="${x.endsWith("*")?"req":""}">${esc(x.replace(/\*$/,""))}${x.endsWith("*")?" *":""}</span>`).join("")}</span></div>` : "";
-  const auth = ep.a ? "X-VTEX-API-AppKey + X-VTEX-API-AppToken (lub VtexIdclientAutCookie)" : "brak wymaganej autoryzacji (security: [])";
+  const auth = ep.a ? "X-VTEX-API-AppKey + X-VTEX-API-AppToken (lub VtexIdclientAutCookie)" : "brak autoryzacji w schemacie";
   return `<div class="detail" data-id="${esc(idOf(ep))}">
     <div><span class="k">${ep.m}</span><span class="url">${url}</span></div>
     <div><span class="k">auth</span>${esc(auth)}</div>
