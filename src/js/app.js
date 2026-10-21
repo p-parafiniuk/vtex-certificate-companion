@@ -14,7 +14,7 @@
   /* ---------- state ---------- */
   /* v2: answers are arrays of selected option indexes (multi-select). Older single-index answers are dropped, "Umiem" marks stay. */
   var S = { v: 2, known: {}, fknown: {}, ans: {}, sims: [], hide: false, dom: "all", set: "all", hint: false, sim: null, simMin: 120, simPrac: true,
-    fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "" } };
+    fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "" }, theme: "auto" };
   try {
     var raw = JSON.parse(localStorage.getItem(KEY) || "{}");
     if (raw && typeof raw === "object") {
@@ -31,6 +31,7 @@
       if (raw.set === "1" || raw.set === "2") S.set = raw.set;
       if (raw.simMin > 0 && raw.simMin <= 600) S.simMin = Math.round(raw.simMin);
       if (raw.simPrac === false) S.simPrac = false;
+      if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
       if (raw.fans && typeof raw.fans === "object" && !Array.isArray(raw.fans)) {
         Object.keys(raw.fans).forEach(function (k) { if (F[k]) S.fans[k] = raw.fans[k] ? 1 : 0; });
       }
@@ -1120,6 +1121,30 @@
   window.addEventListener("scroll", function () {
     clearTimeout(NAV.t); NAV.t = setTimeout(remember, 250);
   }, { passive: true });
+  /* Theme: "auto" leaves data-theme off so the CSS follows the system setting. The head script applies the saved value before first paint. */
+  var THEME_NEXT = { auto: "light", light: "dark", dark: "auto" };
+  var THEME_NAME = { auto: "systemowy", light: "jasny", dark: "ciemny" };
+  var THEME_ICO = {
+    auto: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>',
+    light: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+    dark: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>'
+  };
+  function paintTheme() {
+    if (S.theme === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", S.theme);
+    var b = $("#theme-btn");
+    var label = "Motyw: " + THEME_NAME[S.theme] + ". Zmień na: " + THEME_NAME[THEME_NEXT[S.theme]];
+    b.setAttribute("aria-label", label);
+    b.title = label;
+    b.innerHTML = THEME_ICO[S.theme];
+  }
+  $("#theme-btn").addEventListener("click", function () {
+    S.theme = THEME_NEXT[S.theme];
+    save();
+    paintTheme();
+  });
+  paintTheme();
+
   document.querySelector(".tabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".tab");
     if (b && b.dataset.tab !== CUR) go({ tab: b.dataset.tab });

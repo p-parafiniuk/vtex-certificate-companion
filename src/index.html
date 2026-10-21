@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <title>VTEX API Drill</title>
+<script>(function () { try { var t = JSON.parse(localStorage.getItem("vtex-drill-v1") || "{}").theme; if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) { /* system theme */ } })();</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 <!--@include styles/app.css-->
@@ -23,13 +24,16 @@
       <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%"><span class="pg-k">Symulacja</span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
     </div>
     <button type="button" class="btn small" id="back-q" hidden></button>
-    <nav class="tabs" role="tablist" aria-label="Sekcje">
-      <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania">Pytania <span class="num">161</span></button>
-      <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja">Symulacja <span class="num">36+4</span></button>
-      <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki">Fiszki <span class="num">35</span></button>
-      <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep">Postęp</button>
-      <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP">HTTP</button>
-    </nav>
+    <div class="navrow">
+      <nav class="tabs" role="tablist" aria-label="Sekcje">
+        <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania">Pytania <span class="num">161</span></button>
+        <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja">Symulacja <span class="num">36+4</span></button>
+        <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki">Fiszki <span class="num">35</span></button>
+        <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep">Postęp</button>
+        <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP">HTTP</button>
+      </nav>
+      <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
+    </div>
   </div>
 </header>
 
