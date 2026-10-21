@@ -821,10 +821,17 @@
     if (quiet || !S.gx.toast) return;
     var b = fresh[fresh.length - 1], el = $("#gx-toast");
     el.innerHTML = '<span class="toast-i" aria-hidden="true">' + ICON.medal + '</span><span class="toast-t"><strong>Nowa odznaka: ' + esc(b.n) + "</strong><span>" +
-      esc(fresh.length > 1 ? b.d + " (i " + (fresh.length - 1) + " więcej)" : b.d) + '</span></span><button type="button" class="linkbtn" data-go="postep">Zobacz</button>';
+      esc(fresh.length > 1 ? b.d + " (i " + (fresh.length - 1) + " więcej)" : b.d) + '</span></span><button type="button" class="linkbtn" data-go="postep">Zobacz</button>' +
+      '<button type="button" class="toast-x" aria-label="Zamknij powiadomienie">' + ICON.x + "</button>";
     el.hidden = false;
-    clearTimeout(TOAST_T); TOAST_T = setTimeout(function () { el.hidden = true; }, 6000);
+    toastTimer();
   }
+  /* Hover or keyboard focus keeps the toast open, so its button never vanishes mid-reach. */
+  function toastTimer() {
+    clearTimeout(TOAST_T);
+    TOAST_T = setTimeout(function () { var el = $("#gx-toast"); if (!el.matches(":hover, :focus-within")) el.hidden = true; else toastTimer(); }, 10000);
+  }
+  $("#gx-toast").addEventListener("click", function (ev) { if (ev.target.closest(".toast-x")) { clearTimeout(TOAST_T); ev.currentTarget.hidden = true; } });
   function paintGx() {
     $("#gx-head").hidden = !S.gx.head;
     if (!S.gx.head) return;
@@ -992,7 +999,7 @@
     });
   });
   CARDS.forEach(function (c, n) { c.n = n; BY_ID[c.id] = c; });
-  var FOC = { id: null, open: false, set: false, t: null, dirty: false };
+  var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0 };
   var DECKS = [["all", "Wszystko"], ["q", "Pytania"], ["f", "Fiszki"], ["p", "Praktyczne"]];
   function svg(p) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>"; }
   var ICON = {
@@ -1101,7 +1108,7 @@
     var top = '<div class="ftop">' +
       '<div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="false">Lista</button>' +
       '<button type="button" class="seg-b" data-mode="focus" aria-pressed="true">Focus</button></div>' +
-      '<span class="ftop-r">' + (S.gx.combo && S.combo >= 3 ? '<span class="combo" title="Dobre odpowiedzi z rzędu">' + ICON.bolt + "Combo ×" + S.combo + "</span>" : "") +
+      '<span class="ftop-r">' + (S.gx.combo && S.combo >= 3 ? '<span class="combo' + (S.combo > FOC.combo ? " up" : "") + '" title="Dobre odpowiedzi z rzędu">' + ICON.bolt + "Combo ×" + S.combo + "</span>" : "") +
       '<button type="button" class="icn" id="fo-gear" aria-label="Ustawienia trybu Focus" aria-expanded="' + FOC.set + '" aria-controls="fo-set">' + ICON.gear + "</button>" +
       '<button type="button" class="icn" id="fo-close" aria-label="Zamknij tryb Focus i wróć do listy">' + ICON.x + "</button></span>" +
       '<label class="sr" for="fo-deck">Talia</label><select id="fo-deck" class="fsel deck">' + DECKS.map(function (d) {
@@ -1142,6 +1149,7 @@
       '<span class="fpos">' + (c ? (pos + 1) + " / " + deck.length : "") + "</span>" +
       '<button type="button" class="btn primary big" id="fo-next"' + (pos > -1 && pos < deck.length - 1 ? "" : " disabled") + ">Następna ›</button></div>";
 
+    FOC.combo = S.combo;
     $("#focusroot").innerHTML = top + fSettings(base, c) + head + '<div class="fstage" id="fo-stage" tabindex="-1">' + card + "</div>" + nav + strip;
   }
 
