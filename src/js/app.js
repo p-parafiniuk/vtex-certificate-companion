@@ -1351,6 +1351,12 @@
     else if (b) window.scrollTo(0, 0);
   });
 
+  var infoDlg = $("#info-dlg");
+  $("#info-open").addEventListener("click", function () { infoDlg.showModal(); });
+  $("#info-close").addEventListener("click", function () { infoDlg.close(); });
+  /* A click on the backdrop lands on the dialog element itself, never on its content. */
+  infoDlg.addEventListener("click", function (ev) { if (ev.target === infoDlg) infoDlg.close(); });
+
   header();
   if (S.sim && !S.sim.done) startTick();
   /* First paint: a reload comes back to the same entry and scroll position; a fresh open follows the hash. */
