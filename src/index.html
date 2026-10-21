@@ -148,7 +148,13 @@
     </section>
     <section class="card setg" aria-labelledby="set-h-data">
       <h3 id="set-h-data">Dane</h3>
-      <p class="lead">Postęp, seria i odznaki są zapisane lokalnie. Resetu nie da się cofnąć. Ustawienia zostają.</p>
+      <p class="lead">Postęp, seria i odznaki są zapisane tylko w tej przeglądarce. Plik eksportu przeniesie je na inne urządzenie. Reset nie rusza ustawień i nie da się go cofnąć.</p>
+      <div class="row">
+        <button type="button" class="btn small" id="exp-prog">Eksportuj postęp do pliku</button>
+        <button type="button" class="btn small" id="imp-prog">Importuj postęp z pliku</button>
+        <input type="file" id="imp-file" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
+      </div>
+      <div class="imp-box" id="imp-box" role="status" aria-live="polite"></div>
       <div class="row">
         <button type="button" class="btn small" id="clear-ans">Wyczyść odpowiedzi</button>
         <button type="button" class="btn small danger" id="reset-all">Zresetuj cały postęp</button>
