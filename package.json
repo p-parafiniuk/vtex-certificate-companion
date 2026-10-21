@@ -11,7 +11,8 @@
     "stats": "node scripts/stats.mjs",
     "extract": "node scripts/extract.mjs",
     "serve": "node scripts/serve.mjs 8000",
-    "review-scope": "node scripts/review-scope.mjs"
+    "review-scope": "node scripts/review-scope.mjs",
+    "shots": "node scripts/shots.mjs"
   },
   "engines": {
     "node": ">=18"
