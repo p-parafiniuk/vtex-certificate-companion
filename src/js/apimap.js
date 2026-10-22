@@ -1,6 +1,6 @@
 /* VTEX API Map, mounted on demand into the shadow root of #apimap. Data: vtex/openapi-schemas, one API per item.
-   embed: a second copy inside a category view, { onDoc(url, label) }. It shows only the APIs given to scope(), keeps nothing
-   in storage, and opens API Reference links through onDoc (the category's docs frame) instead of a new tab. */
+   embed: a second copy inside a category view, { onDoc(url, label) }. It shows only the APIs given to scope(), stores only
+   the shared tree/list choice, and opens API Reference links through onDoc (the category's docs frame) instead of a new tab. */
 function bootApiMap(root, onNav, embed) {
   "use strict";
   /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated, q query (* = required), a auth, b body, r responses}] */
@@ -9,6 +9,7 @@ function bootApiMap(root, onNav, embed) {
   /* UI language comes from <html lang>, which the main app sets; relang() redraws after a switch. */
   const L = (pl, en) => (document.documentElement.lang === "en" ? en : pl);
   const scopes = () => [
+    ["all", L("wszystkie", "all"), L("Wszystkie ścieżki", "All paths")],
     [
       "pvt",
       "pvt",
@@ -25,12 +26,7 @@ function bootApiMap(root, onNav, embed) {
         "Paths with /pub/: public, called from the storefront among others"
       )
     ],
-    ["other", L("inne", "other"), L("Ścieżki bez /pvt/ i /pub/ w adresie", "Paths without /pvt/ or /pub/")],
-    [
-      "open",
-      L("tylko OPEN", "OPEN only"),
-      L("Tylko endpointy bez autoryzacji w schemacie", "Only endpoints with no auth in the schema")
-    ]
+    ["other", L("inne", "other"), L("Ścieżki bez /pvt/ i /pub/ w adresie", "Paths without /pvt/ or /pub/")]
   ];
   const LIMIT = 150;
   const KEY = "apimap.v1";
@@ -59,22 +55,37 @@ function bootApiMap(root, onNav, embed) {
     q: "",
     qAll: true,
     methods: new Set(METHODS),
-    scopes: new Set(["pvt", "pub", "other"]),
+    scope: "all",
     onlyOpen: false,
+    view: "tree",
+    filters: false,
+    shown: LIMIT,
     open: new Map()
   };
-  if (!embed)
+  const stored = () => {
     try {
       const p = JSON.parse(localStorage.getItem(KEY) || "{}");
-      if (p && KEYS.includes(p.api)) state.api = p.api;
-      if (p && [0, 1, 2, 3, 99].includes(p.depth)) state.depth = p.depth;
+      return p && typeof p === "object" && !Array.isArray(p) ? p : {};
     } catch (e) {
-      /* defaults */
+      return {};
     }
+  };
+  {
+    const p = stored();
+    if (["tree", "list"].includes(p.view)) state.view = p.view;
+    if (!embed && KEYS.includes(p.api)) state.api = p.api;
+    if (!embed && [0, 1, 2, 3, 99].includes(p.depth)) state.depth = p.depth;
+  }
+  /* Both copies share the tree/list choice; the API and depth belong to the API Map tab alone. */
   function save() {
-    if (embed) return;
+    const p = stored();
+    p.view = state.view;
+    if (!embed) {
+      p.api = state.api;
+      p.depth = state.depth;
+    }
     try {
-      localStorage.setItem(KEY, JSON.stringify({ api: state.api, depth: state.depth }));
+      localStorage.setItem(KEY, JSON.stringify(p));
     } catch (e) {
       /* not persisted */
     }
@@ -95,19 +106,16 @@ function bootApiMap(root, onNav, embed) {
   function buildLabels() {
     buildApis();
     $("scopes").innerHTML = scopes()
-      .map(
-        ([k, l, t]) =>
-          `<button type="button" data-s="${k}" title="${esc(t)}" aria-label="${esc(l + ": " + t)}">${l}</button>`
-      )
+      .map(([k, l, t]) => `<button type="button" data-s="${k}" title="${esc(t)}">${l}</button>`)
       .join("");
-    $("depth").innerHTML = [
-      ["0", L("zwiń", "collapse")],
-      ["1", "1"],
-      ["2", "2"],
-      ["3", "3"],
-      ["99", L("wszystko", "all")]
+    $("view").innerHTML = [
+      ["tree", L("Drzewo", "Tree"), "M3 2v12M3 5h5M3 10h5M8 3.5h5v3H8zM8 8.5h5v3H8z"],
+      ["list", L("Lista", "List"), "M2 3.5h12M2 8h12M2 12.5h12"]
     ]
-      .map(([d, l]) => `<button type="button" data-d="${d}">${l}</button>`)
+      .map(
+        ([v, l, d]) =>
+          `<button type="button" data-v="${v}"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="${d}"/></svg><span class="vl">${l}</span></button>`
+      )
       .join("");
   }
   function buildControls() {
@@ -138,22 +146,43 @@ function bootApiMap(root, onNav, embed) {
     };
     $("scopes").onclick = e => {
       const b = e.target.closest("button");
-      if (!b) return;
-      const s = b.dataset.s;
-      if (s === "open") state.onlyOpen = !state.onlyOpen;
-      else {
-        state.scopes.has(s) ? state.scopes.delete(s) : state.scopes.add(s);
-        if (!state.scopes.size) ["pvt", "pub", "other"].forEach(x => state.scopes.add(x));
-      }
+      if (!b || b.dataset.s === state.scope) return;
+      state.scope = b.dataset.s;
       render();
     };
-    $("depth").onclick = e => {
+    $("onlyopen").onchange = e => {
+      state.onlyOpen = e.target.checked;
+      render();
+    };
+    $("fbtn").onclick = () => {
+      state.filters = !state.filters;
+      syncControls();
+    };
+    $("view").onclick = e => {
       const b = e.target.closest("button");
-      if (!b) return;
-      state.depth = +b.dataset.d;
-      state.open.clear();
+      if (!b || b.dataset.v === state.view) return;
+      state.view = b.dataset.v;
       save();
       render();
+    };
+    /* The bar is rebuilt by render(), so focus moves to the stats line it sits next to. */
+    $("tools").onclick = e => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      const k = b.dataset.t;
+      if (k === "expand" || k === "collapse") {
+        state.depth = k === "expand" ? 99 : 0;
+        state.open.clear();
+        save();
+      }
+      if (k === "scope" || k === "clear") state.scope = "all";
+      if (k === "open" || k === "clear") state.onlyOpen = false;
+      if (k === "clear") METHODS.forEach(m => state.methods.add(m));
+      render();
+      const n = [`[data-t="${k}"]`, ".pill", '[data-t="clear"]', '[data-t="expand"]']
+        .map(q => root.querySelector("#tools " + q))
+        .find(Boolean);
+      (n || $("fbtn")).focus();
     };
     /* Read the value now: after dispatch, e.target is retargeted to the shadow host. */
     let t;
@@ -226,17 +255,15 @@ function bootApiMap(root, onNav, embed) {
     root
       .querySelectorAll("#methods button")
       .forEach(b => b.setAttribute("aria-pressed", !allM && state.methods.has(b.dataset.m)));
-    root
-      .querySelectorAll("#scopes button")
-      .forEach(b =>
-        b.setAttribute(
-          "aria-pressed",
-          b.dataset.s === "open" ? state.onlyOpen : state.scopes.size < 3 && state.scopes.has(b.dataset.s)
-        )
-      );
-    root.querySelectorAll("#depth button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.d === state.depth));
-    /* Search shows a flat list, so tree depth has nothing to act on. */
-    $("depth-pair").hidden = !!state.q;
+    root.querySelectorAll("#scopes button").forEach(b => b.setAttribute("aria-pressed", b.dataset.s === state.scope));
+    root.querySelectorAll("#view button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === state.view));
+    $("onlyopen").checked = state.onlyOpen;
+    const n = (state.scope !== "all") + state.onlyOpen;
+    $("fcount").hidden = !n;
+    $("fcount").textContent = n;
+    $("fbtn").setAttribute("aria-label", L("Filtry", "Filters") + (n ? ` (${L("aktywne", "active")}: ${n})` : ""));
+    $("fbtn").setAttribute("aria-expanded", state.filters);
+    $("fpanel").hidden = !state.filters;
   }
 
   /* ---------- tree ---------- */
@@ -244,7 +271,7 @@ function bootApiMap(root, onNav, embed) {
   /* anyMethod: count per method buttons ignores the method filter itself. */
   function match(ep, anyMethod) {
     if (!anyMethod && !state.methods.has(ep.m)) return false;
-    if (!state.scopes.has(scopeOf(ep.p))) return false;
+    if (state.scope !== "all" && scopeOf(ep.p) !== state.scope) return false;
     if (state.onlyOpen && ep.a) return false;
     if (state.q) {
       const hay = (ep.p + " " + ep.s + " " + ep.t + " " + ep.m).toLowerCase();
@@ -335,9 +362,32 @@ function bootApiMap(root, onNav, embed) {
     return n;
   }
 
+  /* Active filters as removable pills, plus expand/collapse while the tree is on screen. */
+  function toolsHtml(flat) {
+    const btn = (k, text, aria) =>
+      `<button type="button" class="${k === "scope" || k === "open" ? "pill" : "tool"}" data-t="${k}"${aria ? ` aria-label="${esc(aria)}"` : ""}>${text}</button>`;
+    const rm = L("Usuń filtr: ", "Remove filter: ");
+    let h = "";
+    if (state.scope !== "all") {
+      const l = scopes().find(x => x[0] === state.scope)[1];
+      h += btn("scope", esc(l) + " ×", rm + l);
+    }
+    if (state.onlyOpen) h += btn("open", "OPEN ×", rm + "OPEN");
+    if (h || state.methods.size < METHODS.length) h += btn("clear", L("Wyczyść filtry", "Clear filters"));
+    if (!flat)
+      h +=
+        `<span class="tgap"></span>` +
+        btn("expand", L("Rozwiń wszystko", "Expand all")) +
+        btn("collapse", L("Zwiń", "Collapse"));
+    return h;
+  }
+
   let EPS = new Map();
-  function render() {
+  /* more: the "show more" button asked for the next page; any other redraw starts from the first one. */
+  function render(more) {
+    if (!more) state.shown = LIMIT;
     syncControls();
+    const flat = !!state.q || state.view === "list";
     const sel = state.api === "all" ? LIST : LIST.filter(a => a.key === state.api);
     const wide = !!state.q && state.qAll;
     const apis = wide ? LIST : sel;
@@ -360,25 +410,39 @@ function bootApiMap(root, onNav, embed) {
         `<button type="button" data-q="all" aria-pressed="${state.qAll}">${L("wszędzie", "everywhere")} <span class="mc">${hits.get("all")}</span></button>` +
         `<button type="button" data-q="one" aria-pressed="${!state.qAll}">${esc(name)} <span class="mc">${hits.get(state.api)}</span></button>`;
     }
-    if (state.q) {
+    if (flat) {
       const found = [];
       for (const a of apis) for (const ep of a.eps) if (match(ep)) found.push({ ...ep, api: a });
-      found.sort((x, y) => x.p.localeCompare(y.p) || ord(x.m) - ord(y.m));
+      /* Search ranks paths across APIs; the list keeps each API together under its own heading. */
+      const grouped = !state.q && apis.length > 1;
+      const at = new Map(apis.map((a, i) => [a.key, i]));
+      found.sort(
+        (x, y) => (grouped ? at.get(x.api.key) - at.get(y.api.key) : 0) || x.p.localeCompare(y.p) || ord(x.m) - ord(y.m)
+      );
+      const per = new Map();
       found.forEach(ep => {
         EPS.set(idOf(ep), ep);
         c[ep.m]++;
         tot++;
         if (!ep.a) open++;
+        per.set(ep.api.key, (per.get(ep.api.key) || 0) + 1);
       });
-      const many = apis.length > 1;
+      const many = !!state.q && apis.length > 1;
+      let last = "";
+      const rows = found.slice(0, state.shown).map(ep => {
+        let h = "";
+        if (grouped && ep.api.key !== last) {
+          last = ep.api.key;
+          h = `<div class="lh">${esc(ep.api.name)} <span>${per.get(last)}</span></div>`;
+        }
+        return h + hitRow(ep, many);
+      });
+      const left = found.length - state.shown;
       if (found.length)
         html =
-          `<div class="hits">${found
-            .slice(0, LIMIT)
-            .map(ep => hitRow(ep, many))
-            .join("")}</div>` +
-          (found.length > LIMIT
-            ? `<div class="more">${L(`Pokazano ${LIMIT} z ${found.length}. Doprecyzuj wyszukiwanie albo zawęź metody.`, `Showing ${LIMIT} of ${found.length}. Refine the search or narrow the methods.`)}</div>`
+          `<div class="hits">${rows.join("")}</div>` +
+          (left > 0
+            ? `<div class="more"><span>${L(`Pokazano ${state.shown} z ${found.length}.`, `Showing ${state.shown} of ${found.length}.`)}</span> <button type="button" data-more>${L(`Pokaż kolejne ${Math.min(left, LIMIT)}`, `Show ${Math.min(left, LIMIT)} more`)}</button></div>`
             : "");
     } else
       for (const a of apis) {
@@ -402,8 +466,9 @@ function bootApiMap(root, onNav, embed) {
       }
     $("tree").innerHTML =
       html ||
-      `<div class="empty">${L("Nic nie pasuje do filtrów. Wyczyść wyszukiwanie (Esc) albo włącz więcej metod.", "Nothing matches the filters. Clear the search (Esc) or turn on more methods.")}</div>`;
-    $("tree").classList.toggle("flat", !!state.q);
+      `<div class="empty">${L("Nic nie pasuje do filtrów. Wyczyść wyszukiwanie (Esc) albo filtry.", "Nothing matches the filters. Clear the search (Esc) or the filters.")}</div>`;
+    $("tree").classList.toggle("flat", flat);
+    $("tools").innerHTML = toolsHtml(flat);
     const inApis = wide ? new Set([...EPS.values()].map(ep => ep.api.key)).size : 0;
     $("stats").innerHTML =
       `<span><b>${plural(tot, "endpoint", L("endpointy", "endpoints"), L("endpointów", "endpoints"))}</b>${inApis > 1 ? L(" w ", " in ") + inApis + " API" : ""}</span>` +
@@ -438,6 +503,14 @@ function bootApiMap(root, onNav, embed) {
     true
   );
   $("tree").addEventListener("click", e => {
+    if (e.target.closest("[data-more]")) {
+      const i = state.shown;
+      state.shown += LIMIT;
+      render(true);
+      const next = root.querySelectorAll("#tree .ep")[i];
+      if (next) next.focus();
+      return;
+    }
     const b = e.target.closest(".ep");
     if (b) {
       const next = b.nextElementSibling;

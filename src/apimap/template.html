@@ -52,7 +52,34 @@
           aria-keyshortcuts="/"
         /><kbd class="kb" aria-hidden="true">/</kbd></span
       >
+      <span class="group view" id="view" role="group" aria-label="Widok" data-en-aria="View"></span>
+    </div>
+    <div class="row">
       <div class="group" id="methods" role="group" aria-label="Metody" data-en-aria="Methods"></div>
+      <button type="button" class="fbtn" id="fbtn" aria-expanded="false" aria-controls="fpanel">
+        <svg
+          aria-hidden="true"
+          width="16"
+          height="16"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path d="M2 4h12M4.5 8h7M7 12h2" /></svg
+        ><span class="vl" data-en="Filters">Filtry</span
+        ><span class="badge" id="fcount" aria-hidden="true" hidden></span>
+      </button>
+    </div>
+    <div class="fpanel" id="fpanel" hidden>
+      <span class="pair"
+        ><span class="lbl" id="scopes-l" data-en="Scope">Zakres</span>
+        <span class="group" id="scopes" role="group" aria-labelledby="scopes-l"></span
+      ></span>
+      <label class="chk"
+        ><input type="checkbox" id="onlyopen" /> <span data-en="only">tylko</span> <b class="flag open">OPEN</b>
+        <span data-en="(no auth)">(bez autoryzacji)</span></label
+      >
     </div>
     <div class="row" id="qscope" hidden>
       <span class="pair"
@@ -60,19 +87,12 @@
         <span class="group" id="qin" role="group" aria-labelledby="qin-l"></span
       ></span>
     </div>
-    <div class="row">
-      <span class="pair"
-        ><span class="lbl" data-en="Scope">Zakres</span>
-        <span class="group" id="scopes" role="group" aria-label="Zakres" data-en-aria="Scope"></span
-      ></span>
-      <span class="pair" id="depth-pair"
-        ><span class="lbl" data-en="Expand">Rozwiń</span>
-        <span class="group" id="depth" role="group" aria-label="Głębokość" data-en-aria="Depth"></span
-      ></span>
-    </div>
   </div>
 
-  <div class="stats" id="stats" aria-live="polite"></div>
+  <div class="bar">
+    <div class="stats" id="stats" aria-live="polite"></div>
+    <div class="tools" id="tools"></div>
+  </div>
   <div class="server" id="server"></div>
   <div class="tree" id="tree"></div>
   <div class="legend">
