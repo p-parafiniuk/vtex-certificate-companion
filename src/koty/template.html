@@ -5,23 +5,23 @@
   <header class="top">
     <div class="top-row">
       <div>
-        <p class="eyebrow">Suplement · kody statusu HTTP</p>
+        <p class="eyebrow" data-en="Extra · HTTP status codes">Suplement · kody statusu HTTP</p>
         <h1>HTTP Koty</h1>
       </div>
       <div class="meters" aria-live="polite">
-        <div class="meter"><span>Umiem <b id="m-all">0/78</b></span><div class="track"><i id="t-all"></i></div></div>
-        <div class="meter"><span>Topka <b id="m-top">0/21</b></span><div class="track"><i id="t-top"></i></div></div>
-        <div class="meter"><span>Quiz, rekord <b id="m-quiz">–</b></span><div class="track"><i id="t-quiz"></i></div></div>
+        <div class="meter"><span><span data-en="Known">Umiem</span> <b id="m-all">0/78</b></span><div class="track"><i id="t-all"></i></div></div>
+        <div class="meter"><span><span data-en="Top">Topka</span> <b id="m-top">0/21</b></span><div class="track"><i id="t-top"></i></div></div>
+        <div class="meter"><span><span data-en="Quiz, best">Quiz, rekord</span> <b id="m-quiz">–</b></span><div class="track"><i id="t-quiz"></i></div></div>
       </div>
     </div>
-    <p class="sub">Wszystkie kody statusu z http.cat, pogrupowane, z haczykami do zapamiętania i z tym, jak czyta je dokumentacja VTEX.</p>
+    <p class="sub" data-en="Every status code from http.cat, grouped, with memory hooks and how the VTEX docs read them.">Wszystkie kody statusu z http.cat, pogrupowane, z haczykami do zapamiętania i z tym, jak czyta je dokumentacja VTEX.</p>
   </header>
 
-  <nav class="tabs" role="tablist" aria-label="Moduły">
+  <nav class="tabs" role="tablist" aria-label="Moduły" data-en-aria="Modules">
     <button class="tab" role="tab" data-tab="start" id="tab-start">Start</button>
-    <button class="tab" role="tab" data-tab="topka" id="tab-topka">Topka</button>
-    <button class="tab" role="tab" data-tab="kody" id="tab-kody">Wszystkie kody</button>
-    <button class="tab" role="tab" data-tab="braki" id="tab-braki">Brakujące</button>
+    <button class="tab" role="tab" data-tab="topka" id="tab-topka" data-en="Top">Topka</button>
+    <button class="tab" role="tab" data-tab="kody" id="tab-kody" data-en="All codes">Wszystkie kody</button>
+    <button class="tab" role="tab" data-tab="braki" id="tab-braki" data-en="Missing">Brakujące</button>
     <button class="tab" role="tab" data-tab="vtex" id="tab-vtex">VTEX</button>
     <button class="tab" role="tab" data-tab="quiz" id="tab-quiz">Quiz</button>
     <span class="badge" id="badge" role="status" data-ready="0"><i class="ring" id="badge-ring"></i><b id="badge-pct">0%</b><span id="badge-rank">Kociak</span></span>
@@ -32,12 +32,12 @@
     <!-- START -->
     <section class="panel" id="p-start" role="tabpanel" aria-labelledby="tab-start">
       <div class="block">
-        <h2>Ile mamy kodów?</h2>
+        <h2 data-en="How many codes are there?">Ile mamy kodów?</h2>
         <div class="count">
           <span class="big">78</span>
-          <p class="lead"><b>78 kotów na http.cat.</b> Z tego <b>60 to kody oficjalne</b> (rejestr IANA), a <b>18 to nieoficjalne</b>: wynalazki nginx, Cloudflare, Laravela, Twittera i jeden żart primaaprilisowy.</p>
+          <p class="lead" data-en-html="&lt;b&gt;78 cats on http.cat.&lt;/b&gt; Of these, &lt;b&gt;60 are official codes&lt;/b&gt; (IANA registry) and &lt;b&gt;18 are unofficial&lt;/b&gt;: inventions of nginx, Cloudflare, Laravel, Twitter and one April Fools&#x27; joke."><b>78 kotów na http.cat.</b> Z tego <b>60 to kody oficjalne</b> (rejestr IANA), a <b>18 to nieoficjalne</b>: wynalazki nginx, Cloudflare, Laravela, Twittera i jeden żart primaaprilisowy.</p>
         </div>
-        <div class="scale" role="img" aria-label="Podział 78 kodów: 1xx 4, 2xx 11, 3xx 8, 4xx 38, 5xx 17">
+        <div class="scale" role="img" aria-label="Podział 78 kodów: 1xx 4, 2xx 11, 3xx 8, 4xx 38, 5xx 17" data-en-aria="Split of 78 codes: 1xx 4, 2xx 11, 3xx 8, 4xx 38, 5xx 17">
           <span data-k="1" style="flex:4"></span><span data-k="2" style="flex:11"></span><span data-k="3" style="flex:8"></span><span data-k="4" style="flex:38"></span><span data-k="5" style="flex:17"></span>
         </div>
         <div class="legend">
@@ -47,43 +47,43 @@
           <span data-k="4"><i class="dot"></i><b class="num">4xx</b> 38</span>
           <span data-k="5"><i class="dot"></i><b class="num">5xx</b> 17</span>
         </div>
-        <p class="small muted">Prawie połowa to 4xx. Klient ma najwięcej sposobów, żeby coś zepsuć.</p>
+        <p class="small muted" data-en="Almost half are 4xx. The client has the most ways to break something.">Prawie połowa to 4xx. Klient ma najwięcej sposobów, żeby coś zepsuć.</p>
       </div>
 
       <div class="block">
-        <h2>Pięć grup w jednym zdaniu</h2>
+        <h2 data-en="Five groups in one sentence">Pięć grup w jednym zdaniu</h2>
         <div class="tw">
           <table>
-            <thead><tr><th>Grupa</th><th>Serwer mówi</th><th>Czyja wina</th><th>Ponawiać?</th></tr></thead>
+            <thead><tr><th data-en="Group">Grupa</th><th data-en="Server says">Serwer mówi</th><th data-en="Whose fault">Czyja wina</th><th data-en="Retry?">Ponawiać?</th></tr></thead>
             <tbody>
-              <tr data-k="1"><td class="num">1xx</td><td><b>„Czekaj”.</b> Informacja w trakcie, to jeszcze nie odpowiedź.</td><td>niczyja</td><td>nie dotyczy</td></tr>
-              <tr data-k="2"><td class="num">2xx</td><td><b>„Masz”.</b> Udało się.</td><td>niczyja</td><td>nie trzeba</td></tr>
-              <tr data-k="3"><td class="num">3xx</td><td><b>„Idź tam”.</b> Odpowiedź jest gdzie indziej albo w cache.</td><td>niczyja</td><td>idź za <code>Location</code></td></tr>
-              <tr data-k="4"><td class="num">4xx</td><td><b>„Twoja wina”.</b> Request jest zły.</td><td>klienta</td><td>nie, najpierw popraw request. Wyjątki: <b>429</b>, 408</td></tr>
-              <tr data-k="5"><td class="num">5xx</td><td><b>„Moja wina”.</b> Request był dobry, serwer zawiódł.</td><td>serwera</td><td>tak, z odstępem</td></tr>
+              <tr data-k="1"><td class="num">1xx</td><td data-en-html="&lt;b&gt;“Wait.”&lt;/b&gt; Interim information, not the answer yet."><b>„Czekaj”.</b> Informacja w trakcie, to jeszcze nie odpowiedź.</td><td data-en="nobody&#x27;s">niczyja</td><td data-en="not applicable">nie dotyczy</td></tr>
+              <tr data-k="2"><td class="num">2xx</td><td data-en-html="&lt;b&gt;“Here you go.”&lt;/b&gt; It worked."><b>„Masz”.</b> Udało się.</td><td data-en="nobody&#x27;s">niczyja</td><td data-en="no need">nie trzeba</td></tr>
+              <tr data-k="3"><td class="num">3xx</td><td data-en-html="&lt;b&gt;“Go there.”&lt;/b&gt; The answer is elsewhere or in the cache."><b>„Idź tam”.</b> Odpowiedź jest gdzie indziej albo w cache.</td><td data-en="nobody&#x27;s">niczyja</td><td data-en-html="follow &lt;code&gt;Location&lt;/code&gt;">idź za <code>Location</code></td></tr>
+              <tr data-k="4"><td class="num">4xx</td><td data-en-html="&lt;b&gt;“Your fault.”&lt;/b&gt; The request is bad."><b>„Twoja wina”.</b> Request jest zły.</td><td data-en="the client&#x27;s">klienta</td><td data-en-html="no, fix the request first. Exceptions: &lt;b&gt;429&lt;/b&gt;, 408">nie, najpierw popraw request. Wyjątki: <b>429</b>, 408</td></tr>
+              <tr data-k="5"><td class="num">5xx</td><td data-en-html="&lt;b&gt;“My fault.”&lt;/b&gt; The request was fine, the server failed."><b>„Moja wina”.</b> Request był dobry, serwer zawiódł.</td><td data-en="the server&#x27;s">serwera</td><td data-en="yes, with a delay">tak, z odstępem</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="lead"><b>Zasada z RFC 9110:</b> liczy się pierwsza cyfra. Nieznany kod traktujesz jak <code>x00</code> swojej grupy, czyli nieznane 471 to dla klienta 400.</p>
+        <p class="lead" data-en-html="&lt;b&gt;Rule from RFC 9110:&lt;/b&gt; the first digit is what counts. Treat an unknown code as the &lt;code&gt;x00&lt;/code&gt; of its group, so an unknown 471 is a 400 to the client."><b>Zasada z RFC 9110:</b> liczy się pierwsza cyfra. Nieznany kod traktujesz jak <code>x00</code> swojej grupy, czyli nieznane 471 to dla klienta 400.</p>
       </div>
 
       <div class="cols">
         <div class="sheet block">
-          <p class="eyebrow">Kolejność nauki</p>
+          <p class="eyebrow" data-en="Study order">Kolejność nauki</p>
           <ol class="tight">
-            <li><b>Topka:</b> 21 kodów, które musisz mieć od ręki.</li>
-            <li><b>VTEX:</b> co te kody znaczą w dokumentacji i integracjach.</li>
-            <li><b>Quiz:</b> 24 pytania egzaminacyjne, próg 80%.</li>
-            <li><b>Wszystkie kody:</b> reszta kotów, odhaczaj „Umiem”.</li>
+            <li data-en-html="&lt;b&gt;Top:&lt;/b&gt; 21 codes you must know off the top of your head."><b>Topka:</b> 21 kodów, które musisz mieć od ręki.</li>
+            <li data-en-html="&lt;b&gt;VTEX:&lt;/b&gt; what these codes mean in the docs and in integrations."><b>VTEX:</b> co te kody znaczą w dokumentacji i integracjach.</li>
+            <li data-en-html="&lt;b&gt;Quiz:&lt;/b&gt; 24 exam-style questions, 80% pass mark."><b>Quiz:</b> 24 pytania egzaminacyjne, próg 80%.</li>
+            <li data-en-html="&lt;b&gt;All codes:&lt;/b&gt; the rest of the cats, tick “Known”."><b>Wszystkie kody:</b> reszta kotów, odhaczaj „Umiem”.</li>
           </ol>
         </div>
         <div class="sheet block">
-          <p class="eyebrow">Egzamin, o który gramy</p>
+          <p class="eyebrow" data-en="The exam we are playing for">Egzamin, o który gramy</p>
           <ul class="tight">
-            <li><b>36 pytań</b> wielokrotnego wyboru + <b>4 ćwiczenia</b> praktyczne</li>
-            <li><b>2 godziny</b> od startu</li>
-            <li>Próg zaliczenia: <b>80%</b></li>
-            <li>Po rejestracji masz <b>7 dni</b> na podejście</li>
+            <li data-en-html="&lt;b&gt;36 multiple-choice&lt;/b&gt; questions + &lt;b&gt;4 practical&lt;/b&gt; exercises"><b>36 pytań</b> wielokrotnego wyboru + <b>4 ćwiczenia</b> praktyczne</li>
+            <li data-en-html="&lt;b&gt;2 hours&lt;/b&gt; from the start"><b>2 godziny</b> od startu</li>
+            <li data-en-html="Pass mark: &lt;b&gt;80%&lt;/b&gt;">Próg zaliczenia: <b>80%</b></li>
+            <li data-en-html="After registering you have &lt;b&gt;7 days&lt;/b&gt; to take it">Po rejestracji masz <b>7 dni</b> na podejście</li>
           </ul>
         </div>
       </div>
@@ -92,58 +92,58 @@
     <!-- TOPKA -->
     <section class="panel" id="p-topka" role="tabpanel" aria-labelledby="tab-topka" hidden>
       <div class="block">
-        <h2>Oficjalna piętnastka VTEX</h2>
-        <p class="lead">Dokładnie te <b>15 kodów</b> wymienia strona „API response status codes” w dokumentacji VTEX. To jest lista na wczoraj.</p>
+        <h2 data-en="The official VTEX fifteen">Oficjalna piętnastka VTEX</h2>
+        <p class="lead" data-en-html="These are exactly the &lt;b&gt;15 codes&lt;/b&gt; listed on the “API response status codes” page of the VTEX docs. Learn this list first.">Dokładnie te <b>15 kodów</b> wymienia strona „API response status codes” w dokumentacji VTEX. To jest lista na wczoraj.</p>
         <div class="toplist" id="top1"></div>
       </div>
       <div class="block">
-        <h2>Dokładka do integracji</h2>
-        <p class="lead">Tych <b>6 kodów</b> nie ma w tabeli ogólnej, ale spotkasz je w endpointach i w pytaniach o czysty HTTP.</p>
+        <h2 data-en="Extras for integrations">Dokładka do integracji</h2>
+        <p class="lead" data-en-html="These &lt;b&gt;6 codes&lt;/b&gt; are not in the general table, but you will meet them in endpoints and in plain HTTP questions.">Tych <b>6 kodów</b> nie ma w tabeli ogólnej, ale spotkasz je w endpointach i w pytaniach o czysty HTTP.</p>
         <div class="toplist" id="top2"></div>
       </div>
       <div class="block">
-        <h2>Pary, które się mylą</h2>
+        <h2 data-en="Pairs that get mixed up">Pary, które się mylą</h2>
         <div class="cols">
-          <div class="sheet block"><h3>401 kontra 403</h3><ul class="tight"><li><b>401:</b> nie wiem, kim jesteś. Brak albo złe dane logowania.</li><li><b>403:</b> wiem, kim jesteś, i mówię nie. Brak uprawnień.</li><li><b>Haczyk:</b> 401 = <b>1</b> krok do zrobienia (zaloguj się). 403 = drzwi zamknięte.</li></ul></div>
-          <div class="sheet block"><h3>502, 503, 504</h3><ul class="tight"><li><b>502:</b> pośrednik dostał od upstreamu <b>bzdurę</b>.</li><li><b>503:</b> serwer żyje, ale <b>chwilowo nie obsługuje</b>.</li><li><b>504:</b> pośrednik <b>nie doczekał się</b> odpowiedzi.</li></ul></div>
-          <div class="sheet block"><h3>204 kontra 205</h3><ul class="tight"><li><b>204:</b> sukces, nie ma nic do pokazania. Widok zostaje.</li><li><b>205:</b> sukces, <b>wyczyść formularz</b>.</li></ul></div>
-          <div class="sheet block"><h3>400 kontra 422</h3><ul class="tight"><li><b>400:</b> nie umiem tego przeczytać (zepsuty JSON, zły <code>Content-Type</code>).</li><li><b>422:</b> przeczytałem, ale to nie ma sensu (walidacja).</li></ul></div>
+          <div class="sheet block"><h3 data-en="401 vs 403">401 kontra 403</h3><ul class="tight"><li data-en-html="&lt;b&gt;401:&lt;/b&gt; I don&#x27;t know who you are. Missing or wrong credentials."><b>401:</b> nie wiem, kim jesteś. Brak albo złe dane logowania.</li><li data-en-html="&lt;b&gt;403:&lt;/b&gt; I know who you are, and the answer is no. Missing permissions."><b>403:</b> wiem, kim jesteś, i mówię nie. Brak uprawnień.</li><li data-en-html="&lt;b&gt;Memory hook:&lt;/b&gt; 401 = &lt;b&gt;1&lt;/b&gt; step to take (log in). 403 = the door is shut."><b>Haczyk:</b> 401 = <b>1</b> krok do zrobienia (zaloguj się). 403 = drzwi zamknięte.</li></ul></div>
+          <div class="sheet block"><h3>502, 503, 504</h3><ul class="tight"><li data-en-html="&lt;b&gt;502:&lt;/b&gt; the intermediary got &lt;b&gt;garbage&lt;/b&gt; from upstream."><b>502:</b> pośrednik dostał od upstreamu <b>bzdurę</b>.</li><li data-en-html="&lt;b&gt;503:&lt;/b&gt; the server is alive but &lt;b&gt;temporarily not serving&lt;/b&gt;."><b>503:</b> serwer żyje, ale <b>chwilowo nie obsługuje</b>.</li><li data-en-html="&lt;b&gt;504:&lt;/b&gt; the intermediary &lt;b&gt;gave up waiting&lt;/b&gt; for a response."><b>504:</b> pośrednik <b>nie doczekał się</b> odpowiedzi.</li></ul></div>
+          <div class="sheet block"><h3 data-en="204 vs 205">204 kontra 205</h3><ul class="tight"><li data-en-html="&lt;b&gt;204:&lt;/b&gt; success, nothing to show. The view stays."><b>204:</b> sukces, nie ma nic do pokazania. Widok zostaje.</li><li data-en-html="&lt;b&gt;205:&lt;/b&gt; success, &lt;b&gt;clear the form&lt;/b&gt;."><b>205:</b> sukces, <b>wyczyść formularz</b>.</li></ul></div>
+          <div class="sheet block"><h3 data-en="400 vs 422">400 kontra 422</h3><ul class="tight"><li data-en-html="&lt;b&gt;400:&lt;/b&gt; I can&#x27;t read this (broken JSON, wrong &lt;code&gt;Content-Type&lt;/code&gt;)."><b>400:</b> nie umiem tego przeczytać (zepsuty JSON, zły <code>Content-Type</code>).</li><li data-en-html="&lt;b&gt;422:&lt;/b&gt; I read it, but it makes no sense (validation)."><b>422:</b> przeczytałem, ale to nie ma sensu (walidacja).</li></ul></div>
         </div>
       </div>
       <div class="block">
-        <h3>Przekierowania w jednej tabeli</h3>
+        <h3 data-en="Redirects in one table">Przekierowania w jednej tabeli</h3>
         <div class="tw">
           <table>
-            <thead><tr><th>Kod</th><th>Na jak długo</th><th>Metoda i body</th></tr></thead>
+            <thead><tr><th data-en="Code">Kod</th><th data-en="For how long">Na jak długo</th><th data-en="Method and body">Metoda i body</th></tr></thead>
             <tbody data-k="3">
-              <tr><td class="num">301</td><td>na stałe</td><td>klient może zamienić POST na GET</td></tr>
-              <tr><td class="num">302</td><td>tymczasowo</td><td>klient może zamienić POST na GET</td></tr>
-              <tr><td class="num">303</td><td>jednorazowo</td><td>zawsze GET (wzorzec Post/Redirect/Get)</td></tr>
-              <tr><td class="num">307</td><td>tymczasowo</td><td><b>zachowane</b></td></tr>
-              <tr><td class="num">308</td><td>na stałe</td><td><b>zachowane</b></td></tr>
+              <tr><td class="num">301</td><td data-en="permanent">na stałe</td><td data-en="the client may change POST to GET">klient może zamienić POST na GET</td></tr>
+              <tr><td class="num">302</td><td data-en="temporary">tymczasowo</td><td data-en="the client may change POST to GET">klient może zamienić POST na GET</td></tr>
+              <tr><td class="num">303</td><td data-en="one-off">jednorazowo</td><td data-en="always GET (Post/Redirect/Get pattern)">zawsze GET (wzorzec Post/Redirect/Get)</td></tr>
+              <tr><td class="num">307</td><td data-en="temporary">tymczasowo</td><td data-en-html="&lt;b&gt;kept&lt;/b&gt;"><b>zachowane</b></td></tr>
+              <tr><td class="num">308</td><td data-en="permanent">na stałe</td><td data-en-html="&lt;b&gt;kept&lt;/b&gt;"><b>zachowane</b></td></tr>
             </tbody>
           </table>
         </div>
-        <p class="small muted"><b>Haczyk:</b> 7 i 8 są młodsze i pilnują metody. 1 i 8 są na stałe, 2 i 7 na chwilę.</p>
+        <p class="small muted" data-en-html="&lt;b&gt;Memory hook:&lt;/b&gt; 7 and 8 are newer and keep the method. 1 and 8 are permanent, 2 and 7 are temporary."><b>Haczyk:</b> 7 i 8 są młodsze i pilnują metody. 1 i 8 są na stałe, 2 i 7 na chwilę.</p>
       </div>
     </section>
 
     <!-- KODY -->
     <section class="panel" id="p-kody" role="tabpanel" aria-labelledby="tab-kody" hidden>
       <div class="toolbar">
-        <h2>Wszystkie koty</h2>
-        <input class="search" id="q" type="search" placeholder="Szukaj: 429, timeout, nginx…" aria-label="Szukaj kodu">
+        <h2 data-en="All cats">Wszystkie koty</h2>
+        <input class="search" id="q" type="search" placeholder="Szukaj: 429, timeout, nginx…" aria-label="Szukaj kodu" data-en-ph="Search: 429, timeout, nginx…" data-en-aria="Search for a code">
         <div class="chips" id="filters">
-          <button class="chip" data-f="all">Wszystkie</button>
+          <button class="chip" data-f="all" data-en="All">Wszystkie</button>
           <button class="chip" data-f="1">1xx</button>
           <button class="chip" data-f="2">2xx</button>
           <button class="chip" data-f="3">3xx</button>
           <button class="chip" data-f="4">4xx</button>
           <button class="chip" data-f="5">5xx</button>
-          <button class="chip" data-f="top">Topka</button>
-          <button class="chip" data-f="vtex">Z notatką VTEX</button>
-          <button class="chip" data-f="unoff">Nieoficjalne</button>
-          <button class="chip" data-f="todo">Jeszcze nie umiem</button>
+          <button class="chip" data-f="top" data-en="Top">Topka</button>
+          <button class="chip" data-f="vtex" data-en="With a VTEX note">Z notatką VTEX</button>
+          <button class="chip" data-f="unoff" data-en="Unofficial">Nieoficjalne</button>
+          <button class="chip" data-f="todo" data-en="Not known yet">Jeszcze nie umiem</button>
         </div>
         <p class="small muted" id="shown"></p>
       </div>
@@ -153,138 +153,138 @@
     <!-- BRAKI -->
     <section class="panel" id="p-braki" role="tabpanel" aria-labelledby="tab-braki" hidden>
       <div class="block">
-        <h2>Dlaczego nie ma 104, 209 albo 427?</h2>
-        <p class="lead">Każda grupa ma <b>100 numerów</b>, razem 500. Zajętych jest garstka. Poniżej cała przestrzeń 100–599, jedna kratka to jeden numer.</p>
+        <h2 data-en="Why is there no 104, 209 or 427?">Dlaczego nie ma 104, 209 albo 427?</h2>
+        <p class="lead" data-en-html="Each group has &lt;b&gt;100 numbers&lt;/b&gt;, 500 in total. Only a handful are used. Below is the whole 100–599 space, one square per number.">Każda grupa ma <b>100 numerów</b>, razem 500. Zajętych jest garstka. Poniżej cała przestrzeń 100–599, jedna kratka to jeden numer.</p>
         <div class="legend small">
-          <span><i class="key oc"></i>oficjalny, ma kota</span>
-          <span><i class="key uc"></i>nieoficjalny, ma kota</span>
-          <span><i class="key on"></i>w rejestrze IANA, bez kota</span>
-          <span><i class="key em"></i>wolny</span>
+          <span><i class="key oc"></i><span data-en="official, has a cat">oficjalny, ma kota</span></span>
+          <span><i class="key uc"></i><span data-en="unofficial, has a cat">nieoficjalny, ma kota</span></span>
+          <span><i class="key on"></i><span data-en="in the IANA registry, no cat">w rejestrze IANA, bez kota</span></span>
+          <span><i class="key em"></i><span data-en="free">wolny</span></span>
         </div>
-        <p class="small muted"><b>Najedź albo dotknij kratki:</b> podgląd kota i opis. <b>Klik</b> (na telefonie „Pokaż kartę”) przenosi do karty. <b>Strzałki ← →</b> skaczą po zajętych numerach.</p>
+        <p class="small muted" data-en-html="<b>Hover or tap a square:</b> a cat preview and a description. <b>Click</b> (on a phone &ldquo;Show card&rdquo;) takes you to the card. <b>Arrows ← →</b> jump between used numbers."><b>Najedź albo dotknij kratki:</b> podgląd kota i opis. <b>Klik</b> (na telefonie „Pokaż kartę”) przenosi do karty. <b>Strzałki ← →</b> skaczą po zajętych numerach.</p>
         <div class="maps" id="maps"></div>
       </div>
       <div class="block">
-        <h2>Pięć powodów dziur</h2>
+        <h2 data-en="Five reasons for the gaps">Pięć powodów dziur</h2>
         <div class="cols">
-          <div class="sheet block"><h3>1. Nikt ich nie zdefiniował</h3><p>Numer istnieje dopiero, gdy trafi do <b>rejestru IANA</b>, a to wymaga dokumentu RFC i przeglądu IETF. Kodów nie przydziela się po kolei, tylko wtedy, gdy są potrzebne. Na stałe przydzielono <b>61</b>.</p></div>
-          <div class="sheet block"><h3>2. Pamiątki po kolejnych RFC</h3><p>RFC 6585 z 2012 r. dodał naraz <b>428, 429, 431 i 511</b>. Numery <b>427 i 430</b> zostały wolne. Tak samo wolne są 419, 420 i 509, dlatego „pożyczyli” je Laravel, Twitter i Apache.</p></div>
-          <div class="sheet block"><h3>3. Zarezerwowane i wycofane</h3><p><b>306</b> to dawny „Switch Proxy”, w rejestrze jako „(Unused)”. <b>418</b> też ma wpis „(Unused)”, żeby nikt nie zajął numeru czajnika. <b>305 Use Proxy</b> jest przestarzały ze względów bezpieczeństwa, ale kota ma.</p></div>
-          <div class="sheet block"><h3>4. http.cat to nie rejestr</h3><p>Koty rysuje się ręcznie. Brakuje kota dla oficjalnego <b>505 HTTP Version Not Supported</b>, dla 306 i dla tymczasowo zarejestrowanego <b>104</b>. Za to <b>18 kotów</b> ilustruje kody spoza rejestru.</p></div>
-          <div class="sheet block"><h3>5. Vendorzy trzymają się z boku</h3><p>Nieoficjalne kody lądują daleko od zajętych numerów: <b>nginx 444 i 495–499</b>, <b>Cloudflare 521–525</b>. Stąd skupiska na końcach zakresów i pustka w środku.</p></div>
+          <div class="sheet block"><h3 data-en="1. Nobody defined them">1. Nikt ich nie zdefiniował</h3><p data-en-html="A number only exists once it enters the &lt;b&gt;IANA registry&lt;/b&gt;, which takes an RFC and IETF review. Codes are not assigned in order, only when they are needed. &lt;b&gt;61&lt;/b&gt; are permanently assigned.">Numer istnieje dopiero, gdy trafi do <b>rejestru IANA</b>, a to wymaga dokumentu RFC i przeglądu IETF. Kodów nie przydziela się po kolei, tylko wtedy, gdy są potrzebne. Na stałe przydzielono <b>61</b>.</p></div>
+          <div class="sheet block"><h3 data-en="2. Leftovers from successive RFCs">2. Pamiątki po kolejnych RFC</h3><p data-en-html="RFC 6585 from 2012 added &lt;b&gt;428, 429, 431 and 511&lt;/b&gt; at once. Numbers &lt;b&gt;427 and 430&lt;/b&gt; stayed free. So are 419, 420 and 509, which is why Laravel, Twitter and Apache “borrowed” them.">RFC 6585 z 2012 r. dodał naraz <b>428, 429, 431 i 511</b>. Numery <b>427 i 430</b> zostały wolne. Tak samo wolne są 419, 420 i 509, dlatego „pożyczyli” je Laravel, Twitter i Apache.</p></div>
+          <div class="sheet block"><h3 data-en="3. Reserved and retired">3. Zarezerwowane i wycofane</h3><p data-en-html="&lt;b&gt;306&lt;/b&gt; is the former “Switch Proxy”, listed as “(Unused)”. &lt;b&gt;418&lt;/b&gt; is also listed as “(Unused)”, so nobody takes the teapot&#x27;s number. &lt;b&gt;305 Use Proxy&lt;/b&gt; is deprecated for security reasons, but it has a cat."><b>306</b> to dawny „Switch Proxy”, w rejestrze jako „(Unused)”. <b>418</b> też ma wpis „(Unused)”, żeby nikt nie zajął numeru czajnika. <b>305 Use Proxy</b> jest przestarzały ze względów bezpieczeństwa, ale kota ma.</p></div>
+          <div class="sheet block"><h3 data-en="4. http.cat is not the registry">4. http.cat to nie rejestr</h3><p data-en-html="The cats are drawn by hand. There is no cat for the official &lt;b&gt;505 HTTP Version Not Supported&lt;/b&gt;, for 306 or for the provisionally registered &lt;b&gt;104&lt;/b&gt;. On the other hand, &lt;b&gt;18 cats&lt;/b&gt; illustrate codes outside the registry.">Koty rysuje się ręcznie. Brakuje kota dla oficjalnego <b>505 HTTP Version Not Supported</b>, dla 306 i dla tymczasowo zarejestrowanego <b>104</b>. Za to <b>18 kotów</b> ilustruje kody spoza rejestru.</p></div>
+          <div class="sheet block"><h3 data-en="5. Vendors keep to the side">5. Vendorzy trzymają się z boku</h3><p data-en-html="Unofficial codes land far from the used numbers: &lt;b&gt;nginx 444 and 495–499&lt;/b&gt;, &lt;b&gt;Cloudflare 521–525&lt;/b&gt;. Hence the clusters at the ends of the ranges and the emptiness in the middle.">Nieoficjalne kody lądują daleko od zajętych numerów: <b>nginx 444 i 495–499</b>, <b>Cloudflare 521–525</b>. Stąd skupiska na końcach zakresów i pustka w środku.</p></div>
         </div>
       </div>
       <div class="block">
-        <h2>Skąd wzięło się 18 nieoficjalnych</h2>
-        <div class="tw"><table><thead><tr><th>Kod</th><th>Nazwa</th><th>Kto go wymyślił</th></tr></thead><tbody id="unofftable"></tbody></table></div>
+        <h2 data-en="Where the 18 unofficial ones came from">Skąd wzięło się 18 nieoficjalnych</h2>
+        <div class="tw"><table><thead><tr><th data-en="Code">Kod</th><th data-en="Name">Nazwa</th><th data-en="Who invented it">Kto go wymyślił</th></tr></thead><tbody id="unofftable"></tbody></table></div>
       </div>
     </section>
 
     <!-- VTEX -->
     <section class="panel" id="p-vtex" role="tabpanel" aria-labelledby="tab-vtex" hidden>
       <div class="block">
-        <h2>Jak VTEX czyta kody</h2>
-        <p class="lead">Tabela ogólna VTEX ma <b>15 kodów</b>. Kolumna „co robisz” to zalecenia z tej samej strony.</p>
+        <h2 data-en="How VTEX reads the codes">Jak VTEX czyta kody</h2>
+        <p class="lead" data-en-html="The general VTEX table has &lt;b&gt;15 codes&lt;/b&gt;. The &ldquo;What you do&rdquo; column holds the advice from the same page.">Tabela ogólna VTEX ma <b>15 kodów</b>. Kolumna „co robisz” to zalecenia z tej samej strony.</p>
         <div class="tw">
           <table>
-            <thead><tr><th>Kod</th><th>Znaczenie wg VTEX</th><th>Co robisz</th></tr></thead>
+            <thead><tr><th data-en="Code">Kod</th><th data-en="Meaning per VTEX">Znaczenie wg VTEX</th><th data-en="What you do">Co robisz</th></tr></thead>
             <tbody>
-              <tr data-k="2"><td class="num">200</td><td>Request przetworzony poprawnie.</td><td>–</td></tr>
-              <tr data-k="2"><td class="num">201</td><td>Utworzono nowy zasób. Zwykle po <b>POST</b> i części <b>PUT</b>.</td><td>–</td></tr>
-              <tr data-k="2"><td class="num">202</td><td>Przyjęte, ale przetwarzanie <b>jeszcze trwa</b>.</td><td>sprawdź wynik później</td></tr>
-              <tr data-k="2"><td class="num">204</td><td>Sukces, <b>brak treści</b> do zwrócenia.</td><td>nie parsuj body</td></tr>
-              <tr data-k="2"><td class="num">205</td><td>Przyjęte bez treści, klient ma <b>zresetować dokument</b>.</td><td>wyczyść formularz</td></tr>
-              <tr data-k="4"><td class="num">400</td><td>Nie da się zdekodować body: <b>zła składnia</b> albo zły <code>Content-Type</code>.</td><td>popraw JSON i nagłówki</td></tr>
-              <tr data-k="4"><td class="num">401</td><td><b>Brak lub błędne</b> dane uwierzytelniające.</td><td>sprawdź AppKey i AppToken</td></tr>
-              <tr data-k="4"><td class="num">403</td><td>Request poprawny, serwer <b>odmawia</b>.</td><td>sprawdź role klucza</td></tr>
-              <tr data-k="4"><td class="num">404</td><td>Zasobu <b>nie da się znaleźć</b>.</td><td>sprawdź nazwę endpointu w API Reference</td></tr>
-              <tr data-k="4"><td class="num">405</td><td><b>Zła metoda</b> HTTP dla endpointu.</td><td>sprawdź metody w API Reference</td></tr>
-              <tr data-k="4"><td class="num">429</td><td>Przekroczone <b>limity requestów</b>.</td><td>czekaj, potem backoff</td></tr>
-              <tr data-k="5"><td class="num">500</td><td>Wewnętrzny błąd serwera.</td><td>sprawdź nagłówki → status page → support</td></tr>
-              <tr data-k="5"><td class="num">502</td><td>VTEX jako gateway dostał <b>błędną odpowiedź</b> z upstreamu.</td><td>ponów później</td></tr>
-              <tr data-k="5"><td class="num">503</td><td>Serwer <b>chwilowo niedostępny</b>.</td><td>status page → ponów → support</td></tr>
-              <tr data-k="5"><td class="num">504</td><td>VTEX jako gateway <b>nie doczekał się</b> odpowiedzi.</td><td>ponów później → support</td></tr>
+              <tr data-k="2"><td class="num">200</td><td data-en="The request was processed successfully.">Request przetworzony poprawnie.</td><td>–</td></tr>
+              <tr data-k="2"><td class="num">201</td><td data-en-html="A new resource was created. Usually after &lt;b&gt;POST&lt;/b&gt; and some &lt;b&gt;PUT&lt;/b&gt; requests.">Utworzono nowy zasób. Zwykle po <b>POST</b> i części <b>PUT</b>.</td><td>–</td></tr>
+              <tr data-k="2"><td class="num">202</td><td data-en-html="Accepted, but processing is &lt;b&gt;still in progress&lt;/b&gt;.">Przyjęte, ale przetwarzanie <b>jeszcze trwa</b>.</td><td data-en="check the result later">sprawdź wynik później</td></tr>
+              <tr data-k="2"><td class="num">204</td><td data-en-html="Success, &lt;b&gt;no content&lt;/b&gt; to return.">Sukces, <b>brak treści</b> do zwrócenia.</td><td data-en="don&#x27;t parse the body">nie parsuj body</td></tr>
+              <tr data-k="2"><td class="num">205</td><td data-en-html="Accepted with no content, the client should &lt;b&gt;reset the document&lt;/b&gt;.">Przyjęte bez treści, klient ma <b>zresetować dokument</b>.</td><td data-en="clear the form">wyczyść formularz</td></tr>
+              <tr data-k="4"><td class="num">400</td><td data-en-html="The body cannot be decoded: &lt;b&gt;bad syntax&lt;/b&gt; or a wrong &lt;code&gt;Content-Type&lt;/code&gt;.">Nie da się zdekodować body: <b>zła składnia</b> albo zły <code>Content-Type</code>.</td><td data-en="fix the JSON and the headers">popraw JSON i nagłówki</td></tr>
+              <tr data-k="4"><td class="num">401</td><td data-en-html="&lt;b&gt;Missing or invalid&lt;/b&gt; credentials."><b>Brak lub błędne</b> dane uwierzytelniające.</td><td data-en="check AppKey and AppToken">sprawdź AppKey i AppToken</td></tr>
+              <tr data-k="4"><td class="num">403</td><td data-en-html="The request is valid, the server &lt;b&gt;refuses&lt;/b&gt;.">Request poprawny, serwer <b>odmawia</b>.</td><td data-en="check the key&#x27;s roles">sprawdź role klucza</td></tr>
+              <tr data-k="4"><td class="num">404</td><td data-en-html="The resource &lt;b&gt;cannot be found&lt;/b&gt;.">Zasobu <b>nie da się znaleźć</b>.</td><td data-en="check the endpoint name in the API Reference">sprawdź nazwę endpointu w API Reference</td></tr>
+              <tr data-k="4"><td class="num">405</td><td data-en-html="&lt;b&gt;Wrong HTTP method&lt;/b&gt; for the endpoint."><b>Zła metoda</b> HTTP dla endpointu.</td><td data-en="check the methods in the API Reference">sprawdź metody w API Reference</td></tr>
+              <tr data-k="4"><td class="num">429</td><td data-en-html="&lt;b&gt;Request limits&lt;/b&gt; exceeded.">Przekroczone <b>limity requestów</b>.</td><td data-en="wait, then back off">czekaj, potem backoff</td></tr>
+              <tr data-k="5"><td class="num">500</td><td data-en="Internal server error.">Wewnętrzny błąd serwera.</td><td data-en="check the headers → status page → support">sprawdź nagłówki → status page → support</td></tr>
+              <tr data-k="5"><td class="num">502</td><td data-en-html="VTEX, acting as a gateway, got an &lt;b&gt;invalid response&lt;/b&gt; from upstream.">VTEX jako gateway dostał <b>błędną odpowiedź</b> z upstreamu.</td><td data-en="retry later">ponów później</td></tr>
+              <tr data-k="5"><td class="num">503</td><td data-en-html="The server is &lt;b&gt;temporarily unavailable&lt;/b&gt;.">Serwer <b>chwilowo niedostępny</b>.</td><td data-en="status page → retry → support">status page → ponów → support</td></tr>
+              <tr data-k="5"><td class="num">504</td><td data-en-html="VTEX, acting as a gateway, &lt;b&gt;timed out waiting&lt;/b&gt; for a response.">VTEX jako gateway <b>nie doczekał się</b> odpowiedzi.</td><td data-en="retry later → support">ponów później → support</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="lead"><b>Pułapka:</b> zły <code>Content-Type</code> to w tabeli VTEX <b>400</b>, a nie 415. Kodów 206, 301, 304, 409, 415 i 422 w tej tabeli nie ma.</p>
+        <p class="lead" data-en-html="&lt;b&gt;Trap:&lt;/b&gt; in the VTEX table a bad &lt;code&gt;Content-Type&lt;/code&gt; is &lt;b&gt;400&lt;/b&gt;, not 415. Codes 206, 301, 304, 409, 415 and 422 are not in that table."><b>Pułapka:</b> zły <code>Content-Type</code> to w tabeli VTEX <b>400</b>, a nie 415. Kodów 206, 301, 304, 409, 415 i 422 w tej tabeli nie ma.</p>
       </div>
 
       <div class="cols">
         <div class="sheet block">
-          <h3>401 i 403: uwierzytelnienie</h3>
+          <h3 data-en="401 and 403: authentication">401 i 403: uwierzytelnienie</h3>
           <ul class="tight">
-            <li>Klucz idzie w dwóch nagłówkach: <code>X-VTEX-API-AppKey</code> i <code>X-VTEX-API-AppToken</code>.</li>
-            <li>Nazwy nagłówków są <b>niewrażliwe na wielkość liter</b>.</li>
-            <li>Uprawnienia klucza wynikają z <b>ról License Manager</b> i ich zasobów.</li>
-            <li><b>401:</b> nagłówków brak albo są błędne. <b>403:</b> klucz działa, rola nie ma zasobu.</li>
-            <li>Kluczy <b>nie wolno</b> używać po stronie klienta. Frontend używa tokenu użytkownika.</li>
+            <li data-en-html="The key goes in two headers: &lt;code&gt;X-VTEX-API-AppKey&lt;/code&gt; and &lt;code&gt;X-VTEX-API-AppToken&lt;/code&gt;.">Klucz idzie w dwóch nagłówkach: <code>X-VTEX-API-AppKey</code> i <code>X-VTEX-API-AppToken</code>.</li>
+            <li data-en-html="Header names are &lt;b&gt;case-insensitive&lt;/b&gt;.">Nazwy nagłówków są <b>niewrażliwe na wielkość liter</b>.</li>
+            <li data-en-html="A key&#x27;s permissions come from &lt;b&gt;License Manager roles&lt;/b&gt; and their resources.">Uprawnienia klucza wynikają z <b>ról License Manager</b> i ich zasobów.</li>
+            <li data-en-html="&lt;b&gt;401:&lt;/b&gt; the headers are missing or wrong. &lt;b&gt;403:&lt;/b&gt; the key works, the role lacks the resource."><b>401:</b> nagłówków brak albo są błędne. <b>403:</b> klucz działa, rola nie ma zasobu.</li>
+            <li data-en-html="Keys &lt;b&gt;must not&lt;/b&gt; be used client-side. The frontend uses a user token.">Kluczy <b>nie wolno</b> używać po stronie klienta. Frontend używa tokenu użytkownika.</li>
           </ul>
         </div>
         <div class="sheet block">
-          <h3>429: rate limity</h3>
+          <h3 data-en="429: rate limits">429: rate limity</h3>
           <ul class="tight">
-            <li>Przykład z Pricing API: <b>POST i PUT 2000/min</b> (ok. 33/s) z <b>500 burst credits</b>. <b>DELETE 1000/min</b> (ok. 16/s) z <b>300</b>.</li>
-            <li>Każdy request ponad limit zjada 1 credit. <b>Credits = 0 → 429.</b></li>
-            <li>Credits odnawiają się, gdy trasa jest bezczynna.</li>
-            <li>Nagłówki: <code>Ratelimit-Limit</code>, <code>Ratelimit-Remaining</code>, <code>Ratelimit-Reset</code>, <code>Retry-After</code>.</li>
-            <li>Reakcja: odczekaj <code>Retry-After</code>, potem <b>exponential backoff z jitterem</b>. Dla Orders i Feed dokumentacja mówi o <b>1 minucie</b> przerwy.</li>
+            <li data-en-html="Example from the Pricing API: &lt;b&gt;POST and PUT 2000/min&lt;/b&gt; (about 33/s) with &lt;b&gt;500 burst credits&lt;/b&gt;. &lt;b&gt;DELETE 1000/min&lt;/b&gt; (about 16/s) with &lt;b&gt;300&lt;/b&gt;.">Przykład z Pricing API: <b>POST i PUT 2000/min</b> (ok. 33/s) z <b>500 burst credits</b>. <b>DELETE 1000/min</b> (ok. 16/s) z <b>300</b>.</li>
+            <li data-en-html="Each request over the limit uses 1 credit. &lt;b&gt;Credits = 0 → 429.&lt;/b&gt;">Każdy request ponad limit zjada 1 credit. <b>Credits = 0 → 429.</b></li>
+            <li data-en="Credits refill while the route is idle.">Credits odnawiają się, gdy trasa jest bezczynna.</li>
+            <li data-en-html="Headers: &lt;code&gt;Ratelimit-Limit&lt;/code&gt;, &lt;code&gt;Ratelimit-Remaining&lt;/code&gt;, &lt;code&gt;Ratelimit-Reset&lt;/code&gt;, &lt;code&gt;Retry-After&lt;/code&gt;.">Nagłówki: <code>Ratelimit-Limit</code>, <code>Ratelimit-Remaining</code>, <code>Ratelimit-Reset</code>, <code>Retry-After</code>.</li>
+            <li data-en-html="Response: wait for &lt;code&gt;Retry-After&lt;/code&gt;, then use &lt;b&gt;exponential backoff with jitter&lt;/b&gt;. For Orders and Feed the docs say to pause for &lt;b&gt;1 minute&lt;/b&gt;.">Reakcja: odczekaj <code>Retry-After</code>, potem <b>exponential backoff z jitterem</b>. Dla Orders i Feed dokumentacja mówi o <b>1 minucie</b> przerwy.</li>
           </ul>
-          <p class="small muted">Starsze materiały podają 40 req/s, 1000 credits i nagłówki <code>X-RateLimit-*</code>. Jeśli pytanie używa tych liczb, chodzi o ten sam mechanizm.</p>
+          <p class="small muted" data-en-html="Older material gives 40 req/s, 1000 credits and &lt;code&gt;X-RateLimit-*&lt;/code&gt; headers. If a question uses those numbers, it is the same mechanism.">Starsze materiały podają 40 req/s, 1000 credits i nagłówki <code>X-RateLimit-*</code>. Jeśli pytanie używa tych liczb, chodzi o ten sam mechanizm.</p>
         </div>
         <div class="sheet block">
-          <h3>Hook i Feed v3 (zamówienia)</h3>
+          <h3 data-en="Hook and Feed v3 (orders)">Hook i Feed v3 (zamówienia)</h3>
           <ul class="tight">
-            <li><b>Hook = push</b>, VTEX woła Ciebie. <b>Feed = pull</b>, Ty pobierasz i robisz commit.</li>
-            <li>Przy konfiguracji Hooka VTEX wysyła ping <code>{"hookConfig": "ping"}</code>. Endpoint musi zwrócić <b>200</b>.</li>
-            <li>Brak 200 na ping → Hook API zwraca <b>400</b>, konfiguracja <b>się nie zapisuje</b>.</li>
-            <li>Każda notyfikacja: <b>200 w 5000 ms</b>. Inaczej ponowienia w rosnących odstępach.</li>
-            <li><b>3 dni</b> bez notyfikacji → konfiguracja Hooka jest usuwana.</li>
-            <li>Filtry <code>FromWorkflow</code> i <code>FromOrders</code> wykluczają się. Połączenie pól → <b>409 Conflict</b>.</li>
-            <li>Jeden appKey = jeden feed. Retencja feedu: od 345600 s (4 dni) do 1209600 s (14 dni).</li>
-          </ul>
-        </div>
-        <div class="sheet block">
-          <h3>Marketplace i external seller</h3>
-          <ul class="tight">
-            <li>Change notification (<code>sellerId</code> + <code>sellerSkuId</code>): <b>200 = SKU już jest</b> w marketplace, <b>404 = nie ma</b>.</li>
-            <li>Po 404 wysyłasz <b>SKU suggestion</b> (PUT), marketplace ją akceptuje albo odrzuca.</li>
-            <li>Fulfillment simulation sellera musi odpowiedzieć w <b>2,5 s</b>. Wolniej = oferta niedostępna.</li>
+            <li data-en-html="&lt;b&gt;Hook = push&lt;/b&gt;, VTEX calls you. &lt;b&gt;Feed = pull&lt;/b&gt;, you fetch and commit."><b>Hook = push</b>, VTEX woła Ciebie. <b>Feed = pull</b>, Ty pobierasz i robisz commit.</li>
+            <li data-en-html="When you configure a Hook, VTEX sends a ping &lt;code&gt;{&quot;hookConfig&quot;: &quot;ping&quot;}&lt;/code&gt;. The endpoint must return &lt;b&gt;200&lt;/b&gt;.">Przy konfiguracji Hooka VTEX wysyła ping <code>{"hookConfig": "ping"}</code>. Endpoint musi zwrócić <b>200</b>.</li>
+            <li data-en-html="No 200 on the ping → the Hook API returns &lt;b&gt;400&lt;/b&gt; and the configuration &lt;b&gt;is not saved&lt;/b&gt;.">Brak 200 na ping → Hook API zwraca <b>400</b>, konfiguracja <b>się nie zapisuje</b>.</li>
+            <li data-en-html="Every notification: &lt;b&gt;200 within 5000 ms&lt;/b&gt;. Otherwise retries at growing intervals.">Każda notyfikacja: <b>200 w 5000 ms</b>. Inaczej ponowienia w rosnących odstępach.</li>
+            <li data-en-html="&lt;b&gt;3 days&lt;/b&gt; without notifications → the Hook configuration is deleted."><b>3 dni</b> bez notyfikacji → konfiguracja Hooka jest usuwana.</li>
+            <li data-en-html="The &lt;code&gt;FromWorkflow&lt;/code&gt; and &lt;code&gt;FromOrders&lt;/code&gt; filters are mutually exclusive. Combining the fields → &lt;b&gt;409 Conflict&lt;/b&gt;.">Filtry <code>FromWorkflow</code> i <code>FromOrders</code> wykluczają się. Połączenie pól → <b>409 Conflict</b>.</li>
+            <li data-en="One appKey = one feed. Feed retention: from 345600 s (4 days) to 1209600 s (14 days).">Jeden appKey = jeden feed. Retencja feedu: od 345600 s (4 dni) do 1209600 s (14 dni).</li>
           </ul>
         </div>
         <div class="sheet block">
-          <h3>Płatności (Payment Provider Protocol)</h3>
+          <h3 data-en="Marketplace and external seller">Marketplace i external seller</h3>
           <ul class="tight">
-            <li>Connector odpowiada w <b>5 s</b> na testach homologacyjnych i w <b>20 s</b> na produkcji.</li>
-            <li>Tylko <b>HTTPS, port 443, TLS 1.2</b>.</li>
-            <li>Metoda asynchroniczna (Pix, boleto) zwraca <code>status: "undefined"</code>, nigdy od razu <code>approved</code>.</li>
-            <li>Gateway ponawia Create Payment do <b>7 dni</b>. Ten sam <code>paymentId</code> = ta sama odpowiedź (idempotencja).</li>
+            <li data-en-html="Change notification (&lt;code&gt;sellerId&lt;/code&gt; + &lt;code&gt;sellerSkuId&lt;/code&gt;): &lt;b&gt;200 = the SKU already exists&lt;/b&gt; in the marketplace, &lt;b&gt;404 = it does not&lt;/b&gt;.">Change notification (<code>sellerId</code> + <code>sellerSkuId</code>): <b>200 = SKU już jest</b> w marketplace, <b>404 = nie ma</b>.</li>
+            <li data-en-html="After a 404 you send an &lt;b&gt;SKU suggestion&lt;/b&gt; (PUT), and the marketplace accepts or rejects it.">Po 404 wysyłasz <b>SKU suggestion</b> (PUT), marketplace ją akceptuje albo odrzuca.</li>
+            <li data-en-html="The seller&#x27;s fulfillment simulation must respond within &lt;b&gt;2.5 s&lt;/b&gt;. Slower = the offer is unavailable.">Fulfillment simulation sellera musi odpowiedzieć w <b>2,5 s</b>. Wolniej = oferta niedostępna.</li>
           </ul>
         </div>
         <div class="sheet block">
-          <h3>Master Data i Search: paginacja</h3>
+          <h3 data-en="Payments (Payment Provider Protocol)">Płatności (Payment Provider Protocol)</h3>
           <ul class="tight">
-            <li>MD search: nagłówek <code>REST-Range: resources=0-100</code>, maks. <b>100 dokumentów</b> na zapytanie.</li>
-            <li>Odpowiedź niesie <code>REST-Content-Range: resources=0-100/{total}</code>.</li>
-            <li>MD scroll: <code>_size</code> do <b>1000</b>, token w <code>X-VTEX-MD-TOKEN</code>, ważny <b>20 minut</b>.</li>
-            <li>Legacy Search z <code>_from</code>/<code>_to</code> (okno do 50) odpowiada <b>206</b> z nagłówkiem <code>resources: 0-49/1234</code>. To sukces, nie błąd.</li>
+            <li data-en-html="The connector responds within &lt;b&gt;5 s&lt;/b&gt; in homologation tests and &lt;b&gt;20 s&lt;/b&gt; in production.">Connector odpowiada w <b>5 s</b> na testach homologacyjnych i w <b>20 s</b> na produkcji.</li>
+            <li data-en-html="Only &lt;b&gt;HTTPS, port 443, TLS 1.2&lt;/b&gt;.">Tylko <b>HTTPS, port 443, TLS 1.2</b>.</li>
+            <li data-en-html="An asynchronous method (Pix, boleto) returns &lt;code&gt;status: &quot;undefined&quot;&lt;/code&gt;, never &lt;code&gt;approved&lt;/code&gt; right away.">Metoda asynchroniczna (Pix, boleto) zwraca <code>status: "undefined"</code>, nigdy od razu <code>approved</code>.</li>
+            <li data-en-html="The gateway retries Create Payment for up to &lt;b&gt;7 days&lt;/b&gt;. Same &lt;code&gt;paymentId&lt;/code&gt; = same response (idempotency).">Gateway ponawia Create Payment do <b>7 dni</b>. Ten sam <code>paymentId</code> = ta sama odpowiedź (idempotencja).</li>
+          </ul>
+        </div>
+        <div class="sheet block">
+          <h3 data-en="Master Data and Search: pagination">Master Data i Search: paginacja</h3>
+          <ul class="tight">
+            <li data-en-html="MD search: the &lt;code&gt;REST-Range: resources=0-100&lt;/code&gt; header, at most &lt;b&gt;100 documents&lt;/b&gt; per query.">MD search: nagłówek <code>REST-Range: resources=0-100</code>, maks. <b>100 dokumentów</b> na zapytanie.</li>
+            <li data-en-html="The response carries &lt;code&gt;REST-Content-Range: resources=0-100/{total}&lt;/code&gt;.">Odpowiedź niesie <code>REST-Content-Range: resources=0-100/{total}</code>.</li>
+            <li data-en-html="MD scroll: &lt;code&gt;_size&lt;/code&gt; up to &lt;b&gt;1000&lt;/b&gt;, token in &lt;code&gt;X-VTEX-MD-TOKEN&lt;/code&gt;, valid for &lt;b&gt;20 minutes&lt;/b&gt;.">MD scroll: <code>_size</code> do <b>1000</b>, token w <code>X-VTEX-MD-TOKEN</code>, ważny <b>20 minut</b>.</li>
+            <li data-en-html="Legacy Search with &lt;code&gt;_from&lt;/code&gt;/&lt;code&gt;_to&lt;/code&gt; (a window of up to 50) responds &lt;b&gt;206&lt;/b&gt; with the header &lt;code&gt;resources: 0-49/1234&lt;/code&gt;. That is success, not an error.">Legacy Search z <code>_from</code>/<code>_to</code> (okno do 50) odpowiada <b>206</b> z nagłówkiem <code>resources: 0-49/1234</code>. To sukces, nie błąd.</li>
           </ul>
         </div>
       </div>
 
       <div class="block">
-        <h2>Ściąga: dostałem kod, co dalej</h2>
+        <h2 data-en="Cheat sheet: I got a code, what next">Ściąga: dostałem kod, co dalej</h2>
         <div class="tw">
           <table>
-            <thead><tr><th>Kod</th><th>Ponawiać?</th><th>Pierwszy ruch</th></tr></thead>
+            <thead><tr><th data-en="Code">Kod</th><th data-en="Retry?">Ponawiać?</th><th data-en="First move">Pierwszy ruch</th></tr></thead>
             <tbody>
-              <tr data-k="4"><td class="num">400, 404, 405</td><td><b>Nie</b></td><td>Popraw request: body, ścieżkę, metodę.</td></tr>
-              <tr data-k="4"><td class="num">401</td><td><b>Nie</b></td><td>Dodaj lub popraw AppKey i AppToken.</td></tr>
-              <tr data-k="4"><td class="num">403</td><td><b>Nie</b></td><td>Dodaj roli zasób w License Manager.</td></tr>
-              <tr data-k="4"><td class="num">409</td><td><b>Nie</b></td><td>Usuń konflikt w danych lub konfiguracji.</td></tr>
-              <tr data-k="4"><td class="num">429</td><td><b>Tak</b>, po przerwie</td><td>Czekaj <code>Retry-After</code>, zwolnij tempo.</td></tr>
-              <tr data-k="5"><td class="num">500</td><td>Ostrożnie</td><td>Sprawdź nagłówki, potem status page.</td></tr>
-              <tr data-k="5"><td class="num">502, 503, 504</td><td><b>Tak</b>, z backoffem</td><td>Ponów później, przy dłuższym problemie support.</td></tr>
+              <tr data-k="4"><td class="num">400, 404, 405</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Fix the request: body, path, method.">Popraw request: body, ścieżkę, metodę.</td></tr>
+              <tr data-k="4"><td class="num">401</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Add or fix AppKey and AppToken.">Dodaj lub popraw AppKey i AppToken.</td></tr>
+              <tr data-k="4"><td class="num">403</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Add the resource to the role in License Manager.">Dodaj roli zasób w License Manager.</td></tr>
+              <tr data-k="4"><td class="num">409</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Remove the conflict in the data or configuration.">Usuń konflikt w danych lub konfiguracji.</td></tr>
+              <tr data-k="4"><td class="num">429</td><td data-en-html="&lt;b&gt;Yes&lt;/b&gt;, after a pause"><b>Tak</b>, po przerwie</td><td data-en-html="Wait for &lt;code&gt;Retry-After&lt;/code&gt;, slow down.">Czekaj <code>Retry-After</code>, zwolnij tempo.</td></tr>
+              <tr data-k="5"><td class="num">500</td><td data-en="Carefully">Ostrożnie</td><td data-en="Check the headers, then the status page.">Sprawdź nagłówki, potem status page.</td></tr>
+              <tr data-k="5"><td class="num">502, 503, 504</td><td data-en-html="&lt;b&gt;Yes&lt;/b&gt;, with backoff"><b>Tak</b>, z backoffem</td><td data-en="Retry later; if the problem lasts, contact support.">Ponów później, przy dłuższym problemie support.</td></tr>
             </tbody>
           </table>
         </div>
@@ -296,8 +296,8 @@
       <div class="block">
         <h2>Quiz</h2>
         <div class="chips" id="qmodes">
-          <button class="chip" data-m="exam">Scenariusze egzaminacyjne</button>
-          <button class="chip" data-m="drill">Szybkie strzały: kod → nazwa</button>
+          <button class="chip" data-m="exam" data-en="Exam scenarios">Scenariusze egzaminacyjne</button>
+          <button class="chip" data-m="drill" data-en="Quick fire: code → name">Szybkie strzały: kod → nazwa</button>
         </div>
       </div>
       <div id="quizroot"></div>
@@ -306,21 +306,21 @@
 
   <footer>
     <div class="row">
-      <button class="btn ghost" id="reset">Wyczyść postęp</button>
-      <span>Postęp HTTP Kotów zapisuje się w tej przeglądarce, osobno od pytań i fiszek.</span>
-      <span id="resetask" hidden>Na pewno? <button class="btn" id="resetyes">Tak, wyczyść</button> <button class="btn ghost" id="resetno">Anuluj</button></span>
+      <button class="btn ghost" id="reset" data-en="Clear progress">Wyczyść postęp</button>
+      <span data-en="HTTP Koty progress is saved in this browser, separately from questions and flashcards.">Postęp HTTP Kotów zapisuje się w tej przeglądarce, osobno od pytań i fiszek.</span>
+      <span id="resetask" hidden><span data-en="Sure?">Na pewno?</span> <button class="btn" id="resetyes" data-en="Yes, clear">Tak, wyczyść</button> <button class="btn ghost" id="resetno" data-en="Cancel">Anuluj</button></span>
     </div>
-    <p>Koty: <a href="https://http.cat/" target="_blank" rel="noopener">http.cat</a> (licencja MIT, ilustracje @girliemac). Materiał do nauki, niezwiązany z VTEX.</p>
-    <p>Źródła faktów:</p>
+    <p data-en-html="Cats: &lt;a href=&quot;https://http.cat/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http.cat&lt;/a&gt; (MIT licence, illustrations by @girliemac). Study material, not affiliated with VTEX.">Koty: <a href="https://http.cat/" target="_blank" rel="noopener">http.cat</a> (licencja MIT, ilustracje @girliemac). Materiał do nauki, niezwiązany z VTEX.</p>
+    <p data-en="Sources of facts:">Źródła faktów:</p>
     <ul>
       <li><a href="https://developers.vtex.com/docs/guides/api-response-codes" target="_blank" rel="noopener">VTEX: API response status codes</a></li>
       <li><a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys" target="_blank" rel="noopener">VTEX: API authentication using API keys</a></li>
-      <li><a href="https://developers.vtex.com/docs/guides/orders-feed" target="_blank" rel="noopener">VTEX: Feed v3 (Hook i Feed)</a></li>
+      <li data-en-html="&lt;a href=&quot;https://developers.vtex.com/docs/guides/orders-feed&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;VTEX: Feed v3 (Hook and Feed)&lt;/a&gt;"><a href="https://developers.vtex.com/docs/guides/orders-feed" target="_blank" rel="noopener">VTEX: Feed v3 (Hook i Feed)</a></li>
       <li><a href="https://developers.vtex.com/docs/api-reference/pricing-api" target="_blank" rel="noopener">VTEX: Pricing API, rate limits</a></li>
       <li><a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api" target="_blank" rel="noopener">VTEX: Pagination in the Master Data API</a></li>
-      <li><a href="https://github.com/vtex/skills" target="_blank" rel="noopener">github.com/vtex/skills</a>: marketplace (2,5 s, 200/404) i płatności (5 s / 20 s, 7 dni)</li>
-      <li><a href="https://www.tabnews.com.br/antoniorincon/a-api-publica-de-catalogo-da-vtex-que-quase-ninguem-usa" target="_blank" rel="noopener">TabNews</a>: 206 w Legacy Search (źródło społecznościowe, nie oficjalna tabela)</li>
-      <li><a href="https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml" target="_blank" rel="noopener">IANA: HTTP Status Code Registry</a> i <a href="https://www.rfc-editor.org/rfc/rfc9110#name-status-codes" target="_blank" rel="noopener">RFC 9110</a></li>
+      <li data-en-html="&lt;a href=&quot;https://github.com/vtex/skills&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;github.com/vtex/skills&lt;/a&gt;: marketplace (2.5 s, 200/404) and payments (5 s / 20 s, 7 days)"><a href="https://github.com/vtex/skills" target="_blank" rel="noopener">github.com/vtex/skills</a>: marketplace (2,5 s, 200/404) i płatności (5 s / 20 s, 7 dni)</li>
+      <li data-en-html="&lt;a href=&quot;https://www.tabnews.com.br/antoniorincon/a-api-publica-de-catalogo-da-vtex-que-quase-ninguem-usa&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;TabNews&lt;/a&gt;: 206 in Legacy Search (community source, not the official table)"><a href="https://www.tabnews.com.br/antoniorincon/a-api-publica-de-catalogo-da-vtex-que-quase-ninguem-usa" target="_blank" rel="noopener">TabNews</a>: 206 w Legacy Search (źródło społecznościowe, nie oficjalna tabela)</li>
+      <li data-en-html="&lt;a href=&quot;https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;IANA: HTTP Status Code Registry&lt;/a&gt; and &lt;a href=&quot;https://www.rfc-editor.org/rfc/rfc9110#name-status-codes&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;RFC 9110&lt;/a&gt;"><a href="https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml" target="_blank" rel="noopener">IANA: HTTP Status Code Registry</a> i <a href="https://www.rfc-editor.org/rfc/rfc9110#name-status-codes" target="_blank" rel="noopener">RFC 9110</a></li>
     </ul>
   </footer>
 </div>

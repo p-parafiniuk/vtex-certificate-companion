@@ -70,11 +70,12 @@ a { color: var(--accent); }
 .meter i { display: block; height: 100%; width: 0; background: var(--accent); border-radius: 99px; transition: width 0.3s ease; }
 .meter-label { font: 500 0.8rem var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tabs { display: flex; gap: 4px; overflow-x: auto; }
-.tab { background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
+/* No shrinking below the label: on the narrowest phones the row scrolls instead of overlapping. */
+.tab { flex-shrink: 0; background: none; border: 0; border-bottom: 3px solid transparent; padding: 8px 12px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .tab:hover { color: var(--ink); }
 @media (max-width: 480px) { .tab { min-width: 44px; min-height: 44px; padding: 8px 4px; font-size: 0.92rem; } .navrow { gap: 6px; } .theme-btn { width: 36px; } .tabs { justify-content: space-between; } }
-/* Seven tabs: still one row without scrolling at 375 px. */
-@media (max-width: 400px) { .tab { min-width: 44px; min-height: 44px; padding: 8px 4px; font-size: 0.84rem; } .tabs { gap: 2px; justify-content: flex-start; } }
+/* Seven tabs: still one row without scrolling from 375 to 430 px. */
+@media (max-width: 430px) { .tab { min-width: 44px; min-height: 44px; padding: 8px 4px; font-size: 0.84rem; } .tabs { gap: 2px; justify-content: flex-start; } }
 .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 
 /* page */
@@ -335,7 +336,9 @@ kbd { font: 500 0.72rem var(--f-mono); border: 1px solid currentColor; border-ra
 
 /* HTTP Koty: a separate view. It inherits the drill's neutrals and fonts; only the status-class hues are its own. */
 .tab-x { margin-left: auto; }
-@media (max-width: 480px) { .tab .num, .tab-long { display: none; } .tab-x { margin-left: 0; } }
+/* Long tab names ("Symulacja", English labels) get a short form on phones. */
+.tab-short { display: none; }
+@media (max-width: 480px) { .tab .num, .tab-long { display: none; } .tab-short { display: inline; } .tab-x { margin-left: 0; } }
 #koty { display: block; min-width: 0;
   --surface-2: var(--code); --c1: var(--k1); --c2: var(--ok); --c3: var(--k3); --c4: var(--bad); --c5: var(--k5);
   --vtex: var(--accent); --on-accent: var(--surface); --shadow: var(--kshadow);
@@ -412,7 +415,7 @@ body[data-view="pytania"] .bar-in, body[data-view="pytania"] .wrap { max-width: 
 @media (max-width: 480px) { .gx-head { order: 3; flex-basis: 100%; } .goal { flex: 1; } .goal .meter { flex: 1; width: auto; } }
 .tab-set { display: inline-flex; align-items: center; gap: 6px; }
 @media (max-width: 480px) { .tab-set { justify-content: center; } }
-@media (max-width: 400px) { .theme-btn { display: none; } }
+@media (max-width: 430px) { .theme-btn { display: none; } }
 .linkbtn { border: 0; background: none; padding: 0; color: var(--accent); font: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
 @media (pointer: coarse) { .linkbtn { min-height: 44px; } }
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
 <title>VTEX API Drill</title>
-<script>(function () { try { var t = JSON.parse(localStorage.getItem("vtex-drill-v1") || "{}").theme; if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) { /* system theme */ } })();</script>
+<script>(function () { try { var d = JSON.parse(localStorage.getItem("vtex-drill-v1") || "{}"), t = d.theme; if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); if (d.lang === "en") document.documentElement.lang = "en"; } catch (e) { /* system theme, Polish */ } })();</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 <!--@include styles/app.css-->
@@ -16,27 +16,27 @@
     <div class="brand">
       <h1>VTEX API Drill</h1>
       <span class="gx-head" id="gx-head">
-        <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu"></span>
-        <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego"><span class="pg-k">Dziś</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span><span class="pg-v" id="gx-gv">0/20</span></span>
+        <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu" data-en-title="Streak: days of study in a row"></span>
+        <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego" data-en-title="Today's answers against your daily goal"><span class="pg-k" data-en="Today">Dziś</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span><span class="pg-v" id="gx-gv">0/20</span></span>
       </span>
-      <span class="total" title="Opanowane pytania i fiszki razem"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> opanowane</span>
+      <span class="total" title="Opanowane pytania i fiszki razem" data-en-title="Questions and flashcards mastered, together"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> <span data-en="mastered">opanowane</span></span>
     </div>
-    <div class="prog" aria-label="Postęp nauki">
-      <div class="pg" title="Pytania oznaczone jako Umiem"><span class="pg-k">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
-      <div class="pg" title="Fiszki oznaczone jako Umiem"><span class="pg-k">Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
-      <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%"><span class="pg-k">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
-      <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%"><span class="pg-k">Symulacja</span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
+    <div class="prog" aria-label="Postęp nauki" data-en-aria="Study progress">
+      <div class="pg" title="Pytania oznaczone jako Umiem" data-en-title="Questions marked as known"><span class="pg-k" data-en="Questions">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
+      <div class="pg" title="Fiszki oznaczone jako Umiem" data-en-title="Flashcards marked as known"><span class="pg-k" data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
+      <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%" data-en-title="Share of right answers in study mode. Line = 80% pass mark"><span class="pg-k" data-en="Accuracy">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
+      <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%" data-en-title="Score of the last simulation. Line = 80% pass mark"><span class="pg-k" data-en="Simulation">Symulacja</span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
     </div>
     <button type="button" class="btn small" id="back-q" hidden></button>
     <div class="navrow">
-      <nav class="tabs" role="tablist" aria-label="Sekcje">
-        <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania">Pytania <span class="num">161</span></button>
-        <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja">Symulacja <span class="num">36+4</span></button>
-        <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki">Fiszki <span class="num">35</span></button>
-        <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep">Postęp</button>
-        <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP">HTTP</button>
-        <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
-        <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg><span class="tab-long">Ustawienia</span></button>
+      <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
+        <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
+        <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja"><span data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span> <span class="num">36+4</span></button>
+        <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
+        <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
+        <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
+        <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
+        <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg><span class="tab-long" data-en="Settings">Ustawienia</span></button>
       </nav>
       <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
     </div>
@@ -44,25 +44,25 @@
 </header>
 
 <main class="wrap">
-  <p class="notice" id="storage-warn" hidden>Przeglądarka blokuje zapis lokalny. Postęp zniknie po zamknięciu tej strony.</p>
+  <p class="notice" id="storage-warn" data-en="Your browser blocks local storage. Progress will be lost when you close this page." hidden>Przeglądarka blokuje zapis lokalny. Postęp zniknie po zamknięciu tej strony.</p>
 
   <section class="panel" id="p-pytania" role="tabpanel" aria-labelledby="t-pytania" hidden>
     <div class="cats-layout">
-      <nav class="cats" id="cats" aria-label="Kategorie pytań"></nav>
+      <nav class="cats" id="cats" aria-label="Kategorie pytań" data-en-aria="Question categories"></nav>
       <div class="cat-main">
         <div class="cat-head" id="cat-head"></div>
-        <div class="ctabs" id="ctabs" role="tablist" aria-label="Sekcje kategorii">
-          <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania">Pytania</button>
-          <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api">Ścieżki API</button>
+        <div class="ctabs" id="ctabs" role="tablist" aria-label="Sekcje kategorii" data-en-aria="Category sections">
+          <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania" data-en="Questions">Pytania</button>
+          <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api" data-en="API paths">Ścieżki API</button>
           <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
         </div>
         <div class="csec" id="cs-pytania" role="tabpanel" aria-labelledby="ct-pytania">
-          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how"><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
-          <p class="lead" id="q-lead"><strong>Jedna baza do APIs &amp; Integrations Badge: 161 pytań wielokrotnego wyboru.</strong> W każdym pytaniu poprawna może być <strong>jedna odpowiedź albo kilka</strong>. Zaznacz wszystkie pasujące i kliknij <strong>Sprawdź odpowiedź</strong>. Liczy się tylko komplet. Po błędzie dostajesz link do dokumentacji VTEX. Zaznacz <strong>Umiem</strong>, gdy pytanie masz opanowane. Kategorie po lewej zawężają bazę do jednego obszaru.</p>
+          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, flashcards and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
+          <p class="lead" id="q-lead" data-en-html="<strong>One bank for the APIs &amp;amp; Integrations Badge: 161 multiple-choice questions.</strong> Each question can have <strong>one right answer or several</strong>. Select all that apply and click <strong>Check answer</strong>. Only the full set counts. After a mistake you get a link to the VTEX docs. Tick <strong>Known</strong> once you have a question down. The categories narrow the bank to one area."><strong>Jedna baza do APIs &amp; Integrations Badge: 161 pytań wielokrotnego wyboru.</strong> W każdym pytaniu poprawna może być <strong>jedna odpowiedź albo kilka</strong>. Zaznacz wszystkie pasujące i kliknij <strong>Sprawdź odpowiedź</strong>. Liczy się tylko komplet. Po błędzie dostajesz link do dokumentacji VTEX. Zaznacz <strong>Umiem</strong>, gdy pytanie masz opanowane. Kategorie po lewej zawężają bazę do jednego obszaru.</p>
           <div class="toolbar">
-            <div class="chips" id="sets" role="group" aria-label="Filtr rundy"></div>
-            <div class="row"><label class="check" for="hide-known"><input type="checkbox" id="hide-known"> Ukryj opanowane</label>
-            <label class="check" for="hint-on"><input type="checkbox" id="hint-on"> Pokazuj, ile odpowiedzi jest poprawnych</label></div>
+            <div class="chips" id="sets" role="group" aria-label="Filtr rundy" data-en-aria="Round filter"></div>
+            <div class="row"><label class="check" for="hide-known"><input type="checkbox" id="hide-known"> <span data-en="Hide mastered">Ukryj opanowane</span></label>
+            <label class="check" for="hint-on"><input type="checkbox" id="hint-on"> <span data-en="Show how many answers are right">Pokazuj, ile odpowiedzi jest poprawnych</span></label></div>
           </div>
           <div class="list" id="qlist"></div>
         </div>
@@ -76,17 +76,17 @@
   </section>
 
   <section class="panel" id="p-symulacja" role="tabpanel" aria-labelledby="t-symulacja" hidden>
-    <h2>Symulacja egzaminu</h2>
-    <ul class="facts" aria-label="Format prawdziwego egzaminu">
-      <li>36 pytań wielokrotnego wyboru</li><li>4 zadania praktyczne</li><li>2 h na całość</li><li>próg 80%</li>
+    <h2 data-en="Exam simulation">Symulacja egzaminu</h2>
+    <ul class="facts" aria-label="Format prawdziwego egzaminu" data-en-aria="Format of the real exam">
+      <li data-en="36 multiple-choice questions">36 pytań wielokrotnego wyboru</li><li data-en="4 practical tasks">4 zadania praktyczne</li><li data-en="2 h in total">2 h na całość</li><li data-en="80% pass mark">próg 80%</li>
     </ul>
     <div id="simroot" class="simroot"></div>
   </section>
 
   <section class="panel" id="p-fiszki" role="tabpanel" aria-labelledby="t-fiszki" hidden>
-    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how"><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
-    <p class="lead"><strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce.</strong> Dopiero potem odsłoń odpowiedź. Fiszki „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body. Pod każdą odpowiedzią jest link do dokumentacji VTEX. F1–20 to runda 1, F21–35 to runda 2.</p>
-    <div class="row"><button type="button" class="btn small" id="f-hide-all">Ukryj wszystkie odpowiedzi</button></div>
+    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, flashcards and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
+    <p class="lead" data-en-html="<strong>Answer out loud or write the request on paper first.</strong> Only then reveal the answer. The &ldquo;Practical&rdquo; flashcards train the 4 practical tasks: method, path, body. Under each answer there is a link to the VTEX docs. F1–20 are round 1, F21–35 are round 2."><strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce.</strong> Dopiero potem odsłoń odpowiedź. Fiszki „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body. Pod każdą odpowiedzią jest link do dokumentacji VTEX. F1–20 to runda 1, F21–35 to runda 2.</p>
+    <div class="row"><button type="button" class="btn small" id="f-hide-all" data-en="Hide all answers">Ukryj wszystkie odpowiedzi</button></div>
     <div class="list" id="flist"></div>
   </section>
 
@@ -97,72 +97,76 @@
     </div>
     <section class="card" id="gx-badges" aria-labelledby="gx-badges-h"></section>
     <dl class="stats" id="stats"></dl>
-    <h3>Obszary</h3>
+    <h3 data-en="Areas">Obszary</h3>
     <div class="domrows" id="domrows"></div>
-    <h3>Pytania 1–161</h3>
+    <h3 data-en="Questions 1–161">Pytania 1–161</h3>
     <ul class="legend">
-      <li><span class="sw k"></span>opanowane</li>
-      <li><span class="sw r"></span>ostatnio dobrze</li>
-      <li><span class="sw w"></span>ostatnio źle</li>
-      <li><span class="sw"></span>nieruszone</li>
+      <li><span class="sw k"></span><span data-en="mastered">opanowane</span></li>
+      <li><span class="sw r"></span><span data-en="last answer right">ostatnio dobrze</span></li>
+      <li><span class="sw w"></span><span data-en="last answer wrong">ostatnio źle</span></li>
+      <li><span class="sw"></span><span data-en="untouched">nieruszone</span></li>
     </ul>
     <div class="grid" id="qgrid"></div>
-    <h3>Fiszki 1–35</h3>
+    <h3 data-en="Flashcards 1–35">Fiszki 1–35</h3>
     <div class="grid" id="fgrid"></div>
-    <h3>Ostatnie symulacje</h3>
+    <h3 data-en="Recent simulations">Ostatnie symulacje</h3>
     <ul class="hist" id="hist"></ul>
-    <p class="lead">Czyszczenie odpowiedzi i reset postępu są w <button type="button" class="linkbtn" data-go="ustawienia">Ustawieniach</button>.</p>
+    <p class="lead" data-en-html="Clearing answers and resetting progress are in &lt;button type=&quot;button&quot; class=&quot;linkbtn&quot; data-go=&quot;ustawienia&quot;&gt;Settings&lt;/button&gt;.">Czyszczenie odpowiedzi i reset postępu są w <button type="button" class="linkbtn" data-go="ustawienia">Ustawieniach</button>.</p>
   </section>
 
   <section class="panel" id="p-ustawienia" role="tabpanel" aria-labelledby="t-ustawienia" hidden>
     <div>
-      <h2>Ustawienia</h2>
-      <p class="lead">Zapisują się od razu, tylko w tej przeglądarce.</p>
+      <h2 data-en="Settings">Ustawienia</h2>
+      <p class="lead" data-en="Saved right away, only in this browser.">Zapisują się od razu, tylko w tej przeglądarce.</p>
     </div>
     <section class="card setg" aria-labelledby="set-h-nauka">
-      <h3 id="set-h-nauka">Nauka</h3>
+      <h3 id="set-h-nauka" data-en="Study">Nauka</h3>
       <div class="setrow">
-        <span class="setl"><span class="setn" id="set-goal-l">Cel dzienny</span><span class="seth">Ile odpowiedzi dziennie liczy się do celu.</span></span>
+        <span class="setl"><span class="setn" id="set-goal-l" data-en="Daily goal">Cel dzienny</span><span class="seth" data-en="How many answers a day count toward the goal.">Ile odpowiedzi dziennie liczy się do celu.</span></span>
         <div class="seg" role="group" aria-labelledby="set-goal-l" id="set-goal"><button type="button" class="seg-b" data-goal="10">10</button><button type="button" class="seg-b" data-goal="20">20</button><button type="button" class="seg-b" data-goal="40">40</button></div>
       </div>
-      <label class="setrow" for="set-hint"><span class="setl"><span class="setn">Pokazuj, ile odpowiedzi jest poprawnych</span><span class="seth">Podpowiedź przy pytaniach z kilkoma poprawnymi.</span></span><input type="checkbox" id="set-hint"></label>
-      <label class="setrow" for="set-hide"><span class="setl"><span class="setn">Ukryj opanowane</span><span class="seth">Na liście zostają pytania bez znacznika Umiem.</span></span><input type="checkbox" id="set-hide"></label>
+      <label class="setrow" for="set-hint"><span class="setl"><span class="setn" data-en="Show how many answers are right">Pokazuj, ile odpowiedzi jest poprawnych</span><span class="seth" data-en="A hint on questions with several right answers.">Podpowiedź przy pytaniach z kilkoma poprawnymi.</span></span><input type="checkbox" id="set-hint"></label>
+      <label class="setrow" for="set-hide"><span class="setl"><span class="setn" data-en="Hide mastered">Ukryj opanowane</span><span class="seth" data-en="The list keeps only questions not marked Known.">Na liście zostają pytania bez znacznika Umiem.</span></span><input type="checkbox" id="set-hide"></label>
     </section>
     <section class="card setg" aria-labelledby="set-h-sym">
-      <h3 id="set-h-sym">Symulacja</h3>
-      <label class="setrow" for="set-min"><span class="setl"><span class="setn">Czas symulacji</span><span class="seth">Prawdziwy egzamin trwa 120 minut.</span></span><span class="setnum"><input type="number" id="set-min" min="1" max="600" step="1" inputmode="numeric"> min</span></label>
-      <label class="setrow" for="set-prac"><span class="setl"><span class="setn">Zadania praktyczne</span><span class="seth">Cztery zadania na końcu, z oceną własną.</span></span><input type="checkbox" id="set-prac"></label>
+      <h3 id="set-h-sym" data-en="Simulation">Symulacja</h3>
+      <label class="setrow" for="set-min"><span class="setl"><span class="setn" data-en="Simulation time">Czas symulacji</span><span class="seth" data-en="The real exam takes 120 minutes.">Prawdziwy egzamin trwa 120 minut.</span></span><span class="setnum"><input type="number" id="set-min" min="1" max="600" step="1" inputmode="numeric"> min</span></label>
+      <label class="setrow" for="set-prac"><span class="setl"><span class="setn" data-en="Practical tasks">Zadania praktyczne</span><span class="seth" data-en="Four tasks at the end, self-graded.">Cztery zadania na końcu, z oceną własną.</span></span><input type="checkbox" id="set-prac"></label>
     </section>
     <section class="card setg" aria-labelledby="set-h-gx">
-      <h3 id="set-h-gx">Grywalizacja</h3>
-      <label class="setrow" for="set-gx-head"><span class="setl"><span class="setn">Seria i cel w nagłówku</span><span class="seth">Liczba dni z rzędu i pasek dzisiejszego celu.</span></span><input type="checkbox" id="set-gx-head" data-gx="head"></label>
-      <label class="setrow" for="set-gx-combo"><span class="setl"><span class="setn">Combo w trybie Focus</span><span class="seth">Licznik dobrych odpowiedzi z rzędu, od 3.</span></span><input type="checkbox" id="set-gx-combo" data-gx="combo"></label>
-      <label class="setrow" for="set-gx-toast"><span class="setl"><span class="setn">Powiadomienia o odznakach</span><span class="seth">Krótki komunikat na dole ekranu.</span></span><input type="checkbox" id="set-gx-toast" data-gx="toast"></label>
+      <h3 id="set-h-gx" data-en="Gamification">Grywalizacja</h3>
+      <label class="setrow" for="set-gx-head"><span class="setl"><span class="setn" data-en="Streak and goal in the header">Seria i cel w nagłówku</span><span class="seth" data-en="Days in a row and today's goal bar.">Liczba dni z rzędu i pasek dzisiejszego celu.</span></span><input type="checkbox" id="set-gx-head" data-gx="head"></label>
+      <label class="setrow" for="set-gx-combo"><span class="setl"><span class="setn" data-en="Combo in Focus mode">Combo w trybie Focus</span><span class="seth" data-en="Counter of right answers in a row, from 3.">Licznik dobrych odpowiedzi z rzędu, od 3.</span></span><input type="checkbox" id="set-gx-combo" data-gx="combo"></label>
+      <label class="setrow" for="set-gx-toast"><span class="setl"><span class="setn" data-en="Badge notifications">Powiadomienia o odznakach</span><span class="seth" data-en="A short message at the bottom of the screen.">Krótki komunikat na dole ekranu.</span></span><input type="checkbox" id="set-gx-toast" data-gx="toast"></label>
     </section>
     <section class="card setg" aria-labelledby="set-h-look">
-      <h3 id="set-h-look">Wygląd</h3>
+      <h3 id="set-h-look" data-en="Appearance">Wygląd</h3>
       <div class="setrow">
-        <span class="setl"><span class="setn" id="set-theme-l">Motyw</span><span class="seth">Systemowy podąża za ustawieniem urządzenia.</span></span>
-        <div class="seg" role="group" aria-labelledby="set-theme-l" id="set-theme"><button type="button" class="seg-b" data-theme-set="auto">Systemowy</button><button type="button" class="seg-b" data-theme-set="light">Jasny</button><button type="button" class="seg-b" data-theme-set="dark">Ciemny</button></div>
+        <span class="setl"><span class="setn" id="set-lang-l">Język · Language</span><span class="seth" data-en="Changes the interface text and HTTP Koty. Questions, explanations and flashcards stay as written.">Zmienia napisy interfejsu i HTTP Koty. Pytania, wyjaśnienia i fiszki zostają bez zmian.</span></span>
+        <div class="seg" role="group" aria-labelledby="set-lang-l" id="set-lang"><button type="button" class="seg-b" data-lang-set="pl" lang="pl">Polski</button><button type="button" class="seg-b" data-lang-set="en" lang="en">English</button></div>
+      </div>
+      <div class="setrow">
+        <span class="setl"><span class="setn" id="set-theme-l" data-en="Theme">Motyw</span><span class="seth" data-en="System follows your device setting.">Systemowy podąża za ustawieniem urządzenia.</span></span>
+        <div class="seg" role="group" aria-labelledby="set-theme-l" id="set-theme"><button type="button" class="seg-b" data-theme-set="auto" data-en="System">Systemowy</button><button type="button" class="seg-b" data-theme-set="light" data-en="Light">Jasny</button><button type="button" class="seg-b" data-theme-set="dark" data-en="Dark">Ciemny</button></div>
       </div>
     </section>
     <section class="card setg" aria-labelledby="set-h-data">
-      <h3 id="set-h-data">Dane</h3>
-      <p class="lead">Postęp, seria i odznaki są zapisane tylko w tej przeglądarce. Plik eksportu przeniesie je na inne urządzenie. Reset nie rusza ustawień i nie da się go cofnąć.</p>
+      <h3 id="set-h-data" data-en="Data">Dane</h3>
+      <p class="lead" data-en="Progress, streak and badges are saved only in this browser. An export file moves them to another device. Reset leaves the settings alone and cannot be undone.">Postęp, seria i odznaki są zapisane tylko w tej przeglądarce. Plik eksportu przeniesie je na inne urządzenie. Reset nie rusza ustawień i nie da się go cofnąć.</p>
       <div class="row">
-        <button type="button" class="btn small" id="exp-prog">Eksportuj postęp do pliku</button>
-        <button type="button" class="btn small" id="imp-prog">Importuj postęp z pliku</button>
+        <button type="button" class="btn small" id="exp-prog" data-en="Export progress to a file">Eksportuj postęp do pliku</button>
+        <button type="button" class="btn small" id="imp-prog" data-en="Import progress from a file">Importuj postęp z pliku</button>
         <input type="file" id="imp-file" accept=".json,application/json" class="sr" tabindex="-1" aria-hidden="true">
       </div>
       <div class="imp-box" id="imp-box" role="status" aria-live="polite"></div>
       <div class="row">
-        <button type="button" class="btn small" id="clear-ans">Wyczyść odpowiedzi</button>
-        <button type="button" class="btn small danger" id="reset-all">Zresetuj cały postęp</button>
+        <button type="button" class="btn small" id="clear-ans" data-en="Clear answers">Wyczyść odpowiedzi</button>
+        <button type="button" class="btn small danger" id="reset-all" data-en="Reset all progress">Zresetuj cały postęp</button>
       </div>
     </section>
   </section>
 
-  <section class="panel focus" id="p-focus" aria-label="Tryb Focus: jedna karta naraz" hidden>
+  <section class="panel focus" id="p-focus" aria-label="Tryb Focus: jedna karta naraz" data-en-aria="Focus mode: one card at a time" hidden>
     <div id="focusroot" class="simroot focus"></div>
   </section>
 
@@ -177,16 +181,16 @@
   <footer class="src">
     <div class="src-row">
       <span>© qlogic 2026</span>
-      <button type="button" class="info-btn" id="info-open" aria-haspopup="dialog" aria-controls="info-dlg" title="O pytaniach i źródłach"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Info</span></button>
+      <button type="button" class="info-btn" id="info-open" aria-haspopup="dialog" aria-controls="info-dlg" title="O pytaniach i źródłach" data-en-title="About the questions and sources"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Info</span></button>
     </div>
     <dialog class="info-dlg" id="info-dlg" aria-labelledby="info-h">
-      <div class="info-head"><h2 id="info-h">O pytaniach i źródłach</h2><button type="button" class="info-x" id="info-close" aria-label="Zamknij">✕</button></div>
+      <div class="info-head"><h2 id="info-h" data-en="About the questions and sources">O pytaniach i źródłach</h2><button type="button" class="info-x" id="info-close" aria-label="Zamknij" data-en-aria="Close">✕</button></div>
       <div class="info-body">
-    <p><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
-    <p><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
-    <p><strong>Format:</strong> 9 października 2026 baza została przebudowana na wielokrotny wybór (jedna lub kilka poprawnych). Każda dodana poprawna odpowiedź powtarza fakt potwierdzony w dokumentacji albo w API Reference VTEX.</p>
-    <p><strong>Linki przy pytaniach i fiszkach</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
-    <p>Źródła: <a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys">API keys</a> · <a href="https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens">User tokens</a> · <a href="https://developers.vtex.com/docs/guides/catalog-integration">Catalog</a> · <a href="https://developers.vtex.com/docs/guides/skus">SKUs</a> · <a href="https://developers.vtex.com/docs/api-reference/pricing-api">Pricing API</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-inventory">Inventory</a> · <a href="https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api">Checkout order</a> · <a href="https://developers.vtex.com/docs/guides/orders-feed">Feed v3 i Hook</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration">Order integration</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider">Payment provider</a> · <a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api">Master Data pagination</a> · <a href="https://developers.vtex.com/docs/guides/external-seller-integration-connector">External seller</a> · <a href="https://developers.vtex.com/docs/guides/api-response-codes">Status codes</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog">ERP: catalog</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-products">ERP: products</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing">ERP: order processing</a> · <a href="https://developers.vtex.com/docs/guides/change-order">Change order</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-purchase-flows">Purchase flows</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-secure-proxy">Secure Proxy</a> · <a href="https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works">Anti-fraud</a> · <a href="https://developers.vtex.com/docs/guides/login-integration-guide">Login (SSO)</a> · <a href="https://developers.vtex.com/docs/guides/sessions-system-overview">Sessions</a> · <a href="https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2">MD triggers</a> · <a href="https://developers.vtex.com/docs/api-reference/search-api">Search API</a> · <a href="https://developers.vtex.com/docs/api-reference/checkout-api">Checkout API</a> · <a href="https://developers.vtex.com/docs/api-reference/orders-api">Orders API</a> · <a href="https://developers.vtex.com/docs/api-reference/logistics-api">Logistics API</a> · <a href="https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api">Promotions &amp; Taxes API</a> · <a href="https://developers.vtex.com/docs/api-reference/giftcard-api">Giftcard API</a> · <a href="https://developers.vtex.com/docs/api-reference/payment-provider-protocol">Payment Provider Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/marketplace-protocol">Marketplace Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/vtex-id-api">VTEX ID API</a> · <a href="https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196">Order flow and status</a> · <a href="https://github.com/vtex/openapi-schemas">vtex/openapi-schemas</a></p>
+    <p data-en-html="<strong>Unofficial practice questions.</strong> They do not come from the real exam. Written from the public VTEX documentation and OpenAPI schemas, and checked against them on 7 and 8 October 2026. Banks merged on 9 October 2026."><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
+    <p data-en-html="<strong>Focus mode:</strong> questions count as right when every right answer is selected; flashcards and practical tasks by your own grade."><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
+    <p data-en-html="<strong>Format:</strong> on 9 October 2026 the bank was rebuilt as multiple choice (one or several right answers). Every added right answer repeats a fact confirmed in the VTEX docs or API Reference."><strong>Format:</strong> 9 października 2026 baza została przebudowana na wielokrotny wybór (jedna lub kilka poprawnych). Każda dodana poprawna odpowiedź powtarza fakt potwierdzony w dokumentacji albo w API Reference VTEX.</p>
+    <p data-en-html="<strong>Links on questions and flashcards</strong> lead to the VTEX docs (Developer Portal, Help Center, VTEX Learning). Each address was opened twice and compared with the question on 9 October 2026."><strong>Linki przy pytaniach i fiszkach</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
+    <p><span data-en="Sources:">Źródła:</span> <a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys">API keys</a> · <a href="https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens">User tokens</a> · <a href="https://developers.vtex.com/docs/guides/catalog-integration">Catalog</a> · <a href="https://developers.vtex.com/docs/guides/skus">SKUs</a> · <a href="https://developers.vtex.com/docs/api-reference/pricing-api">Pricing API</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-inventory">Inventory</a> · <a href="https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api">Checkout order</a> · <a href="https://developers.vtex.com/docs/guides/orders-feed">Feed v3 i Hook</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration">Order integration</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider">Payment provider</a> · <a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api">Master Data pagination</a> · <a href="https://developers.vtex.com/docs/guides/external-seller-integration-connector">External seller</a> · <a href="https://developers.vtex.com/docs/guides/api-response-codes">Status codes</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog">ERP: catalog</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-products">ERP: products</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing">ERP: order processing</a> · <a href="https://developers.vtex.com/docs/guides/change-order">Change order</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-purchase-flows">Purchase flows</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-secure-proxy">Secure Proxy</a> · <a href="https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works">Anti-fraud</a> · <a href="https://developers.vtex.com/docs/guides/login-integration-guide">Login (SSO)</a> · <a href="https://developers.vtex.com/docs/guides/sessions-system-overview">Sessions</a> · <a href="https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2">MD triggers</a> · <a href="https://developers.vtex.com/docs/api-reference/search-api">Search API</a> · <a href="https://developers.vtex.com/docs/api-reference/checkout-api">Checkout API</a> · <a href="https://developers.vtex.com/docs/api-reference/orders-api">Orders API</a> · <a href="https://developers.vtex.com/docs/api-reference/logistics-api">Logistics API</a> · <a href="https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api">Promotions &amp; Taxes API</a> · <a href="https://developers.vtex.com/docs/api-reference/giftcard-api">Giftcard API</a> · <a href="https://developers.vtex.com/docs/api-reference/payment-provider-protocol">Payment Provider Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/marketplace-protocol">Marketplace Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/vtex-id-api">VTEX ID API</a> · <a href="https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196">Order flow and status</a> · <a href="https://github.com/vtex/openapi-schemas">vtex/openapi-schemas</a></p>
       </div>
     </dialog>
   </footer>

@@ -9,8 +9,8 @@ const err = [], warn = [];
 const E = (w, m) => err.push(w + ": " + m), W = (w, m) => warn.push(w + ": " + m);
 const doms = new Set(D.DOMS.map(d => d[0]));
 const isStr = s => typeof s === "string" && s.trim() !== "";
-/* [key, name, emoji]: the emoji labels the category in the side panel */
-D.DOMS.forEach((d, i) => { if (!Array.isArray(d) || d.length !== 3 || !d.every(isStr)) E("DOMS[" + i + "]", "must be [key, name, emoji]"); });
+/* [key, name, emoji, enName?]: the emoji labels the category in the side panel; enName replaces name in the English UI */
+D.DOMS.forEach((d, i) => { if (!Array.isArray(d) || d.length < 3 || d.length > 4 || !d.every(isStr)) E("DOMS[" + i + "]", "must be [key, name, emoji, enName?]"); });
 
 function markup(w, s) {
   if (typeof s !== "string") return;
@@ -96,6 +96,15 @@ D.CODES.forEach((d, i) => {
   if (i && d.c < D.CODES[i - 1].c) E(w, "codes must be sorted ascending");
   if (!isStr(d.n) || !isStr(d.pl) || !isStr(d.fun)) E(w, "n, pl and fun are required");
   [d.pl, d.fun, d.v].forEach(s => markup(w, s));
+  /* en: the English UI's copy of pl, fun, v and x; same keys, v only where the Polish entry has one */
+  const en = d.en;
+  if (!en || !isStr(en.pl) || !isStr(en.fun)) E(w, "en.pl and en.fun are required");
+  else {
+    if (!!en.v !== !!d.v) E(w, "en.v must exist exactly when v does");
+    if (en.x !== undefined && !d.x) E(w, "en.x without x");
+    Object.keys(en).forEach(k => { if (!["pl", "fun", "v", "x"].includes(k)) E(w, "unknown en field `" + k + "`"); });
+    [en.pl, en.fun, en.v].forEach(s => markup(w + ".en", s));
+  }
 });
 const imgs = new Set(readdirSync(CATS).map(f => parseInt(f)));
 codes.forEach(c => { if (!imgs.has(c)) E("CODES " + c, "no image in src/img/cats"); });
@@ -108,6 +117,10 @@ D.QUESTIONS.forEach((q, i) => {
   if (!["VTEX", "HTTP"].includes(q.tag)) E(w, "tag must be VTEX or HTTP");
   if (!Array.isArray(q.o) || !Number.isInteger(q.a) || q.a < 0 || q.a >= q.o.length) E(w, "a out of range");
   if (!isStr(q.why)) E(w, "empty why");
+  /* en: q and why required; o only when the options need translating, in the same order so a still points at the right one */
+  const en = q.en;
+  if (!en || !isStr(en.q) || !isStr(en.why)) E(w, "en.q and en.why are required");
+  else if (en.o !== undefined && (!Array.isArray(en.o) || en.o.length !== q.o.length || !en.o.every(isStr))) E(w, "en.o must match o in length");
 });
 
 /* append-only lock */

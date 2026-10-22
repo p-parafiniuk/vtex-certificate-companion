@@ -1,12 +1,12 @@
 [
-  ["auth","Auth, kody, SSO","🔐"],
+  ["auth","Auth, kody, SSO","🔐","Auth, codes, SSO"],
   ["catalog","Catalog","📦"],
-  ["search","Search i Session","🔎"],
-  ["pricing","Pricing i promocje","🏷️"],
+  ["search","Search i Session","🔎","Search & Session"],
+  ["pricing","Pricing i promocje","🏷️","Pricing & promotions"],
   ["logistics","Logistics","🚚"],
   ["checkout","Checkout","🛒"],
   ["orders","Orders, Feed, Hook","📋"],
-  ["payments","Payments i anti-fraud","💳"],
+  ["payments","Payments i anti-fraud","💳","Payments & anti-fraud"],
   ["md","Master Data","🗄️"],
   ["mkt","Marketplace / Seller","🏪"]
 ]

@@ -22,6 +22,8 @@ export const BLOCKS = {
   QUESTIONS:   { file: "data/koty-quiz.json",  keys: "js",   layout: "lines", indent: "" },
   KLASS:       { file: "data/koty-meta.json",  pick: "KLASS",       keys: "js", layout: "inline" },
   IANA_NO_CAT: { file: "data/koty-meta.json",  pick: "IANA_NO_CAT", keys: "js", layout: "inline" },
+  KLASS_EN:    { file: "data/koty-meta.json",  pick: "KLASS_EN",    keys: "js", layout: "inline" },
+  IANA_NO_CAT_EN: { file: "data/koty-meta.json", pick: "IANA_NO_CAT_EN", keys: "js", layout: "inline" },
   KCAT:        { images: true, keys: "json", layout: "inline" },
   APIMAP:      { file: "data/apimap.json", keys: "json", layout: "lines", indent: "" },
   CATMAP:      { file: "data/categories.json", keys: "json", layout: "inline" }

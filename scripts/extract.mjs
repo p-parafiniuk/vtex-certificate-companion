@@ -67,7 +67,7 @@ for (const [name, b] of Object.entries(BLOCKS)) {
   if (b.images || b.pick) continue;
   write("src/" + b.file, prettyJSON(data[name]));
 }
-write("src/data/koty-meta.json", prettyJSON({ KLASS: data.KLASS, IANA_NO_CAT: data.IANA_NO_CAT }));
+write("src/data/koty-meta.json", prettyJSON({ KLASS: data.KLASS, IANA_NO_CAT: data.IANA_NO_CAT, KLASS_EN: data.KLASS_EN, IANA_NO_CAT_EN: data.IANA_NO_CAT_EN }));
 rmSync(CATS, { recursive: true, force: true });
 mkdirSync(CATS, { recursive: true });
 for (const [code, uri] of Object.entries(data.KCAT)) {

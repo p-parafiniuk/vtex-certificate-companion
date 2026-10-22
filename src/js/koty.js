@@ -9,9 +9,19 @@ function bootKoty(root, onNav) {
 
 /*@data KLASS*/
 /*@data IANA_NO_CAT*/
+/*@data KLASS_EN*/
+/*@data IANA_NO_CAT_EN*/
 const BY = Object.fromEntries(CODES.map(d => [d.c, d]));
 const TOP = CODES.filter(d => d.t);
 const KEY = "httpkoty.v1";
+/* Language comes from <html lang>, which the main app sets. Codes and quiz items carry English in `en` (same keys as the Polish fields). */
+const isEn = () => document.documentElement.lang === "en";
+const L = (pl, en) => isEn() ? en : pl;
+const tr = (x, k) => isEn() && x.en && x.en[k] !== undefined ? x.en[k] : x[k];
+const klass = k => L(KLASS[k], KLASS_EN[k]);
+const iana = n => L(IANA_NO_CAT[n], IANA_NO_CAT_EN[n]);
+const known = on => on ? L("Umiem ✓", "Known ✓") : L("Umiem", "Known");
+const catAlt = d => L("Kot: ", "Cat: ") + d.c + " " + esc(d.n);
 
 let S = {learned:{}, quiz:{order:null, ans:{}, best:null}, drill:{best:0, ok:0, all:0, scope:"top"}, tab:"start", filter:"all", qmode:"exam"};
 let canSave = true;
@@ -35,14 +45,14 @@ function save(){
 }
 function paintSave(){
   const el = root.getElementById("savestate");
-  el.textContent = canSave ? "" : "Zapis niedostępny w tym widoku, postęp zniknie po odświeżeniu";
+  el.textContent = canSave ? "" : L("Zapis niedostępny w tym widoku, postęp zniknie po odświeżeniu", "Saving is unavailable in this view, progress will be lost on reload");
   el.dataset.off = canSave ? "0" : "1"; el.hidden = canSave;
 }
 
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const fmt = s => esc(s).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
 const kOf = c => Math.floor(c/100);
-const vx = d => { const t = d.v.replace(/^VTEX:\s*/, ""); return fmt(t.charAt(0).toUpperCase() + t.slice(1)); };
+const vx = d => { const t = tr(d, "v").replace(/^VTEX:\s*/, ""); return fmt(t.charAt(0).toUpperCase() + t.slice(1)); };
 const $ = id => root.getElementById(id);
 function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
@@ -59,26 +69,27 @@ function paintMeters(){
   $("t-quiz").style.width = (b || 0) + "%";
   /* readiness badge: 40% top codes, 20% all codes, 40% best exam score */
   const pct = Math.round(40*knownTop/TOP.length + 20*known/CODES.length + 0.4*(b || 0));
-  const rank = pct >= 80 ? "Gotowy na egzamin" : pct >= 50 ? "Łowca kodów" : pct >= 25 ? "Dachowiec" : "Kociak";
+  const rank = pct >= 80 ? L("Gotowy na egzamin", "Exam ready") : pct >= 50 ? L("Łowca kodów", "Code hunter") : pct >= 25 ? L("Dachowiec", "Alley cat") : L("Kociak", "Kitten");
   const badge = $("badge");
   $("badge-ring").style.setProperty("--p", pct);
   $("badge-pct").textContent = pct + "%"; $("badge-rank").textContent = rank;
   badge.dataset.ready = pct >= 80 ? "1" : "0";
-  const tx = "Gotowość " + pct + "%: topka " + knownTop + "/" + TOP.length + " (waga 40%), wszystkie kody " + known + "/" + CODES.length + " (20%), rekord quizu " + (b == null ? "brak" : b + "%") + " (40%)";
+  const tx = L("Gotowość ", "Readiness ") + pct + L("%: topka ", "%: top ") + knownTop + "/" + TOP.length + L(" (waga 40%), wszystkie kody ", " (weight 40%), all codes ") + known + "/" + CODES.length +
+    L(" (20%), rekord quizu ", " (20%), best quiz ") + (b == null ? L("brak", "none") : b + "%") + " (40%)";
   badge.title = tx; badge.setAttribute("aria-label", tx);
 }
 
 /* ---------- know buttons ---------- */
 function knowBtn(c){
   const on = !!S.learned[c];
-  return '<button class="know" data-know="' + c + '" aria-pressed="' + on + '">' + (on ? "Umiem ✓" : "Umiem") + "</button>";
+  return '<button class="know" data-know="' + c + '" aria-pressed="' + on + '">' + known(on) + "</button>";
 }
 function toggleKnow(c){
   if(S.learned[c]) delete S.learned[c]; else S.learned[c] = 1;
   save(); paintMeters();
   root.querySelectorAll('[data-know="' + c + '"]').forEach(b => {
     const on = !!S.learned[c];
-    b.setAttribute("aria-pressed", on); b.textContent = on ? "Umiem ✓" : "Umiem";
+    b.setAttribute("aria-pressed", on); b.textContent = known(on);
     const card = b.closest(".card"); if(card) card.dataset.known = on ? "1" : "0";
   });
   if(S.filter === "todo") paintGrid();
@@ -87,9 +98,9 @@ function toggleKnow(c){
 /* ---------- top lists ---------- */
 function topRow(d){
   return '<article class="trow" data-k="' + kOf(d.c) + '">' +
-    '<img src="' + KCAT[d.c] + '" alt="Kot: ' + d.c + " " + esc(d.n) + '" loading="lazy" width="750" height="600">' +
+    '<img src="' + KCAT[d.c] + '" alt="' + catAlt(d) + '" loading="lazy" width="750" height="600">' +
     '<div class="tb"><h3><span class="num">' + d.c + "</span> " + esc(d.n) + "</h3>" +
-    "<p>" + fmt(d.pl) + " " + fmt(d.fun) + "</p>" +
+    "<p>" + fmt(tr(d, "pl")) + " " + fmt(tr(d, "fun")) + "</p>" +
     (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : "") + "</div>" + knowBtn(d.c) + "</article>";
 }
 function paintTop(){
@@ -99,13 +110,13 @@ function paintTop(){
 
 /* ---------- grid ---------- */
 function card(d){
-  const tags = (d.t ? '<span class="tag tp">Topka</span>' : "") + (d.v ? '<span class="tag vx">VTEX</span>' : "") +
-    (d.x ? '<span class="tag">nieoficjalny · ' + esc(d.x) + "</span>" : "");
+  const tags = (d.t ? '<span class="tag tp">' + L("Topka", "Top") + "</span>" : "") + (d.v ? '<span class="tag vx">VTEX</span>' : "") +
+    (d.x ? '<span class="tag">' + L("nieoficjalny · ", "unofficial · ") + esc(tr(d, "x")) + "</span>" : "");
   return '<article class="card" id="card-' + d.c + '" data-k="' + kOf(d.c) + '" data-known="' + (S.learned[d.c] ? 1 : 0) + '">' +
-    '<img src="' + KCAT[d.c] + '" alt="Kot: ' + d.c + " " + esc(d.n) + '" loading="lazy" width="750" height="600">' +
+    '<img src="' + KCAT[d.c] + '" alt="' + catAlt(d) + '" loading="lazy" width="750" height="600">' +
     '<div class="card-b"><h3><span class="num">' + d.c + "</span> " + esc(d.n) + "</h3>" +
     (tags ? '<div class="tags">' + tags + "</div>" : "") +
-    "<p>" + fmt(d.pl) + "</p><p class=\"muted\"><b>Haczyk:</b> " + fmt(d.fun) + "</p>" +
+    "<p>" + fmt(tr(d, "pl")) + "</p><p class=\"muted\"><b>" + L("Haczyk:", "Memory hook:") + "</b> " + fmt(tr(d, "fun")) + "</p>" +
     (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : "") + knowBtn(d.c) + "</div></article>";
 }
 function matches(d){
@@ -117,7 +128,9 @@ function matches(d){
   if(/^[1-5]$/.test(f) && kOf(d.c) !== +f) return false;
   const q = $("q").value.trim().toLowerCase();
   if(q){
-    const hay = (d.c + " " + d.n + " " + d.pl + " " + d.fun + " " + (d.v||"") + " " + (d.x||"")).toLowerCase();
+    /* Both languages are searchable, so a term from either version finds the code. */
+    const en = d.en || {};
+    const hay = [d.c, d.n, d.pl, d.fun, d.v, d.x, en.pl, en.fun, en.v, en.x].filter(Boolean).join(" ").toLowerCase();
     if(!hay.includes(q)) return false;
   }
   return true;
@@ -130,12 +143,12 @@ function paintGrid(){
     if(k !== last){
       last = k;
       const n = list.filter(e => kOf(e.c) === k).length;
-      html += '<h3 style="grid-column:1/-1" data-k="' + k + '"><span class="num">' + k + "xx</span> " + KLASS[k] + ' <span class="muted small">· ' + n + "</span></h3>";
+      html += '<h3 style="grid-column:1/-1" data-k="' + k + '"><span class="num">' + k + "xx</span> " + esc(klass(k)) + ' <span class="muted small">· ' + n + "</span></h3>";
     }
     html += card(d);
   }
-  $("grid").innerHTML = html || '<p class="muted">Nic nie pasuje. Zmień filtr albo wyczyść wyszukiwanie.</p>';
-  $("shown").textContent = "Widoczne: " + list.length + " z " + CODES.length;
+  $("grid").innerHTML = html || '<p class="muted">' + L("Nic nie pasuje. Zmień filtr albo wyczyść wyszukiwanie.", "Nothing matches. Change the filter or clear the search.") + "</p>";
+  $("shown").textContent = L("Widoczne: ", "Shown: ") + list.length + L(" z ", " of ") + CODES.length;
   root.querySelectorAll("#filters .chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === S.filter));
 }
 
@@ -146,19 +159,19 @@ function paintMaps(){
     let cells = "", used = 0;
     for(let n=k*100;n<k*100+100;n++){
       const d = BY[n];
-      if(d){ used++; cells += '<button class="c ' + (d.x ? "uc" : "oc") + '" data-c="' + n + '" tabindex="-1" aria-label="' + n + " " + esc(d.n) + (d.x ? ", nieoficjalny" : "") + '"></button>'; }
-      else if(IANA_NO_CAT[n]) cells += '<button class="c on" data-c="' + n + '" tabindex="-1" aria-label="' + n + " " + esc(IANA_NO_CAT[n]) + ', bez kota"></button>';
+      if(d){ used++; cells += '<button class="c ' + (d.x ? "uc" : "oc") + '" data-c="' + n + '" tabindex="-1" aria-label="' + n + " " + esc(d.n) + (d.x ? L(", nieoficjalny", ", unofficial") : "") + '"></button>'; }
+      else if(IANA_NO_CAT[n]) cells += '<button class="c on" data-c="' + n + '" tabindex="-1" aria-label="' + n + " " + esc(iana(n)) + L(", bez kota", ", no cat") + '"></button>';
       else cells += '<i class="c" data-c="' + n + '"></i>';
     }
     const noCat = Object.keys(IANA_NO_CAT).filter(n => kOf(+n) === k);
-    html += '<div class="map" data-k="' + k + '"><h3><span class="num">' + k + "xx</span> " + KLASS[k] + "</h3>" +
-      '<div class="cells" role="group" aria-label="Mapa numerów ' + k + '00–' + k + '99">' + cells + "</div>" +
-      '<p class="small muted"><b>' + used + " z 100</b> ma kota" + (noCat.length ? ". Bez kota: " + noCat.join(", ") : "") + ".</p></div>";
+    html += '<div class="map" data-k="' + k + '"><h3><span class="num">' + k + "xx</span> " + esc(klass(k)) + "</h3>" +
+      '<div class="cells" role="group" aria-label="' + L("Mapa numerów ", "Number map ") + k + "00–" + k + '99">' + cells + "</div>" +
+      '<p class="small muted"><b>' + used + L(" z 100</b> ma kota", " of 100</b> have a cat") + (noCat.length ? L(". Bez kota: ", ". No cat: ") + noCat.join(", ") : "") + ".</p></div>";
   }
   $("maps").innerHTML = html;
   const first = root.querySelector("#maps .cells button"); if(first) first.tabIndex = 0;
   $("unofftable").innerHTML = CODES.filter(d => d.x).map(d =>
-    '<tr data-k="' + kOf(d.c) + '"><td><button class="codebtn" data-c="' + d.c + '">' + d.c + "</button></td><td>" + esc(d.n) + "</td><td>" + esc(d.x) + "</td></tr>").join("");
+    '<tr data-k="' + kOf(d.c) + '"><td><button class="codebtn" data-c="' + d.c + '">' + d.c + "</button></td><td>" + esc(d.n) + "</td><td>" + esc(tr(d, "x")) + "</td></tr>").join("");
 }
 
 /* ---------- quiz: exam ---------- */
@@ -174,26 +187,26 @@ function paintExam(){
     const full = order.length === QUESTIONS.length;
     if(full && (S.quiz.best == null || pct > S.quiz.best)){ S.quiz.best = pct; save(); paintMeters(); }
     const wrong = order.filter(id => ans[id] !== QUESTIONS.find(q => q.id === id).a);
-    root.innerHTML = '<div class="qbox"><p class="eyebrow">Wynik' + (full ? "" : " powtórki") + '</p>' +
+    root.innerHTML = '<div class="qbox"><p class="eyebrow">' + (full ? L("Wynik", "Score") : L("Wynik powtórki", "Retry score")) + "</p>" +
       '<p class="score">' + right + "/" + order.length + " · " + pct + "%</p>" +
-      '<p class="verdict ' + (pct >= 80 ? "good" : "bad") + '">' + (pct >= 80 ? "Powyżej progu 80%." : "Poniżej progu 80%. Powtórz błędne i podejdź jeszcze raz.") + "</p>" +
-      (wrong.length ? "<div><p class=\"eyebrow\">Do powtórki</p><ul class=\"tight\">" + wrong.map(id => { const q = QUESTIONS.find(x => x.id === id); return "<li>" + fmt(q.q) + "<br><b>" + fmt(q.o[q.a]) + ".</b> " + fmt(q.why) + "</li>"; }).join("") + "</ul></div>" : "") +
-      '<div class="row"><button class="btn" data-act="restart">Nowe podejście</button>' +
-      (wrong.length ? '<button class="btn ghost" data-act="wrong">Powtórz tylko błędne (' + wrong.length + ")</button>" : "") + "</div></div>";
+      '<p class="verdict ' + (pct >= 80 ? "good" : "bad") + '">' + (pct >= 80 ? L("Powyżej progu 80%.", "Above the 80% pass mark.") : L("Poniżej progu 80%. Powtórz błędne i podejdź jeszcze raz.", "Below the 80% pass mark. Retry the wrong ones and try again.")) + "</p>" +
+      (wrong.length ? "<div><p class=\"eyebrow\">" + L("Do powtórki", "To review") + "</p><ul class=\"tight\">" + wrong.map(id => { const q = QUESTIONS.find(x => x.id === id); return "<li>" + fmt(tr(q, "q")) + "<br><b>" + fmt(tr(q, "o")[q.a]) + ".</b> " + fmt(tr(q, "why")) + "</li>"; }).join("") + "</ul></div>" : "") +
+      '<div class="row"><button class="btn" data-act="restart">' + L("Nowe podejście", "New attempt") + "</button>" +
+      (wrong.length ? '<button class="btn ghost" data-act="wrong">' + L("Powtórz tylko błędne (", "Retry only wrong (") + wrong.length + ")</button>" : "") + "</div></div>";
     return;
   }
   const q = QUESTIONS.find(x => x.id === order[idx]);
   root.innerHTML = '<div class="qbox" data-q="' + q.id + '"><div class="row"><span class="tag ' + (q.tag === "VTEX" ? "vx" : "") + '">' + q.tag + "</span>" +
-    '<span class="small muted">Pytanie ' + (idx+1) + " z " + order.length + " · dobrze: " + right + "</span></div>" +
-    '<p class="qtext">' + fmt(q.q) + '</p><div class="opts">' +
-    q.o.map((o,i) => '<button class="opt" data-o="' + i + '">' + fmt(o) + "</button>").join("") +
+    '<span class="small muted">' + L("Pytanie ", "Question ") + (idx+1) + L(" z ", " of ") + order.length + L(" · dobrze: ", " · right: ") + right + "</span></div>" +
+    '<p class="qtext">' + fmt(tr(q, "q")) + '</p><div class="opts">' +
+    tr(q, "o").map((o,i) => '<button class="opt" data-o="' + i + '">' + fmt(o) + "</button>").join("") +
     '</div><div id="qfb" aria-live="polite"></div></div>';
 }
 function answerExam(q, i){
   const box = root.querySelector(".qbox");
   box.querySelectorAll(".opt").forEach((b,j) => { b.disabled = true; if(j === q.a) b.classList.add("good"); else if(j === i) b.classList.add("bad"); });
   const ok = i === q.a;
-  $("qfb").innerHTML = '<p class="verdict ' + (ok ? "good" : "bad") + '">' + (ok ? "Dobrze." : "Źle.") + "</p><p>" + fmt(q.why) + '</p><p style="margin-top:12px"><button class="btn" data-act="next">Dalej</button></p>';
+  $("qfb").innerHTML = '<p class="verdict ' + (ok ? "good" : "bad") + '">' + (ok ? L("Dobrze.", "Right.") : L("Źle.", "Wrong.")) + "</p><p>" + fmt(tr(q, "why")) + '</p><p style="margin-top:12px"><button class="btn" data-act="next">' + L("Dalej", "Next") + "</button></p>";
   S.quiz.ans[q.id] = i; save(); /* the answered question stays on screen until "Dalej" repaints */
 }
 
@@ -211,10 +224,10 @@ function paintDrill(){
   const cur = drillCur, d = cur.d, st = S.drill;
   $("quizroot").innerHTML = '<div class="qbox" data-k="' + kOf(d.c) + '">' +
     '<div class="row"><div class="chips">' +
-    '<button class="chip" data-scope="top" aria-pressed="' + (st.scope === "top") + '">Tylko topka (21)</button>' +
-    '<button class="chip" data-scope="all" aria-pressed="' + (st.scope === "all") + '">Wszystkie (78)</button></div></div>' +
-    '<p class="small muted">Seria: <b>' + (st.cur||0) + "</b> · rekord serii: <b>" + st.best + "</b> · trafione: <b>" + st.ok + "/" + st.all + "</b></p>" +
-    '<p class="drillcode">' + d.c + '</p><p class="qtext">Jak nazywa się ten kod?</p><div class="opts">' +
+    '<button class="chip" data-scope="top" aria-pressed="' + (st.scope === "top") + '">' + L("Tylko topka", "Top only") + " (21)</button>" +
+    '<button class="chip" data-scope="all" aria-pressed="' + (st.scope === "all") + '">' + L("Wszystkie", "All") + " (78)</button></div></div>" +
+    '<p class="small muted">' + L("Seria: ", "Streak: ") + "<b>" + (st.cur||0) + "</b>" + L(" · rekord serii: ", " · best streak: ") + "<b>" + st.best + "</b>" + L(" · trafione: ", " · hits: ") + "<b>" + st.ok + "/" + st.all + "</b></p>" +
+    '<p class="drillcode">' + d.c + "</p><p class=\"qtext\">" + L("Jak nazywa się ten kod?", "What is this code called?") + '</p><div class="opts">' +
     cur.opts.map(o => '<button class="opt" data-d="' + o.c + '">' + esc(o.n) + "</button>").join("") +
     '</div><div id="qfb" aria-live="polite"></div></div>';
 }
@@ -224,10 +237,10 @@ function answerDrill(c){
   st.all++; if(ok){ st.ok++; st.cur = (st.cur||0) + 1; if(st.cur > st.best) st.best = st.cur; } else st.cur = 0;
   save();
   root.querySelectorAll(".qbox .opt").forEach(b => { b.disabled = true; const v = +b.dataset.d; if(v === d.c) b.classList.add("good"); else if(v === c) b.classList.add("bad"); });
-  $("qfb").innerHTML = '<p class="verdict ' + (ok ? "good" : "bad") + '">' + (ok ? "Dobrze." : "Źle. To " + d.c + " " + esc(d.n) + ".") + "</p>" +
-    '<div class="reveal" style="margin-top:10px"><img src="' + KCAT[d.c] + '" alt="Kot: ' + d.c + " " + esc(d.n) + '" width="750" height="600">' +
-    "<div><p>" + fmt(d.pl) + " " + fmt(d.fun) + "</p>" + (d.v ? '<p class="vxline" style="margin-top:6px"><b>VTEX:</b> ' + vx(d) + "</p>" : "") +
-    '<p style="margin-top:12px"><button class="btn" data-act="nextdrill">Następny</button></p></div></div>';
+  $("qfb").innerHTML = '<p class="verdict ' + (ok ? "good" : "bad") + '">' + (ok ? L("Dobrze.", "Right.") : L("Źle. To ", "Wrong. It is ") + d.c + " " + esc(d.n) + ".") + "</p>" +
+    '<div class="reveal" style="margin-top:10px"><img src="' + KCAT[d.c] + '" alt="' + catAlt(d) + '" width="750" height="600">' +
+    "<div><p>" + fmt(tr(d, "pl")) + " " + fmt(tr(d, "fun")) + "</p>" + (d.v ? '<p class="vxline" style="margin-top:6px"><b>VTEX:</b> ' + vx(d) + "</p>" : "") +
+    '<p style="margin-top:12px"><button class="btn" data-act="nextdrill">' + L("Następny", "Next") + "</button></p></div></div>";
 }
 function paintQuiz(){
   root.querySelectorAll("#qmodes .chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.m === S.qmode));
@@ -264,17 +277,18 @@ function prefetchAll(){
 function tipHTML(n, pin){
   const d = BY[n];
   if(!d){
-    const name = IANA_NO_CAT[n];
-    return '<div class="tb"><p class="th"><span class="num">' + n + "</span> <b>" + (name ? esc(name) : "wolny numer") + "</b></p>" +
-      '<p class="muted">' + (name ? "Jest w rejestrze IANA, ale http.cat nie ma dla niego kota." : "Nikt go nie przydzielił. Nieznany kod klient traktuje jak " + kOf(n) + "00.") + "</p></div>";
+    const name = iana(n);
+    return '<div class="tb"><p class="th"><span class="num">' + n + "</span> <b>" + (name ? esc(name) : L("wolny numer", "free number")) + "</b></p>" +
+      '<p class="muted">' + (name ? L("Jest w rejestrze IANA, ale http.cat nie ma dla niego kota.", "It is in the IANA registry, but http.cat has no cat for it.") :
+      L("Nikt go nie przydzielił. Nieznany kod klient traktuje jak ", "Nobody has assigned it. A client treats an unknown code as ") + kOf(n) + "00.") + "</p></div>";
   }
-  const tags = (d.t ? '<span class="tag tp">Topka</span>' : "") + (d.v ? '<span class="tag vx">VTEX</span>' : "") +
-    (d.x ? '<span class="tag">nieoficjalny · ' + esc(d.x) + "</span>" : "") + (S.learned[n] ? '<span class="tag">Umiem ✓</span>' : "");
+  const tags = (d.t ? '<span class="tag tp">' + L("Topka", "Top") + "</span>" : "") + (d.v ? '<span class="tag vx">VTEX</span>' : "") +
+    (d.x ? '<span class="tag">' + L("nieoficjalny · ", "unofficial · ") + esc(tr(d, "x")) + "</span>" : "") + (S.learned[n] ? '<span class="tag">' + known(true) + "</span>" : "");
   return '<div class="ph"><img src="' + KCAT[n] + '" alt=""></div><div class="tb">' +
     '<p class="th"><span class="num">' + n + "</span> <b>" + esc(d.n) + "</b></p>" +
-    (tags ? '<div class="tags">' + tags + "</div>" : "") + "<p>" + fmt(d.pl) + "</p>" +
-    (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : '<p class="muted">' + fmt(d.fun) + "</p>") +
-    (pin ? '<button class="btn" data-jump="' + n + '">Pokaż kartę</button>' : '<p class="small muted">Klik otwiera kartę</p>') + "</div>";
+    (tags ? '<div class="tags">' + tags + "</div>" : "") + "<p>" + fmt(tr(d, "pl")) + "</p>" +
+    (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : '<p class="muted">' + fmt(tr(d, "fun")) + "</p>") +
+    (pin ? '<button class="btn" data-jump="' + n + '">' + L("Pokaż kartę", "Show card") + "</button>" : '<p class="small muted">' + L("Klik otwiera kartę", "Click opens the card") + "</p>") + "</div>";
 }
 function placeTip(el){
   const r = el.getBoundingClientRect(), above = r.top - 16, below = window.innerHeight - r.bottom - 16;
@@ -396,5 +410,10 @@ function paintAll(){ paintMeters(); paintTop(); paintGrid(); paintMaps(); paintS
 load();
 paintAll();
 show(S.tab, true);
-return { jump: jump, has: n => !!BY[n], show: t => show(t, true), tab: () => S.tab };
+/* After a language switch: the drill keeps its current code, the exam shows the same next question. */
+function relang(){
+  paintAll();
+  if(S.tab === "quiz"){ if(S.qmode !== "drill") paintExam(); else if(drillCur) paintDrill(); }
+}
+return { jump: jump, has: n => !!BY[n], show: t => show(t, true), tab: () => S.tab, relang: relang };
 }

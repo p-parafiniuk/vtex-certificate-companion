@@ -1,4 +1,6 @@
 {
   "KLASS": {"1":"Informacyjne","2":"Sukces","3":"Przekierowania","4":"Błąd klienta","5":"Błąd serwera"},
-  "IANA_NO_CAT": {"104":"Upload Resumption Supported (rejestracja tymczasowa)","306":"(Unused), dawny Switch Proxy","505":"HTTP Version Not Supported"}
+  "IANA_NO_CAT": {"104":"Upload Resumption Supported (rejestracja tymczasowa)","306":"(Unused), dawny Switch Proxy","505":"HTTP Version Not Supported"},
+  "KLASS_EN": {"1":"Informational","2":"Success","3":"Redirection","4":"Client error","5":"Server error"},
+  "IANA_NO_CAT_EN": {"104":"Upload Resumption Supported (provisional registration)","306":"(Unused), formerly Switch Proxy","505":"HTTP Version Not Supported"}
 }
