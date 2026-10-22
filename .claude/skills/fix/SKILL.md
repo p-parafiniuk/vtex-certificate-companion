@@ -5,7 +5,7 @@ description: Fix a bug in VTEX API Drill, such as broken behaviour, a rendering 
 
 # Fix
 
-Read `CLAUDE.md` first if it is not already in context. Work on a `fix/<topic>` branch (see `CLAUDE.md` › Branches and PRs) unless the session dictates one.
+Read `CLAUDE.md` first if it is not already in context. Work on a `fix/<topic>` branch (see `CLAUDE.md` › Branches and PRs) (cloud sessions too: cut it from fresh `origin/main` before the first commit; `npm run branch` must pass).
 
 ## 1. Reproduce first
 - Behaviour bug: start the `drill` launch config, reproduce in the browser pane, and read the console. Note the exact steps and the URL hash (the views are hash-routed).

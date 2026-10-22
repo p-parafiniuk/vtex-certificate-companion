@@ -15,6 +15,7 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 | `npm run check` | validate, then confirm the built file matches `src/`. Run it before every commit. |
 | `npm run stats` | table of questions per domain × round, to find gaps |
 | `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
+| `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json` |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
 | `npm run shots -- <hash>…` | screenshots of the built page into `shots/` (gitignored) at 375 and 1280 px, light and dark. Exits 1 on a console error. Flags: `--w=375`, `--theme=dark`, `--lang=en`, `--full` |
@@ -25,13 +26,14 @@ src/index.html          skeleton with markers: <!--@include path--> and /*@data 
 src/styles/app.css      main app styles (tokens on :root, dark mode via prefers-color-scheme + [data-theme])
 src/js/app.js           main app IIFE: state S, tabs pytania|symulacja|fiszki|postep|http|api, focus mode, hash routing.
                         Pytania has a left side panel of categories (DOMS): #pytania = all questions,
-                        #pytania-<dom>[-api|-docs[-<doc>]] = one category with sections Pytania (list/Focus), Ścieżki API, Dokumentacja
+                        #pytania-<dom>[-info|-api|-docs[-<doc>]] = one category with sections Pytania (list/Focus), Notatki, Ścieżki API, Dokumentacja
 src/koty/template.html  HTTP Koty markup, mounted lazily into a shadow root (#koty)
 src/styles/koty.css     HTTP Koty styles (scoped by the shadow root)
 src/js/koty.js          bootKoty(root, onNav), with its own state under localStorage "httpkoty.v1"
 src/apimap/template.html, src/styles/apimap.css, src/js/apimap.js
                         VTEX API Map, same pattern in #apimap: bootApiMap(root, onNav), state in "apimap.v1"
 src/data/*.json         all content, one item per line (apimap.json: one API per line, from vtex/openapi-schemas, `ref` = api-reference slug)
+src/data/notes.json      per category (+ "all"): TL;DR and study notes for the Notatki section
 src/data/categories.json per category: `api` = [apiKey, tags?] for its embedded API Map, `ref` = [slug, label] API Reference pages
 src/img/cats/<code>.jpg http.cat images, inlined as KCAT at build time
 scripts/                lib (block formats), build, extract, validate, stats. Zero deps, Node >= 18.
@@ -52,11 +54,14 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 
 **DOCS** (`docs.json`): `key: [url, label]`. Every Q/F needs at least one `l` key. URLs must be official (developers.vtex.com, help.vtex.com, learn.vtex.com, github.com/vtex). Before adding or changing a fact, fetch the source page and confirm it states the fact.
 
+**NOTES** (`notes.json`): `{ <domKey>|"all": { t: [TL;DR bullets], s: [[heading, [bullets], [DOCS keys]]] } }`. `t` sits above the category tabs (on `all`: the "Podstawy API" box). `s` fills the Notatki section; a block headed exactly `Pułapki` holds exam traps and gets the accent tint (the heading text is load-bearing). Polish only, never translated. Same fact rule as Q/F: every bullet must be stated by a page its block links; no `[UNVERIFIED]`, no URLs in text. Not keyed by index, so blocks may be reordered.
+
 **Koty**: `koty-codes.json` (`c, n, pl, fun, v?, t?, x?, en: {pl, fun, v?, x?}`, sorted by `c`, each code needs `src/img/cats/<c>.jpg`), `koty-quiz.json` (`id, tag: VTEX|HTTP, q, o, a: index, why, en: {q, o?, why}`; `en.o` keeps the order of `o`, leave it out when the options are code names or numbers), `koty-meta.json` (`KLASS`, `IANA_NO_CAT` and their `_EN` twins). `en` is what the English UI shows; the validator requires it.
 
 ## Writing conventions
 - Q `q` and `o` are in **English**, phrased like the real exam. `e` and flashcard `a` are in **Polish**. HTTP Koty is fully bilingual: Polish fields plus their `en` copies, and `data-en*` on the template.
 - The UI is bilingual (Settings › Język). Every new UI label needs English too: `data-en` / `data-en-html` / `data-en-title` / `data-en-aria` / `data-en-ph` on static markup, `L(pl, en)` in JS. Questions, explanations and flashcards are never translated.
+- **Notes fold by length** (progressive disclosure; the rule lives in `noteOpen` in app.js, the validator guards the limits). TL;DR: 1 to 4 bullets, at most 25 words each. It and the "Podstawy API" box are open on wide screens and start folded at 520 px and below, so the first question stays on the first phone screen. A block with at most 4 bullets and 60 words renders open; a longer one starts folded, with its bullet count in the summary. The first block of the Notatki section is always open (not inside the "Podstawy API" box, which sits above the question list). One fact per bullet, at most 30 words; split a block rather than pass 8 bullets. Folded state is not saved: it resets per category and language.
 - Short, plain sentences. Inline markup is only `` `code` `` and `**bold**`, plus `\n` in flashcard answers. Everything else is escaped (`esc`, then `fmt`).
 - Distractors must be plausible VTEX-isms: real header names, real endpoints, wrong numbers. They must not be obviously absurd.
 - The code style follows the file you are in. `app.js` is ES5 (`var`, `function`), `koty.js` is ES2015+. Comment density is low, and comments explain why, not what.
@@ -72,7 +77,9 @@ A report without a picture of a UI change is not finished.
 - One branch per PR, cut from fresh `main`: `git fetch origin main && git checkout -b <type>/<topic> origin/main`.
 - Name it `<type>/<short-kebab-topic>`, 2 to 5 words that say what changes. Types: `feat` (behaviour), `content` (questions, flashcards, DOCS), `fix`, `ux`, `security`, `chore` (scripts, harness, docs). Examples: `feat/category-side-panel`, `content/logistics-round-2`, `fix/focus-resume-after-filter`.
 - Never reuse a branch whose PR is merged, and never stack an unrelated change on an open PR's branch. Start a new branch.
-- If the session dictates a branch name (cloud sessions do), use it as told, and put the `<type>/<topic>` name in the PR title prefix instead, e.g. `feat(category-side-panel): …`.
+- Cloud sessions start on a generated `claude/<words>` branch. That name never reaches a PR. Before any work, run `git fetch origin main` and fast-forward onto it. Before the first commit, cut `<type>/<topic>` from `origin/main`, then commit, push (`git push -u origin <type>/<topic>`) and open the PR from that branch. This rule is the user's standing permission to push to it instead of the session branch.
+- `npm run branch` checks the current name. `npm run check` runs it too and fails on a `claude/*` branch or a name outside the pattern (`main` and a detached HEAD pass).
+- PR title prefix repeats the topic: `feat(category-side-panel): …`.
 - PR title in English, imperative. The body lists what changed, how it was verified (`npm run check`, the shots), and includes the screenshots.
 
 ## Skills and reviewers

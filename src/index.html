@@ -51,9 +51,11 @@
       <nav class="cats" id="cats" aria-label="Kategorie pytań" data-en-aria="Question categories"></nav>
       <div class="cat-main">
         <div class="cat-head" id="cat-head"></div>
+        <div id="cat-tldr"></div>
         <div class="ctabs" id="ctabs" role="tablist" aria-label="Sekcje kategorii" data-en-aria="Category sections">
           <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania" data-en="Questions">Pytania</button>
-          <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api" data-en="API paths">Ścieżki API</button>
+          <button type="button" class="ctab" role="tab" id="ct-info" data-sec="info" aria-controls="cs-info" data-en="Notes">Notatki</button>
+          <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api"><span class="ctab-l" data-en="API paths">Ścieżki API</span><span class="ctab-s">API</span></button>
           <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
         </div>
         <div class="csec" id="cs-pytania" role="tabpanel" aria-labelledby="ct-pytania">
@@ -66,6 +68,7 @@
           </div>
           <div class="list" id="qlist"></div>
         </div>
+        <div class="csec" id="cs-info" role="tabpanel" aria-labelledby="ct-info" hidden></div>
         <div class="csec" id="cs-api" role="tabpanel" aria-labelledby="ct-api" hidden>
           <p class="lead" id="api-lead"></p>
           <div id="catapi"></div>
@@ -215,6 +218,9 @@
 
 /* Category views: APIs of the embedded API Map ([apiKey, tags?]) and API Reference pages ([slug, label]) per domain. */
 /*@data CATMAP*/
+
+/* Notes per category ("all" = the basics on the all-questions view): t = TL;DR bullets, s = [heading, bullets, DOCS keys]. Polish only, like explanations. */
+/*@data NOTES*/
 
 /*@data Q*/
 

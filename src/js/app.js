@@ -353,16 +353,57 @@
   function renderCat() {
     var all = S.dom === "all", sec = all ? "pytania" : NAV.cur.sec || "pytania";
     $("#ctabs").hidden = all;
-    ["pytania", "api", "docs"].forEach(function (k) {
+    ["pytania", "info", "api", "docs"].forEach(function (k) {
       $("#cs-" + k).hidden = k !== sec;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
-    $("#ct-docs").innerHTML = L("Dokumentacja", "Docs") + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
+    $("#ct-docs").innerHTML = '<span class="ctab-l">' + L("Dokumentacja", "Docs") + '</span><span class="ctab-s">' + L("Dok.", "Docs") + "</span>" + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
+    $("#ct-info").innerHTML = L("Notatki", "Notes") + (NOTES[S.dom] ? ' <span class="num">' + NOTES[S.dom].s.length + "</span>" : "");
+    renderTldr(S.dom);
     if (sec !== "docs") clearDocs();
     if (sec === "pytania") renderQ(); else renderChips();
     if (sec === "api") renderCatApi(S.dom);
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
+    if (sec === "info") renderInfo(S.dom);
+  }
+  /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
+  /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.
+     The first block of the Notatki section is always open, so it never opens as a bare list of headings. */
+  function noteOpen(s, first) {
+    return first || (s[1].length <= 4 && s[1].join(" ").split(/\s+/).length <= 60);
+  }
+  function noteList(xs) {
+    return "<ul>" + xs.map(function (x) { return "<li>" + fmt(x) + "</li>"; }).join("") + "</ul>";
+  }
+  function noteBlocks(n, firstOpen) {
+    return n.s.map(function (s, i) {
+      return '<details class="note' + (s[0] === "Pułapki" ? " trap" : "") + '"' + (noteOpen(s, firstOpen && i === 0) ? " open" : "") + "><summary><span>" + esc(s[0]) + "</span><small>" +
+        plural(s[1].length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + "</small></summary>" + noteList(s[1]) + docLinks({ l: s[2] }) + "</details>";
+    }).join("");
+  }
+  /* The boxes keep their open/closed state while the learner answers questions: they redraw only when the category or language changes. */
+  /* On a phone an open TL;DR pushes the first question below the fold, so there it starts folded. */
+  var PHONE = window.matchMedia("(max-width: 520px)");
+  function renderTldr(d) {
+    var el = $("#cat-tldr"), n = NOTES[d], k = d + " " + S.lang;
+    if (el.dataset.k === k) return;
+    el.dataset.k = k;
+    if (!n) { el.innerHTML = ""; return; }
+    el.innerHTML = d === "all"
+      ? '<details class="note basics"' + (PHONE.matches ? "" : " open") + '><summary><span><b class="tl">TL;DR</b> ' + L("Podstawy API", "API basics") + "</span><small>" +
+        plural(n.s.length, L("blok", "block"), L("bloki", "blocks"), L("bloków", "blocks")) + "</small></summary>" + noteList(n.t) + '<div class="notes">' + noteBlocks(n, false) + "</div></details>"
+      : '<details class="note tldr"' + (PHONE.matches ? "" : " open") + '><summary><span><b class="tl">TL;DR</b></span><small>' +
+        plural(n.t.length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + "</small></summary>" + noteList(n.t) +
+        '<a class="tldr-more" data-nav href="' + catHref(d, "info") + '">' + L("Całe notatki", "All notes") + " →</a></details>";
+  }
+  function renderInfo(d) {
+    var el = $("#cs-info"), k = d + " " + S.lang;
+    if (el.dataset.k === k) return;
+    el.dataset.k = k;
+    el.innerHTML = '<p class="lead">' + L("Notatki z dokumentacji VTEX. Krótkie bloki są otwarte, dłuższe niż 4 punkty są zwinięte: kliknij nagłówek.",
+      "Notes from the VTEX docs, in Polish. Short blocks are open, blocks longer than 4 points are folded: click the heading.") + "</p>" +
+      (NOTES[d] ? '<div class="notes">' + noteBlocks(NOTES[d], true) + "</div>" : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
   }
   function renderCatApi(d) {
     var list = CATMAP[d].api;
@@ -434,8 +475,11 @@
     ev.preventDefault();
     var href = a.getAttribute("href"), r = parseHash(href);
     if (hashOf(r) !== hashOf(NAV.cur)) go(r);
-    /* The lists re-render on navigation; keep keyboard focus on the link that was used. */
-    var again = document.querySelector('a[data-nav][href="' + href.replace(/["\\]/g, "") + '"]');
+    /* The lists re-render on navigation; keep keyboard focus on the link that was used, searched in its own list
+       (the side panel carries the same href). The TL;DR link hands focus to the section tab it opened. */
+    if (a.closest("#cat-tldr")) { $("#ct-info").focus({ preventScroll: true }); return; }
+    var box = a.closest("#cats, .doclist") || document;
+    var again = box.querySelector('a[data-nav][href="' + href.replace(/["\\]/g, "") + '"]');
     if (again) again.focus({ preventScroll: true });
   });
 
@@ -1528,7 +1572,7 @@
       var p = m[2].split("-");
       if (DOM_NAME[p[0]]) {
         r.cat = p[0];
-        if (p[1] === "api" || p[1] === "docs") r.sec = p[1];
+        if (p[1] === "api" || p[1] === "docs" || p[1] === "info") r.sec = p[1];
         if (r.sec === "docs" && p[2]) r.doc = p.slice(2).join("-");
       }
     }
@@ -1576,7 +1620,7 @@
     if (tab === "pytania") {
       /* history.state is stored data: keep only a known category and section. */
       if (!DOM_NAME[r.cat]) { delete r.cat; delete r.sec; }
-      if (r.sec !== "api" && r.sec !== "docs") delete r.sec;
+      if (r.sec !== "api" && r.sec !== "docs" && r.sec !== "info") delete r.sec;
       if (r.sec !== "docs" || !/^[a-z0-9_-]+$/.test(r.doc || "")) delete r.doc;
       if (r.doc !== "ep" || !EP_URL.test(r.url || "")) { delete r.url; delete r.lbl; }
       var dom = r.cat || "all";
