@@ -387,6 +387,29 @@ body[data-view="pytania"] .bar-in, body[data-view="pytania"] .wrap { max-width: 
 .ctab:hover { color: var(--ink); }
 .ctab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
 .ctab .num { margin-left: 2px; }
+.ctab-s { display: none; }
+@media (max-width: 520px) { .ctab-l { display: none; } .ctab-s { display: inline; } }
+/* Notes: the TL;DR is never folded; a block folds by the rule in noteOpen (app.js). */
+.tl { font: 600 0.75rem var(--f-mono); letter-spacing: 0.06em; color: var(--accent); }
+.tldr { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 2px 16px 12px; }
+.tldr-h { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.tldr-h a { margin-left: auto; font-size: 0.9rem; min-height: 44px; display: inline-flex; align-items: center; }
+.tldr ul, .note ul { margin: 0; padding-left: 1.15em; display: grid; gap: 4px; font-size: 0.95rem; max-width: 72ch; }
+.notes { display: grid; gap: 8px; }
+#cat-tldr:empty { display: none; }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 0 16px; }
+.note[open] { padding-bottom: 12px; }
+.note.trap { background: var(--accent-soft); }
+.note summary { min-height: 44px; display: flex; align-items: center; gap: 10px; font-weight: 600; cursor: pointer; list-style: none; }
+.note summary::-webkit-details-marker { display: none; }
+.note summary::before { content: "›"; flex: none; width: 1em; text-align: center; color: var(--muted); transition: transform 0.15s; }
+.note[open] > summary::before { transform: rotate(90deg); }
+.note summary span { flex: 1; min-width: 0; }
+.note summary small { font: 500 0.75rem var(--f-mono); color: var(--muted); white-space: nowrap; }
+.note .doc { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.note.basics > ul { margin-bottom: 12px; }
+.note.basics .note { border-radius: 8px; }
+@media (prefers-reduced-motion: reduce) { .note summary::before { transition: none; } }
 .docs { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; align-items: start; }
 .doclist { display: grid; gap: 2px; max-height: 76vh; overflow-y: auto; }
 .docg { margin: 10px 0 2px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); }
@@ -542,9 +565,11 @@ div.setrow { cursor: default; }
       <nav class="cats" id="cats" aria-label="Kategorie pytań" data-en-aria="Question categories"></nav>
       <div class="cat-main">
         <div class="cat-head" id="cat-head"></div>
+        <div id="cat-tldr"></div>
         <div class="ctabs" id="ctabs" role="tablist" aria-label="Sekcje kategorii" data-en-aria="Category sections">
           <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania" data-en="Questions">Pytania</button>
-          <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api" data-en="API paths">Ścieżki API</button>
+          <button type="button" class="ctab" role="tab" id="ct-info" data-sec="info" aria-controls="cs-info">Notatki</button>
+          <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api"><span class="ctab-l" data-en="API paths">Ścieżki API</span><span class="ctab-s">API</span></button>
           <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
         </div>
         <div class="csec" id="cs-pytania" role="tabpanel" aria-labelledby="ct-pytania">
@@ -557,6 +582,7 @@ div.setrow { cursor: default; }
           </div>
           <div class="list" id="qlist"></div>
         </div>
+        <div class="csec" id="cs-info" role="tabpanel" aria-labelledby="ct-info" hidden></div>
         <div class="csec" id="cs-api" role="tabpanel" aria-labelledby="ct-api" hidden>
           <p class="lead" id="api-lead"></p>
           <div id="catapi"></div>
@@ -1340,6 +1366,9 @@ const HN = {"200":"OK","201":"Created","202":"Accepted","204":"No Content","400"
 
 /* Category views: APIs of the embedded API Map ([apiKey, tags?]) and API Reference pages ([slug, label]) per domain. */
 const CATMAP = {"auth":{"api":[["license"]],"ref":[["license-manager-api","License Manager API"],["vtex-id-api","VTEX ID API"]]},"catalog":{"api":[["catalog"]],"ref":[["catalog-api","Catalog API"]]},"search":{"api":[],"ref":[["search-api","Legacy Search API"],["intelligent-search-api","Intelligent Search API"],["session-manager-api","Session Manager API"]]},"pricing":{"api":[["pricing"],["promotions"],["promotions-v2"]],"ref":[["pricing-api","Pricing API"],["promotions-and-taxes-api","Promotions & Taxes API"],["promotions-and-taxes-api-v2","Promotions & Taxes API v2"]]},"logistics":{"api":[["logistics"]],"ref":[["logistics-api","Logistics API"]]},"checkout":{"api":[["checkout"]],"ref":[["checkout-api","Checkout API"]]},"orders":{"api":[["orders"]],"ref":[["orders-api","Orders API"]]},"payments":{"api":[["payments"],["giftcard"],["giftcard-hub"]],"ref":[["payments-gateway-api","Payments Gateway API"],["payment-provider-protocol","Payment Provider Protocol"],["antifraud-provider-protocol","Anti-fraud Provider Protocol"],["giftcard-api","Giftcard API"],["giftcard-hub-api","GiftCard Hub API"]]},"md":{"api":[],"ref":[["master-data-api-v2","Master Data API v2"],["masterdata-api","Master Data API v1"]]},"mkt":{"api":[["catalog",["Seller","SKU seller"]],["checkout",["Fulfillment"]],["orders",["Change seller"]]],"ref":[["marketplace-apis","Marketplace API"],["marketplace-protocol-external-marketplace-orders","Marketplace Protocol: external marketplace orders"]]}};
+
+/* Notes per category ("all" = the basics on the all-questions view): t = TL;DR bullets, s = [heading, bullets, DOCS keys]. Polish only, like explanations. */
+const NOTES = {"catalog":{"t":["test **x** `y`"],"s":[["A",["a"],["skus"]]]}};
 
 const Q = [
  {"d":"auth","r":1,"q":"Which HTTP headers authenticate a request to a VTEX API with an application key?","o":["`X-VTEX-API-AppKey`","`X-VTEX-API-AppToken`","`Authorization: Bearer {appToken}`","`X-VTEX-AppSecret`","`X-VTEX-Account`"],"e":"Para **appKey + appToken** idzie w dwóch nagłówkach: `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`.","l":["keys"],"n":2},
@@ -2750,16 +2779,54 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
   function renderCat() {
     var all = S.dom === "all", sec = all ? "pytania" : NAV.cur.sec || "pytania";
     $("#ctabs").hidden = all;
-    ["pytania", "api", "docs"].forEach(function (k) {
+    ["pytania", "info", "api", "docs"].forEach(function (k) {
       $("#cs-" + k).hidden = k !== sec;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
-    $("#ct-docs").innerHTML = L("Dokumentacja", "Docs") + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
+    $("#ct-docs").innerHTML = '<span class="ctab-l">' + L("Dokumentacja", "Docs") + '</span><span class="ctab-s">Docs</span>' + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
+    $("#ct-info").innerHTML = L("Notatki", "Notes") + (NOTES[S.dom] ? ' <span class="num">' + NOTES[S.dom].s.length + "</span>" : "");
+    renderTldr(S.dom);
     if (sec !== "docs") clearDocs();
     if (sec === "pytania") renderQ(); else renderChips();
     if (sec === "api") renderCatApi(S.dom);
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
+    if (sec === "info") renderInfo(S.dom);
+  }
+  /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
+  /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.
+     The first block is always open, so the section never opens as a bare list of headings. */
+  function noteOpen(s, i) {
+    return i === 0 || (s[1].length <= 4 && s[1].join(" ").split(/\s+/).length <= 60);
+  }
+  function noteList(xs) {
+    return "<ul>" + xs.map(function (x) { return "<li>" + fmt(x) + "</li>"; }).join("") + "</ul>";
+  }
+  function noteBlocks(n) {
+    return n.s.map(function (s, i) {
+      return '<details class="note' + (s[0] === "Pułapki" ? " trap" : "") + '"' + (noteOpen(s, i) ? " open" : "") + "><summary><span>" + esc(s[0]) + "</span><small>" +
+        plural(s[1].length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + "</small></summary>" + noteList(s[1]) + docLinks({ l: s[2] }) + "</details>";
+    }).join("");
+  }
+  /* The boxes keep their open/closed state while the learner answers questions: they redraw only when the category or language changes. */
+  function renderTldr(d) {
+    var el = $("#cat-tldr"), n = NOTES[d], k = d + " " + S.lang;
+    if (el.dataset.k === k) return;
+    el.dataset.k = k;
+    if (!n) { el.innerHTML = ""; return; }
+    el.innerHTML = d === "all"
+      ? '<details class="note basics" open><summary><span><b class="tl">TL;DR</b> ' + L("Podstawy API", "API basics") + "</span><small>" +
+        plural(n.s.length, L("blok", "block"), L("bloki", "blocks"), L("bloków", "blocks")) + "</small></summary>" + noteList(n.t) + '<div class="notes">' + noteBlocks(n) + "</div></details>"
+      : '<section class="tldr" aria-labelledby="tldr-h"><div class="tldr-h"><b class="tl" id="tldr-h">TL;DR</b>' +
+        '<a data-nav href="' + catHref(d, "info") + '">' + L("Całe notatki", "All notes") + " →</a></div>" + noteList(n.t) + "</section>";
+  }
+  function renderInfo(d) {
+    var el = $("#cs-info"), k = d + " " + S.lang;
+    if (el.dataset.k === k) return;
+    el.dataset.k = k;
+    el.innerHTML = '<p class="lead">' + L("Notatki z dokumentacji VTEX. Krótkie bloki są otwarte, dłuższe niż 4 punkty są zwinięte: kliknij nagłówek.",
+      "Notes from the VTEX docs, in Polish. Short blocks are open, blocks longer than 4 points are folded: click the heading.") + "</p>" +
+      (NOTES[d] ? '<div class="notes">' + noteBlocks(NOTES[d]) + "</div>" : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
   }
   function renderCatApi(d) {
     var list = CATMAP[d].api;
@@ -3925,7 +3992,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
       var p = m[2].split("-");
       if (DOM_NAME[p[0]]) {
         r.cat = p[0];
-        if (p[1] === "api" || p[1] === "docs") r.sec = p[1];
+        if (p[1] === "api" || p[1] === "docs" || p[1] === "info") r.sec = p[1];
         if (r.sec === "docs" && p[2]) r.doc = p.slice(2).join("-");
       }
     }
@@ -3973,7 +4040,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     if (tab === "pytania") {
       /* history.state is stored data: keep only a known category and section. */
       if (!DOM_NAME[r.cat]) { delete r.cat; delete r.sec; }
-      if (r.sec !== "api" && r.sec !== "docs") delete r.sec;
+      if (r.sec !== "api" && r.sec !== "docs" && r.sec !== "info") delete r.sec;
       if (r.sec !== "docs" || !/^[a-z0-9_-]+$/.test(r.doc || "")) delete r.doc;
       if (r.doc !== "ep" || !EP_URL.test(r.url || "")) { delete r.url; delete r.lbl; }
       var dom = r.cat || "all";

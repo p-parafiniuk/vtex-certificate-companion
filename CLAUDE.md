@@ -26,13 +26,14 @@ src/index.html          skeleton with markers: <!--@include path--> and /*@data 
 src/styles/app.css      main app styles (tokens on :root, dark mode via prefers-color-scheme + [data-theme])
 src/js/app.js           main app IIFE: state S, tabs pytania|symulacja|fiszki|postep|http|api, focus mode, hash routing.
                         Pytania has a left side panel of categories (DOMS): #pytania = all questions,
-                        #pytania-<dom>[-api|-docs[-<doc>]] = one category with sections Pytania (list/Focus), Ścieżki API, Dokumentacja
+                        #pytania-<dom>[-info|-api|-docs[-<doc>]] = one category with sections Pytania (list/Focus), Notatki, Ścieżki API, Dokumentacja
 src/koty/template.html  HTTP Koty markup, mounted lazily into a shadow root (#koty)
 src/styles/koty.css     HTTP Koty styles (scoped by the shadow root)
 src/js/koty.js          bootKoty(root, onNav), with its own state under localStorage "httpkoty.v1"
 src/apimap/template.html, src/styles/apimap.css, src/js/apimap.js
                         VTEX API Map, same pattern in #apimap: bootApiMap(root, onNav), state in "apimap.v1"
 src/data/*.json         all content, one item per line (apimap.json: one API per line, from vtex/openapi-schemas, `ref` = api-reference slug)
+src/data/notes.json      per category (+ "all"): TL;DR and study notes for the Notatki section
 src/data/categories.json per category: `api` = [apiKey, tags?] for its embedded API Map, `ref` = [slug, label] API Reference pages
 src/img/cats/<code>.jpg http.cat images, inlined as KCAT at build time
 scripts/                lib (block formats), build, extract, validate, stats. Zero deps, Node >= 18.
@@ -53,11 +54,14 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 
 **DOCS** (`docs.json`): `key: [url, label]`. Every Q/F needs at least one `l` key. URLs must be official (developers.vtex.com, help.vtex.com, learn.vtex.com, github.com/vtex). Before adding or changing a fact, fetch the source page and confirm it states the fact.
 
+**NOTES** (`notes.json`): `{ <domKey>|"all": { t: [TL;DR bullets], s: [[heading, [bullets], [DOCS keys]]] } }`. `t` sits above the category tabs (on `all`: the "Podstawy API" box). `s` fills the Notatki section; a block headed `Pułapki` holds exam traps and gets the accent tint. Polish only, never translated. Same fact rule as Q/F: every bullet must be stated by a page its block links; no `[UNVERIFIED]`, no URLs in text. Not keyed by index, so blocks may be reordered.
+
 **Koty**: `koty-codes.json` (`c, n, pl, fun, v?, t?, x?, en: {pl, fun, v?, x?}`, sorted by `c`, each code needs `src/img/cats/<c>.jpg`), `koty-quiz.json` (`id, tag: VTEX|HTTP, q, o, a: index, why, en: {q, o?, why}`; `en.o` keeps the order of `o`, leave it out when the options are code names or numbers), `koty-meta.json` (`KLASS`, `IANA_NO_CAT` and their `_EN` twins). `en` is what the English UI shows; the validator requires it.
 
 ## Writing conventions
 - Q `q` and `o` are in **English**, phrased like the real exam. `e` and flashcard `a` are in **Polish**. HTTP Koty is fully bilingual: Polish fields plus their `en` copies, and `data-en*` on the template.
 - The UI is bilingual (Settings › Język). Every new UI label needs English too: `data-en` / `data-en-html` / `data-en-title` / `data-en-aria` / `data-en-ph` on static markup, `L(pl, en)` in JS. Questions, explanations and flashcards are never translated.
+- **Notes fold by length** (progressive disclosure; the rule lives in `noteOpen` in app.js, the validator guards the limits). TL;DR: 1 to 4 bullets, at most 25 words each, never folded. A block with at most 4 bullets and 60 words renders open; a longer one starts folded, with its bullet count in the summary. The first block is always open. One fact per bullet, at most 30 words; split a block rather than pass 8 bullets. Folded state is not saved: it resets per category and language.
 - Short, plain sentences. Inline markup is only `` `code` `` and `**bold**`, plus `\n` in flashcard answers. Everything else is escaped (`esc`, then `fmt`).
 - Distractors must be plausible VTEX-isms: real header names, real endpoints, wrong numbers. They must not be obviously absurd.
 - The code style follows the file you are in. `app.js` is ES5 (`var`, `function`), `koty.js` is ES2015+. Comment density is low, and comments explain why, not what.

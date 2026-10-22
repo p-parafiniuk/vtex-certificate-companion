@@ -59,7 +59,7 @@ for (const [name, arr] of [["Q", D.Q], ["F", D.F]]) {
 }
 
 /* DOCS */
-const used = new Set([...D.Q, ...D.F].flatMap(x => x.l || []));
+const used = new Set([...D.Q, ...D.F].flatMap(x => x.l || []).concat(Object.values(D.NOTES).flatMap(n => (n.s || []).flatMap(s => s[2] || []))));
 for (const [k, v] of Object.entries(D.DOCS)) {
   if (!Array.isArray(v) || v.length !== 2 || !isStr(v[1])) E("DOCS." + k, "must be [url, label]");
   else if (!/^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\//.test(v[0])) W("DOCS." + k, "url outside vtex.com docs: " + v[0]);
@@ -85,6 +85,27 @@ D.APIMAP.forEach(a => a.eps.forEach(ep => {
   const u = "https://developers.vtex.com/docs/api-reference/" + a.ref + "#" + ep.m.toLowerCase() + "-" + ep.p.replace(/\{([^}]+)\}/g, "-$1-");
   if (!EP_URL.test(u)) W("APIMAP." + a.key, "endpoint doc link not accepted by EP_URL: " + ep.m + " " + ep.p);
 }));
+
+/* Notes: one entry per category plus "all". The TL;DR is never folded, so it stays short; app.js folds long blocks itself. */
+for (const d of [...doms, "all"]) if (!D.NOTES[d]) W("NOTES", "no notes for " + d);
+for (const [k, n] of Object.entries(D.NOTES)) {
+  const w = "NOTES." + k, txt = (x, ww) => {
+    if (!isStr(x)) return E(ww, "empty text");
+    markup(ww, x);
+    if (/\[UNVERIFIED|https?:|</i.test(x)) E(ww, "no [UNVERIFIED], URLs or raw < in notes: sources go in DOCS keys");
+  };
+  if (k !== "all" && !doms.has(k)) E(w, "not in DOMS");
+  for (const f of Object.keys(n)) if (f !== "t" && f !== "s") E(w, "unknown field `" + f + "`");
+  if (!Array.isArray(n.t) || n.t.length < 1 || n.t.length > 4) E(w, "t (TL;DR) needs 1 to 4 bullets");
+  else n.t.forEach((x, i) => { txt(x, w + ".t[" + i + "]"); if (x.split(/\s+/).length > 25) W(w + ".t[" + i + "]", "TL;DR bullet over 25 words"); });
+  if (!Array.isArray(n.s) || !n.s.length) E(w, "s needs at least one block");
+  else n.s.forEach((s, i) => {
+    const ws = w + ".s[" + i + "]";
+    if (!Array.isArray(s) || s.length !== 3 || !isStr(s[0]) || !Array.isArray(s[1]) || !s[1].length || !Array.isArray(s[2]) || !s[2].length) return E(ws, "must be [heading, bullets[], DOCS keys[]]");
+    s[1].forEach((x, j) => txt(x, ws + "[" + j + "]"));
+    s[2].forEach(d => { if (!D.DOCS[d]) E(ws, "DOCS key `" + d + "` not in DOCS"); });
+  });
+}
 
 /* HTTP Koty */
 const codes = new Set();

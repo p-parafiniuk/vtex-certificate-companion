@@ -26,7 +26,8 @@ export const BLOCKS = {
   IANA_NO_CAT_EN: { file: "data/koty-meta.json", pick: "IANA_NO_CAT_EN", keys: "js", layout: "inline" },
   KCAT:        { images: true, keys: "json", layout: "inline" },
   APIMAP:      { file: "data/apimap.json", keys: "json", layout: "lines", indent: "" },
-  CATMAP:      { file: "data/categories.json", keys: "json", layout: "inline" }
+  CATMAP:      { file: "data/categories.json", keys: "json", layout: "inline" },
+  NOTES:       { file: "data/notes.json", keys: "json", layout: "inline" }
 };
 
 export const MARKER = /^\s*(?:<!--|\/\*)\s*@(include|data)\s+(\S+)\s*(?:-->|\*\/)\s*$/;
