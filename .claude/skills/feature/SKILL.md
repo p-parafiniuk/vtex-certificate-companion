@@ -36,5 +36,6 @@ Read `CLAUDE.md` first if it is not already in context. Work in `src/` only.
 - `npm run format`, then `npm run build`; `npm run check` must be green (it fails on unformatted code).
 - Preview through the `drill` launch config, open the affected tab, use the feature, then reload and confirm the state persisted. The console must be clean.
 - Run `npm run shots -- <hashes>` for every touched view, look at the images, and send the user the 375 px dark and desktop light shots.
+- If the change came from a mockup: `npm run compare -- <topic>` (`CLAUDE.md` › Always show it), open every compare image, list the differences, fix them or say why they stay. Send the compare images. Do not say the feature is finished before this step.
 - Run `/review` (the review skill). It picks the needed reviewers from the diff and does at most one round of fixes.
 - Report what was added (count per domain, or the behaviour), with the sources used, the review verdicts and the screenshots.

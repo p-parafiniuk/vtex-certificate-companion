@@ -4834,6 +4834,16 @@ h1 b {
   background: var(--hover);
   box-shadow: inset 0 -2px 0 var(--c, var(--accent));
 }
+/* Method names carry their colour even when off, so the row reads like the method column below it. */
+#methods button,
+#methods button[aria-pressed="true"] {
+  color: var(--c);
+}
+#scopes button[aria-pressed="true"] {
+  color: var(--bg);
+  background: var(--fg);
+  box-shadow: none;
+}
 .view button {
   display: inline-flex;
   align-items: center;
@@ -4931,13 +4941,9 @@ h1 b {
 }
 .lh {
   font: 700 14px var(--f-display);
-  padding: 10px 6px 4px;
-  margin-top: 6px;
+  padding: 10px 14px 6px;
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
-}
-.lh:first-child {
-  margin-top: 0;
-  padding-top: 2px;
 }
 .lh span {
   font: 500 11px var(--f-mono);
@@ -5252,14 +5258,36 @@ summary.apiroot .seg {
 .resp pre {
   margin: 4px 0 6px 22px;
 }
+/* The flat list is a card of ruled rows: method, path over summary, tag on the right. */
+.tree.flat {
+  padding: 0;
+  overflow: hidden;
+}
 .hits {
   display: grid;
-  gap: 2px;
 }
 .ep.hit {
   align-items: flex-start;
   white-space: normal;
-  padding: 6px;
+  padding: 8px 14px;
+  gap: 12px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+}
+.hits > .ep.hit:last-child {
+  border-bottom: 0;
+}
+.ep.hit .ht {
+  flex: none;
+  max-width: 28%;
+  margin-left: auto;
+  padding-top: 2px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+}
+.hits > .detail {
+  margin: 8px 14px 8px 78px;
 }
 .ep.hit .m {
   padding-top: 2px;
@@ -5281,12 +5309,13 @@ summary.apiroot .seg {
   color: var(--muted);
 }
 .more {
-  padding: 10px 6px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
   color: var(--muted);
   font-family: var(--f-body);
 }
 .empty {
-  padding: 24px 8px;
+  padding: 24px 14px;
   color: var(--muted);
   font-family: var(--f-body);
 }
@@ -5319,14 +5348,19 @@ mark {
   .deck {
     position: static;
   }
-  .ep .t {
+  .ep .t,
+  .ep.hit .ht {
     display: none;
   }
   .ep .s {
     white-space: normal;
   }
-  .detail {
+  .detail,
+  .hits > .detail {
     margin-left: 8px;
+  }
+  .hits > .detail {
+    margin-right: 8px;
   }
 }
 @media (pointer: coarse), (max-width: 560px) {
@@ -5382,8 +5416,19 @@ mark {
     padding-inline: 2px;
   }
 }
+@media (max-width: 560px) {
+  .fpanel .pair {
+    display: grid;
+    width: 100%;
+  }
+  #scopes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
 @media (max-width: 420px) {
-  #methods .mc {
+  #methods .mc,
+  #methods .mx {
     display: none;
   }
 }
@@ -5470,8 +5515,7 @@ mark {
           stroke-width="1.5"
         >
           <path d="M2 4h12M4.5 8h7M7 12h2" /></svg
-        ><span class="vl" data-en="Filters">Filtry</span
-        ><span class="badge" id="fcount" aria-hidden="true" hidden></span>
+        ><span data-en="Filters">Filtry</span><span class="badge" id="fcount" aria-hidden="true" hidden></span>
       </button>
     </div>
     <div class="fpanel" id="fpanel" hidden>
@@ -6868,7 +6912,7 @@ const APIMAP = [
     if (embed) root.querySelector(".top").hidden = true;
     $("methods").innerHTML = METHODS.map(
       m =>
-        `<button type="button" data-m="${m}" style="--c:var(--${m.toLowerCase()})">${m}<span class="mc"></span></button>`
+        `<button type="button" data-m="${m}" aria-label="${m}" style="--c:var(--${m.toLowerCase()})">${m === "DELETE" ? 'DEL<span class="mx">ETE</span>' : m}<span class="mc" aria-hidden="true"></span></button>`
     ).join("");
 
     $("apis").onclick = e => {
@@ -7088,8 +7132,8 @@ const APIMAP = [
   function hitRow(ep, many) {
     return (
       `<button type="button" class="ep hit" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span>` +
-      `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s || L("(brak opisu)", "(no description)"))} · ${esc(ep.t || "—")}${many ? " · " + esc(ep.api.name) : ""}</span></span>` +
-      `${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? '<span class="flag dep">DEPR</span>' : ""}</button>`
+      `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s || L("(brak opisu)", "(no description)"))}${many ? " · " + esc(ep.api.name) : ""}</span></span>` +
+      `${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? '<span class="flag dep">DEPR</span>' : ""}<span class="ht">${hl(ep.t || "")}</span></button>`
     );
   }
   /* While searching, each API chip shows its own number of hits, so results in another API are never invisible. */
@@ -7178,7 +7222,9 @@ const APIMAP = [
         let h = "";
         if (grouped && ep.api.key !== last) {
           last = ep.api.key;
-          h = `<div class="lh">${esc(ep.api.name)} <span>${per.get(last)}</span></div>`;
+          const n = per.get(last),
+            all = ep.api.eps.length;
+          h = `<div class="lh">${esc(ep.api.name)} <span>${n < all ? L(`${n} z ${all}`, `${n} of ${all}`) : n}</span></div>`;
         }
         return h + hitRow(ep, many);
       });

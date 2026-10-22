@@ -15,6 +15,7 @@ Check in the browser pane. Start the `drill` launch config; if it is already run
 4. Use `read_page` for names and state of new controls (`aria-pressed`/`aria-expanded`, labels). Prefer it over screenshots.
 5. New colours use `:root` tokens and have dark values under both dark selectors. No horizontal scroll at 375 px. Touch targets are at least 44 px.
 6. Polish UI copy is short and consistent with existing labels.
+7. If you are given a design topic, run `npm run compare -- <topic>` and open the `shots/compare-<topic>-*.png` images. Every visible difference from the mockup (layout, order, labels, colours, what is shown or hidden) is a finding, unless the caller named it as deliberate.
 
 Reply in exactly this format and nothing else (findings at most 8, most severe first):
 ```

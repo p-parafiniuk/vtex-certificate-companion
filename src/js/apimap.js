@@ -123,7 +123,7 @@ function bootApiMap(root, onNav, embed) {
     if (embed) root.querySelector(".top").hidden = true;
     $("methods").innerHTML = METHODS.map(
       m =>
-        `<button type="button" data-m="${m}" style="--c:var(--${m.toLowerCase()})">${m}<span class="mc"></span></button>`
+        `<button type="button" data-m="${m}" aria-label="${m}" style="--c:var(--${m.toLowerCase()})">${m === "DELETE" ? 'DEL<span class="mx">ETE</span>' : m}<span class="mc" aria-hidden="true"></span></button>`
     ).join("");
 
     $("apis").onclick = e => {
@@ -343,8 +343,8 @@ function bootApiMap(root, onNav, embed) {
   function hitRow(ep, many) {
     return (
       `<button type="button" class="ep hit" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span>` +
-      `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s || L("(brak opisu)", "(no description)"))} · ${esc(ep.t || "—")}${many ? " · " + esc(ep.api.name) : ""}</span></span>` +
-      `${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? '<span class="flag dep">DEPR</span>' : ""}</button>`
+      `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s || L("(brak opisu)", "(no description)"))}${many ? " · " + esc(ep.api.name) : ""}</span></span>` +
+      `${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? '<span class="flag dep">DEPR</span>' : ""}<span class="ht">${hl(ep.t || "")}</span></button>`
     );
   }
   /* While searching, each API chip shows its own number of hits, so results in another API are never invisible. */
@@ -433,7 +433,9 @@ function bootApiMap(root, onNav, embed) {
         let h = "";
         if (grouped && ep.api.key !== last) {
           last = ep.api.key;
-          h = `<div class="lh">${esc(ep.api.name)} <span>${per.get(last)}</span></div>`;
+          const n = per.get(last),
+            all = ep.api.eps.length;
+          h = `<div class="lh">${esc(ep.api.name)} <span>${n < all ? L(`${n} z ${all}`, `${n} of ${all}`) : n}</span></div>`;
         }
         return h + hitRow(ep, many);
       });
