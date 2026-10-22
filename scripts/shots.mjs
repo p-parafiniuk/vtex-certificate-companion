@@ -9,7 +9,9 @@ import { pathToFileURL } from "node:url";
 import { ROOT, OUT } from "./lib.mjs";
 
 async function playwright() {
-  try { return await import("playwright"); } catch {}
+  try {
+    return await import("playwright");
+  } catch {}
   const g = execSync("npm root -g", { encoding: "utf8" }).trim();
   return import(pathToFileURL(join(g, "playwright", "index.mjs")).href);
 }
@@ -29,20 +31,37 @@ const browser = await chromium.launch();
 const dir = join(ROOT, "shots");
 mkdirSync(dir, { recursive: true });
 let errors = 0;
-for (const h of hashes) for (const w of widths) for (const t of themes) {
-  const page = await browser.newPage({ viewport: { width: w, height: w < 600 ? 812 : 900 }, colorScheme: t });
-  page.on("console", m => { if (m.type() === "error" && !/Failed to load resource: net::ERR_FAILED/.test(m.text())) { errors++; console.error(`[${h} ${w} ${t}] console: ${m.text()}`); } });
-  page.on("pageerror", e => { errors++; console.error(`[${h} ${w} ${t}] error: ${e.message}`); });
-  /* Google Fonts and docs frames need the network; block them so a shot never waits on it. */
-  await page.route(/^https?:/, r => r.abort());
-  /* The UI language is a saved setting, so it goes into storage before the page boots. */
-  if (lang) await page.addInitScript(l => { try { const d = JSON.parse(localStorage.getItem("vtex-drill-v1") || "{}"); d.lang = l; localStorage.setItem("vtex-drill-v1", JSON.stringify(d)); } catch {} }, lang);
-  await page.goto(pathToFileURL(OUT).href + "#" + h);
-  await page.waitForTimeout(400);
-  const f = join(dir, `${h}-${w}-${t}${lang ? "-" + lang : ""}.png`);
-  await page.screenshot({ path: f, fullPage: full });
-  console.log("shot", f.slice(ROOT.length + 1));
-  await page.close();
-}
+for (const h of hashes)
+  for (const w of widths)
+    for (const t of themes) {
+      const page = await browser.newPage({ viewport: { width: w, height: w < 600 ? 812 : 900 }, colorScheme: t });
+      page.on("console", m => {
+        if (m.type() === "error" && !/Failed to load resource: net::ERR_FAILED/.test(m.text())) {
+          errors++;
+          console.error(`[${h} ${w} ${t}] console: ${m.text()}`);
+        }
+      });
+      page.on("pageerror", e => {
+        errors++;
+        console.error(`[${h} ${w} ${t}] error: ${e.message}`);
+      });
+      /* Google Fonts and docs frames need the network; block them so a shot never waits on it. */
+      await page.route(/^https?:/, r => r.abort());
+      /* The UI language is a saved setting, so it goes into storage before the page boots. */
+      if (lang)
+        await page.addInitScript(l => {
+          try {
+            const d = JSON.parse(localStorage.getItem("vtex-drill-v1") || "{}");
+            d.lang = l;
+            localStorage.setItem("vtex-drill-v1", JSON.stringify(d));
+          } catch {}
+        }, lang);
+      await page.goto(pathToFileURL(OUT).href + "#" + h);
+      await page.waitForTimeout(400);
+      const f = join(dir, `${h}-${w}-${t}${lang ? "-" + lang : ""}.png`);
+      await page.screenshot({ path: f, fullPage: full });
+      console.log("shot", f.slice(ROOT.length + 1));
+      await page.close();
+    }
 await browser.close();
 process.exit(errors ? 1 : 0);
