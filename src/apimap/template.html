@@ -11,94 +11,107 @@
     </p>
   </header>
 
-  <div class="deck">
-    <div class="apis-wrap" id="apis-wrap">
-      <button
-        type="button"
-        class="scr l"
-        id="apis-l"
-        tabindex="-1"
-        aria-label="Przewiń listę API w lewo"
-        data-en-aria="Scroll the API list left"
-      >
-        ‹
-      </button>
-      <div class="apis" id="apis" role="group" aria-label="API"></div>
-      <button
-        type="button"
-        class="scr r"
-        id="apis-r"
-        tabindex="-1"
-        aria-label="Przewiń listę API w prawo"
-        data-en-aria="Scroll the API list right"
-      >
-        ›
-      </button>
-    </div>
-    <div class="row">
-      <span class="sbox"
-        ><input
-          id="q"
-          class="search"
-          type="search"
-          spellcheck="false"
-          autocapitalize="off"
-          autocomplete="off"
-          autocorrect="off"
-          placeholder="Szukaj: ścieżka, opis, tag… np. orderForm, {skuId}, invoice"
-          aria-label="Szukaj endpointów"
-          data-en-ph="Search: path, summary, tag… e.g. orderForm, {skuId}, invoice"
-          data-en-aria="Search endpoints"
-          aria-keyshortcuts="/"
-        /><kbd class="kb" aria-hidden="true">/</kbd></span
-      >
-      <span class="group view" id="view" role="group" aria-label="Widok" data-en-aria="View"></span>
-    </div>
-    <div class="row">
-      <div class="group" id="methods" role="group" aria-label="Metody" data-en-aria="Methods"></div>
-      <button type="button" class="fbtn" id="fbtn" aria-expanded="false" aria-controls="fpanel">
-        <svg
-          aria-hidden="true"
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
-          <path d="M2 4h12M4.5 8h7M7 12h2" /></svg
-        ><span data-en="Filters">Filtry</span><span class="badge" id="fcount" aria-hidden="true" hidden></span>
-      </button>
-    </div>
-    <div class="fpanel" id="fpanel" hidden>
-      <span class="pair"
-        ><span class="lbl" id="scopes-l" data-en="Scope">Zakres</span>
-        <span class="group" id="scopes" role="group" aria-labelledby="scopes-l"></span
-      ></span>
-      <label class="chk"
-        ><input type="checkbox" id="onlyopen" /> <span data-en="only">tylko</span> <b class="flag open">OPEN</b>
-        <span data-en="(no auth)">(bez autoryzacji)</span></label
-      >
-    </div>
-    <div class="row" id="qscope" hidden>
-      <span class="pair"
-        ><span class="lbl" id="qin-l" data-en="Search in">Szukaj w</span>
-        <span class="group" id="qin" role="group" aria-labelledby="qin-l"></span
-      ></span>
-    </div>
-  </div>
+  <div class="layout">
+    <aside class="side" id="side" aria-label="API i filtry" data-en-aria="APIs and filters" hidden>
+      <p class="lbl sl">API</p>
+      <div id="side-a"></div>
+      <p class="lbl sl" data-en="Methods">Metody</p>
+      <div id="side-m"></div>
+    </aside>
+    <div class="main">
+      <div class="deck" id="deck">
+        <div class="apis-wrap" id="apis-wrap">
+          <button
+            type="button"
+            class="scr l"
+            id="apis-l"
+            tabindex="-1"
+            aria-label="Przewiń listę API w lewo"
+            data-en-aria="Scroll the API list left"
+          >
+            ‹
+          </button>
+          <div class="apis" id="apis" role="group" aria-label="API"></div>
+          <button
+            type="button"
+            class="scr r"
+            id="apis-r"
+            tabindex="-1"
+            aria-label="Przewiń listę API w prawo"
+            data-en-aria="Scroll the API list right"
+          >
+            ›
+          </button>
+        </div>
+        <div class="row" id="srow">
+          <span class="sbox"
+            ><input
+              id="q"
+              class="search"
+              type="search"
+              spellcheck="false"
+              autocapitalize="off"
+              autocomplete="off"
+              autocorrect="off"
+              placeholder="Szukaj: ścieżka, opis, tag… np. orderForm, {skuId}, invoice"
+              aria-label="Szukaj endpointów"
+              data-en-ph="Search: path, summary, tag… e.g. orderForm, {skuId}, invoice"
+              data-en-aria="Search endpoints"
+              aria-keyshortcuts="/"
+            /><kbd class="kb" aria-hidden="true">/</kbd></span
+          >
+          <span class="group view" id="view" role="group" aria-label="Widok" data-en-aria="View"></span>
+        </div>
+        <div class="row" id="frow">
+          <div class="group" id="methods" role="group" aria-label="Metody" data-en-aria="Methods"></div>
+          <button type="button" class="fbtn" id="fbtn" aria-expanded="false" aria-controls="fpanel">
+            <svg
+              aria-hidden="true"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <path d="M2 4h12M4.5 8h7M7 12h2" /></svg
+            ><span data-en="Filters">Filtry</span><span class="badge" id="fcount" aria-hidden="true" hidden></span>
+          </button>
+        </div>
+        <div class="fpanel" id="fpanel" hidden>
+          <span class="pair"
+            ><span class="lbl" id="scopes-l" data-en="Scope">Zakres</span>
+            <span class="group" id="scopes" role="group" aria-labelledby="scopes-l"></span
+          ></span>
+          <label class="chk"
+            ><input type="checkbox" id="onlyopen" /> <span data-en="only">tylko</span> <b class="flag open">OPEN</b>
+            <span data-en="(no auth)">(bez autoryzacji)</span></label
+          >
+        </div>
+        <div class="row" id="qscope" hidden>
+          <span class="pair"
+            ><span class="lbl" id="qin-l" data-en="Search in">Szukaj w</span>
+            <span class="group" id="qin" role="group" aria-labelledby="qin-l"></span
+          ></span>
+        </div>
+      </div>
 
-  <div class="bar">
-    <div class="stats" id="stats" aria-live="polite"></div>
-    <div class="tools" id="tools"></div>
-  </div>
-  <div class="server" id="server"></div>
-  <div class="tree" id="tree"></div>
-  <div class="legend">
-    <span><b class="flag open">OPEN</b> <span data-en="no auth in the schema">bez autoryzacji w schemacie</span></span>
-    <span><b class="flag dep">DEPR</b> deprecated</span>
-    <span data-en="Click an endpoint to see the full URL, auth, query params, sample body, response codes and curl."
-      >Kliknij endpoint, żeby zobaczyć pełny URL, auth, query params, przykładowe body, kody odpowiedzi i curl.</span
-    >
+      <div class="bar">
+        <div class="stats" id="stats" aria-live="polite"></div>
+        <div class="tools" id="tools"></div>
+      </div>
+      <div class="server" id="server"></div>
+      <div class="tree" id="tree"></div>
+      <div class="legend">
+        <span
+          ><b class="flag open">OPEN</b> <span data-en="no auth in the schema">bez autoryzacji w schemacie</span></span
+        >
+        <span><b class="flag dep">DEPR</b> deprecated</span>
+        <span data-en="Click an endpoint to see the full URL, auth, query params, sample body, response codes and curl."
+          >Kliknij endpoint, żeby zobaczyć pełny URL, auth, query params, przykładowe body, kody odpowiedzi i
+          curl.</span
+        >
+      </div>
+    </div>
   </div>
 </div>

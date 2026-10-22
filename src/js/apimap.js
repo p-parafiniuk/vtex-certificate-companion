@@ -223,6 +223,31 @@ function bootApiMap(root, onNav, embed) {
     apisEl.addEventListener("scroll", edges, { passive: true });
     window.addEventListener("resize", edges);
   }
+  /* The API Map tab mirrors the question categories: from 761 px the API list and the filters sit in a side menu.
+     Narrower screens, and the copy embedded in a category, keep them in the deck. */
+  const wide = window.matchMedia("(min-width: 761px)");
+  let side = false;
+  function place() {
+    const on = !embed && wide.matches;
+    if (on === side) return;
+    side = on;
+    const f = root.activeElement;
+    root.querySelector(".wrap").classList.toggle("sidemode", on);
+    $("side").hidden = !on;
+    $("frow").hidden = on;
+    if (on) {
+      $("side-a").append($("apis-wrap"));
+      $("side-m").append($("methods"), $("fpanel"));
+    } else {
+      $("deck").prepend($("apis-wrap"));
+      $("frow").prepend($("methods"));
+      $("frow").after($("fpanel"));
+    }
+    syncControls();
+    edges();
+    /* Moving a node drops its focus; put it back unless the control is now hidden. */
+    if (f && f.getClientRects().length) f.focus();
+  }
   /* Arrows show only on the side where chips are hidden. */
   function edges() {
     const a = $("apis"),
@@ -263,7 +288,7 @@ function bootApiMap(root, onNav, embed) {
     $("fcount").textContent = n;
     $("fbtn").setAttribute("aria-label", L("Filtry", "Filters") + (n ? ` (${L("aktywne", "active")}: ${n})` : ""));
     $("fbtn").setAttribute("aria-expanded", state.filters);
-    $("fpanel").hidden = !state.filters;
+    $("fpanel").hidden = !state.filters && !side;
   }
 
   /* ---------- tree ---------- */
@@ -657,6 +682,8 @@ function bootApiMap(root, onNav, embed) {
   }
 
   buildControls();
+  place();
+  wide.addEventListener("change", place);
   render();
   requestAnimationFrame(revealChip);
   return {
