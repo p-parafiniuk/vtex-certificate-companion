@@ -5,23 +5,23 @@
   <header class="top">
     <div class="top-row">
       <div>
-        <p class="eyebrow">Suplement · kody statusu HTTP</p>
+        <p class="eyebrow" data-en="Extra · HTTP status codes">Suplement · kody statusu HTTP</p>
         <h1>HTTP Koty</h1>
       </div>
       <div class="meters" aria-live="polite">
-        <div class="meter"><span>Umiem <b id="m-all">0/78</b></span><div class="track"><i id="t-all"></i></div></div>
-        <div class="meter"><span>Topka <b id="m-top">0/21</b></span><div class="track"><i id="t-top"></i></div></div>
-        <div class="meter"><span>Quiz, rekord <b id="m-quiz">–</b></span><div class="track"><i id="t-quiz"></i></div></div>
+        <div class="meter"><span><span data-en="Known">Umiem</span> <b id="m-all">0/78</b></span><div class="track"><i id="t-all"></i></div></div>
+        <div class="meter"><span><span data-en="Top">Topka</span> <b id="m-top">0/21</b></span><div class="track"><i id="t-top"></i></div></div>
+        <div class="meter"><span><span data-en="Quiz, best">Quiz, rekord</span> <b id="m-quiz">–</b></span><div class="track"><i id="t-quiz"></i></div></div>
       </div>
     </div>
-    <p class="sub">Wszystkie kody statusu z http.cat, pogrupowane, z haczykami do zapamiętania i z tym, jak czyta je dokumentacja VTEX.</p>
+    <p class="sub" data-en="Every status code from http.cat, grouped, with memory hooks and how the VTEX docs read them.">Wszystkie kody statusu z http.cat, pogrupowane, z haczykami do zapamiętania i z tym, jak czyta je dokumentacja VTEX.</p>
   </header>
 
-  <nav class="tabs" role="tablist" aria-label="Moduły">
+  <nav class="tabs" role="tablist" aria-label="Moduły" data-en-aria="Modules">
     <button class="tab" role="tab" data-tab="start" id="tab-start">Start</button>
-    <button class="tab" role="tab" data-tab="topka" id="tab-topka">Topka</button>
-    <button class="tab" role="tab" data-tab="kody" id="tab-kody">Wszystkie kody</button>
-    <button class="tab" role="tab" data-tab="braki" id="tab-braki">Brakujące</button>
+    <button class="tab" role="tab" data-tab="topka" id="tab-topka" data-en="Top">Topka</button>
+    <button class="tab" role="tab" data-tab="kody" id="tab-kody" data-en="All codes">Wszystkie kody</button>
+    <button class="tab" role="tab" data-tab="braki" id="tab-braki" data-en="Missing">Brakujące</button>
     <button class="tab" role="tab" data-tab="vtex" id="tab-vtex">VTEX</button>
     <button class="tab" role="tab" data-tab="quiz" id="tab-quiz">Quiz</button>
     <span class="badge" id="badge" role="status" data-ready="0"><i class="ring" id="badge-ring"></i><b id="badge-pct">0%</b><span id="badge-rank">Kociak</span></span>
@@ -131,19 +131,19 @@
     <!-- KODY -->
     <section class="panel" id="p-kody" role="tabpanel" aria-labelledby="tab-kody" hidden>
       <div class="toolbar">
-        <h2>Wszystkie koty</h2>
-        <input class="search" id="q" type="search" placeholder="Szukaj: 429, timeout, nginx…" aria-label="Szukaj kodu">
+        <h2 data-en="All cats">Wszystkie koty</h2>
+        <input class="search" id="q" type="search" placeholder="Szukaj: 429, timeout, nginx…" aria-label="Szukaj kodu" data-en-ph="Search: 429, timeout, nginx…" data-en-aria="Search for a code">
         <div class="chips" id="filters">
-          <button class="chip" data-f="all">Wszystkie</button>
+          <button class="chip" data-f="all" data-en="All">Wszystkie</button>
           <button class="chip" data-f="1">1xx</button>
           <button class="chip" data-f="2">2xx</button>
           <button class="chip" data-f="3">3xx</button>
           <button class="chip" data-f="4">4xx</button>
           <button class="chip" data-f="5">5xx</button>
-          <button class="chip" data-f="top">Topka</button>
-          <button class="chip" data-f="vtex">Z notatką VTEX</button>
-          <button class="chip" data-f="unoff">Nieoficjalne</button>
-          <button class="chip" data-f="todo">Jeszcze nie umiem</button>
+          <button class="chip" data-f="top" data-en="Top">Topka</button>
+          <button class="chip" data-f="vtex" data-en="With a VTEX note">Z notatką VTEX</button>
+          <button class="chip" data-f="unoff" data-en="Unofficial">Nieoficjalne</button>
+          <button class="chip" data-f="todo" data-en="Not known yet">Jeszcze nie umiem</button>
         </div>
         <p class="small muted" id="shown"></p>
       </div>
@@ -156,12 +156,12 @@
         <h2>Dlaczego nie ma 104, 209 albo 427?</h2>
         <p class="lead">Każda grupa ma <b>100 numerów</b>, razem 500. Zajętych jest garstka. Poniżej cała przestrzeń 100–599, jedna kratka to jeden numer.</p>
         <div class="legend small">
-          <span><i class="key oc"></i>oficjalny, ma kota</span>
-          <span><i class="key uc"></i>nieoficjalny, ma kota</span>
-          <span><i class="key on"></i>w rejestrze IANA, bez kota</span>
-          <span><i class="key em"></i>wolny</span>
+          <span><i class="key oc"></i><span data-en="official, has a cat">oficjalny, ma kota</span></span>
+          <span><i class="key uc"></i><span data-en="unofficial, has a cat">nieoficjalny, ma kota</span></span>
+          <span><i class="key on"></i><span data-en="in the IANA registry, no cat">w rejestrze IANA, bez kota</span></span>
+          <span><i class="key em"></i><span data-en="free">wolny</span></span>
         </div>
-        <p class="small muted"><b>Najedź albo dotknij kratki:</b> podgląd kota i opis. <b>Klik</b> (na telefonie „Pokaż kartę”) przenosi do karty. <b>Strzałki ← →</b> skaczą po zajętych numerach.</p>
+        <p class="small muted" data-en-html="<b>Hover or tap a square:</b> a cat preview and a description. <b>Click</b> (on a phone &ldquo;Show card&rdquo;) takes you to the card. <b>Arrows ← →</b> jump between used numbers."><b>Najedź albo dotknij kratki:</b> podgląd kota i opis. <b>Klik</b> (na telefonie „Pokaż kartę”) przenosi do karty. <b>Strzałki ← →</b> skaczą po zajętych numerach.</p>
         <div class="maps" id="maps"></div>
       </div>
       <div class="block">
@@ -296,8 +296,8 @@
       <div class="block">
         <h2>Quiz</h2>
         <div class="chips" id="qmodes">
-          <button class="chip" data-m="exam">Scenariusze egzaminacyjne</button>
-          <button class="chip" data-m="drill">Szybkie strzały: kod → nazwa</button>
+          <button class="chip" data-m="exam" data-en="Exam scenarios">Scenariusze egzaminacyjne</button>
+          <button class="chip" data-m="drill" data-en="Quick fire: code → name">Szybkie strzały: kod → nazwa</button>
         </div>
       </div>
       <div id="quizroot"></div>
@@ -306,12 +306,12 @@
 
   <footer>
     <div class="row">
-      <button class="btn ghost" id="reset">Wyczyść postęp</button>
-      <span>Postęp HTTP Kotów zapisuje się w tej przeglądarce, osobno od pytań i fiszek.</span>
-      <span id="resetask" hidden>Na pewno? <button class="btn" id="resetyes">Tak, wyczyść</button> <button class="btn ghost" id="resetno">Anuluj</button></span>
+      <button class="btn ghost" id="reset" data-en="Clear progress">Wyczyść postęp</button>
+      <span data-en="HTTP Koty progress is saved in this browser, separately from questions and flashcards.">Postęp HTTP Kotów zapisuje się w tej przeglądarce, osobno od pytań i fiszek.</span>
+      <span id="resetask" hidden><span data-en="Sure?">Na pewno?</span> <button class="btn" id="resetyes" data-en="Yes, clear">Tak, wyczyść</button> <button class="btn ghost" id="resetno" data-en="Cancel">Anuluj</button></span>
     </div>
-    <p>Koty: <a href="https://http.cat/" target="_blank" rel="noopener">http.cat</a> (licencja MIT, ilustracje @girliemac). Materiał do nauki, niezwiązany z VTEX.</p>
-    <p>Źródła faktów:</p>
+    <p data-en-html="Cats: &lt;a href=&quot;https://http.cat/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http.cat&lt;/a&gt; (MIT licence, illustrations by @girliemac). Study material, not affiliated with VTEX.">Koty: <a href="https://http.cat/" target="_blank" rel="noopener">http.cat</a> (licencja MIT, ilustracje @girliemac). Materiał do nauki, niezwiązany z VTEX.</p>
+    <p data-en="Sources of facts:">Źródła faktów:</p>
     <ul>
       <li><a href="https://developers.vtex.com/docs/guides/api-response-codes" target="_blank" rel="noopener">VTEX: API response status codes</a></li>
       <li><a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys" target="_blank" rel="noopener">VTEX: API authentication using API keys</a></li>

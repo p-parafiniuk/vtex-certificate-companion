@@ -102,7 +102,7 @@
   catch (e) { $("#storage-warn").hidden = false; }
 
   /* ---------- helpers ---------- */
-  /* UI language only: questions, explanations, flashcards and HTTP Koty stay as written. */
+  /* UI language only: questions, explanations, flashcards and the HTTP Koty study text stay as written. */
   function L(pl, en) { return S.lang === "en" ? en : pl; }
   function T(pair) { return pair[S.lang === "en" ? 1 : 0]; }
   function dn(k) { return S.lang === "en" && DOM_EN[k] || DOM_NAME[k]; }
@@ -1465,6 +1465,7 @@
       root.appendChild($("#koty-tpl").content.cloneNode(true));
       /* A module picked inside HTTP Koty becomes its own history entry; the view is already switched. */
       KOTY = bootKoty(root, function (sub) { if (!NAV.mute) go({ tab: "http", sub: sub }, false, true); });
+      if (S.lang === "en") localize(root);
     }
     kotyTop();
   }
@@ -1666,7 +1667,7 @@
     S.lang = l; save();
     document.documentElement.lang = l;
     localize(document);
-    [["#apimap", APIM], ["#catapi", CATAPI]].forEach(function (m) { if (m[1]) { localize($(m[0]).shadowRoot); m[1].relang(); } });
+    [["#apimap", APIM], ["#catapi", CATAPI], ["#koty", KOTY]].forEach(function (m) { if (m[1]) { localize($(m[0]).shadowRoot); m[1].relang(); } });
     paintTheme(); clearDocs(); header(true); apply(NAV.cur, true);
   }
 

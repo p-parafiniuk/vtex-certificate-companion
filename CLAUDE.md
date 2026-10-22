@@ -55,7 +55,8 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 **Koty**: `koty-codes.json` (`c, n, pl, fun, v?, t?, x?`, sorted by `c`, each code needs `src/img/cats/<c>.jpg`), `koty-quiz.json` (`id, tag: VTEX|HTTP, q, o, a: index, why`), `koty-meta.json`.
 
 ## Writing conventions
-- Q `q` and `o` are in **English**, phrased like the real exam. `e`, flashcard `a` and all Koty text are in **Polish**.
+- Q `q` and `o` are in **English**, phrased like the real exam. `e`, flashcard `a` and the Koty study text (code descriptions, hooks, tables, quiz) are in **Polish**.
+- The UI is bilingual (Settings › Język). Every new UI label needs English too: `data-en` / `data-en-html` / `data-en-title` / `data-en-aria` / `data-en-ph` on static markup, `L(pl, en)` in JS. Content is never translated.
 - Short, plain sentences. Inline markup is only `` `code` `` and `**bold**`, plus `\n` in flashcard answers. Everything else is escaped (`esc`, then `fmt`).
 - Distractors must be plausible VTEX-isms: real header names, real endpoints, wrong numbers. They must not be obviously absurd.
 - The code style follows the file you are in. `app.js` is ES5 (`var`, `function`), `koty.js` is ES2015+. Comment density is low, and comments explain why, not what.
