@@ -1180,8 +1180,11 @@
       IMP = p.data;
       var d = p.data[KEY], cnt = function (o) { return isObj(o) ? Object.keys(o).length : 0; };
       var when = +p.at > 0 ? new Date(+p.at).toLocaleDateString(L("pl-PL", "en-GB")) : L("nieznana data", "an unknown date");
+      var best = Math.max(0, Math.min(Math.floor(+d.best) || 0, 1e6));
+      var nb = isObj(d.badges) ? Object.keys(d.badges).filter(function (k) { return BADGE_ID[k] && +d.badges[k] > 0; }).length : 0;
       impMsg("<p>" + L("Plik z ", "File from ") + esc(when) + L(". Opanowane pytania: ", ". Questions mastered: ") + cnt(d.known) + L(", fiszki: ", ", flashcards: ") + cnt(d.fknown) + L(", notatki: ", ", notes: ") + cnt(d.nknown) +
-        L(", odpowiedzi: ", ", answers: ") + (Math.floor(+d.total) || 0) + L(". Import zastąpi obecny postęp.", ". Importing replaces your current progress.") + "</p>" +
+        L(", odpowiedzi: ", ", answers: ") + (Math.floor(+d.total) || 0) + L(", rekord serii: ", ", best streak: ") + best + " " + days(best) +
+        L(", odznaki: ", ", badges: ") + nb + " / " + BADGES.length + L(". Import zastąpi obecny postęp.", ". Importing replaces your current progress.") + "</p>" +
         '<button type="button" class="btn small danger" id="imp-ok">' + L("Zastąp postęp", "Replace progress") + '</button><button type="button" class="btn small" id="imp-no">' + L("Anuluj", "Cancel") + "</button>");
       $("#imp-ok").focus();
     };
