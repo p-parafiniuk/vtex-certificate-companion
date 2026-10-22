@@ -633,7 +633,7 @@ div.setrow { cursor: default; }
     <section class="card setg" aria-labelledby="set-h-look">
       <h3 id="set-h-look" data-en="Appearance">Wygląd</h3>
       <div class="setrow">
-        <span class="setl"><span class="setn" id="set-lang-l">Język · Language</span><span class="seth" data-en="Changes the interface text. Questions, explanations, flashcards and the HTTP Koty code descriptions stay as written.">Zmienia napisy interfejsu. Pytania, wyjaśnienia, fiszki i opisy kodów w HTTP Kotach zostają bez zmian.</span></span>
+        <span class="setl"><span class="setn" id="set-lang-l">Język · Language</span><span class="seth" data-en="Changes the interface text and HTTP Koty. Questions, explanations and flashcards stay as written.">Zmienia napisy interfejsu i HTTP Koty. Pytania, wyjaśnienia i fiszki zostają bez zmian.</span></span>
         <div class="seg" role="group" aria-labelledby="set-lang-l" id="set-lang"><button type="button" class="seg-b" data-lang-set="pl" lang="pl">Polski</button><button type="button" class="seg-b" data-lang-set="en" lang="en">English</button></div>
       </div>
       <div class="setrow">
@@ -885,9 +885,9 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
         <h2 data-en="How many codes are there?">Ile mamy kodów?</h2>
         <div class="count">
           <span class="big">78</span>
-          <p class="lead"><b>78 kotów na http.cat.</b> Z tego <b>60 to kody oficjalne</b> (rejestr IANA), a <b>18 to nieoficjalne</b>: wynalazki nginx, Cloudflare, Laravela, Twittera i jeden żart primaaprilisowy.</p>
+          <p class="lead" data-en-html="&lt;b&gt;78 cats on http.cat.&lt;/b&gt; Of these, &lt;b&gt;60 are official codes&lt;/b&gt; (IANA registry) and &lt;b&gt;18 are unofficial&lt;/b&gt;: inventions of nginx, Cloudflare, Laravel, Twitter and one April Fools&#x27; joke."><b>78 kotów na http.cat.</b> Z tego <b>60 to kody oficjalne</b> (rejestr IANA), a <b>18 to nieoficjalne</b>: wynalazki nginx, Cloudflare, Laravela, Twittera i jeden żart primaaprilisowy.</p>
         </div>
-        <div class="scale" role="img" aria-label="Podział 78 kodów: 1xx 4, 2xx 11, 3xx 8, 4xx 38, 5xx 17">
+        <div class="scale" role="img" aria-label="Podział 78 kodów: 1xx 4, 2xx 11, 3xx 8, 4xx 38, 5xx 17" data-en-aria="Split of 78 codes: 1xx 4, 2xx 11, 3xx 8, 4xx 38, 5xx 17">
           <span data-k="1" style="flex:4"></span><span data-k="2" style="flex:11"></span><span data-k="3" style="flex:8"></span><span data-k="4" style="flex:38"></span><span data-k="5" style="flex:17"></span>
         </div>
         <div class="legend">
@@ -897,7 +897,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           <span data-k="4"><i class="dot"></i><b class="num">4xx</b> 38</span>
           <span data-k="5"><i class="dot"></i><b class="num">5xx</b> 17</span>
         </div>
-        <p class="small muted">Prawie połowa to 4xx. Klient ma najwięcej sposobów, żeby coś zepsuć.</p>
+        <p class="small muted" data-en="Almost half are 4xx. The client has the most ways to break something.">Prawie połowa to 4xx. Klient ma najwięcej sposobów, żeby coś zepsuć.</p>
       </div>
 
       <div class="block">
@@ -906,11 +906,11 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           <table>
             <thead><tr><th data-en="Group">Grupa</th><th data-en="Server says">Serwer mówi</th><th data-en="Whose fault">Czyja wina</th><th data-en="Retry?">Ponawiać?</th></tr></thead>
             <tbody>
-              <tr data-k="1"><td class="num">1xx</td><td><b>„Czekaj”.</b> Informacja w trakcie, to jeszcze nie odpowiedź.</td><td>niczyja</td><td>nie dotyczy</td></tr>
-              <tr data-k="2"><td class="num">2xx</td><td><b>„Masz”.</b> Udało się.</td><td>niczyja</td><td>nie trzeba</td></tr>
-              <tr data-k="3"><td class="num">3xx</td><td><b>„Idź tam”.</b> Odpowiedź jest gdzie indziej albo w cache.</td><td>niczyja</td><td>idź za <code>Location</code></td></tr>
-              <tr data-k="4"><td class="num">4xx</td><td><b>„Twoja wina”.</b> Request jest zły.</td><td>klienta</td><td>nie, najpierw popraw request. Wyjątki: <b>429</b>, 408</td></tr>
-              <tr data-k="5"><td class="num">5xx</td><td><b>„Moja wina”.</b> Request był dobry, serwer zawiódł.</td><td>serwera</td><td>tak, z odstępem</td></tr>
+              <tr data-k="1"><td class="num">1xx</td><td data-en-html="&lt;b&gt;“Wait.”&lt;/b&gt; Interim information, not the answer yet."><b>„Czekaj”.</b> Informacja w trakcie, to jeszcze nie odpowiedź.</td><td data-en="nobody&#x27;s">niczyja</td><td data-en="not applicable">nie dotyczy</td></tr>
+              <tr data-k="2"><td class="num">2xx</td><td data-en-html="&lt;b&gt;“Here you go.”&lt;/b&gt; It worked."><b>„Masz”.</b> Udało się.</td><td data-en="nobody&#x27;s">niczyja</td><td data-en="no need">nie trzeba</td></tr>
+              <tr data-k="3"><td class="num">3xx</td><td data-en-html="&lt;b&gt;“Go there.”&lt;/b&gt; The answer is elsewhere or in the cache."><b>„Idź tam”.</b> Odpowiedź jest gdzie indziej albo w cache.</td><td data-en="nobody&#x27;s">niczyja</td><td data-en-html="follow &lt;code&gt;Location&lt;/code&gt;">idź za <code>Location</code></td></tr>
+              <tr data-k="4"><td class="num">4xx</td><td data-en-html="&lt;b&gt;“Your fault.”&lt;/b&gt; The request is bad."><b>„Twoja wina”.</b> Request jest zły.</td><td data-en="the client&#x27;s">klienta</td><td data-en-html="no, fix the request first. Exceptions: &lt;b&gt;429&lt;/b&gt;, 408">nie, najpierw popraw request. Wyjątki: <b>429</b>, 408</td></tr>
+              <tr data-k="5"><td class="num">5xx</td><td data-en-html="&lt;b&gt;“My fault.”&lt;/b&gt; The request was fine, the server failed."><b>„Moja wina”.</b> Request był dobry, serwer zawiódł.</td><td data-en="the server&#x27;s">serwera</td><td data-en="yes, with a delay">tak, z odstępem</td></tr>
             </tbody>
           </table>
         </div>
@@ -921,19 +921,19 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
         <div class="sheet block">
           <p class="eyebrow" data-en="Study order">Kolejność nauki</p>
           <ol class="tight">
-            <li><b>Topka:</b> 21 kodów, które musisz mieć od ręki.</li>
-            <li><b>VTEX:</b> co te kody znaczą w dokumentacji i integracjach.</li>
-            <li><b>Quiz:</b> 24 pytania egzaminacyjne, próg 80%.</li>
-            <li><b>Wszystkie kody:</b> reszta kotów, odhaczaj „Umiem”.</li>
+            <li data-en-html="&lt;b&gt;Top:&lt;/b&gt; 21 codes you must know off the top of your head."><b>Topka:</b> 21 kodów, które musisz mieć od ręki.</li>
+            <li data-en-html="&lt;b&gt;VTEX:&lt;/b&gt; what these codes mean in the docs and in integrations."><b>VTEX:</b> co te kody znaczą w dokumentacji i integracjach.</li>
+            <li data-en-html="&lt;b&gt;Quiz:&lt;/b&gt; 24 exam-style questions, 80% pass mark."><b>Quiz:</b> 24 pytania egzaminacyjne, próg 80%.</li>
+            <li data-en-html="&lt;b&gt;All codes:&lt;/b&gt; the rest of the cats, tick “Known”."><b>Wszystkie kody:</b> reszta kotów, odhaczaj „Umiem”.</li>
           </ol>
         </div>
         <div class="sheet block">
           <p class="eyebrow" data-en="The exam we are playing for">Egzamin, o który gramy</p>
           <ul class="tight">
-            <li><b>36 pytań</b> wielokrotnego wyboru + <b>4 ćwiczenia</b> praktyczne</li>
-            <li><b>2 godziny</b> od startu</li>
-            <li>Próg zaliczenia: <b>80%</b></li>
-            <li>Po rejestracji masz <b>7 dni</b> na podejście</li>
+            <li data-en-html="&lt;b&gt;36 multiple-choice&lt;/b&gt; questions + &lt;b&gt;4 practical&lt;/b&gt; exercises"><b>36 pytań</b> wielokrotnego wyboru + <b>4 ćwiczenia</b> praktyczne</li>
+            <li data-en-html="&lt;b&gt;2 hours&lt;/b&gt; from the start"><b>2 godziny</b> od startu</li>
+            <li data-en-html="Pass mark: &lt;b&gt;80%&lt;/b&gt;">Próg zaliczenia: <b>80%</b></li>
+            <li data-en-html="After registering you have &lt;b&gt;7 days&lt;/b&gt; to take it">Po rejestracji masz <b>7 dni</b> na podejście</li>
           </ul>
         </div>
       </div>
@@ -943,21 +943,21 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
     <section class="panel" id="p-topka" role="tabpanel" aria-labelledby="tab-topka" hidden>
       <div class="block">
         <h2 data-en="The official VTEX fifteen">Oficjalna piętnastka VTEX</h2>
-        <p class="lead">Dokładnie te <b>15 kodów</b> wymienia strona „API response status codes” w dokumentacji VTEX. To jest lista na wczoraj.</p>
+        <p class="lead" data-en-html="These are exactly the &lt;b&gt;15 codes&lt;/b&gt; listed on the “API response status codes” page of the VTEX docs. Learn this list first.">Dokładnie te <b>15 kodów</b> wymienia strona „API response status codes” w dokumentacji VTEX. To jest lista na wczoraj.</p>
         <div class="toplist" id="top1"></div>
       </div>
       <div class="block">
         <h2 data-en="Extras for integrations">Dokładka do integracji</h2>
-        <p class="lead">Tych <b>6 kodów</b> nie ma w tabeli ogólnej, ale spotkasz je w endpointach i w pytaniach o czysty HTTP.</p>
+        <p class="lead" data-en-html="These &lt;b&gt;6 codes&lt;/b&gt; are not in the general table, but you will meet them in endpoints and in plain HTTP questions.">Tych <b>6 kodów</b> nie ma w tabeli ogólnej, ale spotkasz je w endpointach i w pytaniach o czysty HTTP.</p>
         <div class="toplist" id="top2"></div>
       </div>
       <div class="block">
         <h2 data-en="Pairs that get mixed up">Pary, które się mylą</h2>
         <div class="cols">
-          <div class="sheet block"><h3 data-en="401 vs 403">401 kontra 403</h3><ul class="tight"><li><b>401:</b> nie wiem, kim jesteś. Brak albo złe dane logowania.</li><li><b>403:</b> wiem, kim jesteś, i mówię nie. Brak uprawnień.</li><li><b>Haczyk:</b> 401 = <b>1</b> krok do zrobienia (zaloguj się). 403 = drzwi zamknięte.</li></ul></div>
-          <div class="sheet block"><h3>502, 503, 504</h3><ul class="tight"><li><b>502:</b> pośrednik dostał od upstreamu <b>bzdurę</b>.</li><li><b>503:</b> serwer żyje, ale <b>chwilowo nie obsługuje</b>.</li><li><b>504:</b> pośrednik <b>nie doczekał się</b> odpowiedzi.</li></ul></div>
-          <div class="sheet block"><h3 data-en="204 vs 205">204 kontra 205</h3><ul class="tight"><li><b>204:</b> sukces, nie ma nic do pokazania. Widok zostaje.</li><li><b>205:</b> sukces, <b>wyczyść formularz</b>.</li></ul></div>
-          <div class="sheet block"><h3 data-en="400 vs 422">400 kontra 422</h3><ul class="tight"><li><b>400:</b> nie umiem tego przeczytać (zepsuty JSON, zły <code>Content-Type</code>).</li><li><b>422:</b> przeczytałem, ale to nie ma sensu (walidacja).</li></ul></div>
+          <div class="sheet block"><h3 data-en="401 vs 403">401 kontra 403</h3><ul class="tight"><li data-en-html="&lt;b&gt;401:&lt;/b&gt; I don&#x27;t know who you are. Missing or wrong credentials."><b>401:</b> nie wiem, kim jesteś. Brak albo złe dane logowania.</li><li data-en-html="&lt;b&gt;403:&lt;/b&gt; I know who you are, and the answer is no. Missing permissions."><b>403:</b> wiem, kim jesteś, i mówię nie. Brak uprawnień.</li><li data-en-html="&lt;b&gt;Memory hook:&lt;/b&gt; 401 = &lt;b&gt;1&lt;/b&gt; step to take (log in). 403 = the door is shut."><b>Haczyk:</b> 401 = <b>1</b> krok do zrobienia (zaloguj się). 403 = drzwi zamknięte.</li></ul></div>
+          <div class="sheet block"><h3>502, 503, 504</h3><ul class="tight"><li data-en-html="&lt;b&gt;502:&lt;/b&gt; the intermediary got &lt;b&gt;garbage&lt;/b&gt; from upstream."><b>502:</b> pośrednik dostał od upstreamu <b>bzdurę</b>.</li><li data-en-html="&lt;b&gt;503:&lt;/b&gt; the server is alive but &lt;b&gt;temporarily not serving&lt;/b&gt;."><b>503:</b> serwer żyje, ale <b>chwilowo nie obsługuje</b>.</li><li data-en-html="&lt;b&gt;504:&lt;/b&gt; the intermediary &lt;b&gt;gave up waiting&lt;/b&gt; for a response."><b>504:</b> pośrednik <b>nie doczekał się</b> odpowiedzi.</li></ul></div>
+          <div class="sheet block"><h3 data-en="204 vs 205">204 kontra 205</h3><ul class="tight"><li data-en-html="&lt;b&gt;204:&lt;/b&gt; success, nothing to show. The view stays."><b>204:</b> sukces, nie ma nic do pokazania. Widok zostaje.</li><li data-en-html="&lt;b&gt;205:&lt;/b&gt; success, &lt;b&gt;clear the form&lt;/b&gt;."><b>205:</b> sukces, <b>wyczyść formularz</b>.</li></ul></div>
+          <div class="sheet block"><h3 data-en="400 vs 422">400 kontra 422</h3><ul class="tight"><li data-en-html="&lt;b&gt;400:&lt;/b&gt; I can&#x27;t read this (broken JSON, wrong &lt;code&gt;Content-Type&lt;/code&gt;)."><b>400:</b> nie umiem tego przeczytać (zepsuty JSON, zły <code>Content-Type</code>).</li><li data-en-html="&lt;b&gt;422:&lt;/b&gt; I read it, but it makes no sense (validation)."><b>422:</b> przeczytałem, ale to nie ma sensu (walidacja).</li></ul></div>
         </div>
       </div>
       <div class="block">
@@ -966,15 +966,15 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           <table>
             <thead><tr><th data-en="Code">Kod</th><th data-en="For how long">Na jak długo</th><th data-en="Method and body">Metoda i body</th></tr></thead>
             <tbody data-k="3">
-              <tr><td class="num">301</td><td>na stałe</td><td>klient może zamienić POST na GET</td></tr>
-              <tr><td class="num">302</td><td>tymczasowo</td><td>klient może zamienić POST na GET</td></tr>
-              <tr><td class="num">303</td><td>jednorazowo</td><td>zawsze GET (wzorzec Post/Redirect/Get)</td></tr>
-              <tr><td class="num">307</td><td>tymczasowo</td><td><b>zachowane</b></td></tr>
-              <tr><td class="num">308</td><td>na stałe</td><td><b>zachowane</b></td></tr>
+              <tr><td class="num">301</td><td data-en="permanent">na stałe</td><td data-en="the client may change POST to GET">klient może zamienić POST na GET</td></tr>
+              <tr><td class="num">302</td><td data-en="temporary">tymczasowo</td><td data-en="the client may change POST to GET">klient może zamienić POST na GET</td></tr>
+              <tr><td class="num">303</td><td data-en="one-off">jednorazowo</td><td data-en="always GET (Post/Redirect/Get pattern)">zawsze GET (wzorzec Post/Redirect/Get)</td></tr>
+              <tr><td class="num">307</td><td data-en="temporary">tymczasowo</td><td data-en-html="&lt;b&gt;kept&lt;/b&gt;"><b>zachowane</b></td></tr>
+              <tr><td class="num">308</td><td data-en="permanent">na stałe</td><td data-en-html="&lt;b&gt;kept&lt;/b&gt;"><b>zachowane</b></td></tr>
             </tbody>
           </table>
         </div>
-        <p class="small muted" data-en-html="&lt;b&gt;Hook:&lt;/b&gt; 7 and 8 are newer and keep the method. 1 and 8 are permanent, 2 and 7 are temporary."><b>Haczyk:</b> 7 i 8 są młodsze i pilnują metody. 1 i 8 są na stałe, 2 i 7 na chwilę.</p>
+        <p class="small muted" data-en-html="&lt;b&gt;Memory hook:&lt;/b&gt; 7 and 8 are newer and keep the method. 1 and 8 are permanent, 2 and 7 are temporary."><b>Haczyk:</b> 7 i 8 są młodsze i pilnują metody. 1 i 8 są na stałe, 2 i 7 na chwilę.</p>
       </div>
     </section>
 
@@ -1004,7 +1004,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
     <section class="panel" id="p-braki" role="tabpanel" aria-labelledby="tab-braki" hidden>
       <div class="block">
         <h2 data-en="Why is there no 104, 209 or 427?">Dlaczego nie ma 104, 209 albo 427?</h2>
-        <p class="lead">Każda grupa ma <b>100 numerów</b>, razem 500. Zajętych jest garstka. Poniżej cała przestrzeń 100–599, jedna kratka to jeden numer.</p>
+        <p class="lead" data-en-html="Each group has &lt;b&gt;100 numbers&lt;/b&gt;, 500 in total. Only a handful are used. Below is the whole 100–599 space, one square per number.">Każda grupa ma <b>100 numerów</b>, razem 500. Zajętych jest garstka. Poniżej cała przestrzeń 100–599, jedna kratka to jeden numer.</p>
         <div class="legend small">
           <span><i class="key oc"></i><span data-en="official, has a cat">oficjalny, ma kota</span></span>
           <span><i class="key uc"></i><span data-en="unofficial, has a cat">nieoficjalny, ma kota</span></span>
@@ -1017,11 +1017,11 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
       <div class="block">
         <h2 data-en="Five reasons for the gaps">Pięć powodów dziur</h2>
         <div class="cols">
-          <div class="sheet block"><h3 data-en="1. Nobody defined them">1. Nikt ich nie zdefiniował</h3><p>Numer istnieje dopiero, gdy trafi do <b>rejestru IANA</b>, a to wymaga dokumentu RFC i przeglądu IETF. Kodów nie przydziela się po kolei, tylko wtedy, gdy są potrzebne. Na stałe przydzielono <b>61</b>.</p></div>
-          <div class="sheet block"><h3 data-en="2. Leftovers from successive RFCs">2. Pamiątki po kolejnych RFC</h3><p>RFC 6585 z 2012 r. dodał naraz <b>428, 429, 431 i 511</b>. Numery <b>427 i 430</b> zostały wolne. Tak samo wolne są 419, 420 i 509, dlatego „pożyczyli” je Laravel, Twitter i Apache.</p></div>
-          <div class="sheet block"><h3 data-en="3. Reserved and retired">3. Zarezerwowane i wycofane</h3><p><b>306</b> to dawny „Switch Proxy”, w rejestrze jako „(Unused)”. <b>418</b> też ma wpis „(Unused)”, żeby nikt nie zajął numeru czajnika. <b>305 Use Proxy</b> jest przestarzały ze względów bezpieczeństwa, ale kota ma.</p></div>
-          <div class="sheet block"><h3 data-en="4. http.cat is not the registry">4. http.cat to nie rejestr</h3><p>Koty rysuje się ręcznie. Brakuje kota dla oficjalnego <b>505 HTTP Version Not Supported</b>, dla 306 i dla tymczasowo zarejestrowanego <b>104</b>. Za to <b>18 kotów</b> ilustruje kody spoza rejestru.</p></div>
-          <div class="sheet block"><h3 data-en="5. Vendors keep to the side">5. Vendorzy trzymają się z boku</h3><p>Nieoficjalne kody lądują daleko od zajętych numerów: <b>nginx 444 i 495–499</b>, <b>Cloudflare 521–525</b>. Stąd skupiska na końcach zakresów i pustka w środku.</p></div>
+          <div class="sheet block"><h3 data-en="1. Nobody defined them">1. Nikt ich nie zdefiniował</h3><p data-en-html="A number only exists once it enters the &lt;b&gt;IANA registry&lt;/b&gt;, which takes an RFC and IETF review. Codes are not assigned in order, only when they are needed. &lt;b&gt;61&lt;/b&gt; are permanently assigned.">Numer istnieje dopiero, gdy trafi do <b>rejestru IANA</b>, a to wymaga dokumentu RFC i przeglądu IETF. Kodów nie przydziela się po kolei, tylko wtedy, gdy są potrzebne. Na stałe przydzielono <b>61</b>.</p></div>
+          <div class="sheet block"><h3 data-en="2. Leftovers from successive RFCs">2. Pamiątki po kolejnych RFC</h3><p data-en-html="RFC 6585 from 2012 added &lt;b&gt;428, 429, 431 and 511&lt;/b&gt; at once. Numbers &lt;b&gt;427 and 430&lt;/b&gt; stayed free. So are 419, 420 and 509, which is why Laravel, Twitter and Apache “borrowed” them.">RFC 6585 z 2012 r. dodał naraz <b>428, 429, 431 i 511</b>. Numery <b>427 i 430</b> zostały wolne. Tak samo wolne są 419, 420 i 509, dlatego „pożyczyli” je Laravel, Twitter i Apache.</p></div>
+          <div class="sheet block"><h3 data-en="3. Reserved and retired">3. Zarezerwowane i wycofane</h3><p data-en-html="&lt;b&gt;306&lt;/b&gt; is the former “Switch Proxy”, listed as “(Unused)”. &lt;b&gt;418&lt;/b&gt; is also listed as “(Unused)”, so nobody takes the teapot&#x27;s number. &lt;b&gt;305 Use Proxy&lt;/b&gt; is deprecated for security reasons, but it has a cat."><b>306</b> to dawny „Switch Proxy”, w rejestrze jako „(Unused)”. <b>418</b> też ma wpis „(Unused)”, żeby nikt nie zajął numeru czajnika. <b>305 Use Proxy</b> jest przestarzały ze względów bezpieczeństwa, ale kota ma.</p></div>
+          <div class="sheet block"><h3 data-en="4. http.cat is not the registry">4. http.cat to nie rejestr</h3><p data-en-html="The cats are drawn by hand. There is no cat for the official &lt;b&gt;505 HTTP Version Not Supported&lt;/b&gt;, for 306 or for the provisionally registered &lt;b&gt;104&lt;/b&gt;. On the other hand, &lt;b&gt;18 cats&lt;/b&gt; illustrate codes outside the registry.">Koty rysuje się ręcznie. Brakuje kota dla oficjalnego <b>505 HTTP Version Not Supported</b>, dla 306 i dla tymczasowo zarejestrowanego <b>104</b>. Za to <b>18 kotów</b> ilustruje kody spoza rejestru.</p></div>
+          <div class="sheet block"><h3 data-en="5. Vendors keep to the side">5. Vendorzy trzymają się z boku</h3><p data-en-html="Unofficial codes land far from the used numbers: &lt;b&gt;nginx 444 and 495–499&lt;/b&gt;, &lt;b&gt;Cloudflare 521–525&lt;/b&gt;. Hence the clusters at the ends of the ranges and the emptiness in the middle.">Nieoficjalne kody lądują daleko od zajętych numerów: <b>nginx 444 i 495–499</b>, <b>Cloudflare 521–525</b>. Stąd skupiska na końcach zakresów i pustka w środku.</p></div>
         </div>
       </div>
       <div class="block">
@@ -1039,21 +1039,21 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           <table>
             <thead><tr><th data-en="Code">Kod</th><th data-en="Meaning per VTEX">Znaczenie wg VTEX</th><th data-en="What you do">Co robisz</th></tr></thead>
             <tbody>
-              <tr data-k="2"><td class="num">200</td><td>Request przetworzony poprawnie.</td><td>–</td></tr>
-              <tr data-k="2"><td class="num">201</td><td>Utworzono nowy zasób. Zwykle po <b>POST</b> i części <b>PUT</b>.</td><td>–</td></tr>
-              <tr data-k="2"><td class="num">202</td><td>Przyjęte, ale przetwarzanie <b>jeszcze trwa</b>.</td><td>sprawdź wynik później</td></tr>
-              <tr data-k="2"><td class="num">204</td><td>Sukces, <b>brak treści</b> do zwrócenia.</td><td>nie parsuj body</td></tr>
-              <tr data-k="2"><td class="num">205</td><td>Przyjęte bez treści, klient ma <b>zresetować dokument</b>.</td><td>wyczyść formularz</td></tr>
-              <tr data-k="4"><td class="num">400</td><td>Nie da się zdekodować body: <b>zła składnia</b> albo zły <code>Content-Type</code>.</td><td>popraw JSON i nagłówki</td></tr>
-              <tr data-k="4"><td class="num">401</td><td><b>Brak lub błędne</b> dane uwierzytelniające.</td><td>sprawdź AppKey i AppToken</td></tr>
-              <tr data-k="4"><td class="num">403</td><td>Request poprawny, serwer <b>odmawia</b>.</td><td>sprawdź role klucza</td></tr>
-              <tr data-k="4"><td class="num">404</td><td>Zasobu <b>nie da się znaleźć</b>.</td><td>sprawdź nazwę endpointu w API Reference</td></tr>
-              <tr data-k="4"><td class="num">405</td><td><b>Zła metoda</b> HTTP dla endpointu.</td><td>sprawdź metody w API Reference</td></tr>
-              <tr data-k="4"><td class="num">429</td><td>Przekroczone <b>limity requestów</b>.</td><td>czekaj, potem backoff</td></tr>
-              <tr data-k="5"><td class="num">500</td><td>Wewnętrzny błąd serwera.</td><td>sprawdź nagłówki → status page → support</td></tr>
-              <tr data-k="5"><td class="num">502</td><td>VTEX jako gateway dostał <b>błędną odpowiedź</b> z upstreamu.</td><td>ponów później</td></tr>
-              <tr data-k="5"><td class="num">503</td><td>Serwer <b>chwilowo niedostępny</b>.</td><td>status page → ponów → support</td></tr>
-              <tr data-k="5"><td class="num">504</td><td>VTEX jako gateway <b>nie doczekał się</b> odpowiedzi.</td><td>ponów później → support</td></tr>
+              <tr data-k="2"><td class="num">200</td><td data-en="The request was processed successfully.">Request przetworzony poprawnie.</td><td>–</td></tr>
+              <tr data-k="2"><td class="num">201</td><td data-en-html="A new resource was created. Usually after &lt;b&gt;POST&lt;/b&gt; and some &lt;b&gt;PUT&lt;/b&gt; requests.">Utworzono nowy zasób. Zwykle po <b>POST</b> i części <b>PUT</b>.</td><td>–</td></tr>
+              <tr data-k="2"><td class="num">202</td><td data-en-html="Accepted, but processing is &lt;b&gt;still in progress&lt;/b&gt;.">Przyjęte, ale przetwarzanie <b>jeszcze trwa</b>.</td><td data-en="check the result later">sprawdź wynik później</td></tr>
+              <tr data-k="2"><td class="num">204</td><td data-en-html="Success, &lt;b&gt;no content&lt;/b&gt; to return.">Sukces, <b>brak treści</b> do zwrócenia.</td><td data-en="don&#x27;t parse the body">nie parsuj body</td></tr>
+              <tr data-k="2"><td class="num">205</td><td data-en-html="Accepted with no content, the client should &lt;b&gt;reset the document&lt;/b&gt;.">Przyjęte bez treści, klient ma <b>zresetować dokument</b>.</td><td data-en="clear the form">wyczyść formularz</td></tr>
+              <tr data-k="4"><td class="num">400</td><td data-en-html="The body cannot be decoded: &lt;b&gt;bad syntax&lt;/b&gt; or a wrong &lt;code&gt;Content-Type&lt;/code&gt;.">Nie da się zdekodować body: <b>zła składnia</b> albo zły <code>Content-Type</code>.</td><td data-en="fix the JSON and the headers">popraw JSON i nagłówki</td></tr>
+              <tr data-k="4"><td class="num">401</td><td data-en-html="&lt;b&gt;Missing or invalid&lt;/b&gt; credentials."><b>Brak lub błędne</b> dane uwierzytelniające.</td><td data-en="check AppKey and AppToken">sprawdź AppKey i AppToken</td></tr>
+              <tr data-k="4"><td class="num">403</td><td data-en-html="The request is valid, the server &lt;b&gt;refuses&lt;/b&gt;.">Request poprawny, serwer <b>odmawia</b>.</td><td data-en="check the key&#x27;s roles">sprawdź role klucza</td></tr>
+              <tr data-k="4"><td class="num">404</td><td data-en-html="The resource &lt;b&gt;cannot be found&lt;/b&gt;.">Zasobu <b>nie da się znaleźć</b>.</td><td data-en="check the endpoint name in the API Reference">sprawdź nazwę endpointu w API Reference</td></tr>
+              <tr data-k="4"><td class="num">405</td><td data-en-html="&lt;b&gt;Wrong HTTP method&lt;/b&gt; for the endpoint."><b>Zła metoda</b> HTTP dla endpointu.</td><td data-en="check the methods in the API Reference">sprawdź metody w API Reference</td></tr>
+              <tr data-k="4"><td class="num">429</td><td data-en-html="&lt;b&gt;Request limits&lt;/b&gt; exceeded.">Przekroczone <b>limity requestów</b>.</td><td data-en="wait, then back off">czekaj, potem backoff</td></tr>
+              <tr data-k="5"><td class="num">500</td><td data-en="Internal server error.">Wewnętrzny błąd serwera.</td><td data-en="check the headers → status page → support">sprawdź nagłówki → status page → support</td></tr>
+              <tr data-k="5"><td class="num">502</td><td data-en-html="VTEX, acting as a gateway, got an &lt;b&gt;invalid response&lt;/b&gt; from upstream.">VTEX jako gateway dostał <b>błędną odpowiedź</b> z upstreamu.</td><td data-en="retry later">ponów później</td></tr>
+              <tr data-k="5"><td class="num">503</td><td data-en-html="The server is &lt;b&gt;temporarily unavailable&lt;/b&gt;.">Serwer <b>chwilowo niedostępny</b>.</td><td data-en="status page → retry → support">status page → ponów → support</td></tr>
+              <tr data-k="5"><td class="num">504</td><td data-en-html="VTEX, acting as a gateway, &lt;b&gt;timed out waiting&lt;/b&gt; for a response.">VTEX jako gateway <b>nie doczekał się</b> odpowiedzi.</td><td data-en="retry later → support">ponów później → support</td></tr>
             </tbody>
           </table>
         </div>
@@ -1064,60 +1064,60 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
         <div class="sheet block">
           <h3 data-en="401 and 403: authentication">401 i 403: uwierzytelnienie</h3>
           <ul class="tight">
-            <li>Klucz idzie w dwóch nagłówkach: <code>X-VTEX-API-AppKey</code> i <code>X-VTEX-API-AppToken</code>.</li>
-            <li>Nazwy nagłówków są <b>niewrażliwe na wielkość liter</b>.</li>
-            <li>Uprawnienia klucza wynikają z <b>ról License Manager</b> i ich zasobów.</li>
-            <li><b>401:</b> nagłówków brak albo są błędne. <b>403:</b> klucz działa, rola nie ma zasobu.</li>
-            <li>Kluczy <b>nie wolno</b> używać po stronie klienta. Frontend używa tokenu użytkownika.</li>
+            <li data-en-html="The key goes in two headers: &lt;code&gt;X-VTEX-API-AppKey&lt;/code&gt; and &lt;code&gt;X-VTEX-API-AppToken&lt;/code&gt;.">Klucz idzie w dwóch nagłówkach: <code>X-VTEX-API-AppKey</code> i <code>X-VTEX-API-AppToken</code>.</li>
+            <li data-en-html="Header names are &lt;b&gt;case-insensitive&lt;/b&gt;.">Nazwy nagłówków są <b>niewrażliwe na wielkość liter</b>.</li>
+            <li data-en-html="A key&#x27;s permissions come from &lt;b&gt;License Manager roles&lt;/b&gt; and their resources.">Uprawnienia klucza wynikają z <b>ról License Manager</b> i ich zasobów.</li>
+            <li data-en-html="&lt;b&gt;401:&lt;/b&gt; the headers are missing or wrong. &lt;b&gt;403:&lt;/b&gt; the key works, the role lacks the resource."><b>401:</b> nagłówków brak albo są błędne. <b>403:</b> klucz działa, rola nie ma zasobu.</li>
+            <li data-en-html="Keys &lt;b&gt;must not&lt;/b&gt; be used client-side. The frontend uses a user token.">Kluczy <b>nie wolno</b> używać po stronie klienta. Frontend używa tokenu użytkownika.</li>
           </ul>
         </div>
         <div class="sheet block">
           <h3 data-en="429: rate limits">429: rate limity</h3>
           <ul class="tight">
-            <li>Przykład z Pricing API: <b>POST i PUT 2000/min</b> (ok. 33/s) z <b>500 burst credits</b>. <b>DELETE 1000/min</b> (ok. 16/s) z <b>300</b>.</li>
-            <li>Każdy request ponad limit zjada 1 credit. <b>Credits = 0 → 429.</b></li>
-            <li>Credits odnawiają się, gdy trasa jest bezczynna.</li>
-            <li>Nagłówki: <code>Ratelimit-Limit</code>, <code>Ratelimit-Remaining</code>, <code>Ratelimit-Reset</code>, <code>Retry-After</code>.</li>
-            <li>Reakcja: odczekaj <code>Retry-After</code>, potem <b>exponential backoff z jitterem</b>. Dla Orders i Feed dokumentacja mówi o <b>1 minucie</b> przerwy.</li>
+            <li data-en-html="Example from the Pricing API: &lt;b&gt;POST and PUT 2000/min&lt;/b&gt; (about 33/s) with &lt;b&gt;500 burst credits&lt;/b&gt;. &lt;b&gt;DELETE 1000/min&lt;/b&gt; (about 16/s) with &lt;b&gt;300&lt;/b&gt;.">Przykład z Pricing API: <b>POST i PUT 2000/min</b> (ok. 33/s) z <b>500 burst credits</b>. <b>DELETE 1000/min</b> (ok. 16/s) z <b>300</b>.</li>
+            <li data-en-html="Each request over the limit uses 1 credit. &lt;b&gt;Credits = 0 → 429.&lt;/b&gt;">Każdy request ponad limit zjada 1 credit. <b>Credits = 0 → 429.</b></li>
+            <li data-en="Credits refill while the route is idle.">Credits odnawiają się, gdy trasa jest bezczynna.</li>
+            <li data-en-html="Headers: &lt;code&gt;Ratelimit-Limit&lt;/code&gt;, &lt;code&gt;Ratelimit-Remaining&lt;/code&gt;, &lt;code&gt;Ratelimit-Reset&lt;/code&gt;, &lt;code&gt;Retry-After&lt;/code&gt;.">Nagłówki: <code>Ratelimit-Limit</code>, <code>Ratelimit-Remaining</code>, <code>Ratelimit-Reset</code>, <code>Retry-After</code>.</li>
+            <li data-en-html="Response: wait for &lt;code&gt;Retry-After&lt;/code&gt;, then use &lt;b&gt;exponential backoff with jitter&lt;/b&gt;. For Orders and Feed the docs say to pause for &lt;b&gt;1 minute&lt;/b&gt;.">Reakcja: odczekaj <code>Retry-After</code>, potem <b>exponential backoff z jitterem</b>. Dla Orders i Feed dokumentacja mówi o <b>1 minucie</b> przerwy.</li>
           </ul>
-          <p class="small muted">Starsze materiały podają 40 req/s, 1000 credits i nagłówki <code>X-RateLimit-*</code>. Jeśli pytanie używa tych liczb, chodzi o ten sam mechanizm.</p>
+          <p class="small muted" data-en-html="Older material gives 40 req/s, 1000 credits and &lt;code&gt;X-RateLimit-*&lt;/code&gt; headers. If a question uses those numbers, it is the same mechanism.">Starsze materiały podają 40 req/s, 1000 credits i nagłówki <code>X-RateLimit-*</code>. Jeśli pytanie używa tych liczb, chodzi o ten sam mechanizm.</p>
         </div>
         <div class="sheet block">
           <h3 data-en="Hook and Feed v3 (orders)">Hook i Feed v3 (zamówienia)</h3>
           <ul class="tight">
-            <li><b>Hook = push</b>, VTEX woła Ciebie. <b>Feed = pull</b>, Ty pobierasz i robisz commit.</li>
-            <li>Przy konfiguracji Hooka VTEX wysyła ping <code>{"hookConfig": "ping"}</code>. Endpoint musi zwrócić <b>200</b>.</li>
-            <li>Brak 200 na ping → Hook API zwraca <b>400</b>, konfiguracja <b>się nie zapisuje</b>.</li>
-            <li>Każda notyfikacja: <b>200 w 5000 ms</b>. Inaczej ponowienia w rosnących odstępach.</li>
-            <li><b>3 dni</b> bez notyfikacji → konfiguracja Hooka jest usuwana.</li>
-            <li>Filtry <code>FromWorkflow</code> i <code>FromOrders</code> wykluczają się. Połączenie pól → <b>409 Conflict</b>.</li>
-            <li>Jeden appKey = jeden feed. Retencja feedu: od 345600 s (4 dni) do 1209600 s (14 dni).</li>
+            <li data-en-html="&lt;b&gt;Hook = push&lt;/b&gt;, VTEX calls you. &lt;b&gt;Feed = pull&lt;/b&gt;, you fetch and commit."><b>Hook = push</b>, VTEX woła Ciebie. <b>Feed = pull</b>, Ty pobierasz i robisz commit.</li>
+            <li data-en-html="When you configure a Hook, VTEX sends a ping &lt;code&gt;{&quot;hookConfig&quot;: &quot;ping&quot;}&lt;/code&gt;. The endpoint must return &lt;b&gt;200&lt;/b&gt;.">Przy konfiguracji Hooka VTEX wysyła ping <code>{"hookConfig": "ping"}</code>. Endpoint musi zwrócić <b>200</b>.</li>
+            <li data-en-html="No 200 on the ping → the Hook API returns &lt;b&gt;400&lt;/b&gt; and the configuration &lt;b&gt;is not saved&lt;/b&gt;.">Brak 200 na ping → Hook API zwraca <b>400</b>, konfiguracja <b>się nie zapisuje</b>.</li>
+            <li data-en-html="Every notification: &lt;b&gt;200 within 5000 ms&lt;/b&gt;. Otherwise retries at growing intervals.">Każda notyfikacja: <b>200 w 5000 ms</b>. Inaczej ponowienia w rosnących odstępach.</li>
+            <li data-en-html="&lt;b&gt;3 days&lt;/b&gt; without notifications → the Hook configuration is deleted."><b>3 dni</b> bez notyfikacji → konfiguracja Hooka jest usuwana.</li>
+            <li data-en-html="The &lt;code&gt;FromWorkflow&lt;/code&gt; and &lt;code&gt;FromOrders&lt;/code&gt; filters are mutually exclusive. Combining the fields → &lt;b&gt;409 Conflict&lt;/b&gt;.">Filtry <code>FromWorkflow</code> i <code>FromOrders</code> wykluczają się. Połączenie pól → <b>409 Conflict</b>.</li>
+            <li data-en="One appKey = one feed. Feed retention: from 345600 s (4 days) to 1209600 s (14 days).">Jeden appKey = jeden feed. Retencja feedu: od 345600 s (4 dni) do 1209600 s (14 dni).</li>
           </ul>
         </div>
         <div class="sheet block">
           <h3 data-en="Marketplace and external seller">Marketplace i external seller</h3>
           <ul class="tight">
-            <li>Change notification (<code>sellerId</code> + <code>sellerSkuId</code>): <b>200 = SKU już jest</b> w marketplace, <b>404 = nie ma</b>.</li>
-            <li>Po 404 wysyłasz <b>SKU suggestion</b> (PUT), marketplace ją akceptuje albo odrzuca.</li>
-            <li>Fulfillment simulation sellera musi odpowiedzieć w <b>2,5 s</b>. Wolniej = oferta niedostępna.</li>
+            <li data-en-html="Change notification (&lt;code&gt;sellerId&lt;/code&gt; + &lt;code&gt;sellerSkuId&lt;/code&gt;): &lt;b&gt;200 = the SKU already exists&lt;/b&gt; in the marketplace, &lt;b&gt;404 = it does not&lt;/b&gt;.">Change notification (<code>sellerId</code> + <code>sellerSkuId</code>): <b>200 = SKU już jest</b> w marketplace, <b>404 = nie ma</b>.</li>
+            <li data-en-html="After a 404 you send an &lt;b&gt;SKU suggestion&lt;/b&gt; (PUT), and the marketplace accepts or rejects it.">Po 404 wysyłasz <b>SKU suggestion</b> (PUT), marketplace ją akceptuje albo odrzuca.</li>
+            <li data-en-html="The seller&#x27;s fulfillment simulation must respond within &lt;b&gt;2.5 s&lt;/b&gt;. Slower = the offer is unavailable.">Fulfillment simulation sellera musi odpowiedzieć w <b>2,5 s</b>. Wolniej = oferta niedostępna.</li>
           </ul>
         </div>
         <div class="sheet block">
           <h3 data-en="Payments (Payment Provider Protocol)">Płatności (Payment Provider Protocol)</h3>
           <ul class="tight">
-            <li>Connector odpowiada w <b>5 s</b> na testach homologacyjnych i w <b>20 s</b> na produkcji.</li>
-            <li>Tylko <b>HTTPS, port 443, TLS 1.2</b>.</li>
-            <li>Metoda asynchroniczna (Pix, boleto) zwraca <code>status: "undefined"</code>, nigdy od razu <code>approved</code>.</li>
-            <li>Gateway ponawia Create Payment do <b>7 dni</b>. Ten sam <code>paymentId</code> = ta sama odpowiedź (idempotencja).</li>
+            <li data-en-html="The connector responds within &lt;b&gt;5 s&lt;/b&gt; in homologation tests and &lt;b&gt;20 s&lt;/b&gt; in production.">Connector odpowiada w <b>5 s</b> na testach homologacyjnych i w <b>20 s</b> na produkcji.</li>
+            <li data-en-html="Only &lt;b&gt;HTTPS, port 443, TLS 1.2&lt;/b&gt;.">Tylko <b>HTTPS, port 443, TLS 1.2</b>.</li>
+            <li data-en-html="An asynchronous method (Pix, boleto) returns &lt;code&gt;status: &quot;undefined&quot;&lt;/code&gt;, never &lt;code&gt;approved&lt;/code&gt; right away.">Metoda asynchroniczna (Pix, boleto) zwraca <code>status: "undefined"</code>, nigdy od razu <code>approved</code>.</li>
+            <li data-en-html="The gateway retries Create Payment for up to &lt;b&gt;7 days&lt;/b&gt;. Same &lt;code&gt;paymentId&lt;/code&gt; = same response (idempotency).">Gateway ponawia Create Payment do <b>7 dni</b>. Ten sam <code>paymentId</code> = ta sama odpowiedź (idempotencja).</li>
           </ul>
         </div>
         <div class="sheet block">
           <h3 data-en="Master Data and Search: pagination">Master Data i Search: paginacja</h3>
           <ul class="tight">
-            <li>MD search: nagłówek <code>REST-Range: resources=0-100</code>, maks. <b>100 dokumentów</b> na zapytanie.</li>
-            <li>Odpowiedź niesie <code>REST-Content-Range: resources=0-100/{total}</code>.</li>
-            <li>MD scroll: <code>_size</code> do <b>1000</b>, token w <code>X-VTEX-MD-TOKEN</code>, ważny <b>20 minut</b>.</li>
-            <li>Legacy Search z <code>_from</code>/<code>_to</code> (okno do 50) odpowiada <b>206</b> z nagłówkiem <code>resources: 0-49/1234</code>. To sukces, nie błąd.</li>
+            <li data-en-html="MD search: the &lt;code&gt;REST-Range: resources=0-100&lt;/code&gt; header, at most &lt;b&gt;100 documents&lt;/b&gt; per query.">MD search: nagłówek <code>REST-Range: resources=0-100</code>, maks. <b>100 dokumentów</b> na zapytanie.</li>
+            <li data-en-html="The response carries &lt;code&gt;REST-Content-Range: resources=0-100/{total}&lt;/code&gt;.">Odpowiedź niesie <code>REST-Content-Range: resources=0-100/{total}</code>.</li>
+            <li data-en-html="MD scroll: &lt;code&gt;_size&lt;/code&gt; up to &lt;b&gt;1000&lt;/b&gt;, token in &lt;code&gt;X-VTEX-MD-TOKEN&lt;/code&gt;, valid for &lt;b&gt;20 minutes&lt;/b&gt;.">MD scroll: <code>_size</code> do <b>1000</b>, token w <code>X-VTEX-MD-TOKEN</code>, ważny <b>20 minut</b>.</li>
+            <li data-en-html="Legacy Search with &lt;code&gt;_from&lt;/code&gt;/&lt;code&gt;_to&lt;/code&gt; (a window of up to 50) responds &lt;b&gt;206&lt;/b&gt; with the header &lt;code&gt;resources: 0-49/1234&lt;/code&gt;. That is success, not an error.">Legacy Search z <code>_from</code>/<code>_to</code> (okno do 50) odpowiada <b>206</b> z nagłówkiem <code>resources: 0-49/1234</code>. To sukces, nie błąd.</li>
           </ul>
         </div>
       </div>
@@ -1128,13 +1128,13 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           <table>
             <thead><tr><th data-en="Code">Kod</th><th data-en="Retry?">Ponawiać?</th><th data-en="First move">Pierwszy ruch</th></tr></thead>
             <tbody>
-              <tr data-k="4"><td class="num">400, 404, 405</td><td><b>Nie</b></td><td>Popraw request: body, ścieżkę, metodę.</td></tr>
-              <tr data-k="4"><td class="num">401</td><td><b>Nie</b></td><td>Dodaj lub popraw AppKey i AppToken.</td></tr>
-              <tr data-k="4"><td class="num">403</td><td><b>Nie</b></td><td>Dodaj roli zasób w License Manager.</td></tr>
-              <tr data-k="4"><td class="num">409</td><td><b>Nie</b></td><td>Usuń konflikt w danych lub konfiguracji.</td></tr>
-              <tr data-k="4"><td class="num">429</td><td><b>Tak</b>, po przerwie</td><td>Czekaj <code>Retry-After</code>, zwolnij tempo.</td></tr>
-              <tr data-k="5"><td class="num">500</td><td>Ostrożnie</td><td>Sprawdź nagłówki, potem status page.</td></tr>
-              <tr data-k="5"><td class="num">502, 503, 504</td><td><b>Tak</b>, z backoffem</td><td>Ponów później, przy dłuższym problemie support.</td></tr>
+              <tr data-k="4"><td class="num">400, 404, 405</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Fix the request: body, path, method.">Popraw request: body, ścieżkę, metodę.</td></tr>
+              <tr data-k="4"><td class="num">401</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Add or fix AppKey and AppToken.">Dodaj lub popraw AppKey i AppToken.</td></tr>
+              <tr data-k="4"><td class="num">403</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Add the resource to the role in License Manager.">Dodaj roli zasób w License Manager.</td></tr>
+              <tr data-k="4"><td class="num">409</td><td data-en-html="&lt;b&gt;No&lt;/b&gt;"><b>Nie</b></td><td data-en="Remove the conflict in the data or configuration.">Usuń konflikt w danych lub konfiguracji.</td></tr>
+              <tr data-k="4"><td class="num">429</td><td data-en-html="&lt;b&gt;Yes&lt;/b&gt;, after a pause"><b>Tak</b>, po przerwie</td><td data-en-html="Wait for &lt;code&gt;Retry-After&lt;/code&gt;, slow down.">Czekaj <code>Retry-After</code>, zwolnij tempo.</td></tr>
+              <tr data-k="5"><td class="num">500</td><td data-en="Carefully">Ostrożnie</td><td data-en="Check the headers, then the status page.">Sprawdź nagłówki, potem status page.</td></tr>
+              <tr data-k="5"><td class="num">502, 503, 504</td><td data-en-html="&lt;b&gt;Yes&lt;/b&gt;, with backoff"><b>Tak</b>, z backoffem</td><td data-en="Retry later; if the problem lasts, contact support.">Ponów później, przy dłuższym problemie support.</td></tr>
             </tbody>
           </table>
         </div>
@@ -1165,12 +1165,12 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
     <ul>
       <li><a href="https://developers.vtex.com/docs/guides/api-response-codes" target="_blank" rel="noopener">VTEX: API response status codes</a></li>
       <li><a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys" target="_blank" rel="noopener">VTEX: API authentication using API keys</a></li>
-      <li><a href="https://developers.vtex.com/docs/guides/orders-feed" target="_blank" rel="noopener">VTEX: Feed v3 (Hook i Feed)</a></li>
+      <li data-en-html="&lt;a href=&quot;https://developers.vtex.com/docs/guides/orders-feed&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;VTEX: Feed v3 (Hook and Feed)&lt;/a&gt;"><a href="https://developers.vtex.com/docs/guides/orders-feed" target="_blank" rel="noopener">VTEX: Feed v3 (Hook i Feed)</a></li>
       <li><a href="https://developers.vtex.com/docs/api-reference/pricing-api" target="_blank" rel="noopener">VTEX: Pricing API, rate limits</a></li>
       <li><a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api" target="_blank" rel="noopener">VTEX: Pagination in the Master Data API</a></li>
-      <li><a href="https://github.com/vtex/skills" target="_blank" rel="noopener">github.com/vtex/skills</a>: marketplace (2,5 s, 200/404) i płatności (5 s / 20 s, 7 dni)</li>
-      <li><a href="https://www.tabnews.com.br/antoniorincon/a-api-publica-de-catalogo-da-vtex-que-quase-ninguem-usa" target="_blank" rel="noopener">TabNews</a>: 206 w Legacy Search (źródło społecznościowe, nie oficjalna tabela)</li>
-      <li><a href="https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml" target="_blank" rel="noopener">IANA: HTTP Status Code Registry</a> i <a href="https://www.rfc-editor.org/rfc/rfc9110#name-status-codes" target="_blank" rel="noopener">RFC 9110</a></li>
+      <li data-en-html="&lt;a href=&quot;https://github.com/vtex/skills&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;github.com/vtex/skills&lt;/a&gt;: marketplace (2.5 s, 200/404) and payments (5 s / 20 s, 7 days)"><a href="https://github.com/vtex/skills" target="_blank" rel="noopener">github.com/vtex/skills</a>: marketplace (2,5 s, 200/404) i płatności (5 s / 20 s, 7 dni)</li>
+      <li data-en-html="&lt;a href=&quot;https://www.tabnews.com.br/antoniorincon/a-api-publica-de-catalogo-da-vtex-que-quase-ninguem-usa&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;TabNews&lt;/a&gt;: 206 in Legacy Search (community source, not the official table)"><a href="https://www.tabnews.com.br/antoniorincon/a-api-publica-de-catalogo-da-vtex-que-quase-ninguem-usa" target="_blank" rel="noopener">TabNews</a>: 206 w Legacy Search (źródło społecznościowe, nie oficjalna tabela)</li>
+      <li data-en-html="&lt;a href=&quot;https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;IANA: HTTP Status Code Registry&lt;/a&gt; and &lt;a href=&quot;https://www.rfc-editor.org/rfc/rfc9110#name-status-codes&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;RFC 9110&lt;/a&gt;"><a href="https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml" target="_blank" rel="noopener">IANA: HTTP Status Code Registry</a> i <a href="https://www.rfc-editor.org/rfc/rfc9110#name-status-codes" target="_blank" rel="noopener">RFC 9110</a></li>
     </ul>
   </footer>
 </div>
@@ -1551,122 +1551,126 @@ function bootKoty(root, onNav) {
 "use strict";
 /* c: code, n: name as on http.cat, pl: meaning, fun: memory hook, x: origin if unofficial, v: VTEX note, t: top tier */
 const CODES = [
-{c:100,n:"Continue",pl:"**Nagłówki OK, ślij body.**",fun:"Klient pyta `Expect: 100-continue`, zanim wyśle duży upload. curl robi to sam przy dużych body."},
-{c:101,n:"Switching Protocols",pl:"**Zmieniamy protokół.**",fun:"Tak zaczyna się każdy WebSocket: `Upgrade: websocket`."},
-{c:102,n:"Processing",pl:"**Pracuję, nie rozłączaj się.**",fun:"Z WebDAV. Nowsza wersja WebDAV go wyrzuciła, numer w rejestrze został."},
-{c:103,n:"Early Hints",pl:"**Zanim odpowiem, zacznij ładować te zasoby.**",fun:"Serwer wysyła `Link: rel=preload`, zanim policzy właściwą odpowiedź. RFC 8297 z 2017 r."},
-{c:200,n:"OK",pl:"**Udało się.**",fun:"Uwaga na API, które zwracają 200 z błędem w body. Status nie zastąpi czytania odpowiedzi.",v:"Hook endpoint musi odpowiedzieć **200** na ping i na każdą notyfikację, w 5000 ms.",t:1},
-{c:201,n:"Created",pl:"**Utworzono nowy zasób.**",fun:"Powinien przyjść z nagłówkiem `Location` do nowego zasobu.",v:"W tabeli VTEX: nowy zasób, zwykle po POST i części PUT.",t:1},
-{c:202,n:"Accepted",pl:"**Przyjąłem, zrobię później.**",fun:"Jak numerek w kolejce: masz potwierdzenie, nie masz wyniku.",v:"W tabeli VTEX: przyjęte, przetwarzanie jeszcze trwa.",t:1},
-{c:203,n:"Non-Authoritative Information",pl:"**Odpowiedź przerobił pośrednik.**",fun:"Proxy zmieniło treść po drodze, to nie jest oryginał z serwera."},
-{c:204,n:"No Content",pl:"**Sukces, puste body.**",fun:"Typowy po DELETE. Przeglądarka nie zmienia widoku.",v:"W tabeli VTEX: sukces bez treści do zwrócenia. Nie parsuj body.",t:1},
-{c:205,n:"Reset Content",pl:"**Sukces, wyczyść formularz.**",fun:"Jak 204, tylko z poleceniem dla widoku: zresetuj dokument.",v:"Rzadki w sieci, ale **jest** w oficjalnej tabeli VTEX. Łatwa pułapka.",t:1},
-{c:206,n:"Partial Content",pl:"**Masz kawałek, o który prosiłeś.**",fun:"Przewijanie wideo i wznawianie pobierania działają dzięki nagłówkowi `Range`.",v:"Legacy Search z `_from`/`_to` odpowiada 206 i nagłówkiem `resources: 0-49/1234`. To sukces.",t:2},
-{c:207,n:"Multi-Status",pl:"**Kilka statusów w jednym body.**",fun:"WebDAV: jedna operacja na wielu plikach, każdy z własnym wynikiem w XML."},
-{c:208,n:"Already Reported",pl:"**To już wymieniłem wyżej.**",fun:"WebDAV: unika powtarzania tych samych elementów w odpowiedzi 207."},
-{c:214,n:"Transformation Applied",pl:"**Pośrednik zmienił treść.**",fun:"To nie status, tylko dawny kod ostrzeżenia z nagłówka `Warning: 214`. Kot dostał się na listę bokiem.",x:"nagłówek Warning"},
-{c:226,n:"IM Used",pl:"**Masz różnicę, a nie całość.**",fun:"IM to „instance manipulation”, czyli kodowanie delta. Najwyższy oficjalny 2xx."},
-{c:300,n:"Multiple Choices",pl:"**Jest kilka wersji, wybierz.**",fun:"W praktyce prawie nieużywany. Serwery wolą wybrać za klienta."},
-{c:301,n:"Moved Permanently",pl:"**Przeniesione na stałe.**",fun:"Przeglądarki cache'ują go bardzo długo. Pomyłka w 301 potrafi się ciągnąć tygodniami.",t:2},
-{c:302,n:"Found",pl:"**Tymczasowo gdzie indziej.**",fun:"W HTTP/1.0 nazywał się „Moved Temporarily”. Przeglądarki zmieniały POST na GET, więc powstały 303 i 307.",t:2},
-{c:303,n:"See Other",pl:"**Wynik obejrzysz GET-em pod innym adresem.**",fun:"Wzorzec Post/Redirect/Get: po wysłaniu formularza odświeżenie nie wysyła go drugi raz."},
-{c:304,n:"Not Modified",pl:"**Twoja kopia z cache jest aktualna.**",fun:"Bez body. Para `ETag` i `If-None-Match` oszczędza transfer.",t:2},
-{c:305,n:"Use Proxy",pl:"**Idź przez to proxy.**",fun:"Przestarzały ze względów bezpieczeństwa. Przeglądarki go ignorują."},
-{c:307,n:"Temporary Redirect",pl:"**Tymczasowo, ta sama metoda.**",fun:"302 z gwarancją: POST zostaje POST-em."},
-{c:308,n:"Permanent Redirect",pl:"**Na stałe, ta sama metoda.**",fun:"301 z gwarancją: POST zostaje POST-em."},
-{c:400,n:"Bad Request",pl:"**Nie umiem przeczytać requestu.**",fun:"Worek na błędy klienta, gdy nic dokładniejszego nie pasuje.",v:"VTEX: body nie do zdekodowania, zwykle zła składnia albo zły `Content-Type`. Hook API zwraca 400, gdy endpoint nie odpowie 200 na ping.",t:1},
-{c:401,n:"Unauthorized",pl:"**Nie wiem, kim jesteś.**",fun:"Nazwa myli: chodzi o brak uwierzytelnienia, a nie autoryzacji.",v:"VTEX: brak lub błędne dane uwierzytelniające. Sprawdź `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`.",t:1},
-{c:402,n:"Payment Required",pl:"**Najpierw zapłać.**",fun:"Od lat 90. „zarezerwowany na przyszłość” pod cyfrową gotówkę. Dziś używają go po swojemu m.in. Shopify i Stripe."},
-{c:403,n:"Forbidden",pl:"**Wiem, kim jesteś, i mówię nie.**",fun:"Ponowne logowanie nie pomoże. Potrzebne są uprawnienia.",v:"VTEX: request poprawny, serwer odmawia. Klucz nie ma roli z potrzebnym zasobem License Manager.",t:1},
-{c:404,n:"Not Found",pl:"**Nie ma tu tego.**",fun:"Legenda o pokoju 404 w CERN to mit. Numer wynika po prostu z kolejności w grupie 4xx.",v:"VTEX: sprawdź nazwę endpointu. Marketplace: 404 na change notification = SKU nie istnieje, wyślij SKU suggestion.",t:1},
-{c:405,n:"Method Not Allowed",pl:"**Zła metoda dla tego adresu.**",fun:"Odpowiedź musi wymienić dozwolone metody w nagłówku `Allow`.",v:"VTEX: metoda HTTP użyta do endpointu jest niepoprawna. Sprawdź API Reference.",t:1},
-{c:406,n:"Not Acceptable",pl:"**Nie mam formatu, o który prosisz.**",fun:"Chodzi o nagłówek `Accept`: prosisz o XML, serwer ma tylko JSON."},
-{c:407,n:"Proxy Authentication Required",pl:"**Zaloguj się do proxy.**",fun:"To samo co 401, tylko pyta pośrednik, a nie serwer docelowy."},
-{c:408,n:"Request Timeout",pl:"**Za wolno wysyłasz request.**",fun:"Serwer się zniecierpliwił, czekając na klienta. Odwrotność 504."},
-{c:409,n:"Conflict",pl:"**Konflikt z obecnym stanem zasobu.**",fun:"Dwie osoby edytują to samo albo dane sobie przeczą.",v:"Feed v3: pola `FromWorkflow` i `FromOrders` w jednej konfiguracji dają 409.",t:2},
-{c:410,n:"Gone",pl:"**Było i nie wróci.**",fun:"Mocniejsze 404: zasób usunięto celowo i na stałe."},
-{c:411,n:"Length Required",pl:"**Podaj Content-Length.**",fun:"Serwer nie przyjmie body, którego długości nie zna z góry."},
-{c:412,n:"Precondition Failed",pl:"**Warunek z nagłówka nie jest spełniony.**",fun:"`If-Match` nie pasuje do aktualnego `ETag`: ktoś zmienił zasób przed Tobą."},
-{c:413,n:"Payload Too Large",pl:"**Za duże body.**",fun:"W RFC 9110 nazywa się już „Content Too Large”. Trzecia nazwa w historii tego kodu."},
-{c:414,n:"Request-URI Too Long",pl:"**Za długi adres.**",fun:"Zwykle GET z ogromnym query stringiem, który powinien być POST-em."},
-{c:415,n:"Unsupported Media Type",pl:"**Nie obsługuję tego Content-Type.**",fun:"406 dotyczy tego, co chcesz dostać. 415 tego, co wysyłasz."},
-{c:416,n:"Request Range Not Satisfiable",pl:"**Tego zakresu nie ma.**",fun:"Prosisz o bajty 500–600 z pliku, który ma 100. Para do 206."},
-{c:417,n:"Expectation Failed",pl:"**Nie spełnię nagłówka Expect.**",fun:"Odmowa na `Expect: 100-continue`. Para do 100."},
-{c:418,n:"I’m a teapot",pl:"**Jestem czajnikiem, kawy nie zaparzę.**",fun:"Żart primaaprilisowy z 1998 r. (protokół sterowania ekspresem do kawy). W 2017 r. internet obronił go przed usunięciem.",x:"żart z RFC 2324"},
-{c:419,n:"Page Expired",pl:"**Sesja formularza wygasła.**",fun:"Laravel zwraca go, gdy token CSRF jest nieważny.",x:"Laravel"},
-{c:420,n:"Enhance Your Calm",pl:"**Uspokój się, za dużo requestów.**",fun:"Stare API Twittera, cytat z filmu „Człowiek demolka”. Zastąpił go 429.",x:"Twitter"},
-{c:421,n:"Misdirected Request",pl:"**To nie ten serwer.**",fun:"HTTP/2 użył ponownie połączenia do hosta, którego ten serwer nie obsługuje."},
-{c:422,n:"Unprocessable Entity",pl:"**Składnia dobra, sens zły.**",fun:"Z WebDAV. W RFC 9110 awansował do głównego HTTP jako „Unprocessable Content”. Typowy błąd walidacji.",t:2},
-{c:423,n:"Locked",pl:"**Zasób jest zablokowany.**",fun:"WebDAV: ktoś trzyma blokadę na pliku."},
-{c:424,n:"Failed Dependency",pl:"**Nie wyszło, bo poprzedni krok padł.**",fun:"WebDAV: operacja zależała od innej, która się nie udała."},
-{c:425,n:"Too Early",pl:"**Za wcześnie, to może być powtórka.**",fun:"Chroni przed atakiem replay na dane wysłane w TLS 1.3 przed końcem handshake'u."},
-{c:426,n:"Upgrade Required",pl:"**Przejdź na nowszy protokół.**",fun:"Odpowiedź wskazuje wymagany protokół w nagłówku `Upgrade`."},
-{c:428,n:"Precondition Required",pl:"**Wyślij warunek, bez niego nie przyjmę.**",fun:"Serwer wymusza `If-Match`, żeby nikt nie nadpisał cudzych zmian."},
-{c:429,n:"Too Many Requests",pl:"**Za dużo requestów, zwolnij.**",fun:"Jedyny 4xx, który naprawia się czekaniem. Nagłówek `Retry-After` mówi, jak długo.",v:"VTEX: przekroczony rate limit. Czekaj tyle, ile mówi `Retry-After`, potem backoff. Dla Orders i Feed zalecana 1 minuta.",t:1},
-{c:431,n:"Request Header Fields Too Large",pl:"**Za duże nagłówki.**",fun:"Najczęstszy winowajca: rozdęte cookies."},
-{c:444,n:"No Response",pl:"**Serwer zamyka połączenie bez słowa.**",fun:"nginx używa go wewnętrznie do zbywania botów. Klient nigdy tego kodu nie zobaczy.",x:"nginx"},
-{c:450,n:"Blocked by Windows Parental Controls",pl:"**Zablokowane przez kontrolę rodzicielską.**",fun:"Wynalazek Microsoftu z czasów Windows Vista.",x:"Microsoft"},
-{c:451,n:"Unavailable For Legal Reasons",pl:"**Niedostępne z powodów prawnych.**",fun:"Numer to ukłon w stronę powieści „451° Fahrenheita” o paleniu książek. Oficjalny od 2016 r."},
-{c:495,n:"SSL Certificate Error",pl:"**Certyfikat klienta jest błędny.**",fun:"Kod z logów nginx.",x:"nginx"},
-{c:496,n:"SSL Certificate Required",pl:"**Brak wymaganego certyfikatu klienta.**",fun:"Kod z logów nginx.",x:"nginx"},
-{c:497,n:"HTTP Request Sent to HTTPS Port",pl:"**Czysty HTTP wysłany na port HTTPS.**",fun:"Kod z logów nginx.",x:"nginx"},
-{c:498,n:"Token expired/invalid",pl:"**Token wygasł lub jest błędny.**",fun:"Z ArcGIS firmy Esri. Większość API użyłaby tu 401.",x:"Esri ArcGIS"},
-{c:499,n:"Client Closed Request",pl:"**Klient rozłączył się przed odpowiedzią.**",fun:"Widzisz go w logach nginx, gdy klient zamknął kartę albo sam miał krótszy timeout.",x:"nginx"},
-{c:500,n:"Internal Server Error",pl:"**Coś pękło po stronie serwera.**",fun:"Worek na błędy serwera, odpowiednik 400 po drugiej stronie.",v:"VTEX: sprawdź nagłówki requestu, potem status page, potem support.",t:1},
-{c:501,n:"Not Implemented",pl:"**Tej funkcji serwer nie ma.**",fun:"405 znaczy „nie tutaj”. 501 znaczy „nigdzie na tym serwerze”."},
-{c:502,n:"Bad Gateway",pl:"**Pośrednik dostał od upstreamu bzdurę.**",fun:"Upstream odpowiedział, ale nie tak, jak trzeba.",v:"VTEX jako gateway dostał błędną odpowiedź z upstreamu. Ponów później.",t:1},
-{c:503,n:"Service Unavailable",pl:"**Chwilowo nie obsługuję.**",fun:"Przeciążenie albo przerwa techniczna. Może przyjść z `Retry-After`.",v:"VTEX chwilowo niedostępny. Status page, ponów później, przy dłuższym problemie support.",t:1},
-{c:504,n:"Gateway Timeout",pl:"**Pośrednik nie doczekał się upstreamu.**",fun:"408: klient za wolny. 504: serwer w tle za wolny.",v:"VTEX jako gateway nie doczekał się odpowiedzi. Ponów później.",t:1},
-{c:506,n:"Variant Also Negotiates",pl:"**Negocjacja treści się zapętliła.**",fun:"Błąd konfiguracji serwera z eksperymentalnego RFC 2295."},
-{c:507,n:"Insufficient Storage",pl:"**Brak miejsca na serwerze.**",fun:"WebDAV: dysk pełny."},
-{c:508,n:"Loop Detected",pl:"**Wykryto nieskończoną pętlę.**",fun:"WebDAV: serwer zapętlił się, przetwarzając request."},
-{c:509,n:"Bandwidth Limit Exceeded",pl:"**Limit transferu wyczerpany.**",fun:"Znany z hostingów na Apache i cPanel. W rejestrze numer jest wolny.",x:"Apache / cPanel"},
-{c:510,n:"Not Extended",pl:"**Brakuje wymaganego rozszerzenia.**",fun:"Z RFC 2774, który nigdy się nie przyjął. W rejestrze oznaczony jako przestarzały."},
-{c:511,n:"Network Authentication Required",pl:"**Zaloguj się do sieci.**",fun:"Wi-Fi w hotelu: ekran logowania, zanim puści Cię do internetu."},
-{c:521,n:"Web Server Is Down",pl:"**Serwer źródłowy odrzuca połączenie.**",fun:"Cloudflare działa, Twój origin nie.",x:"Cloudflare"},
-{c:522,n:"Connection Timed Out",pl:"**Origin nie odpowiada na połączenie.**",fun:"Cloudflare nie zdołał nawiązać połączenia TCP z originem.",x:"Cloudflare"},
-{c:523,n:"Origin Is Unreachable",pl:"**Do originu nie ma drogi.**",fun:"Cloudflare: zwykle zły rekord DNS albo routing.",x:"Cloudflare"},
-{c:525,n:"SSL Handshake Failed",pl:"**Handshake TLS z originem się nie udał.**",fun:"Cloudflare: problem z certyfikatem po stronie originu.",x:"Cloudflare"},
-{c:530,n:"Site Frozen",pl:"**Strona zamrożona.**",fun:"Hosting Pantheon tak oznacza uśpione strony. Cloudflare używa 530 razem z własnymi błędami 1xxx.",x:"Pantheon"},
-{c:599,n:"Network Connect Timeout Error",pl:"**Timeout połączenia sieciowego.**",fun:"Żaden RFC go nie zna. Zgłaszają go niektóre proxy. Ostatni numer w całej przestrzeni.",x:"niektóre proxy"}
+{c:100,n:"Continue",pl:"**Nagłówki OK, ślij body.**",fun:"Klient pyta `Expect: 100-continue`, zanim wyśle duży upload. curl robi to sam przy dużych body.",en:{pl:"**Headers OK, send the body.**",fun:"The client asks with `Expect: 100-continue` before sending a large upload. curl does this by itself for large bodies."}},
+{c:101,n:"Switching Protocols",pl:"**Zmieniamy protokół.**",fun:"Tak zaczyna się każdy WebSocket: `Upgrade: websocket`.",en:{pl:"**Switching protocols.**",fun:"Every WebSocket starts like this: `Upgrade: websocket`."}},
+{c:102,n:"Processing",pl:"**Pracuję, nie rozłączaj się.**",fun:"Z WebDAV. Nowsza wersja WebDAV go wyrzuciła, numer w rejestrze został.",en:{pl:"**Working on it, don't hang up.**",fun:"From WebDAV. A newer WebDAV version dropped it, but the number stayed in the registry."}},
+{c:103,n:"Early Hints",pl:"**Zanim odpowiem, zacznij ładować te zasoby.**",fun:"Serwer wysyła `Link: rel=preload`, zanim policzy właściwą odpowiedź. RFC 8297 z 2017 r.",en:{pl:"**Start loading these resources before I answer.**",fun:"The server sends `Link: rel=preload` before it computes the real response. RFC 8297 from 2017."}},
+{c:200,n:"OK",pl:"**Udało się.**",fun:"Uwaga na API, które zwracają 200 z błędem w body. Status nie zastąpi czytania odpowiedzi.",v:"Hook endpoint musi odpowiedzieć **200** na ping i na każdą notyfikację, w 5000 ms.",t:1,en:{pl:"**It worked.**",fun:"Watch out for APIs that return 200 with an error in the body. The status does not replace reading the response.",v:"A Hook endpoint must answer **200** to the ping and to every notification, within 5000 ms."}},
+{c:201,n:"Created",pl:"**Utworzono nowy zasób.**",fun:"Powinien przyjść z nagłówkiem `Location` do nowego zasobu.",v:"W tabeli VTEX: nowy zasób, zwykle po POST i części PUT.",t:1,en:{pl:"**A new resource was created.**",fun:"It should come with a `Location` header pointing to the new resource.",v:"In the VTEX table: a new resource, usually after POST and some PUT requests."}},
+{c:202,n:"Accepted",pl:"**Przyjąłem, zrobię później.**",fun:"Jak numerek w kolejce: masz potwierdzenie, nie masz wyniku.",v:"W tabeli VTEX: przyjęte, przetwarzanie jeszcze trwa.",t:1,en:{pl:"**Accepted, I'll do it later.**",fun:"Like a ticket in a queue: you have a confirmation, not a result.",v:"In the VTEX table: accepted, processing is still in progress."}},
+{c:203,n:"Non-Authoritative Information",pl:"**Odpowiedź przerobił pośrednik.**",fun:"Proxy zmieniło treść po drodze, to nie jest oryginał z serwera.",en:{pl:"**An intermediary reworked the response.**",fun:"A proxy changed the content on the way, this is not the original from the server."}},
+{c:204,n:"No Content",pl:"**Sukces, puste body.**",fun:"Typowy po DELETE. Przeglądarka nie zmienia widoku.",v:"W tabeli VTEX: sukces bez treści do zwrócenia. Nie parsuj body.",t:1,en:{pl:"**Success, empty body.**",fun:"Typical after DELETE. The browser does not change the view.",v:"In the VTEX table: success with no content to return. Don't parse the body."}},
+{c:205,n:"Reset Content",pl:"**Sukces, wyczyść formularz.**",fun:"Jak 204, tylko z poleceniem dla widoku: zresetuj dokument.",v:"Rzadki w sieci, ale **jest** w oficjalnej tabeli VTEX. Łatwa pułapka.",t:1,en:{pl:"**Success, clear the form.**",fun:"Like 204, but with an instruction for the view: reset the document.",v:"Rare on the web, but it **is** in the official VTEX table. An easy trap."}},
+{c:206,n:"Partial Content",pl:"**Masz kawałek, o który prosiłeś.**",fun:"Przewijanie wideo i wznawianie pobierania działają dzięki nagłówkowi `Range`.",v:"Legacy Search z `_from`/`_to` odpowiada 206 i nagłówkiem `resources: 0-49/1234`. To sukces.",t:2,en:{pl:"**Here is the piece you asked for.**",fun:"Seeking in a video and resuming downloads work thanks to the `Range` header.",v:"Legacy Search with `_from`/`_to` answers 206 with the header `resources: 0-49/1234`. That is success."}},
+{c:207,n:"Multi-Status",pl:"**Kilka statusów w jednym body.**",fun:"WebDAV: jedna operacja na wielu plikach, każdy z własnym wynikiem w XML.",en:{pl:"**Several statuses in one body.**",fun:"WebDAV: one operation on many files, each with its own result in XML."}},
+{c:208,n:"Already Reported",pl:"**To już wymieniłem wyżej.**",fun:"WebDAV: unika powtarzania tych samych elementów w odpowiedzi 207.",en:{pl:"**I already listed that above.**",fun:"WebDAV: avoids repeating the same members in a 207 response."}},
+{c:214,n:"Transformation Applied",pl:"**Pośrednik zmienił treść.**",fun:"To nie status, tylko dawny kod ostrzeżenia z nagłówka `Warning: 214`. Kot dostał się na listę bokiem.",x:"nagłówek Warning",en:{pl:"**An intermediary changed the content.**",fun:"Not a status, but an old warning code from the `Warning: 214` header. The cat got onto the list sideways.",x:"Warning header"}},
+{c:226,n:"IM Used",pl:"**Masz różnicę, a nie całość.**",fun:"IM to „instance manipulation”, czyli kodowanie delta. Najwyższy oficjalny 2xx.",en:{pl:"**Here is the difference, not the whole thing.**",fun:"IM stands for “instance manipulation”, meaning delta encoding. The highest official 2xx."}},
+{c:300,n:"Multiple Choices",pl:"**Jest kilka wersji, wybierz.**",fun:"W praktyce prawie nieużywany. Serwery wolą wybrać za klienta.",en:{pl:"**There are several versions, pick one.**",fun:"Almost never used in practice. Servers prefer to choose for the client."}},
+{c:301,n:"Moved Permanently",pl:"**Przeniesione na stałe.**",fun:"Przeglądarki cache'ują go bardzo długo. Pomyłka w 301 potrafi się ciągnąć tygodniami.",t:2,en:{pl:"**Moved permanently.**",fun:"Browsers cache it for a very long time. A mistaken 301 can linger for weeks."}},
+{c:302,n:"Found",pl:"**Tymczasowo gdzie indziej.**",fun:"W HTTP/1.0 nazywał się „Moved Temporarily”. Przeglądarki zmieniały POST na GET, więc powstały 303 i 307.",t:2,en:{pl:"**Temporarily somewhere else.**",fun:"In HTTP/1.0 it was called “Moved Temporarily”. Browsers changed POST to GET, which is why 303 and 307 were created."}},
+{c:303,n:"See Other",pl:"**Wynik obejrzysz GET-em pod innym adresem.**",fun:"Wzorzec Post/Redirect/Get: po wysłaniu formularza odświeżenie nie wysyła go drugi raz.",en:{pl:"**See the result with a GET at another address.**",fun:"The Post/Redirect/Get pattern: after a form is sent, a refresh does not send it again."}},
+{c:304,n:"Not Modified",pl:"**Twoja kopia z cache jest aktualna.**",fun:"Bez body. Para `ETag` i `If-None-Match` oszczędza transfer.",t:2,en:{pl:"**Your cached copy is up to date.**",fun:"No body. The `ETag` and `If-None-Match` pair saves transfer."}},
+{c:305,n:"Use Proxy",pl:"**Idź przez to proxy.**",fun:"Przestarzały ze względów bezpieczeństwa. Przeglądarki go ignorują.",en:{pl:"**Go through this proxy.**",fun:"Deprecated for security reasons. Browsers ignore it."}},
+{c:307,n:"Temporary Redirect",pl:"**Tymczasowo, ta sama metoda.**",fun:"302 z gwarancją: POST zostaje POST-em.",en:{pl:"**Temporary, same method.**",fun:"302 with a guarantee: POST stays POST."}},
+{c:308,n:"Permanent Redirect",pl:"**Na stałe, ta sama metoda.**",fun:"301 z gwarancją: POST zostaje POST-em.",en:{pl:"**Permanent, same method.**",fun:"301 with a guarantee: POST stays POST."}},
+{c:400,n:"Bad Request",pl:"**Nie umiem przeczytać requestu.**",fun:"Worek na błędy klienta, gdy nic dokładniejszego nie pasuje.",v:"VTEX: body nie do zdekodowania, zwykle zła składnia albo zły `Content-Type`. Hook API zwraca 400, gdy endpoint nie odpowie 200 na ping.",t:1,en:{pl:"**I can't read the request.**",fun:"A catch-all for client errors when nothing more specific fits.",v:"VTEX: the body cannot be decoded, usually bad syntax or a wrong `Content-Type`. The Hook API returns 400 when the endpoint does not answer the ping with 200."}},
+{c:401,n:"Unauthorized",pl:"**Nie wiem, kim jesteś.**",fun:"Nazwa myli: chodzi o brak uwierzytelnienia, a nie autoryzacji.",v:"VTEX: brak lub błędne dane uwierzytelniające. Sprawdź `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`.",t:1,en:{pl:"**I don't know who you are.**",fun:"The name is misleading: it is about missing authentication, not authorization.",v:"VTEX: missing or invalid credentials. Check `X-VTEX-API-AppKey` and `X-VTEX-API-AppToken`."}},
+{c:402,n:"Payment Required",pl:"**Najpierw zapłać.**",fun:"Od lat 90. „zarezerwowany na przyszłość” pod cyfrową gotówkę. Dziś używają go po swojemu m.in. Shopify i Stripe.",en:{pl:"**Pay first.**",fun:"“Reserved for future use” since the 1990s, meant for digital cash. Today Shopify and Stripe, among others, use it their own way."}},
+{c:403,n:"Forbidden",pl:"**Wiem, kim jesteś, i mówię nie.**",fun:"Ponowne logowanie nie pomoże. Potrzebne są uprawnienia.",v:"VTEX: request poprawny, serwer odmawia. Klucz nie ma roli z potrzebnym zasobem License Manager.",t:1,en:{pl:"**I know who you are, and the answer is no.**",fun:"Logging in again won't help. You need permissions.",v:"VTEX: the request is valid, the server refuses. The key has no role with the required License Manager resource."}},
+{c:404,n:"Not Found",pl:"**Nie ma tu tego.**",fun:"Legenda o pokoju 404 w CERN to mit. Numer wynika po prostu z kolejności w grupie 4xx.",v:"VTEX: sprawdź nazwę endpointu. Marketplace: 404 na change notification = SKU nie istnieje, wyślij SKU suggestion.",t:1,en:{pl:"**Nothing here.**",fun:"The legend of room 404 at CERN is a myth. The number simply follows the order in the 4xx group.",v:"VTEX: check the endpoint name. Marketplace: 404 on a change notification = the SKU does not exist, send an SKU suggestion."}},
+{c:405,n:"Method Not Allowed",pl:"**Zła metoda dla tego adresu.**",fun:"Odpowiedź musi wymienić dozwolone metody w nagłówku `Allow`.",v:"VTEX: metoda HTTP użyta do endpointu jest niepoprawna. Sprawdź API Reference.",t:1,en:{pl:"**Wrong method for this address.**",fun:"The response must list the allowed methods in the `Allow` header.",v:"VTEX: the HTTP method used for the endpoint is wrong. Check the API Reference."}},
+{c:406,n:"Not Acceptable",pl:"**Nie mam formatu, o który prosisz.**",fun:"Chodzi o nagłówek `Accept`: prosisz o XML, serwer ma tylko JSON.",en:{pl:"**I don't have the format you ask for.**",fun:"It is about the `Accept` header: you ask for XML, the server only has JSON."}},
+{c:407,n:"Proxy Authentication Required",pl:"**Zaloguj się do proxy.**",fun:"To samo co 401, tylko pyta pośrednik, a nie serwer docelowy.",en:{pl:"**Log in to the proxy.**",fun:"Same as 401, only the intermediary asks, not the target server."}},
+{c:408,n:"Request Timeout",pl:"**Za wolno wysyłasz request.**",fun:"Serwer się zniecierpliwił, czekając na klienta. Odwrotność 504.",en:{pl:"**You are sending the request too slowly.**",fun:"The server ran out of patience waiting for the client. The opposite of 504."}},
+{c:409,n:"Conflict",pl:"**Konflikt z obecnym stanem zasobu.**",fun:"Dwie osoby edytują to samo albo dane sobie przeczą.",v:"Feed v3: pola `FromWorkflow` i `FromOrders` w jednej konfiguracji dają 409.",t:2,en:{pl:"**Conflict with the current state of the resource.**",fun:"Two people edit the same thing, or the data contradicts itself.",v:"Feed v3: the `FromWorkflow` and `FromOrders` fields in one configuration give 409."}},
+{c:410,n:"Gone",pl:"**Było i nie wróci.**",fun:"Mocniejsze 404: zasób usunięto celowo i na stałe.",en:{pl:"**It was here and it won't come back.**",fun:"A stronger 404: the resource was removed on purpose and for good."}},
+{c:411,n:"Length Required",pl:"**Podaj Content-Length.**",fun:"Serwer nie przyjmie body, którego długości nie zna z góry.",en:{pl:"**Send Content-Length.**",fun:"The server won't accept a body whose length it does not know up front."}},
+{c:412,n:"Precondition Failed",pl:"**Warunek z nagłówka nie jest spełniony.**",fun:"`If-Match` nie pasuje do aktualnego `ETag`: ktoś zmienił zasób przed Tobą.",en:{pl:"**The precondition from the header is not met.**",fun:"`If-Match` does not match the current `ETag`: someone changed the resource before you."}},
+{c:413,n:"Payload Too Large",pl:"**Za duże body.**",fun:"W RFC 9110 nazywa się już „Content Too Large”. Trzecia nazwa w historii tego kodu.",en:{pl:"**The body is too large.**",fun:"RFC 9110 now calls it “Content Too Large”. The third name in this code's history."}},
+{c:414,n:"Request-URI Too Long",pl:"**Za długi adres.**",fun:"Zwykle GET z ogromnym query stringiem, który powinien być POST-em.",en:{pl:"**The address is too long.**",fun:"Usually a GET with a huge query string that should have been a POST."}},
+{c:415,n:"Unsupported Media Type",pl:"**Nie obsługuję tego Content-Type.**",fun:"406 dotyczy tego, co chcesz dostać. 415 tego, co wysyłasz.",en:{pl:"**I don't support this Content-Type.**",fun:"406 is about what you want to receive. 415 is about what you send."}},
+{c:416,n:"Request Range Not Satisfiable",pl:"**Tego zakresu nie ma.**",fun:"Prosisz o bajty 500–600 z pliku, który ma 100. Para do 206.",en:{pl:"**That range does not exist.**",fun:"You ask for bytes 500–600 of a file that has 100. The pair of 206."}},
+{c:417,n:"Expectation Failed",pl:"**Nie spełnię nagłówka Expect.**",fun:"Odmowa na `Expect: 100-continue`. Para do 100.",en:{pl:"**I can't meet the Expect header.**",fun:"A refusal of `Expect: 100-continue`. The pair of 100."}},
+{c:418,n:"I’m a teapot",pl:"**Jestem czajnikiem, kawy nie zaparzę.**",fun:"Żart primaaprilisowy z 1998 r. (protokół sterowania ekspresem do kawy). W 2017 r. internet obronił go przed usunięciem.",x:"żart z RFC 2324",en:{pl:"**I'm a teapot, I won't brew coffee.**",fun:"An April Fools' joke from 1998 (a protocol for controlling coffee pots). In 2017 the internet saved it from removal.",x:"joke from RFC 2324"}},
+{c:419,n:"Page Expired",pl:"**Sesja formularza wygasła.**",fun:"Laravel zwraca go, gdy token CSRF jest nieważny.",x:"Laravel",en:{pl:"**The form session expired.**",fun:"Laravel returns it when the CSRF token is invalid."}},
+{c:420,n:"Enhance Your Calm",pl:"**Uspokój się, za dużo requestów.**",fun:"Stare API Twittera, cytat z filmu „Człowiek demolka”. Zastąpił go 429.",x:"Twitter",en:{pl:"**Calm down, too many requests.**",fun:"The old Twitter API, a quote from the film “Demolition Man”. Replaced by 429."}},
+{c:421,n:"Misdirected Request",pl:"**To nie ten serwer.**",fun:"HTTP/2 użył ponownie połączenia do hosta, którego ten serwer nie obsługuje.",en:{pl:"**Wrong server.**",fun:"HTTP/2 reused a connection for a host this server does not serve."}},
+{c:422,n:"Unprocessable Entity",pl:"**Składnia dobra, sens zły.**",fun:"Z WebDAV. W RFC 9110 awansował do głównego HTTP jako „Unprocessable Content”. Typowy błąd walidacji.",t:2,en:{pl:"**Good syntax, bad meaning.**",fun:"From WebDAV. RFC 9110 promoted it to core HTTP as “Unprocessable Content”. A typical validation error."}},
+{c:423,n:"Locked",pl:"**Zasób jest zablokowany.**",fun:"WebDAV: ktoś trzyma blokadę na pliku.",en:{pl:"**The resource is locked.**",fun:"WebDAV: someone holds a lock on the file."}},
+{c:424,n:"Failed Dependency",pl:"**Nie wyszło, bo poprzedni krok padł.**",fun:"WebDAV: operacja zależała od innej, która się nie udała.",en:{pl:"**It failed because the previous step failed.**",fun:"WebDAV: the operation depended on another one that did not succeed."}},
+{c:425,n:"Too Early",pl:"**Za wcześnie, to może być powtórka.**",fun:"Chroni przed atakiem replay na dane wysłane w TLS 1.3 przed końcem handshake'u.",en:{pl:"**Too early, this might be a replay.**",fun:"Protects against replay attacks on data sent in TLS 1.3 before the handshake finishes."}},
+{c:426,n:"Upgrade Required",pl:"**Przejdź na nowszy protokół.**",fun:"Odpowiedź wskazuje wymagany protokół w nagłówku `Upgrade`.",en:{pl:"**Switch to a newer protocol.**",fun:"The response names the required protocol in the `Upgrade` header."}},
+{c:428,n:"Precondition Required",pl:"**Wyślij warunek, bez niego nie przyjmę.**",fun:"Serwer wymusza `If-Match`, żeby nikt nie nadpisał cudzych zmian.",en:{pl:"**Send a precondition, I won't accept it without one.**",fun:"The server forces `If-Match` so nobody overwrites someone else's changes."}},
+{c:429,n:"Too Many Requests",pl:"**Za dużo requestów, zwolnij.**",fun:"Jedyny 4xx, który naprawia się czekaniem. Nagłówek `Retry-After` mówi, jak długo.",v:"VTEX: przekroczony rate limit. Czekaj tyle, ile mówi `Retry-After`, potem backoff. Dla Orders i Feed zalecana 1 minuta.",t:1,en:{pl:"**Too many requests, slow down.**",fun:"The only 4xx that is fixed by waiting. The `Retry-After` header says how long.",v:"VTEX: rate limit exceeded. Wait as long as `Retry-After` says, then back off. For Orders and Feed, 1 minute is recommended."}},
+{c:431,n:"Request Header Fields Too Large",pl:"**Za duże nagłówki.**",fun:"Najczęstszy winowajca: rozdęte cookies.",en:{pl:"**The headers are too large.**",fun:"The most common culprit: bloated cookies."}},
+{c:444,n:"No Response",pl:"**Serwer zamyka połączenie bez słowa.**",fun:"nginx używa go wewnętrznie do zbywania botów. Klient nigdy tego kodu nie zobaczy.",x:"nginx",en:{pl:"**The server closes the connection without a word.**",fun:"nginx uses it internally to brush off bots. The client never sees this code."}},
+{c:450,n:"Blocked by Windows Parental Controls",pl:"**Zablokowane przez kontrolę rodzicielską.**",fun:"Wynalazek Microsoftu z czasów Windows Vista.",x:"Microsoft",en:{pl:"**Blocked by parental controls.**",fun:"A Microsoft invention from the Windows Vista days."}},
+{c:451,n:"Unavailable For Legal Reasons",pl:"**Niedostępne z powodów prawnych.**",fun:"Numer to ukłon w stronę powieści „451° Fahrenheita” o paleniu książek. Oficjalny od 2016 r.",en:{pl:"**Unavailable for legal reasons.**",fun:"The number is a nod to the book-burning novel “Fahrenheit 451”. Official since 2016."}},
+{c:495,n:"SSL Certificate Error",pl:"**Certyfikat klienta jest błędny.**",fun:"Kod z logów nginx.",x:"nginx",en:{pl:"**The client certificate is invalid.**",fun:"A code from nginx logs."}},
+{c:496,n:"SSL Certificate Required",pl:"**Brak wymaganego certyfikatu klienta.**",fun:"Kod z logów nginx.",x:"nginx",en:{pl:"**The required client certificate is missing.**",fun:"A code from nginx logs."}},
+{c:497,n:"HTTP Request Sent to HTTPS Port",pl:"**Czysty HTTP wysłany na port HTTPS.**",fun:"Kod z logów nginx.",x:"nginx",en:{pl:"**Plain HTTP sent to the HTTPS port.**",fun:"A code from nginx logs."}},
+{c:498,n:"Token expired/invalid",pl:"**Token wygasł lub jest błędny.**",fun:"Z ArcGIS firmy Esri. Większość API użyłaby tu 401.",x:"Esri ArcGIS",en:{pl:"**The token expired or is invalid.**",fun:"From Esri's ArcGIS. Most APIs would use 401 here."}},
+{c:499,n:"Client Closed Request",pl:"**Klient rozłączył się przed odpowiedzią.**",fun:"Widzisz go w logach nginx, gdy klient zamknął kartę albo sam miał krótszy timeout.",x:"nginx",en:{pl:"**The client disconnected before the response.**",fun:"You see it in nginx logs when the client closed the tab or had a shorter timeout itself."}},
+{c:500,n:"Internal Server Error",pl:"**Coś pękło po stronie serwera.**",fun:"Worek na błędy serwera, odpowiednik 400 po drugiej stronie.",v:"VTEX: sprawdź nagłówki requestu, potem status page, potem support.",t:1,en:{pl:"**Something broke on the server side.**",fun:"A catch-all for server errors, the server-side counterpart of 400.",v:"VTEX: check the request headers, then the status page, then support."}},
+{c:501,n:"Not Implemented",pl:"**Tej funkcji serwer nie ma.**",fun:"405 znaczy „nie tutaj”. 501 znaczy „nigdzie na tym serwerze”.",en:{pl:"**The server does not have this feature.**",fun:"405 means “not here”. 501 means “nowhere on this server”."}},
+{c:502,n:"Bad Gateway",pl:"**Pośrednik dostał od upstreamu bzdurę.**",fun:"Upstream odpowiedział, ale nie tak, jak trzeba.",v:"VTEX jako gateway dostał błędną odpowiedź z upstreamu. Ponów później.",t:1,en:{pl:"**The intermediary got garbage from upstream.**",fun:"Upstream answered, but not the way it should.",v:"VTEX, acting as a gateway, got an invalid response from upstream. Retry later."}},
+{c:503,n:"Service Unavailable",pl:"**Chwilowo nie obsługuję.**",fun:"Przeciążenie albo przerwa techniczna. Może przyjść z `Retry-After`.",v:"VTEX chwilowo niedostępny. Status page, ponów później, przy dłuższym problemie support.",t:1,en:{pl:"**Temporarily not serving.**",fun:"Overload or maintenance. It may come with `Retry-After`.",v:"VTEX is temporarily unavailable. Status page, retry later; if the problem lasts, support."}},
+{c:504,n:"Gateway Timeout",pl:"**Pośrednik nie doczekał się upstreamu.**",fun:"408: klient za wolny. 504: serwer w tle za wolny.",v:"VTEX jako gateway nie doczekał się odpowiedzi. Ponów później.",t:1,en:{pl:"**The intermediary gave up waiting for upstream.**",fun:"408: the client is too slow. 504: the server behind is too slow.",v:"VTEX, acting as a gateway, timed out waiting for a response. Retry later."}},
+{c:506,n:"Variant Also Negotiates",pl:"**Negocjacja treści się zapętliła.**",fun:"Błąd konfiguracji serwera z eksperymentalnego RFC 2295.",en:{pl:"**Content negotiation went into a loop.**",fun:"A server configuration error from the experimental RFC 2295."}},
+{c:507,n:"Insufficient Storage",pl:"**Brak miejsca na serwerze.**",fun:"WebDAV: dysk pełny.",en:{pl:"**Not enough storage on the server.**",fun:"WebDAV: the disk is full."}},
+{c:508,n:"Loop Detected",pl:"**Wykryto nieskończoną pętlę.**",fun:"WebDAV: serwer zapętlił się, przetwarzając request.",en:{pl:"**An infinite loop was detected.**",fun:"WebDAV: the server looped while processing the request."}},
+{c:509,n:"Bandwidth Limit Exceeded",pl:"**Limit transferu wyczerpany.**",fun:"Znany z hostingów na Apache i cPanel. W rejestrze numer jest wolny.",x:"Apache / cPanel",en:{pl:"**Bandwidth limit used up.**",fun:"Known from Apache and cPanel hosting. The number is free in the registry."}},
+{c:510,n:"Not Extended",pl:"**Brakuje wymaganego rozszerzenia.**",fun:"Z RFC 2774, który nigdy się nie przyjął. W rejestrze oznaczony jako przestarzały.",en:{pl:"**A required extension is missing.**",fun:"From RFC 2774, which never caught on. Marked obsolete in the registry."}},
+{c:511,n:"Network Authentication Required",pl:"**Zaloguj się do sieci.**",fun:"Wi-Fi w hotelu: ekran logowania, zanim puści Cię do internetu.",en:{pl:"**Log in to the network.**",fun:"Hotel Wi-Fi: the login screen before it lets you onto the internet."}},
+{c:521,n:"Web Server Is Down",pl:"**Serwer źródłowy odrzuca połączenie.**",fun:"Cloudflare działa, Twój origin nie.",x:"Cloudflare",en:{pl:"**The origin server refuses the connection.**",fun:"Cloudflare works, your origin does not."}},
+{c:522,n:"Connection Timed Out",pl:"**Origin nie odpowiada na połączenie.**",fun:"Cloudflare nie zdołał nawiązać połączenia TCP z originem.",x:"Cloudflare",en:{pl:"**The origin does not answer the connection.**",fun:"Cloudflare could not open a TCP connection to the origin."}},
+{c:523,n:"Origin Is Unreachable",pl:"**Do originu nie ma drogi.**",fun:"Cloudflare: zwykle zły rekord DNS albo routing.",x:"Cloudflare",en:{pl:"**There is no route to the origin.**",fun:"Cloudflare: usually a bad DNS record or routing."}},
+{c:525,n:"SSL Handshake Failed",pl:"**Handshake TLS z originem się nie udał.**",fun:"Cloudflare: problem z certyfikatem po stronie originu.",x:"Cloudflare",en:{pl:"**The TLS handshake with the origin failed.**",fun:"Cloudflare: a certificate problem on the origin side."}},
+{c:530,n:"Site Frozen",pl:"**Strona zamrożona.**",fun:"Hosting Pantheon tak oznacza uśpione strony. Cloudflare używa 530 razem z własnymi błędami 1xxx.",x:"Pantheon",en:{pl:"**Site frozen.**",fun:"Pantheon hosting marks sleeping sites this way. Cloudflare uses 530 together with its own 1xxx errors."}},
+{c:599,n:"Network Connect Timeout Error",pl:"**Timeout połączenia sieciowego.**",fun:"Żaden RFC go nie zna. Zgłaszają go niektóre proxy. Ostatni numer w całej przestrzeni.",x:"niektóre proxy",en:{pl:"**Network connection timeout.**",fun:"No RFC knows it. Some proxies report it. The last number in the whole space.",x:"some proxies"}}
 ];
 
 const QUESTIONS = [
-{id:"q1",tag:"VTEX",q:"Wołasz Orders API bez nagłówków `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`. Jaki status wraca?",o:["400 Bad Request","401 Unauthorized","403 Forbidden","404 Not Found"],a:1,why:"VTEX opisuje 401 jako brak lub błędne dane uwierzytelniające. 403 dostaniesz dopiero wtedy, gdy klucz jest poprawny, ale nie ma uprawnień."},
-{id:"q2",tag:"VTEX",q:"Klucz jest poprawny, ale jego rola nie ma zasobu wymaganego przez endpoint. Jaki status?",o:["403 Forbidden","401 Unauthorized","405 Method Not Allowed","409 Conflict"],a:0,why:"Request jest poprawny, serwer odmawia. Naprawiasz to w License Manager, dodając roli zasób."},
-{id:"q3",tag:"VTEX",q:"Synchronizacja cen dostaje **429** z `Retry-After: 30`. Poprawna reakcja?",o:["Ponawiać od razu, do skutku","Wygenerować nowy appToken","Odczekać co najmniej 30 s, potem ponawiać z rosnącym odstępem","Zamienić PUT na POST"],a:2,why:"`Retry-After` podaje liczbę sekund do przyjęcia kolejnego requestu. Natychmiastowe ponowienia tylko przedłużają blokadę."},
-{id:"q4",tag:"VTEX",q:"Rejestrujesz Hook v3. VTEX wysyła ping `{\"hookConfig\": \"ping\"}`, a Twój endpoint odpowiada 500. Co się dzieje?",o:["Hook zapisuje się, VTEX ponowi ping później","Hook zapisuje się jako nieaktywny","Hook API zwraca 409 Conflict","Hook API zwraca 400 Bad Request i konfiguracja się nie zapisuje"],a:3,why:"Endpoint musi odpowiedzieć 200 na ping. Bez tego Hook API zwraca 400 i nic nie zapisuje."},
-{id:"q5",tag:"VTEX",q:"Jak Twój endpoint musi odpowiadać na notyfikacje Hooka?",o:["202 w 2,5 s","200 w 5000 ms","204 w 20 s","Dowolne 2xx, bez limitu czasu"],a:1,why:"Zawsze status 200 w ciągu 5000 ms. 2,5 s to limit fulfillment simulation, 20 s to limit connectora płatności."},
-{id:"q6",tag:"VTEX",q:"W jednej konfiguracji Feed v3 łączysz `status` (FromWorkflow) z `expression` (FromOrders). Status odpowiedzi?",o:["400 Bad Request","403 Forbidden","409 Conflict","422 Unprocessable Entity"],a:2,why:"Typy filtrów wykluczają się wzajemnie. Połączenie ich pól zwraca 409 Conflict."},
-{id:"q7",tag:"VTEX",q:"Seller woła change notification z `sellerId` i `sellerSkuId`. Wraca **404**. Następny krok?",o:["Ponowić za minutę","Wysłać SKU suggestion, bo SKU nie istnieje jeszcze w marketplace","Zgłosić błąd do supportu","Wysłać notyfikację ceny"],a:1,why:"200 znaczy, że SKU już istnieje. 404 znaczy, że go nie ma, więc wysyłasz sugestię do akceptacji przez marketplace."},
-{id:"q8",tag:"VTEX",q:"Fulfillment simulation zewnętrznego sellera odpowiada po 4 sekundach. Skutek?",o:["Żaden, limit to 5 s","VTEX ponawia do 3 razy","Klient dostaje 504","Oferta jest traktowana jako niedostępna, bo limit to 2,5 s"],a:3,why:"Symulacja musi zmieścić się w 2,5 s. Wolniejsza odpowiedź oznacza niedostępny produkt."},
-{id:"q9",tag:"VTEX",q:"Które dwa kody tabela VTEX opisuje jako błąd serwera działającego jako gateway lub proxy?",o:["500 i 503","502 i 504","503 i 504","400 i 502"],a:1,why:"502: gateway dostał błędną odpowiedź z upstreamu. 504: gateway nie doczekał się odpowiedzi."},
-{id:"q10",tag:"VTEX",q:"Wysyłasz POST z `Content-Type: text/plain` zamiast JSON. Który kod przypisuje temu tabela VTEX?",o:["415 Unsupported Media Type","400 Bad Request","405 Method Not Allowed","422 Unprocessable Entity"],a:1,why:"W czystym HTTP pasowałby 415, ale tabela VTEX wymienia zły `Content-Type` przy 400. Kodu 415 w tej tabeli nie ma."},
-{id:"q11",tag:"VTEX",q:"Który kod NIE występuje w oficjalnej tabeli „API response status codes” VTEX?",o:["205 Reset Content","202 Accepted","409 Conflict","405 Method Not Allowed"],a:2,why:"409 pojawia się w dokumentacji Feed v3, ale w tabeli ogólnej go nie ma. 205 jest tam mimo swojej rzadkości."},
-{id:"q12",tag:"VTEX",q:"Ile kodów zawiera oficjalna tabela statusów VTEX?",o:["9","12","15","21"],a:2,why:"Pięć kodów 2xx (200, 201, 202, 204, 205), sześć 4xx (400, 401, 403, 404, 405, 429) i cztery 5xx (500, 502, 503, 504)."},
-{id:"q13",tag:"VTEX",q:"Pricing API: na trasie PUT skończyły Ci się burst credits. Co zwraca serwis?",o:["403 Forbidden","429 Too Many Requests","503 Service Unavailable","509 Bandwidth Limit Exceeded"],a:1,why:"Gdy burst credits spadną do zera, serwis blokuje nowe requesty i zwraca 429."},
-{id:"q14",tag:"VTEX",q:"Legacy Search zwraca **206** i nagłówek `resources: 0-49/1234`. Jak to czytać?",o:["Błąd, trzeba ponowić","Sukces: dostałeś pozycje 0–49 z 1234","Przekierowanie do kolejnej strony","Kopia w cache jest nieaktualna"],a:1,why:"206 Partial Content to normalna odpowiedź przy paginacji. Traktuj ją jak sukces i przesuwaj okno `_from`/`_to`."},
-{id:"q15",tag:"VTEX",q:"Hook nie dostał żadnej notyfikacji przez 3 dni. Co mówi dokumentacja?",o:["Nic się nie dzieje","Hook przełącza się na Feed","Konfiguracja jest usuwana i trzeba ją założyć ponownie","VTEX wysyła ping kontrolny"],a:2,why:"Po trzech dniach bez notyfikacji konfiguracja Hooka znika."},
-{id:"q16",tag:"VTEX",q:"Metoda płatności jest asynchroniczna (np. Pix). Jaki `status` zwraca connector w Create Payment?",o:["approved","pending","denied","undefined"],a:3,why:"Dopóki acquirer nie potwierdzi, status to `undefined`. Zwrócenie `approved` przed potwierdzeniem to błąd."},
-{id:"q17",tag:"VTEX",q:"Master Data search: ile dokumentów maksymalnie w jednym zapytaniu i jakim nagłówkiem stronicujesz?",o:["100, nagłówek `REST-Range`","50, nagłówek `resources`","1000, nagłówek `X-VTEX-MD-TOKEN`","2500, parametry `_from` i `_to`"],a:0,why:"`REST-Range: resources=0-100`, maksymalnie 100 dokumentów. 1000 i token dotyczą endpointu scroll."},
-{id:"q18",tag:"VTEX",q:"Dostajesz **503** z API VTEX. Kolejność działań wg dokumentacji?",o:["Zmienić appKey","Poprawić body requestu","Dodać nagłówek `Retry-After` do requestu","Sprawdzić status page, ponowić później, przy dłuższym problemie support"],a:3,why:"503 to chwilowa niedostępność po stronie VTEX. Request jest dobry, więc niczego w nim nie zmieniasz."},
-{id:"q19",tag:"HTTP",q:"Co odróżnia 401 od 403?",o:["401 = brak uwierzytelnienia, 403 = brak uprawnień","401 = brak uprawnień, 403 = brak uwierzytelnienia","401 dotyczy proxy, 403 serwera","Są zamienne"],a:0,why:"401: nie wiem, kim jesteś. 403: wiem, kim jesteś, i odmawiam. Proxy ma własny kod 407."},
-{id:"q20",tag:"HTTP",q:"Które przekierowanie jest stałe i gwarantuje zachowanie metody POST?",o:["301","302","307","308"],a:3,why:"308 to stałe z zachowaniem metody. 307 też zachowuje metodę, ale jest tymczasowe."},
-{id:"q21",tag:"HTTP",q:"Czym różni się 502 od 504?",o:["502: upstream odpowiedział źle. 504: upstream nie odpowiedział na czas","502: serwer przeciążony. 504: błąd DNS","502: błąd klienta. 504: błąd serwera","To ten sam błąd w różnych serwerach"],a:0,why:"Oba zgłasza pośrednik. 502 to zła odpowiedź, 504 to brak odpowiedzi w czasie."},
-{id:"q22",tag:"HTTP",q:"Dostajesz kod 471, którego nie znasz. Jak go potraktować wg RFC 9110?",o:["Jak 500","Jak 200","Jak 400, bo liczy się pierwsza cyfra","Zignorować"],a:2,why:"Klient musi rozumieć grupę po pierwszej cyfrze i traktować nieznany kod jak x00 tej grupy."},
-{id:"q23",tag:"HTTP",q:"Który kod pochodzi z żartu primaaprilisowego z 1998 r.?",o:["402 Payment Required","418 I’m a teapot","420 Enhance Your Calm","451 Unavailable For Legal Reasons"],a:1,why:"418 pochodzi z żartobliwego protokołu sterowania ekspresem do kawy. 420 to Twitter, 451 jest oficjalny od 2016 r."},
-{id:"q24",tag:"HTTP",q:"Która odpowiedź nie ma body i mówi „użyj kopii z cache”?",o:["204 No Content","205 Reset Content","304 Not Modified","410 Gone"],a:2,why:"304 odpowiada na warunkowy GET z `If-None-Match`. 204 i 205 też nie mają body, ale nie dotyczą cache."}
+{id:"q1",tag:"VTEX",q:"Wołasz Orders API bez nagłówków `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`. Jaki status wraca?",o:["400 Bad Request","401 Unauthorized","403 Forbidden","404 Not Found"],a:1,why:"VTEX opisuje 401 jako brak lub błędne dane uwierzytelniające. 403 dostaniesz dopiero wtedy, gdy klucz jest poprawny, ale nie ma uprawnień.",en:{q:"You call the Orders API without the `X-VTEX-API-AppKey` and `X-VTEX-API-AppToken` headers. Which status comes back?",why:"VTEX describes 401 as missing or invalid credentials. You only get 403 when the key is valid but has no permissions."}},
+{id:"q2",tag:"VTEX",q:"Klucz jest poprawny, ale jego rola nie ma zasobu wymaganego przez endpoint. Jaki status?",o:["403 Forbidden","401 Unauthorized","405 Method Not Allowed","409 Conflict"],a:0,why:"Request jest poprawny, serwer odmawia. Naprawiasz to w License Manager, dodając roli zasób.",en:{q:"The key is valid, but its role lacks the resource the endpoint requires. Which status?",why:"The request is valid, the server refuses. You fix it in License Manager by adding the resource to the role."}},
+{id:"q3",tag:"VTEX",q:"Synchronizacja cen dostaje **429** z `Retry-After: 30`. Poprawna reakcja?",o:["Ponawiać od razu, do skutku","Wygenerować nowy appToken","Odczekać co najmniej 30 s, potem ponawiać z rosnącym odstępem","Zamienić PUT na POST"],a:2,why:"`Retry-After` podaje liczbę sekund do przyjęcia kolejnego requestu. Natychmiastowe ponowienia tylko przedłużają blokadę.",en:{q:"A price sync gets **429** with `Retry-After: 30`. The right reaction?",o:["Retry right away until it works","Generate a new appToken","Wait at least 30 s, then retry with a growing delay","Switch PUT to POST"],why:"`Retry-After` gives the number of seconds until the next request is accepted. Immediate retries only extend the block."}},
+{id:"q4",tag:"VTEX",q:"Rejestrujesz Hook v3. VTEX wysyła ping `{\"hookConfig\": \"ping\"}`, a Twój endpoint odpowiada 500. Co się dzieje?",o:["Hook zapisuje się, VTEX ponowi ping później","Hook zapisuje się jako nieaktywny","Hook API zwraca 409 Conflict","Hook API zwraca 400 Bad Request i konfiguracja się nie zapisuje"],a:3,why:"Endpoint musi odpowiedzieć 200 na ping. Bez tego Hook API zwraca 400 i nic nie zapisuje.",en:{q:"You register a Hook v3. VTEX sends the ping `{\"hookConfig\": \"ping\"}` and your endpoint answers 500. What happens?",o:["The Hook is saved, VTEX retries the ping later","The Hook is saved as inactive","The Hook API returns 409 Conflict","The Hook API returns 400 Bad Request and the configuration is not saved"],why:"The endpoint must answer the ping with 200. Without it, the Hook API returns 400 and saves nothing."}},
+{id:"q5",tag:"VTEX",q:"Jak Twój endpoint musi odpowiadać na notyfikacje Hooka?",o:["202 w 2,5 s","200 w 5000 ms","204 w 20 s","Dowolne 2xx, bez limitu czasu"],a:1,why:"Zawsze status 200 w ciągu 5000 ms. 2,5 s to limit fulfillment simulation, 20 s to limit connectora płatności.",en:{q:"How must your endpoint answer Hook notifications?",o:["202 within 2.5 s","200 within 5000 ms","204 within 20 s","Any 2xx, no time limit"],why:"Always status 200 within 5000 ms. 2.5 s is the fulfillment simulation limit, 20 s is the payment connector limit."}},
+{id:"q6",tag:"VTEX",q:"W jednej konfiguracji Feed v3 łączysz `status` (FromWorkflow) z `expression` (FromOrders). Status odpowiedzi?",o:["400 Bad Request","403 Forbidden","409 Conflict","422 Unprocessable Entity"],a:2,why:"Typy filtrów wykluczają się wzajemnie. Połączenie ich pól zwraca 409 Conflict.",en:{q:"In one Feed v3 configuration you combine `status` (FromWorkflow) with `expression` (FromOrders). Response status?",why:"The filter types are mutually exclusive. Combining their fields returns 409 Conflict."}},
+{id:"q7",tag:"VTEX",q:"Seller woła change notification z `sellerId` i `sellerSkuId`. Wraca **404**. Następny krok?",o:["Ponowić za minutę","Wysłać SKU suggestion, bo SKU nie istnieje jeszcze w marketplace","Zgłosić błąd do supportu","Wysłać notyfikację ceny"],a:1,why:"200 znaczy, że SKU już istnieje. 404 znaczy, że go nie ma, więc wysyłasz sugestię do akceptacji przez marketplace.",en:{q:"A seller calls the change notification with `sellerId` and `sellerSkuId`. It returns **404**. Next step?",o:["Retry in a minute","Send an SKU suggestion, because the SKU does not exist in the marketplace yet","Report a bug to support","Send a price notification"],why:"200 means the SKU already exists. 404 means it does not, so you send a suggestion for the marketplace to accept."}},
+{id:"q8",tag:"VTEX",q:"Fulfillment simulation zewnętrznego sellera odpowiada po 4 sekundach. Skutek?",o:["Żaden, limit to 5 s","VTEX ponawia do 3 razy","Klient dostaje 504","Oferta jest traktowana jako niedostępna, bo limit to 2,5 s"],a:3,why:"Symulacja musi zmieścić się w 2,5 s. Wolniejsza odpowiedź oznacza niedostępny produkt.",en:{q:"An external seller's fulfillment simulation answers after 4 seconds. The result?",o:["None, the limit is 5 s","VTEX retries up to 3 times","The shopper gets 504","The offer is treated as unavailable, because the limit is 2.5 s"],why:"The simulation must fit in 2.5 s. A slower answer means the product is unavailable."}},
+{id:"q9",tag:"VTEX",q:"Które dwa kody tabela VTEX opisuje jako błąd serwera działającego jako gateway lub proxy?",o:["500 i 503","502 i 504","503 i 504","400 i 502"],a:1,why:"502: gateway dostał błędną odpowiedź z upstreamu. 504: gateway nie doczekał się odpowiedzi.",en:{q:"Which two codes does the VTEX table describe as an error of a server acting as a gateway or proxy?",o:["500 and 503","502 and 504","503 and 504","400 and 502"],why:"502: the gateway got an invalid response from upstream. 504: the gateway timed out waiting for a response."}},
+{id:"q10",tag:"VTEX",q:"Wysyłasz POST z `Content-Type: text/plain` zamiast JSON. Który kod przypisuje temu tabela VTEX?",o:["415 Unsupported Media Type","400 Bad Request","405 Method Not Allowed","422 Unprocessable Entity"],a:1,why:"W czystym HTTP pasowałby 415, ale tabela VTEX wymienia zły `Content-Type` przy 400. Kodu 415 w tej tabeli nie ma.",en:{q:"You send a POST with `Content-Type: text/plain` instead of JSON. Which code does the VTEX table give this?",why:"In plain HTTP 415 would fit, but the VTEX table lists a wrong `Content-Type` under 400. Code 415 is not in that table."}},
+{id:"q11",tag:"VTEX",q:"Który kod NIE występuje w oficjalnej tabeli „API response status codes” VTEX?",o:["205 Reset Content","202 Accepted","409 Conflict","405 Method Not Allowed"],a:2,why:"409 pojawia się w dokumentacji Feed v3, ale w tabeli ogólnej go nie ma. 205 jest tam mimo swojej rzadkości.",en:{q:"Which code is NOT in the official VTEX “API response status codes” table?",why:"409 appears in the Feed v3 docs, but not in the general table. 205 is there despite being rare."}},
+{id:"q12",tag:"VTEX",q:"Ile kodów zawiera oficjalna tabela statusów VTEX?",o:["9","12","15","21"],a:2,why:"Pięć kodów 2xx (200, 201, 202, 204, 205), sześć 4xx (400, 401, 403, 404, 405, 429) i cztery 5xx (500, 502, 503, 504).",en:{q:"How many codes does the official VTEX status table contain?",why:"Five 2xx codes (200, 201, 202, 204, 205), six 4xx (400, 401, 403, 404, 405, 429) and four 5xx (500, 502, 503, 504)."}},
+{id:"q13",tag:"VTEX",q:"Pricing API: na trasie PUT skończyły Ci się burst credits. Co zwraca serwis?",o:["403 Forbidden","429 Too Many Requests","503 Service Unavailable","509 Bandwidth Limit Exceeded"],a:1,why:"Gdy burst credits spadną do zera, serwis blokuje nowe requesty i zwraca 429.",en:{q:"Pricing API: you ran out of burst credits on a PUT route. What does the service return?",why:"When burst credits drop to zero, the service blocks new requests and returns 429."}},
+{id:"q14",tag:"VTEX",q:"Legacy Search zwraca **206** i nagłówek `resources: 0-49/1234`. Jak to czytać?",o:["Błąd, trzeba ponowić","Sukces: dostałeś pozycje 0–49 z 1234","Przekierowanie do kolejnej strony","Kopia w cache jest nieaktualna"],a:1,why:"206 Partial Content to normalna odpowiedź przy paginacji. Traktuj ją jak sukces i przesuwaj okno `_from`/`_to`.",en:{q:"Legacy Search returns **206** with the header `resources: 0-49/1234`. How do you read it?",o:["An error, you must retry","Success: you got items 0–49 of 1234","A redirect to the next page","The cached copy is stale"],why:"206 Partial Content is the normal response when paginating. Treat it as success and move the `_from`/`_to` window."}},
+{id:"q15",tag:"VTEX",q:"Hook nie dostał żadnej notyfikacji przez 3 dni. Co mówi dokumentacja?",o:["Nic się nie dzieje","Hook przełącza się na Feed","Konfiguracja jest usuwana i trzeba ją założyć ponownie","VTEX wysyła ping kontrolny"],a:2,why:"Po trzech dniach bez notyfikacji konfiguracja Hooka znika.",en:{q:"A Hook has received no notifications for 3 days. What do the docs say?",o:["Nothing happens","The Hook switches to Feed","The configuration is deleted and must be created again","VTEX sends a control ping"],why:"After three days without notifications, the Hook configuration is gone."}},
+{id:"q16",tag:"VTEX",q:"Metoda płatności jest asynchroniczna (np. Pix). Jaki `status` zwraca connector w Create Payment?",o:["approved","pending","denied","undefined"],a:3,why:"Dopóki acquirer nie potwierdzi, status to `undefined`. Zwrócenie `approved` przed potwierdzeniem to błąd.",en:{q:"The payment method is asynchronous (e.g. Pix). Which `status` does the connector return in Create Payment?",why:"Until the acquirer confirms, the status is `undefined`. Returning `approved` before confirmation is a mistake."}},
+{id:"q17",tag:"VTEX",q:"Master Data search: ile dokumentów maksymalnie w jednym zapytaniu i jakim nagłówkiem stronicujesz?",o:["100, nagłówek `REST-Range`","50, nagłówek `resources`","1000, nagłówek `X-VTEX-MD-TOKEN`","2500, parametry `_from` i `_to`"],a:0,why:"`REST-Range: resources=0-100`, maksymalnie 100 dokumentów. 1000 i token dotyczą endpointu scroll.",en:{q:"Master Data search: how many documents at most per query, and which header do you paginate with?",o:["100, the `REST-Range` header","50, the `resources` header","1000, the `X-VTEX-MD-TOKEN` header","2500, the `_from` and `_to` parameters"],why:"`REST-Range: resources=0-100`, at most 100 documents. 1000 and the token belong to the scroll endpoint."}},
+{id:"q18",tag:"VTEX",q:"Dostajesz **503** z API VTEX. Kolejność działań wg dokumentacji?",o:["Zmienić appKey","Poprawić body requestu","Dodać nagłówek `Retry-After` do requestu","Sprawdzić status page, ponowić później, przy dłuższym problemie support"],a:3,why:"503 to chwilowa niedostępność po stronie VTEX. Request jest dobry, więc niczego w nim nie zmieniasz.",en:{q:"You get **503** from a VTEX API. The order of actions according to the docs?",o:["Change the appKey","Fix the request body","Add a `Retry-After` header to the request","Check the status page, retry later; if the problem lasts, contact support"],why:"503 is a temporary unavailability on the VTEX side. The request is fine, so you change nothing in it."}},
+{id:"q19",tag:"HTTP",q:"Co odróżnia 401 od 403?",o:["401 = brak uwierzytelnienia, 403 = brak uprawnień","401 = brak uprawnień, 403 = brak uwierzytelnienia","401 dotyczy proxy, 403 serwera","Są zamienne"],a:0,why:"401: nie wiem, kim jesteś. 403: wiem, kim jesteś, i odmawiam. Proxy ma własny kod 407.",en:{q:"What separates 401 from 403?",o:["401 = no authentication, 403 = no permissions","401 = no permissions, 403 = no authentication","401 is about a proxy, 403 about the server","They are interchangeable"],why:"401: I don't know who you are. 403: I know who you are, and I refuse. A proxy has its own code, 407."}},
+{id:"q20",tag:"HTTP",q:"Które przekierowanie jest stałe i gwarantuje zachowanie metody POST?",o:["301","302","307","308"],a:3,why:"308 to stałe z zachowaniem metody. 307 też zachowuje metodę, ale jest tymczasowe.",en:{q:"Which redirect is permanent and guarantees that the POST method is kept?",why:"308 is permanent and keeps the method. 307 keeps the method too, but it is temporary."}},
+{id:"q21",tag:"HTTP",q:"Czym różni się 502 od 504?",o:["502: upstream odpowiedział źle. 504: upstream nie odpowiedział na czas","502: serwer przeciążony. 504: błąd DNS","502: błąd klienta. 504: błąd serwera","To ten sam błąd w różnych serwerach"],a:0,why:"Oba zgłasza pośrednik. 502 to zła odpowiedź, 504 to brak odpowiedzi w czasie.",en:{q:"How does 502 differ from 504?",o:["502: upstream answered badly. 504: upstream did not answer in time","502: the server is overloaded. 504: a DNS error","502: a client error. 504: a server error","It is the same error on different servers"],why:"Both are reported by an intermediary. 502 is a bad response, 504 is no response in time."}},
+{id:"q22",tag:"HTTP",q:"Dostajesz kod 471, którego nie znasz. Jak go potraktować wg RFC 9110?",o:["Jak 500","Jak 200","Jak 400, bo liczy się pierwsza cyfra","Zignorować"],a:2,why:"Klient musi rozumieć grupę po pierwszej cyfrze i traktować nieznany kod jak x00 tej grupy.",en:{q:"You get code 471, which you don't know. How should you treat it according to RFC 9110?",o:["As 500","As 200","As 400, because the first digit is what counts","Ignore it"],why:"A client must understand the class from the first digit and treat an unknown code as the x00 of that class."}},
+{id:"q23",tag:"HTTP",q:"Który kod pochodzi z żartu primaaprilisowego z 1998 r.?",o:["402 Payment Required","418 I’m a teapot","420 Enhance Your Calm","451 Unavailable For Legal Reasons"],a:1,why:"418 pochodzi z żartobliwego protokołu sterowania ekspresem do kawy. 420 to Twitter, 451 jest oficjalny od 2016 r.",en:{q:"Which code comes from a 1998 April Fools' joke?",why:"418 comes from a joke protocol for controlling coffee pots. 420 is Twitter, 451 has been official since 2016."}},
+{id:"q24",tag:"HTTP",q:"Która odpowiedź nie ma body i mówi „użyj kopii z cache”?",o:["204 No Content","205 Reset Content","304 Not Modified","410 Gone"],a:2,why:"304 odpowiada na warunkowy GET z `If-None-Match`. 204 i 205 też nie mają body, ale nie dotyczą cache.",en:{q:"Which response has no body and says “use your cached copy”?",why:"304 answers a conditional GET with `If-None-Match`. 204 and 205 have no body either, but they are not about the cache."}}
 ];
 
 const KLASS = {1:"Informacyjne",2:"Sukces",3:"Przekierowania",4:"Błąd klienta",5:"Błąd serwera"};
 const IANA_NO_CAT = {104:"Upload Resumption Supported (rejestracja tymczasowa)",306:"(Unused), dawny Switch Proxy",505:"HTTP Version Not Supported"};
+const KLASS_EN = {1:"Informational",2:"Success",3:"Redirection",4:"Client error",5:"Server error"};
+const IANA_NO_CAT_EN = {104:"Upload Resumption Supported (provisional registration)",306:"(Unused), formerly Switch Proxy",505:"HTTP Version Not Supported"};
 const BY = Object.fromEntries(CODES.map(d => [d.c, d]));
 const TOP = CODES.filter(d => d.t);
 const KEY = "httpkoty.v1";
-/* UI language comes from <html lang>, which the main app sets. Only labels switch; code descriptions, hooks and the quiz stay in Polish. */
-const L = (pl, en) => document.documentElement.lang === "en" ? en : pl;
-const KLASS_EN = {1:"Informational", 2:"Success", 3:"Redirection", 4:"Client error", 5:"Server error"};
+/* Language comes from <html lang>, which the main app sets. Codes and quiz items carry English in `en` (same keys as the Polish fields). */
+const isEn = () => document.documentElement.lang === "en";
+const L = (pl, en) => isEn() ? en : pl;
+const tr = (x, k) => isEn() && x.en && x.en[k] !== undefined ? x.en[k] : x[k];
 const klass = k => L(KLASS[k], KLASS_EN[k]);
+const iana = n => L(IANA_NO_CAT[n], IANA_NO_CAT_EN[n]);
 const known = on => on ? L("Umiem ✓", "Known ✓") : L("Umiem", "Known");
 const catAlt = d => L("Kot: ", "Cat: ") + d.c + " " + esc(d.n);
 
@@ -1699,7 +1703,7 @@ function paintSave(){
 const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const fmt = s => esc(s).replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
 const kOf = c => Math.floor(c/100);
-const vx = d => { const t = d.v.replace(/^VTEX:\s*/, ""); return fmt(t.charAt(0).toUpperCase() + t.slice(1)); };
+const vx = d => { const t = tr(d, "v").replace(/^VTEX:\s*/, ""); return fmt(t.charAt(0).toUpperCase() + t.slice(1)); };
 const $ = id => root.getElementById(id);
 function shuffle(a){ a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
@@ -1747,7 +1751,7 @@ function topRow(d){
   return '<article class="trow" data-k="' + kOf(d.c) + '">' +
     '<img src="' + KCAT[d.c] + '" alt="' + catAlt(d) + '" loading="lazy" width="750" height="600">' +
     '<div class="tb"><h3><span class="num">' + d.c + "</span> " + esc(d.n) + "</h3>" +
-    "<p>" + fmt(d.pl) + " " + fmt(d.fun) + "</p>" +
+    "<p>" + fmt(tr(d, "pl")) + " " + fmt(tr(d, "fun")) + "</p>" +
     (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : "") + "</div>" + knowBtn(d.c) + "</article>";
 }
 function paintTop(){
@@ -1758,12 +1762,12 @@ function paintTop(){
 /* ---------- grid ---------- */
 function card(d){
   const tags = (d.t ? '<span class="tag tp">' + L("Topka", "Top") + "</span>" : "") + (d.v ? '<span class="tag vx">VTEX</span>' : "") +
-    (d.x ? '<span class="tag">' + L("nieoficjalny · ", "unofficial · ") + esc(d.x) + "</span>" : "");
+    (d.x ? '<span class="tag">' + L("nieoficjalny · ", "unofficial · ") + esc(tr(d, "x")) + "</span>" : "");
   return '<article class="card" id="card-' + d.c + '" data-k="' + kOf(d.c) + '" data-known="' + (S.learned[d.c] ? 1 : 0) + '">' +
     '<img src="' + KCAT[d.c] + '" alt="' + catAlt(d) + '" loading="lazy" width="750" height="600">' +
     '<div class="card-b"><h3><span class="num">' + d.c + "</span> " + esc(d.n) + "</h3>" +
     (tags ? '<div class="tags">' + tags + "</div>" : "") +
-    "<p>" + fmt(d.pl) + "</p><p class=\"muted\"><b>" + L("Haczyk:", "Hook:") + "</b> " + fmt(d.fun) + "</p>" +
+    "<p>" + fmt(tr(d, "pl")) + "</p><p class=\"muted\"><b>" + L("Haczyk:", "Memory hook:") + "</b> " + fmt(tr(d, "fun")) + "</p>" +
     (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : "") + knowBtn(d.c) + "</div></article>";
 }
 function matches(d){
@@ -1775,7 +1779,9 @@ function matches(d){
   if(/^[1-5]$/.test(f) && kOf(d.c) !== +f) return false;
   const q = $("q").value.trim().toLowerCase();
   if(q){
-    const hay = (d.c + " " + d.n + " " + d.pl + " " + d.fun + " " + (d.v||"") + " " + (d.x||"")).toLowerCase();
+    /* Both languages are searchable, so a term from either version finds the code. */
+    const en = d.en || {};
+    const hay = [d.c, d.n, d.pl, d.fun, d.v, d.x, en.pl, en.fun, en.v, en.x].filter(Boolean).join(" ").toLowerCase();
     if(!hay.includes(q)) return false;
   }
   return true;
@@ -1788,7 +1794,7 @@ function paintGrid(){
     if(k !== last){
       last = k;
       const n = list.filter(e => kOf(e.c) === k).length;
-      html += '<h3 style="grid-column:1/-1" data-k="' + k + '"><span class="num">' + k + "xx</span> " + klass(k) + ' <span class="muted small">· ' + n + "</span></h3>";
+      html += '<h3 style="grid-column:1/-1" data-k="' + k + '"><span class="num">' + k + "xx</span> " + esc(klass(k)) + ' <span class="muted small">· ' + n + "</span></h3>";
     }
     html += card(d);
   }
@@ -1805,18 +1811,18 @@ function paintMaps(){
     for(let n=k*100;n<k*100+100;n++){
       const d = BY[n];
       if(d){ used++; cells += '<button class="c ' + (d.x ? "uc" : "oc") + '" data-c="' + n + '" tabindex="-1" aria-label="' + n + " " + esc(d.n) + (d.x ? L(", nieoficjalny", ", unofficial") : "") + '"></button>'; }
-      else if(IANA_NO_CAT[n]) cells += '<button class="c on" data-c="' + n + '" tabindex="-1" aria-label="' + n + " " + esc(IANA_NO_CAT[n]) + L(", bez kota", ", no cat") + '"></button>';
+      else if(IANA_NO_CAT[n]) cells += '<button class="c on" data-c="' + n + '" tabindex="-1" aria-label="' + n + " " + esc(iana(n)) + L(", bez kota", ", no cat") + '"></button>';
       else cells += '<i class="c" data-c="' + n + '"></i>';
     }
     const noCat = Object.keys(IANA_NO_CAT).filter(n => kOf(+n) === k);
-    html += '<div class="map" data-k="' + k + '"><h3><span class="num">' + k + "xx</span> " + klass(k) + "</h3>" +
+    html += '<div class="map" data-k="' + k + '"><h3><span class="num">' + k + "xx</span> " + esc(klass(k)) + "</h3>" +
       '<div class="cells" role="group" aria-label="' + L("Mapa numerów ", "Number map ") + k + "00–" + k + '99">' + cells + "</div>" +
       '<p class="small muted"><b>' + used + L(" z 100</b> ma kota", " of 100</b> have a cat") + (noCat.length ? L(". Bez kota: ", ". No cat: ") + noCat.join(", ") : "") + ".</p></div>";
   }
   $("maps").innerHTML = html;
   const first = root.querySelector("#maps .cells button"); if(first) first.tabIndex = 0;
   $("unofftable").innerHTML = CODES.filter(d => d.x).map(d =>
-    '<tr data-k="' + kOf(d.c) + '"><td><button class="codebtn" data-c="' + d.c + '">' + d.c + "</button></td><td>" + esc(d.n) + "</td><td>" + esc(d.x) + "</td></tr>").join("");
+    '<tr data-k="' + kOf(d.c) + '"><td><button class="codebtn" data-c="' + d.c + '">' + d.c + "</button></td><td>" + esc(d.n) + "</td><td>" + esc(tr(d, "x")) + "</td></tr>").join("");
 }
 
 /* ---------- quiz: exam ---------- */
@@ -1835,7 +1841,7 @@ function paintExam(){
     root.innerHTML = '<div class="qbox"><p class="eyebrow">' + (full ? L("Wynik", "Score") : L("Wynik powtórki", "Retry score")) + "</p>" +
       '<p class="score">' + right + "/" + order.length + " · " + pct + "%</p>" +
       '<p class="verdict ' + (pct >= 80 ? "good" : "bad") + '">' + (pct >= 80 ? L("Powyżej progu 80%.", "Above the 80% pass mark.") : L("Poniżej progu 80%. Powtórz błędne i podejdź jeszcze raz.", "Below the 80% pass mark. Retry the wrong ones and try again.")) + "</p>" +
-      (wrong.length ? "<div><p class=\"eyebrow\">" + L("Do powtórki", "To review") + "</p><ul class=\"tight\">" + wrong.map(id => { const q = QUESTIONS.find(x => x.id === id); return "<li>" + fmt(q.q) + "<br><b>" + fmt(q.o[q.a]) + ".</b> " + fmt(q.why) + "</li>"; }).join("") + "</ul></div>" : "") +
+      (wrong.length ? "<div><p class=\"eyebrow\">" + L("Do powtórki", "To review") + "</p><ul class=\"tight\">" + wrong.map(id => { const q = QUESTIONS.find(x => x.id === id); return "<li>" + fmt(tr(q, "q")) + "<br><b>" + fmt(tr(q, "o")[q.a]) + ".</b> " + fmt(tr(q, "why")) + "</li>"; }).join("") + "</ul></div>" : "") +
       '<div class="row"><button class="btn" data-act="restart">' + L("Nowe podejście", "New attempt") + "</button>" +
       (wrong.length ? '<button class="btn ghost" data-act="wrong">' + L("Powtórz tylko błędne (", "Retry only wrong (") + wrong.length + ")</button>" : "") + "</div></div>";
     return;
@@ -1843,15 +1849,15 @@ function paintExam(){
   const q = QUESTIONS.find(x => x.id === order[idx]);
   root.innerHTML = '<div class="qbox" data-q="' + q.id + '"><div class="row"><span class="tag ' + (q.tag === "VTEX" ? "vx" : "") + '">' + q.tag + "</span>" +
     '<span class="small muted">' + L("Pytanie ", "Question ") + (idx+1) + L(" z ", " of ") + order.length + L(" · dobrze: ", " · right: ") + right + "</span></div>" +
-    '<p class="qtext">' + fmt(q.q) + '</p><div class="opts">' +
-    q.o.map((o,i) => '<button class="opt" data-o="' + i + '">' + fmt(o) + "</button>").join("") +
+    '<p class="qtext">' + fmt(tr(q, "q")) + '</p><div class="opts">' +
+    tr(q, "o").map((o,i) => '<button class="opt" data-o="' + i + '">' + fmt(o) + "</button>").join("") +
     '</div><div id="qfb" aria-live="polite"></div></div>';
 }
 function answerExam(q, i){
   const box = root.querySelector(".qbox");
   box.querySelectorAll(".opt").forEach((b,j) => { b.disabled = true; if(j === q.a) b.classList.add("good"); else if(j === i) b.classList.add("bad"); });
   const ok = i === q.a;
-  $("qfb").innerHTML = '<p class="verdict ' + (ok ? "good" : "bad") + '">' + (ok ? L("Dobrze.", "Right.") : L("Źle.", "Wrong.")) + "</p><p>" + fmt(q.why) + '</p><p style="margin-top:12px"><button class="btn" data-act="next">' + L("Dalej", "Next") + "</button></p>";
+  $("qfb").innerHTML = '<p class="verdict ' + (ok ? "good" : "bad") + '">' + (ok ? L("Dobrze.", "Right.") : L("Źle.", "Wrong.")) + "</p><p>" + fmt(tr(q, "why")) + '</p><p style="margin-top:12px"><button class="btn" data-act="next">' + L("Dalej", "Next") + "</button></p>";
   S.quiz.ans[q.id] = i; save(); /* the answered question stays on screen until "Dalej" repaints */
 }
 
@@ -1884,7 +1890,7 @@ function answerDrill(c){
   root.querySelectorAll(".qbox .opt").forEach(b => { b.disabled = true; const v = +b.dataset.d; if(v === d.c) b.classList.add("good"); else if(v === c) b.classList.add("bad"); });
   $("qfb").innerHTML = '<p class="verdict ' + (ok ? "good" : "bad") + '">' + (ok ? L("Dobrze.", "Right.") : L("Źle. To ", "Wrong. It is ") + d.c + " " + esc(d.n) + ".") + "</p>" +
     '<div class="reveal" style="margin-top:10px"><img src="' + KCAT[d.c] + '" alt="' + catAlt(d) + '" width="750" height="600">' +
-    "<div><p>" + fmt(d.pl) + " " + fmt(d.fun) + "</p>" + (d.v ? '<p class="vxline" style="margin-top:6px"><b>VTEX:</b> ' + vx(d) + "</p>" : "") +
+    "<div><p>" + fmt(tr(d, "pl")) + " " + fmt(tr(d, "fun")) + "</p>" + (d.v ? '<p class="vxline" style="margin-top:6px"><b>VTEX:</b> ' + vx(d) + "</p>" : "") +
     '<p style="margin-top:12px"><button class="btn" data-act="nextdrill">' + L("Następny", "Next") + "</button></p></div></div>";
 }
 function paintQuiz(){
@@ -1922,17 +1928,17 @@ function prefetchAll(){
 function tipHTML(n, pin){
   const d = BY[n];
   if(!d){
-    const name = IANA_NO_CAT[n];
+    const name = iana(n);
     return '<div class="tb"><p class="th"><span class="num">' + n + "</span> <b>" + (name ? esc(name) : L("wolny numer", "free number")) + "</b></p>" +
       '<p class="muted">' + (name ? L("Jest w rejestrze IANA, ale http.cat nie ma dla niego kota.", "It is in the IANA registry, but http.cat has no cat for it.") :
       L("Nikt go nie przydzielił. Nieznany kod klient traktuje jak ", "Nobody has assigned it. A client treats an unknown code as ") + kOf(n) + "00.") + "</p></div>";
   }
   const tags = (d.t ? '<span class="tag tp">' + L("Topka", "Top") + "</span>" : "") + (d.v ? '<span class="tag vx">VTEX</span>' : "") +
-    (d.x ? '<span class="tag">' + L("nieoficjalny · ", "unofficial · ") + esc(d.x) + "</span>" : "") + (S.learned[n] ? '<span class="tag">' + known(true) + "</span>" : "");
+    (d.x ? '<span class="tag">' + L("nieoficjalny · ", "unofficial · ") + esc(tr(d, "x")) + "</span>" : "") + (S.learned[n] ? '<span class="tag">' + known(true) + "</span>" : "");
   return '<div class="ph"><img src="' + KCAT[n] + '" alt=""></div><div class="tb">' +
     '<p class="th"><span class="num">' + n + "</span> <b>" + esc(d.n) + "</b></p>" +
-    (tags ? '<div class="tags">' + tags + "</div>" : "") + "<p>" + fmt(d.pl) + "</p>" +
-    (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : '<p class="muted">' + fmt(d.fun) + "</p>") +
+    (tags ? '<div class="tags">' + tags + "</div>" : "") + "<p>" + fmt(tr(d, "pl")) + "</p>" +
+    (d.v ? '<p class="vxline"><b>VTEX:</b> ' + vx(d) + "</p>" : '<p class="muted">' + fmt(tr(d, "fun")) + "</p>") +
     (pin ? '<button class="btn" data-jump="' + n + '">' + L("Pokaż kartę", "Show card") + "</button>" : '<p class="small muted">' + L("Klik otwiera kartę", "Click opens the card") + "</p>") + "</div>";
 }
 function placeTip(el){
@@ -2493,7 +2499,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
   catch (e) { $("#storage-warn").hidden = false; }
 
   /* ---------- helpers ---------- */
-  /* UI language only: questions, explanations, flashcards and the HTTP Koty study text stay as written. */
+  /* UI language: questions, explanations and flashcards stay as written. HTTP Koty translates its own content. */
   function L(pl, en) { return S.lang === "en" ? en : pl; }
   function T(pair) { return pair[S.lang === "en" ? 1 : 0]; }
   function dn(k) { return S.lang === "en" && DOM_EN[k] || DOM_NAME[k]; }

@@ -52,11 +52,11 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 
 **DOCS** (`docs.json`): `key: [url, label]`. Every Q/F needs at least one `l` key. URLs must be official (developers.vtex.com, help.vtex.com, learn.vtex.com, github.com/vtex). Before adding or changing a fact, fetch the source page and confirm it states the fact.
 
-**Koty**: `koty-codes.json` (`c, n, pl, fun, v?, t?, x?`, sorted by `c`, each code needs `src/img/cats/<c>.jpg`), `koty-quiz.json` (`id, tag: VTEX|HTTP, q, o, a: index, why`), `koty-meta.json`.
+**Koty**: `koty-codes.json` (`c, n, pl, fun, v?, t?, x?, en: {pl, fun, v?, x?}`, sorted by `c`, each code needs `src/img/cats/<c>.jpg`), `koty-quiz.json` (`id, tag: VTEX|HTTP, q, o, a: index, why, en: {q, o?, why}`; `en.o` keeps the order of `o`, leave it out when the options are code names or numbers), `koty-meta.json` (`KLASS`, `IANA_NO_CAT` and their `_EN` twins). `en` is what the English UI shows; the validator requires it.
 
 ## Writing conventions
-- Q `q` and `o` are in **English**, phrased like the real exam. `e`, flashcard `a` and the Koty study text (code descriptions, hooks, table cells, quiz) are in **Polish**. Koty block and table headings are labels and have English.
-- The UI is bilingual (Settings › Język). Every new UI label needs English too: `data-en` / `data-en-html` / `data-en-title` / `data-en-aria` / `data-en-ph` on static markup, `L(pl, en)` in JS. Content is never translated.
+- Q `q` and `o` are in **English**, phrased like the real exam. `e` and flashcard `a` are in **Polish**. HTTP Koty is fully bilingual: Polish fields plus their `en` copies, and `data-en*` on the template.
+- The UI is bilingual (Settings › Język). Every new UI label needs English too: `data-en` / `data-en-html` / `data-en-title` / `data-en-aria` / `data-en-ph` on static markup, `L(pl, en)` in JS. Questions, explanations and flashcards are never translated.
 - Short, plain sentences. Inline markup is only `` `code` `` and `**bold**`, plus `\n` in flashcard answers. Everything else is escaped (`esc`, then `fmt`).
 - Distractors must be plausible VTEX-isms: real header names, real endpoints, wrong numbers. They must not be obviously absurd.
 - The code style follows the file you are in. `app.js` is ES5 (`var`, `function`), `koty.js` is ES2015+. Comment density is low, and comments explain why, not what.

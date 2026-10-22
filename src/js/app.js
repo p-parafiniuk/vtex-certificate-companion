@@ -102,7 +102,7 @@
   catch (e) { $("#storage-warn").hidden = false; }
 
   /* ---------- helpers ---------- */
-  /* UI language only: questions, explanations, flashcards and the HTTP Koty study text stay as written. */
+  /* UI language: questions, explanations and flashcards stay as written. HTTP Koty translates its own content. */
   function L(pl, en) { return S.lang === "en" ? en : pl; }
   function T(pair) { return pair[S.lang === "en" ? 1 : 0]; }
   function dn(k) { return S.lang === "en" && DOM_EN[k] || DOM_NAME[k]; }
