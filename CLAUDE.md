@@ -11,8 +11,10 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 ## Commands
 | | |
 |---|---|
+| `npm install` | once per checkout: installs Prettier (the only devDependency) and enables the git hooks in `.githooks/` |
+| `npm run format` | format JS, CSS, templates and scripts with Prettier. Run it before every commit and before opening a PR. |
 | `npm run build` | validate, then write `vtex-api-drill.html` |
-| `npm run check` | validate, then confirm the built file matches `src/`. Run it before every commit. |
+| `npm run check` | branch name, formatting, validate, then confirm the built file matches `src/`. Run it before every commit. |
 | `npm run stats` | table of questions per domain × round, to find gaps |
 | `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
 | `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
@@ -36,7 +38,7 @@ src/data/*.json         all content, one item per line (apimap.json: one API per
 src/data/notes.json      per category (+ "all"): TL;DR and study notes for the Notatki section
 src/data/categories.json per category: `api` = [apiKey, tags?] for its embedded API Map, `ref` = [slug, label] API Reference pages
 src/img/cats/<code>.jpg http.cat images, inlined as KCAT at build time
-scripts/                lib (block formats), build, extract, validate, stats. Zero deps, Node >= 18.
+scripts/                lib (block formats), build, extract, validate, stats, format. Node >= 18; Prettier is the one devDependency.
 ```
 Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs` (`BLOCKS`). To add a new data block: add it there, add a `/*@data NAME*/` line in the right script, and create the JSON file.
 
@@ -73,6 +75,12 @@ Every answer that changes or proposes UI ends with a visualization the user can 
 - **Data or structure change**: a short table or diagram of what maps to what (e.g. category → APIs → doc pages).
 A report without a picture of a UI change is not finished.
 
+## Formatting
+Prettier formats the code (`.prettierrc.json`: 120 columns, double quotes, no trailing commas, so app.js stays ES5). `.prettierignore` leaves out `src/data/` (one item per line, owned by the validator), `src/index.html` (build markers), the built file and Markdown.
+- **Always format before a commit, and above all before opening a PR**: `npm run format`, then `npm run build` if `src/` changed, then `npm run check`.
+- Three gates enforce it: the git `pre-commit` hook formats and re-stages staged files (and rebuilds when `src/` changed), `npm run check` fails on an unformatted file, and the Claude Code hook in `.claude/settings.json` blocks `git commit` and `gh pr create` until the tree is formatted.
+- Never bypass them with `--no-verify`, and never hand-format against Prettier. A formatting-only change goes in its own commit.
+
 ## Branches and PRs
 - One branch per PR, cut from fresh `main`: `git fetch origin main && git checkout -b <type>/<topic> origin/main`.
 - Name it `<type>/<short-kebab-topic>`, 2 to 5 words that say what changes. Types: `feat` (behaviour), `content` (questions, flashcards, DOCS), `fix`, `ux`, `security`, `chore` (scripts, harness, docs). Examples: `feat/category-side-panel`, `content/logistics-round-2`, `fix/focus-resume-after-filter`.
@@ -80,7 +88,8 @@ A report without a picture of a UI change is not finished.
 - Cloud sessions start on a generated `claude/<words>` branch. That name never reaches a PR. Before any work, run `git fetch origin main` and fast-forward onto it. Before the first commit, cut `<type>/<topic>` from `origin/main`, then commit, push (`git push -u origin <type>/<topic>`) and open the PR from that branch. This rule is the user's standing permission to push to it instead of the session branch.
 - `npm run branch` checks the current name. `npm run check` runs it too and fails on a `claude/*` branch or a name outside the pattern (`main` and a detached HEAD pass).
 - PR title prefix repeats the topic: `feat(category-side-panel): …`.
-- PR title in English, imperative. The body lists what changed, how it was verified (`npm run check`, the shots), and includes the screenshots.
+- Before `gh pr create`: `npm run format`, `npm run check`, commit what they changed, push.
+- PR title in English, imperative. The body lists what changed, how it was verified (`npm run format`, `npm run check`, the shots), and includes the screenshots.
 
 ## Skills and reviewers
 `/feature`, `/fix`, `/ux`, `/security`, `/gamify` do the work. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.

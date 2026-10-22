@@ -25,4 +25,4 @@ Start the `drill` launch config. For each tab (Pytania, Symulacja, Fiszki, PostÄ
 - Before changing a screen, show it as a Claude Design mockup (`CLAUDE.md` â€º Always show it) and wait for the user's go.
 - First give a short prioritised list: issue, where it is (`src/...:line`), why it matters for studying, and the proposed fix. Group it into must, should and nice.
 - Implement what the user approves. Use tokens only, change dark mode alongside light, follow the existing ES5 style, and do not add libraries.
-- After the changes, take the same screenshots again (`npm run shots -- <hash>`), compare them before and after, and send the user the pairs. `npm run check` must be green.
+- After the changes, take the same screenshots again (`npm run shots -- <hash>`), compare them before and after, and send the user the pairs. `npm run format`, then `npm run check` must be green.

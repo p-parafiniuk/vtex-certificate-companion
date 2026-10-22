@@ -30,4 +30,4 @@ Read `CLAUDE.md` first if it is not already in context. This is a static, offlin
 
 ## 4. Report and fix
 - List findings ranked by severity: what, where (`src/...:line`), an exploit scenario in one sentence, and the fix. Say plainly when an area is clean.
-- Apply fixes the user approves. Run `npm run check`, then open the page with CSP active and exercise every tab with the console open. There must be no CSP violations.
+- Apply fixes the user approves. Run `npm run format` and `npm run check`, then open the page with CSP active and exercise every tab with the console open. There must be no CSP violations.

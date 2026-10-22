@@ -8,7 +8,7 @@ description: Targeted review gate for VTEX API Drill changes. Picks only the rev
 A lightweight gate, not a pipeline. The user decides on merging. Never merge or push.
 
 ## 1. Free checks first
-Run `npm run check`. If it fails, fix that first. Never spend reviewer tokens on a change the validator rejects.
+Run `npm run format`, then `npm run check`. If it fails, fix that first. Never spend reviewer tokens on a change the validator rejects.
 
 ## 2. Pick reviewers deterministically
 Run `npm run review-scope --silent` (base defaults to `main`; pass another base after `--` if the user names one). It prints JSON with `reviewers`, `files` and `reasons`.

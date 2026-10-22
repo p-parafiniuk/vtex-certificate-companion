@@ -1,0 +1,10 @@
+# Build output: written by npm run build, never by hand.
+vtex-api-drill.html
+# Content is one item per line (scripts/lib.mjs BLOCKS); the validator owns its shape.
+src/data/
+tests/ids.lock.json
+# Skeleton with build markers inside <style> and <script>; not parseable as one document.
+src/index.html
+package-lock.json
+shots/
+*.md
