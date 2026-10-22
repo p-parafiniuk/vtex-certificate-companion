@@ -717,6 +717,131 @@ mark {
   letter-spacing: 0;
   text-transform: none;
 }
+/* API Map tab from 761 px: the API list and the filters form a side menu, styled like the question categories. */
+.sidemode .layout {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.main {
+  min-width: 0;
+}
+.side {
+  position: sticky;
+  top: calc(var(--apimap-top, 0px) + 12px);
+  max-height: calc(100vh - var(--apimap-top, 0px) - 24px);
+  overflow-y: auto;
+  display: grid;
+  gap: 2px;
+  padding-block: 10px;
+}
+.sl {
+  margin: 14px 0 4px;
+  padding: 12px 10px 0;
+  border-top: 1px solid var(--line);
+}
+.sl:first-child {
+  margin-top: 0;
+  padding-top: 4px;
+  border-top: 0;
+}
+.sidemode .apis {
+  display: grid;
+  gap: 2px;
+  overflow: visible;
+}
+.sidemode .scr {
+  display: none !important;
+}
+.sidemode .chip,
+.sidemode #methods button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  justify-content: space-between;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  padding: 6px 10px;
+  text-align: left;
+}
+.sidemode .chip {
+  font-size: 14px;
+}
+.sidemode .chip:hover,
+.sidemode #methods button:hover {
+  background: var(--panel);
+  border-color: var(--line);
+}
+.sidemode .chip[aria-pressed="true"],
+.sidemode #methods button[aria-pressed="true"] {
+  background: var(--panel);
+  color: var(--fg);
+  border-color: var(--line);
+  box-shadow: inset 3px 0 0 var(--accent);
+  font-weight: 600;
+}
+.sidemode #methods button[aria-pressed="true"] {
+  color: var(--c);
+  box-shadow: inset 3px 0 0 var(--c);
+}
+.sidemode .chip[aria-pressed="true"] span,
+.sidemode #methods .mc {
+  color: var(--muted);
+  opacity: 1;
+}
+/* The count is pushed right by its own margin, so the DEL|ETE pieces of the label stay together. */
+.sidemode #methods button {
+  justify-content: flex-start;
+}
+.sidemode #methods .mc {
+  margin-left: auto;
+}
+.sidemode #methods {
+  display: grid;
+  gap: 2px;
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+.sidemode .fpanel {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px 10px 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+}
+.sidemode .fpanel .pair {
+  display: grid;
+  gap: 8px;
+}
+.sidemode #scopes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.sidemode #scopes button {
+  min-height: 44px;
+}
+.sidemode .chk {
+  min-height: 44px;
+}
+.sidemode .chip:focus-visible,
+.sidemode #methods button:focus-visible,
+.sidemode #scopes button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.sidemode #scopes button:nth-child(2n) {
+  border-right: 0;
+}
+.sidemode #scopes button:nth-child(n + 3) {
+  border-top: 1px solid var(--line);
+}
 /* Phones: the deck scrolls away so the tree keeps the screen, and summaries wrap instead of hiding off the right edge. */
 @media (max-width: 560px) {
   .deck {
