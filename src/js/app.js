@@ -7,8 +7,8 @@
   var VIEWS = TABS.concat(["focus"]);
   var LET = "ABCDEFG";
   /* No prototype: keys come from the URL and storage, and "constructor" must not count as a category. */
-  var DOM_NAME = Object.create(null), DOM_ICO = Object.create(null);
-  DOMS.forEach(function (d) { DOM_NAME[d[0]] = d[1]; DOM_ICO[d[0]] = d[2]; });
+  var DOM_NAME = Object.create(null), DOM_ICO = Object.create(null), DOM_EN = Object.create(null);
+  DOMS.forEach(function (d) { DOM_NAME[d[0]] = d[1]; DOM_ICO[d[0]] = d[2]; if (d[3]) DOM_EN[d[0]] = d[3]; });
   var REF = "https://developers.vtex.com/docs/api-reference/";
   /* An endpoint page opened from the embedded API Map. It lives in history.state, so it is checked before it reaches the frame. */
   var EP_URL = /^https:\/\/developers\.vtex\.com\/docs\/api-reference\/[a-z0-9-]+(#[A-Za-z0-9_\-\/.@]*)?$/;
@@ -20,23 +20,23 @@
   /* v2: answers are arrays of selected option indexes (multi-select). Older single-index answers are dropped, "Umiem" marks stay. */
   var S = { v: 2, known: {}, fknown: {}, ans: {}, sims: [], hide: false, dom: "all", set: "all", hint: false, sim: null, simMin: 120, simPrac: true,
     fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" }, theme: "auto",
-    days: {}, tday: { d: "", ids: {} }, total: 0, combo: 0, comboBest: 0, best: 0, badges: {}, goal: 20, gx: { head: true, combo: true, toast: true } };
+    days: {}, tday: { d: "", ids: {} }, total: 0, combo: 0, comboBest: 0, best: 0, badges: {}, goal: 20, gx: { head: true, combo: true, toast: true }, lang: "pl" };
   var GOALS = [10, 20, 40];
   var DAY_RE = /^\d{4}-\d\d-\d\d$/;
   /* Append only: unlock dates are stored by id. */
   var BADGES = [
-    { id: "first", n: "Pierwszy krok", d: "Pierwsza odpowiedź", ok: function (x) { return x.total >= 1; }, p: function () { return "Odpowiedz na dowolne pytanie"; } },
-    { id: "a100", n: "Setka", d: "100 odpowiedzi", ok: function (x) { return x.total >= 100; }, p: function (x) { return x.total + " / 100 odpowiedzi"; } },
-    { id: "goal", n: "Cel dnia", d: "Cel dzienny osiągnięty", ok: function (x) { return x.goalHit; }, p: function (x) { return "Dziś " + x.today + " / " + x.goal; } },
-    { id: "s3", n: "Seria 3 dni", d: "3 dni nauki z rzędu", ok: function (x) { return x.best >= 3; }, p: function (x) { return x.streak + " / 3 dni"; } },
-    { id: "s7", n: "Seria 7 dni", d: "Tydzień nauki z rzędu", ok: function (x) { return x.best >= 7; }, p: function (x) { return x.streak + " / 7 dni"; } },
-    { id: "s14", n: "Seria 14 dni", d: "Dwa tygodnie z rzędu", ok: function (x) { return x.best >= 14; }, p: function (x) { return x.streak + " / 14 dni"; } },
-    { id: "c10", n: "Combo 10", d: "10 dobrych odpowiedzi z rzędu", ok: function (x) { return x.comboBest >= 10; }, p: function (x) { return "Rekord " + x.comboBest + " z rzędu"; } },
-    { id: "c25", n: "Combo 25", d: "25 dobrych odpowiedzi z rzędu", ok: function (x) { return x.comboBest >= 25; }, p: function (x) { return "Rekord " + x.comboBest + " z rzędu"; } },
-    { id: "sim", n: "Zdana symulacja", d: "Co najmniej 80% w symulacji", ok: function (x) { return x.simPass; }, p: function (x) { return x.simBest; } },
-    { id: "dom", n: "Obszar na 100%", d: "Wszystkie pytania z obszaru opanowane", ok: function (x) { return x.domFull; }, p: function (x) { return "Najbliżej: " + x.domNear; } },
-    { id: "fall", n: "Wszystkie fiszki", d: "Każda fiszka oznaczona Umiem", ok: function (x) { return x.kf >= F.length; }, p: function (x) { return x.kf + " / " + F.length + " fiszek"; } },
-    { id: "ready", n: "Gotowy", d: "Gotowość co najmniej 80", ok: function (x) { return x.ready >= 80; }, p: function (x) { return "Gotowość " + x.ready + " / 80"; } }
+    { id: "first", n: ["Pierwszy krok", "First step"], d: ["Pierwsza odpowiedź", "First answer"], ok: function (x) { return x.total >= 1; }, p: function () { return L("Odpowiedz na dowolne pytanie", "Answer any question"); } },
+    { id: "a100", n: ["Setka", "Century"], d: ["100 odpowiedzi", "100 answers"], ok: function (x) { return x.total >= 100; }, p: function (x) { return x.total + L(" / 100 odpowiedzi", " / 100 answers"); } },
+    { id: "goal", n: ["Cel dnia", "Goal of the day"], d: ["Cel dzienny osiągnięty", "Daily goal reached"], ok: function (x) { return x.goalHit; }, p: function (x) { return L("Dziś ", "Today ") + x.today + " / " + x.goal; } },
+    { id: "s3", n: ["Seria 3 dni", "3-day streak"], d: ["3 dni nauki z rzędu", "3 days of study in a row"], ok: function (x) { return x.best >= 3; }, p: function (x) { return x.streak + L(" / 3 dni", " / 3 days"); } },
+    { id: "s7", n: ["Seria 7 dni", "7-day streak"], d: ["Tydzień nauki z rzędu", "A week of study in a row"], ok: function (x) { return x.best >= 7; }, p: function (x) { return x.streak + L(" / 7 dni", " / 7 days"); } },
+    { id: "s14", n: ["Seria 14 dni", "14-day streak"], d: ["Dwa tygodnie z rzędu", "Two weeks in a row"], ok: function (x) { return x.best >= 14; }, p: function (x) { return x.streak + L(" / 14 dni", " / 14 days"); } },
+    { id: "c10", n: ["Combo 10", "Combo 10"], d: ["10 dobrych odpowiedzi z rzędu", "10 right answers in a row"], ok: function (x) { return x.comboBest >= 10; }, p: function (x) { return L("Rekord ", "Best ") + x.comboBest + L(" z rzędu", " in a row"); } },
+    { id: "c25", n: ["Combo 25", "Combo 25"], d: ["25 dobrych odpowiedzi z rzędu", "25 right answers in a row"], ok: function (x) { return x.comboBest >= 25; }, p: function (x) { return L("Rekord ", "Best ") + x.comboBest + L(" z rzędu", " in a row"); } },
+    { id: "sim", n: ["Zdana symulacja", "Simulation passed"], d: ["Co najmniej 80% w symulacji", "At least 80% in a simulation"], ok: function (x) { return x.simPass; }, p: function (x) { return x.simBest; } },
+    { id: "dom", n: ["Obszar na 100%", "Area at 100%"], d: ["Wszystkie pytania z obszaru opanowane", "Every question in one area mastered"], ok: function (x) { return x.domFull; }, p: function (x) { return L("Najbliżej: ", "Closest: ") + x.domNear; } },
+    { id: "fall", n: ["Wszystkie fiszki", "All flashcards"], d: ["Każda fiszka oznaczona Umiem", "Every flashcard marked Known"], ok: function (x) { return x.kf >= F.length; }, p: function (x) { return x.kf + " / " + F.length + L(" fiszek", " flashcards"); } },
+    { id: "ready", n: ["Gotowy", "Ready"], d: ["Gotowość co najmniej 80", "Readiness of at least 80"], ok: function (x) { return x.ready >= 80; }, p: function (x) { return L("Gotowość ", "Readiness ") + x.ready + " / 80"; } }
   ];
   var BADGE_ID = Object.create(null);
   BADGES.forEach(function (b) { BADGE_ID[b.id] = true; });
@@ -57,6 +57,7 @@
       if (raw.simMin > 0 && raw.simMin <= 600) S.simMin = Math.round(raw.simMin);
       if (raw.simPrac === false) S.simPrac = false;
       if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
+      if (raw.lang === "en") S.lang = "en";
       if (raw.days && typeof raw.days === "object" && !Array.isArray(raw.days)) {
         Object.keys(raw.days).forEach(function (k) { var n = raw.days[k] >>> 0; if (DAY_RE.test(k) && n > 0) S.days[k] = Math.min(n, 9999); });
       }
@@ -101,6 +102,23 @@
   catch (e) { $("#storage-warn").hidden = false; }
 
   /* ---------- helpers ---------- */
+  /* UI language only: questions, explanations, flashcards and HTTP Koty stay as written. */
+  function L(pl, en) { return S.lang === "en" ? en : pl; }
+  function T(pair) { return pair[S.lang === "en" ? 1 : 0]; }
+  function dn(k) { return S.lang === "en" && DOM_EN[k] || DOM_NAME[k]; }
+  /* Static markup carries its English in data-en (text), data-en-html (markup written in the page itself), data-en-title, data-en-aria and data-en-ph.
+     The Polish original is kept on the element the first time, so switching back needs no second copy. */
+  function localize(root) {
+    var en = S.lang === "en";
+    root.querySelectorAll("[data-en], [data-en-html], [data-en-title], [data-en-aria], [data-en-ph]").forEach(function (el) {
+      var pl = el._pl || (el._pl = { h: el.innerHTML, t: el.getAttribute("title"), a: el.getAttribute("aria-label"), p: el.getAttribute("placeholder") });
+      if (el.hasAttribute("data-en")) { if (en) el.textContent = el.dataset.en; else el.innerHTML = pl.h; }
+      if (el.hasAttribute("data-en-html")) el.innerHTML = en ? el.dataset.enHtml : pl.h;
+      if (el.hasAttribute("data-en-title")) el.title = en ? el.dataset.enTitle : pl.t;
+      if (el.hasAttribute("data-en-aria")) el.setAttribute("aria-label", en ? el.dataset.enAria : pl.a);
+      if (el.hasAttribute("data-en-ph")) el.placeholder = en ? el.dataset.enPh : pl.p;
+    });
+  }
   function esc(s) {
     return String(s).replace(/[&<>"]/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
@@ -134,6 +152,7 @@
     Q.concat(F).forEach(function (x) { if (x.d === d[0]) (x.l || []).forEach(function (k) { n[k] = (n[k] || 0) + 1; }); });
     CAT_DOCS[d[0]] = Object.keys(n).sort(function (a, b) { return n[b] - n[a] || (a < b ? -1 : 1); }).map(function (k) { return [k, n[k]]; });
   });
+  /* English passes the same word as few and many. */
   function plural(n, one, few, many) {
     var t = n % 10, h = n % 100;
     return n + " " + (n === 1 ? one : t >= 2 && t <= 4 && (h < 12 || h > 14) ? few : many);
@@ -150,42 +169,42 @@
   function httpChips(x) {
     var cs = x.h || [];
     if (!cs.length) return "";
-    return '<p class="doc"><span class="doc-k">Te kody w HTTP Kotach:</span> ' + cs.map(function (c) {
+    return '<p class="doc"><span class="doc-k">' + L("Te kody w HTTP Kotach:", "These codes in HTTP Koty:") + "</span> " + cs.map(function (c) {
       return '<button type="button" class="hchip" data-code="' + c + '">' + c + " " + esc(HN[c]) + "</button>";
     }).join(" ") + "</p>";
   }
   function docLinks(x) {
     var ks = x.l || [];
     if (!ks.length) return "";
-    return '<p class="doc"><span class="doc-k">Dokumentacja VTEX:</span> ' + ks.map(function (k) {
+    return '<p class="doc"><span class="doc-k">' + L("Dokumentacja VTEX:", "VTEX docs:") + "</span> " + ks.map(function (k) {
       return '<span class="doci"><a href="' + esc(DOCS[k][0]) + '" target="_blank" rel="noopener">' + esc(DOCS[k][1]) + " ↗</a>" +
-        (FRAMEABLE.test(DOCS[k][0]) ? '<button type="button" class="docf" data-doc="' + esc(k) + '" aria-expanded="false" aria-label="' + esc(docfLabel(DOCS[k][1], false)) + '">Czytaj tutaj</button>' : "") + "</span>";
+        (FRAMEABLE.test(DOCS[k][0]) ? '<button type="button" class="docf" data-doc="' + esc(k) + '" aria-expanded="false" aria-label="' + esc(docfLabel(DOCS[k][1], false)) + '">' + L("Czytaj tutaj", "Read here") + "</button>" : "") + "</span>";
     }).join("") + "</p>";
   }
   /* Only official VTEX pages ever go into a frame (the same hosts DOCS may use). */
   var FRAMEABLE = /^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\//;
   function docFrame(url, label, closer) {
     return '<div class="docbar"><span class="docurl">' + esc(url.replace(/^https:\/\//, "")) + "</span>" +
-      '<span class="docacts"><a class="btn small" href="' + esc(url) + '" target="_blank" rel="noopener">Otwórz w nowej karcie ↗</a>' +
-      (closer ? '<button type="button" class="btn small docx">Zamknij</button>' : "") + "</span></div>" +
+      '<span class="docacts"><a class="btn small" href="' + esc(url) + '" target="_blank" rel="noopener">' + L("Otwórz w nowej karcie", "Open in a new tab") + " ↗</a>" +
+      (closer ? '<button type="button" class="btn small docx">' + L("Zamknij", "Close") + "</button>" : "") + "</span></div>" +
       (FRAMEABLE.test(url) ? '<iframe class="docframe" src="' + esc(url) + '" title="' + esc(label) +
         '" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>' : "") +
-      '<p class="how">Pusta ramka? Ta strona VTEX blokuje osadzanie. Otwórz ją w nowej karcie.</p>';
+      '<p class="how">' + L("Pusta ramka? Ta strona VTEX blokuje osadzanie. Otwórz ją w nowej karcie.", "Empty frame? This VTEX page blocks embedding. Open it in a new tab.") + "</p>";
   }
   /* The accessible name has to start with the visible label, so it changes with the toggle. */
-  function docfLabel(label, open) { return open ? "Zwiń „" + label + "”" : "Czytaj tutaj „" + label + "”, bez wychodzenia z nauki"; }
+  function docfLabel(label, open) { return open ? L("Zwiń „" + label + "”", "Collapse “" + label + "”") : L("Czytaj tutaj „" + label + "”, bez wychodzenia z nauki", "Read here “" + label + "”, without leaving your study"); }
   var PANE_N = 0;
   /* Inline reading: one frame under the doc line, so the question and its explanation stay in view. */
   function setDocPane(line, btn) {
     var pane = line.nextElementSibling && line.nextElementSibling.classList.contains("docpane") ? line.nextElementSibling : null;
     if (pane) pane.remove();
     line.querySelectorAll(".docf").forEach(function (b) {
-      b.setAttribute("aria-expanded", "false"); b.removeAttribute("aria-controls"); b.textContent = "Czytaj tutaj";
+      b.setAttribute("aria-expanded", "false"); b.removeAttribute("aria-controls"); b.textContent = L("Czytaj tutaj", "Read here");
       b.setAttribute("aria-label", docfLabel(DOCS[b.dataset.doc][1], false));
     });
     if (!btn) return;
     var d = DOCS[btn.dataset.doc], id = "docpane-" + (++PANE_N);
-    btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-controls", id); btn.textContent = "Zwiń";
+    btn.setAttribute("aria-expanded", "true"); btn.setAttribute("aria-controls", id); btn.textContent = L("Zwiń", "Collapse");
     btn.setAttribute("aria-label", docfLabel(d[1], true));
     line.insertAdjacentHTML("afterend", '<div class="docpane docview" id="' + id + '" role="region" aria-label="' + esc(d[1]) + '">' + docFrame(d[0], d[1], true) + "</div>");
   }
@@ -228,9 +247,9 @@
       var cls = "opt", mark = "";
       if (good) rightLetters.push(letter);
       if (reveal) {
-        if (good && on) { cls += " is-right"; mark = '<span class="mark">dobrze</span>'; }
-        else if (good) { cls += " is-missed"; mark = '<span class="mark">pominięta</span>'; }
-        else if (on) { cls += " is-wrong"; mark = '<span class="mark">błędna</span>'; }
+        if (good && on) { cls += " is-right"; mark = '<span class="mark">' + L("dobrze", "right") + "</span>"; }
+        else if (good) { cls += " is-missed"; mark = '<span class="mark">' + L("pominięta", "missed") + "</span>"; }
+        else if (on) { cls += " is-wrong"; mark = '<span class="mark">' + L("błędna", "wrong") + "</span>"; }
       } else if (on) { cls += " is-picked"; }
       opts += '<button type="button" role="checkbox" class="' + cls + '" data-o="' + oi + '"' + (reveal ? " disabled" : "") +
         ' aria-checked="' + on + '"><span class="let">' + letter + '</span><span class="otxt">' +
@@ -240,23 +259,23 @@
     var tail = "";
     if (reveal) {
       var ok = isRight(i, sel);
-      var word = need > 1 ? "Poprawne: " : "Poprawna: ";
+      var word = need > 1 ? L("Poprawne: ", "Right answers: ") : L("Poprawna: ", "Right answer: ");
       var verdict = ok
-        ? '<span class="verdict ok">Dobrze.</span>'
-        : '<span class="verdict no">' + (sel.length ? "Źle. " : "Brak odpowiedzi. ") + word + rightLetters.join(", ") + ".</span>";
+        ? '<span class="verdict ok">' + L("Dobrze.", "Right.") + "</span>"
+        : '<span class="verdict no">' + (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) + word + rightLetters.join(", ") + ".</span>";
       tail = '<div class="exp"><p>' + verdict + " " + fmt(q.e) + "</p>" + (ok ? "" : docLinks(q) + httpChips(q)) +
-        (mode === "learn" ? '<button type="button" class="btn small retry">Spróbuj jeszcze raz</button>' : "") + "</div>";
+        (mode === "learn" ? '<button type="button" class="btn small retry">' + L("Spróbuj jeszcze raz", "Try again") + "</button>" : "") + "</div>";
     } else if (mode === "learn") {
-      tail = '<div class="row"><button type="button" class="btn primary chk"' + (sel.length ? "" : " disabled") + ">Sprawdź odpowiedź</button></div>";
+      tail = '<div class="row"><button type="button" class="btn primary chk"' + (sel.length ? "" : " disabled") + ">" + L("Sprawdź odpowiedź", "Check answer") + "</button></div>";
     }
 
     var know = mode === "learn"
       ? '<label class="check" for="kq-' + n + '"><input type="checkbox" class="kn" id="kq-' + n + '"' +
-        (S.known[i] ? " checked" : "") + "> Umiem</label>"
+        (S.known[i] ? " checked" : "") + "> " + L("Umiem", "Known") + "</label>"
       : "";
     var top = head !== undefined ? head
-      : '<span class="num">#' + n + '</span><span class="dom">' + esc(DOM_NAME[q.d]) + '</span><span class="rnd">R' + q.r + "</span>";
-    var how = reveal ? "" : '<p class="how">Zaznacz wszystkie poprawne odpowiedzi' + (S.hint ? " <strong>(poprawnych: " + need + ")</strong>" : "") + ".</p>";
+      : '<span class="num">#' + n + '</span><span class="dom">' + esc(dn(q.d)) + '</span><span class="rnd">R' + q.r + "</span>";
+    var how = reveal ? "" : '<p class="how">' + L("Zaznacz wszystkie poprawne odpowiedzi", "Select all right answers") + (S.hint ? " <strong>(" + L("poprawnych: ", "right: ") + need + ")</strong>" : "") + ".</p>";
 
     return '<article class="q' + (mode === "learn" && S.known[i] ? " is-known" : "") + '" id="' +
       (mode === "learn" ? "q-" : "s-") + n + '" data-i="' + i + '">' +
@@ -290,16 +309,16 @@
       per[q.d][0] += k; per[q.d][1]++;
       per.all[0] += k; per.all[1]++;
     });
-    $("#sets").innerHTML = [["all", "Obie rundy"], ["1", "Runda 1"], ["2", "Runda 2 (luki)"]].map(function (s) {
+    $("#sets").innerHTML = [["all", L("Obie rundy", "Both rounds")], ["1", L("Runda 1", "Round 1")], ["2", L("Runda 2 (luki)", "Round 2 (gaps)")]].map(function (s) {
       return '<button type="button" class="chip" data-set="' + s[0] + '" aria-pressed="' + (S.set === s[0]) +
         '">' + s[1] + " <small>" + sets[s[0]][0] + "/" + sets[s[0]][1] + "</small></button>";
     }).join("");
     /* Switching category keeps the open section, so API paths can be compared across areas. */
     var sec = S.dom === "all" ? undefined : NAV.cur.sec;
-    $("#cats").innerHTML = [["all", "Wszystkie pytania", "📚"]].concat(DOMS).map(function (d) {
+    $("#cats").innerHTML = [["all", L("Wszystkie pytania", "All questions"), "📚"]].concat(DOMS).map(function (d) {
       var p = per[d[0]];
       return '<a class="cat" data-nav href="' + catHref(d[0], d[0] === "all" ? undefined : sec) + '"' + (S.dom === d[0] ? ' aria-current="page"' : "") +
-        ' title="Opanowane w tej kategorii: ' + p[0] + " z " + p[1] + '"><span class="cat-i" aria-hidden="true">' + esc(d[2]) + '</span><span class="cat-n">' + esc(d[1]) +
+        ' title="' + L("Opanowane w tej kategorii: ", "Mastered in this category: ") + p[0] + L(" z ", " of ") + p[1] + '"><span class="cat-i" aria-hidden="true">' + esc(d[2]) + '</span><span class="cat-n">' + esc(d[0] === "all" ? d[1] : dn(d[0])) +
         "</span><small>" + p[0] + "/" + p[1] + "</small></a>";
     }).join("");
     /* On phones the panel is one scrolling row: keep the open category in view. */
@@ -308,9 +327,9 @@
     var all = S.dom === "all", nq = 0, kq = 0, nf = 0;
     Q.forEach(function (q, i) { if (all || q.d === S.dom) { nq++; if (S.known[i]) kq++; } });
     F.forEach(function (f) { if (all || f.d === S.dom) nf++; });
-    $("#cat-head").innerHTML = '<h2><span class="cat-i" aria-hidden="true">' + esc(all ? "📚" : DOM_ICO[S.dom]) + "</span>" + esc(all ? "Wszystkie pytania" : DOM_NAME[S.dom]) + "</h2>" +
-      '<p class="cat-sub">' + plural(nq, "pytanie", "pytania", "pytań") + " · " + plural(nf, "fiszka", "fiszki", "fiszek") +
-      (all ? "" : " · " + plural(catDocs(S.dom, {}).length, "strona", "strony", "stron") + " dokumentacji") + " · opanowane " + kq + "/" + nq + "</p>";
+    $("#cat-head").innerHTML = '<h2><span class="cat-i" aria-hidden="true">' + esc(all ? "📚" : DOM_ICO[S.dom]) + "</span>" + esc(all ? L("Wszystkie pytania", "All questions") : dn(S.dom)) + "</h2>" +
+      '<p class="cat-sub">' + plural(nq, L("pytanie", "question"), L("pytania", "questions"), L("pytań", "questions")) + " · " + plural(nf, L("fiszka", "flashcard"), L("fiszki", "flashcards"), L("fiszek", "flashcards")) +
+      (all ? "" : " · " + plural(catDocs(S.dom, {}).length, L("strona", "doc page"), L("strony", "doc pages"), L("stron", "doc pages")) + L(" dokumentacji", "")) + L(" · opanowane ", " · mastered ") + kq + "/" + nq + "</p>";
   }
   function renderQ() {
     var html = "";
@@ -322,8 +341,8 @@
       html += qCard(i, "learn", learnSel(i));
     });
     $("#qlist").innerHTML = html || (S.hide
-      ? '<p class="empty">Wszystko w tym filtrze masz opanowane. Odznacz „Ukryj opanowane”, aby zobaczyć pytania.</p>'
-      : '<p class="empty">W tej rundzie nie ma pytań z tej kategorii. Wybierz „Obie rundy” albo inną kategorię.</p>');
+      ? '<p class="empty">' + L("Wszystko w tym filtrze masz opanowane. Odznacz „Ukryj opanowane”, aby zobaczyć pytania.", "You have mastered everything in this filter. Untick “Hide mastered” to see the questions.") + "</p>"
+      : '<p class="empty">' + L("W tej rundzie nie ma pytań z tej kategorii. Wybierz „Obie rundy” albo inną kategorię.", "This round has no questions in this category. Pick “Both rounds” or another category.") + "</p>");
     $("#q-lead").hidden = S.dom !== "all";
     $("#hide-known").checked = S.hide;
     $("#hint-on").checked = S.hint;
@@ -339,7 +358,7 @@
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
-    $("#ct-docs").innerHTML = "Dokumentacja" + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
+    $("#ct-docs").innerHTML = L("Dokumentacja", "Docs") + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
     if (sec !== "docs") clearDocs();
     if (sec === "pytania") renderQ(); else renderChips();
     if (sec === "api") renderCatApi(S.dom);
@@ -348,8 +367,10 @@
   function renderCatApi(d) {
     var list = CATMAP[d].api;
     $("#api-lead").innerHTML = list.length
-      ? "Ścieżki z publicznych schematów OpenAPI VTEX (vtex/openapi-schemas) dla tej kategorii. Kliknij endpoint: pełny URL, auth, query, body, odpowiedzi i curl. Wszystkie API są w zakładce <a data-nav href=\"#api\">API Map</a>."
-      : 'W mapie nie ma schematu OpenAPI dla tej kategorii. Ścieżki i przykłady znajdziesz w sekcji <a data-nav href="' + catHref(d, "docs") + '">Dokumentacja</a>.';
+      ? L("Ścieżki z publicznych schematów OpenAPI VTEX (vtex/openapi-schemas) dla tej kategorii. Kliknij endpoint: pełny URL, auth, query, body, odpowiedzi i curl. Wszystkie API są w zakładce <a data-nav href=\"#api\">API Map</a>.",
+        "Paths from the public VTEX OpenAPI schemas (vtex/openapi-schemas) for this category. Click an endpoint: full URL, auth, query, body, responses and curl. All APIs are in the <a data-nav href=\"#api\">API Map</a> tab.")
+      : L("W mapie nie ma schematu OpenAPI dla tej kategorii. Ścieżki i przykłady znajdziesz w sekcji ", "The map has no OpenAPI schema for this category. Paths and examples are in the ") +
+        '<a data-nav href="' + catHref(d, "docs") + '">' + L("Dokumentacja", "Docs") + "</a>" + L(".", " section.");
     $("#catapi").hidden = !list.length;
     if (!list.length) return;
     if (!CATAPI) {
@@ -358,6 +379,7 @@
       CATAPI = bootApiMap(root, null, { onDoc: function (url, label) {
         go({ tab: "pytania", cat: S.dom, sec: "docs", doc: "ep", url: url, lbl: String(label || "").slice(0, 300) });
       } });
+      if (S.lang === "en") localize(root);
     }
     if (CATAPI_D !== d) { CATAPI.scope(list); CATAPI_D = d; }
     kotyTop();
@@ -370,25 +392,25 @@
   /* The category's pages: the endpoint opened from its API map, its API Reference pages, then the pages its questions and flashcards cite. */
   function catDocs(d, r) {
     var out = [];
-    if (r.doc === "ep" && EP_URL.test(r.url || "")) out.push({ id: "ep", url: r.url, label: r.lbl || "Endpoint", g: "Otwarty endpoint" });
+    if (r.doc === "ep" && EP_URL.test(r.url || "")) out.push({ id: "ep", url: r.url, label: r.lbl || "Endpoint", g: L("Otwarty endpoint", "Opened endpoint") });
     CATMAP[d].ref.forEach(function (x) { out.push({ id: "r-" + x[0], url: REF + x[0], label: x[1], g: "API Reference" }); });
-    CAT_DOCS[d].forEach(function (x) { out.push({ id: x[0], url: DOCS[x[0]][0], label: DOCS[x[0]][1], n: x[1], g: "Z pytań i fiszek" }); });
+    CAT_DOCS[d].forEach(function (x) { out.push({ id: x[0], url: DOCS[x[0]][0], label: DOCS[x[0]][1], n: x[1], g: L("Z pytań i fiszek", "From questions and flashcards") }); });
     return out;
   }
   function renderDocs(d, r) {
     var list = catDocs(d, r), el = $("#cs-docs"), cur = null;
     list.forEach(function (x) { if (x.id === r.doc) cur = x; });
     cur = cur || list[0];
-    if (!cur) { el.innerHTML = '<p class="empty">Ta kategoria nie ma jeszcze linków do dokumentacji.</p>'; return; }
+    if (!cur) { el.innerHTML = '<p class="empty">' + L("Ta kategoria nie ma jeszcze linków do dokumentacji.", "This category has no doc links yet.") + "</p>"; return; }
     if (el.dataset.k === d + " " + cur.url) return;
     el.dataset.k = d + " " + cur.url;
     var g = "", html = "";
     list.forEach(function (x) {
       if (x.g !== g) { g = x.g; html += '<p class="docg">' + esc(g) + "</p>"; }
       html += '<a class="docb" data-nav href="' + catHref(d, "docs") + "-" + esc(x.id) + '"' + (x === cur ? ' aria-current="page"' : "") + ">" +
-        "<span>" + esc(x.label) + "</span>" + (x.n ? '<small title="Pytania i fiszki z tym linkiem">' + x.n + "</small>" : "") + "</a>";
+        "<span>" + esc(x.label) + "</span>" + (x.n ? '<small title="' + L("Pytania i fiszki z tym linkiem", "Questions and flashcards with this link") + '">' + x.n + "</small>" : "") + "</a>";
     });
-    el.innerHTML = '<div class="docs"><nav class="doclist" aria-label="Strony dokumentacji tej kategorii">' + html + "</nav>" +
+    el.innerHTML = '<div class="docs"><nav class="doclist" aria-label="' + L("Strony dokumentacji tej kategorii", "Doc pages of this category") + '">' + html + "</nav>" +
       '<div class="docview">' + docFrame(cur.url, cur.label, false) + "</div></div>";
   }
   $("#ctabs").addEventListener("click", function (ev) {
@@ -500,18 +522,21 @@
   function stopTick() { if (TICK) { clearInterval(TICK); TICK = null; } }
 
   function simSetup() {
-    var presets = [[120, "2 h, jak na egzaminie"], [60, "60 min"], [30, "30 min"]];
-    return '<p class="lead">Losuję <strong>' + SIM_Q + " pytań z " + Q.length + "</strong> i <strong>" + SIM_P +
+    var presets = [[120, L("2 h, jak na egzaminie", "2 h, like the exam")], [60, "60 min"], [30, "30 min"]];
+    return '<p class="lead">' + L("Losuję <strong>" + SIM_Q + " pytań z " + Q.length + "</strong> i <strong>" + SIM_P +
       " zadania praktyczne</strong> z fiszek „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
-      "Wynik i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.</p>" +
+      "Wynik i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.",
+      "I draw <strong>" + SIM_Q + " questions out of " + Q.length + "</strong> and <strong>" + SIM_P +
+      " practical tasks</strong> from the “Practical” flashcards. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
+      "You get the score and explanations at the end. The pass mark is <strong>80%</strong>.") + "</p>" +
       '<div class="setup">' +
-      '<div class="fs"><h3 id="sim-time-h">Czas</h3><div class="chips" role="group" aria-labelledby="sim-time-h">' + presets.map(function (p) {
+      '<div class="fs"><h3 id="sim-time-h">' + L("Czas", "Time") + '</h3><div class="chips" role="group" aria-labelledby="sim-time-h">' + presets.map(function (p) {
         return '<button type="button" class="chip" data-min="' + p[0] + '" aria-pressed="' + (S.simMin === p[0]) + '">' + p[1] + "</button>";
       }).join("") + "</div>" +
-      '<label class="inl" for="sim-min">Własny czas <input type="number" id="sim-min" min="1" max="600" step="1" inputmode="numeric" value="' + S.simMin + '"> min</label></div>' +
-      '<label class="check" for="sim-prac"><input type="checkbox" id="sim-prac"' + (S.simPrac ? " checked" : "") + "> Dołącz " + SIM_P + " zadania praktyczne (pole tekstowe, ocena własna)</label>" +
-      '<label class="check" for="sim-hint"><input type="checkbox" id="sim-hint"' + (S.hint ? " checked" : "") + "> Pokazuj, ile odpowiedzi jest poprawnych</label>" +
-      '<div class="row"><button type="button" class="btn primary" id="sim-start">Rozpocznij symulację</button></div></div>';
+      '<label class="inl" for="sim-min">' + L("Własny czas", "Custom time") + ' <input type="number" id="sim-min" min="1" max="600" step="1" inputmode="numeric" value="' + S.simMin + '"> min</label></div>' +
+      '<label class="check" for="sim-prac"><input type="checkbox" id="sim-prac"' + (S.simPrac ? " checked" : "") + "> " + L("Dołącz " + SIM_P + " zadania praktyczne (pole tekstowe, ocena własna)", "Include " + SIM_P + " practical tasks (text field, self-graded)") + "</label>" +
+      '<label class="check" for="sim-hint"><input type="checkbox" id="sim-hint"' + (S.hint ? " checked" : "") + "> " + L("Pokazuj, ile odpowiedzi jest poprawnych", "Show how many answers are right") + "</label>" +
+      '<div class="row"><button type="button" class="btn primary" id="sim-start">' + L("Rozpocznij symulację", "Start simulation") + '</button></div></div>';
   }
   function simRun() {
     var m = S.sim, total = simLen(), pos = Math.min(Math.max(m.cur, 0), total - 1), nq = m.ids.length;
@@ -519,30 +544,31 @@
     var card;
     if (pos < nq) {
       var i = m.ids[pos];
-      card = qCard(i, "sim", m.ans[i] || [], '<span class="num">Pytanie ' + (pos + 1) + " z " + nq + "</span>");
+      card = qCard(i, "sim", m.ans[i] || [], '<span class="num">' + L("Pytanie ", "Question ") + (pos + 1) + L(" z ", " of ") + nq + "</span>");
     } else {
       var k = pos - nq, fi = m.pr[k];
-      card = '<article class="q prac" data-f="' + fi + '"><div class="q-head"><span class="num">Zadanie praktyczne ' + (k + 1) + " z " + m.pr.length + "</span></div>" +
+      card = '<article class="q prac" data-f="' + fi + '"><div class="q-head"><span class="num">' + L("Zadanie praktyczne ", "Practical task ") + (k + 1) + L(" z ", " of ") + m.pr.length + "</span></div>" +
         '<p class="qt">' + fmt(pTitle(F[fi])) + "</p>" +
-        '<label class="how" for="ta-' + fi + '">Twoja odpowiedź: metoda, ścieżka, nagłówki, body. Zapisuje się sama.</label>' +
+        '<label class="how" for="ta-' + fi + '">' + L("Twoja odpowiedź: metoda, ścieżka, nagłówki, body. Zapisuje się sama.", "Your answer: method, path, headers, body. It saves itself.") + "</label>" +
         '<textarea class="ta" id="ta-' + fi + '" rows="10" spellcheck="false" autocapitalize="off" autocomplete="off">' + esc(m.txt[fi] || "") + "</textarea></article>";
     }
     var pal = "";
     for (var p = 0; p < total; p++) {
       pal += '<button type="button" class="pc' + (p === pos ? " is-cur" : "") + (simAnswered(p) ? " is-ans" : "") + (m.flag[p] ? " is-flag" : "") +
-        '" data-pos="' + p + '" aria-label="' + (p < nq ? "Pytanie " + (p + 1) : "Zadanie praktyczne " + (p - nq + 1)) +
-        (simAnswered(p) ? ", z odpowiedzią" : ", bez odpowiedzi") + (m.flag[p] ? ", oznaczone do powrotu" : "") + '"' + (p === pos ? ' aria-current="true"' : "") + ">" +
+        '" data-pos="' + p + '" aria-label="' + (p < nq ? L("Pytanie ", "Question ") + (p + 1) : L("Zadanie praktyczne ", "Practical task ") + (p - nq + 1)) +
+        (simAnswered(p) ? L(", z odpowiedzią", ", answered") : L(", bez odpowiedzi", ", not answered")) + (m.flag[p] ? L(", oznaczone do powrotu", ", flagged to revisit") : "") + '"' + (p === pos ? ' aria-current="true"' : "") + ">" +
         (p < nq ? p + 1 : "P" + (p - nq + 1)) + "</button>";
     }
     return '<div class="simtop"><button type="button" class="btn small" id="sim-flag" aria-pressed="' + !!m.flag[pos] + '">' +
-      (m.flag[pos] ? "Oznaczone do powrotu" : "Oznacz do powrotu") + "</button>" +
+      (m.flag[pos] ? L("Oznaczone do powrotu", "Flagged to revisit") : L("Oznacz do powrotu", "Flag to revisit")) + "</button>" +
       '<span class="simleft" id="sim-count"></span></div>' + card +
-      '<div class="pal" role="group" aria-label="Nawigacja po kartach">' + pal + "</div>" +
-      '<ul class="legend"><li><span class="sw k"></span>z odpowiedzią</li><li><span class="sw f"></span>do powrotu</li><li><span class="sw"></span>bez odpowiedzi</li></ul>' +
-      '<div class="simbar"><button type="button" class="btn" id="sim-prev"' + (pos === 0 ? " disabled" : "") + ">← Poprzednia</button>" +
-      '<button type="button" class="btn" id="sim-next"' + (pos === total - 1 ? " disabled" : "") + ">Następna →</button>" +
-      '<span class="timer" id="sim-timer" role="timer" aria-label="Pozostały czas">' + clock(m.endAt - Date.now()) + "</span>" +
-      '<button type="button" class="btn primary" id="sim-finish">Zakończ i oceń</button></div>';
+      '<div class="pal" role="group" aria-label="' + L("Nawigacja po kartach", "Card navigation") + '">' + pal + "</div>" +
+      '<ul class="legend"><li><span class="sw k"></span>' + L("z odpowiedzią", "answered") + '</li><li><span class="sw f"></span>' + L("do powrotu", "to revisit") +
+        '</li><li><span class="sw"></span>' + L("bez odpowiedzi", "not answered") + "</li></ul>" +
+      '<div class="simbar"><button type="button" class="btn" id="sim-prev"' + (pos === 0 ? " disabled" : "") + ">← " + L("Poprzednia", "Previous") + "</button>" +
+      '<button type="button" class="btn" id="sim-next"' + (pos === total - 1 ? " disabled" : "") + ">" + L("Następna", "Next") + " →</button>" +
+      '<span class="timer" id="sim-timer" role="timer" aria-label="' + L("Pozostały czas", "Time left") + '">' + clock(m.endAt - Date.now()) + "</span>" +
+      '<button type="button" class="btn primary" id="sim-finish">' + L("Zakończ i oceń", "Finish and grade") + "</button></div>";
   }
   function simResult() {
     var m = S.sim, nq = m.ids.length, score = simScore(), pass = Math.ceil(nq * 0.8), ok = score >= pass;
@@ -550,42 +576,44 @@
     m.ids.forEach(function (i) { if (!isRight(i, m.ans[i])) miss[Q[i].d] = (miss[Q[i].d] || 0) + 1; });
     var weak = DOMS.filter(function (d) { return miss[d[0]]; })
       .sort(function (a, b) { return miss[b[0]] - miss[a[0]]; })
-      .map(function (d) { return esc(d[1]) + " (" + miss[d[0]] + ")"; }).join(" · ");
+      .map(function (d) { return esc(dn(d[0])) + " (" + miss[d[0]] + ")"; }).join(" · ");
     var pOk = 0, pSet = 0;
     m.pr.forEach(function (fi) { if (m.self[fi] !== undefined) { pSet++; if (m.self[fi]) pOk++; } });
     var all = nq + m.pr.length;
     var prLine = "";
     if (m.pr.length) {
       prLine = pSet === m.pr.length
-        ? "<p><strong>Razem z zadaniami praktycznymi:</strong> " + (score + pOk) + " / " + all + " · " + Math.round((score + pOk) / all * 100) +
-          "% (praktyczne " + pOk + " / " + m.pr.length + " według Twojej oceny, każda karta liczona za 1 punkt).</p>"
-        : "<p><strong>Zadania praktyczne:</strong> oceń je poniżej, porównując z wzorcem (" + pSet + " / " + m.pr.length + " ocenione).</p>";
+        ? "<p><strong>" + L("Razem z zadaniami praktycznymi:", "With the practical tasks:") + "</strong> " + (score + pOk) + " / " + all + " · " + Math.round((score + pOk) / all * 100) +
+          L("% (praktyczne " + pOk + " / " + m.pr.length + " według Twojej oceny, każda karta liczona za 1 punkt).", "% (practical " + pOk + " / " + m.pr.length + " by your own grade, each card counts as 1 point).") + "</p>"
+        : "<p><strong>" + L("Zadania praktyczne:", "Practical tasks:") + "</strong> " +
+          L("oceń je poniżej, porównując z wzorcem (" + pSet + " / " + m.pr.length + " ocenione).", "grade them below against the model answer (" + pSet + " / " + m.pr.length + " graded).") + "</p>";
     }
     var html = '<div class="result ' + (ok ? "pass" : "fail") + '" tabindex="-1" id="sim-res-box">' +
       '<p class="score">' + score + " / " + nq + " · " + Math.round(score / nq * 100) + "%</p>" +
-      '<p class="verdict ' + (ok ? "ok" : "no") + '">Część testowa: ' + (ok ? "zdane." : "niezdane.") + " Próg to " + pass + " z " + nq + " (80%).</p>" + prLine +
-      "<p>Czas: " + Math.max(1, Math.round(m.used / 60000)) + " min z " + m.dur + (m.timeUp ? ". <strong>Czas się skończył</strong>, symulacja zamknęła się sama" : "") + ".</p>" +
-      (weak ? "<p><strong>Do powtórki:</strong> " + weak + "</p>" : "<p>Bez błędów w części testowej.</p>") +
-      '<div class="row"><button type="button" class="btn primary" id="sim-new">Nowa symulacja</button></div></div>';
+      '<p class="verdict ' + (ok ? "ok" : "no") + '">' + L("Część testowa: ", "Test part: ") + (ok ? L("zdane.", "passed.") : L("niezdane.", "failed.")) + L(" Próg to ", " The pass mark is ") + pass + L(" z ", " of ") + nq + " (80%).</p>" + prLine +
+      "<p>" + L("Czas: ", "Time: ") + Math.max(1, Math.round(m.used / 60000)) + L(" min z ", " min of ") + m.dur +
+        (m.timeUp ? L(". <strong>Czas się skończył</strong>, symulacja zamknęła się sama", ". <strong>Time ran out</strong>, the simulation closed itself") : "") + ".</p>" +
+      (weak ? "<p><strong>" + L("Do powtórki:", "To review:") + "</strong> " + weak + "</p>" : "<p>" + L("Bez błędów w części testowej.", "No mistakes in the test part.") + "</p>") +
+      '<div class="row"><button type="button" class="btn primary" id="sim-new">' + L("Nowa symulacja", "New simulation") + '</button></div></div>';
 
     if (m.pr.length) {
-      html += "<h3>Zadania praktyczne: porównaj z wzorcem</h3>" + m.pr.map(function (fi, k) {
+      html += "<h3>" + L("Zadania praktyczne: porównaj z wzorcem", "Practical tasks: compare with the model answer") + "</h3>" + m.pr.map(function (fi, k) {
         var f = F[fi], mine = String(m.txt[fi] || "").trim(), v = m.self[fi];
-        return '<article class="q prac" data-f="' + fi + '"><div class="q-head"><span class="num">Zadanie praktyczne ' + (k + 1) + '</span><span class="dom">' + esc(DOM_NAME[f.d]) + "</span></div>" +
+        return '<article class="q prac" data-f="' + fi + '"><div class="q-head"><span class="num">' + L("Zadanie praktyczne ", "Practical task ") + (k + 1) + '</span><span class="dom">' + esc(dn(f.d)) + "</span></div>" +
           '<p class="qt">' + fmt(pTitle(f)) + "</p>" +
-          '<div class="cmp"><div><p class="how">Twoja odpowiedź</p>' + (mine ? '<pre class="mine">' + esc(mine) + "</pre>" : '<p class="empty">Brak odpowiedzi.</p>') + "</div>" +
-          '<div><p class="how">Wzorzec</p><div class="model">' + fmt(f.a) + "</div></div></div>" + docLinks(f) +
-          '<div class="row" role="group" aria-label="Ocena własna"><button type="button" class="btn small self" data-v="1" aria-pressed="' + (v === true) + '">Zaliczam</button>' +
-          '<button type="button" class="btn small self" data-v="0" aria-pressed="' + (v === false) + '">Nie zaliczam</button></div></article>';
+          '<div class="cmp"><div><p class="how">' + L("Twoja odpowiedź", "Your answer") + "</p>" + (mine ? '<pre class="mine">' + esc(mine) + "</pre>" : '<p class="empty">' + L("Brak odpowiedzi.", "No answer.") + "</p>") + "</div>" +
+          '<div><p class="how">' + L("Wzorzec", "Model answer") + '</p><div class="model">' + fmt(f.a) + "</div></div></div>" + docLinks(f) +
+          '<div class="row" role="group" aria-label="' + L("Ocena własna", "Self-grade") + '"><button type="button" class="btn small self" data-v="1" aria-pressed="' + (v === true) + '">' + L("Zaliczam", "Pass") + "</button>" +
+          '<button type="button" class="btn small self" data-v="0" aria-pressed="' + (v === false) + '">' + L("Nie zaliczam", "Fail") + "</button></div></article>";
       }).join("");
     }
     var wrong = m.ids.filter(function (i) { return !isRight(i, m.ans[i]); });
-    html += "<h3>Pytania</h3>" +
-      '<div class="chips" role="group" aria-label="Filtr przeglądu"><button type="button" class="chip" data-only="all" aria-pressed="' + (m.only !== "wrong") + '">Wszystkie <small>' + nq + "</small></button>" +
-      '<button type="button" class="chip" data-only="wrong" aria-pressed="' + (m.only === "wrong") + '">Tylko błędne <small>' + wrong.length + "</small></button></div>" +
+    html += "<h3>" + L("Pytania", "Questions") + "</h3>" +
+      '<div class="chips" role="group" aria-label="' + L("Filtr przeglądu", "Review filter") + '"><button type="button" class="chip" data-only="all" aria-pressed="' + (m.only !== "wrong") + '">' + L("Wszystkie", "All") + " <small>" + nq + "</small></button>" +
+      '<button type="button" class="chip" data-only="wrong" aria-pressed="' + (m.only === "wrong") + '">' + L("Tylko błędne", "Only wrong") + " <small>" + wrong.length + "</small></button></div>" +
       '<div class="list">' + ((m.only === "wrong" ? wrong : m.ids).map(function (i) {
-        return qCard(i, "review", m.ans[i] || [], '<span class="num">Pytanie ' + (m.ids.indexOf(i) + 1) + '</span><span class="dom">' + esc(DOM_NAME[Q[i].d]) + '</span><span class="rnd">#' + (i + 1) + "</span>");
-      }).join("") || '<p class="empty">Brak błędnych odpowiedzi.</p>') + "</div>";
+        return qCard(i, "review", m.ans[i] || [], '<span class="num">' + L("Pytanie ", "Question ") + (m.ids.indexOf(i) + 1) + '</span><span class="dom">' + esc(dn(Q[i].d)) + '</span><span class="rnd">#' + (i + 1) + "</span>");
+      }).join("") || '<p class="empty">' + L("Brak błędnych odpowiedzi.", "No wrong answers.") + "</p>") + "</div>";
     return html;
   }
   function renderSim() {
@@ -599,7 +627,7 @@
   }
   function simCount() {
     var el = $("#sim-count");
-    if (el) el.textContent = "Odpowiedzi: " + simDoneCount() + " / " + simLen();
+    if (el) el.textContent = L("Odpowiedzi: ", "Answered: ") + simDoneCount() + " / " + simLen();
   }
   function paintPal() {
     var m = S.sim;
@@ -683,15 +711,15 @@
     if (b) {
       if (m.flag[m.cur]) delete m.flag[m.cur]; else m.flag[m.cur] = true;
       b.setAttribute("aria-pressed", !!m.flag[m.cur]);
-      b.textContent = m.flag[m.cur] ? "Oznaczone do powrotu" : "Oznacz do powrotu";
+      b.textContent = m.flag[m.cur] ? L("Oznaczone do powrotu", "Flagged to revisit") : L("Oznacz do powrotu", "Flag to revisit");
       save(); paintPal(); return;
     }
     b = t.closest("#sim-finish");
     if (b) {
       var open = simLen() - simDoneCount();
       if (!ARM) {
-        b.textContent = open ? "Bez odpowiedzi: " + open + ". Kliknij ponownie, aby zakończyć" : "Na pewno? Kliknij ponownie";
-        ARM = setTimeout(function () { ARM = null; var x = $("#sim-finish"); if (x) x.textContent = "Zakończ i oceń"; }, 5000);
+        b.textContent = open ? L("Bez odpowiedzi: " + open + ". Kliknij ponownie, aby zakończyć", "Not answered: " + open + ". Click again to finish") : L("Na pewno? Kliknij ponownie", "Sure? Click again");
+        ARM = setTimeout(function () { ARM = null; var x = $("#sim-finish"); if (x) x.textContent = L("Zakończ i oceń", "Finish and grade"); }, 5000);
         return;
       }
       clearTimeout(ARM); finishSim(false);
@@ -717,11 +745,11 @@
     $("#flist").innerHTML = F.map(function (f, i) {
       var n = i + 1;
       return '<article class="fc' + (S.fknown[i] ? " is-known" : "") + '" id="f-' + n + '" data-i="' + i + '">' +
-        '<div class="q-head"><span class="num">F' + n + '</span><span class="dom">' + esc(DOM_NAME[f.d]) + '</span><span class="rnd">R' + f.r + "</span>" +
+        '<div class="q-head"><span class="num">F' + n + '</span><span class="dom">' + esc(dn(f.d)) + '</span><span class="rnd">R' + f.r + "</span>" +
         '<label class="check" for="kf-' + n + '"><input type="checkbox" class="kn" id="kf-' + n + '"' +
-        (S.fknown[i] ? " checked" : "") + "> Umiem</label></div>" +
+        (S.fknown[i] ? " checked" : "") + "> " + L("Umiem", "Known") + "</label></div>" +
         '<p class="qt">' + fmt(f.q) + "</p>" +
-        '<button type="button" class="btn rev" aria-expanded="false" aria-controls="fa-' + n + '">Pokaż odpowiedź</button>' +
+        '<button type="button" class="btn rev" aria-expanded="false" aria-controls="fa-' + n + '">' + L("Pokaż odpowiedź", "Show answer") + "</button>" +
         '<div class="ans" id="fa-' + n + '" hidden>' + fmt(f.a) + docLinks(f) + httpChips(f) + "</div></article>";
     }).join("");
   }
@@ -729,7 +757,7 @@
     var ans = document.getElementById(btn.getAttribute("aria-controls"));
     ans.hidden = !open;
     btn.setAttribute("aria-expanded", open);
-    btn.textContent = open ? "Ukryj odpowiedź" : "Pokaż odpowiedź";
+    btn.textContent = open ? L("Ukryj odpowiedź", "Hide answer") : L("Pokaż odpowiedź", "Show answer");
   }
   $("#flist").addEventListener("click", function (ev) {
     var b = ev.target.closest(".rev");
@@ -767,8 +795,8 @@
     S.total++;
     S.combo = ok ? S.combo + 1 : 0;
     if (S.combo > S.comboBest) S.comboBest = S.combo;
-    if (S.gx.combo && [5, 10, 25, 50].indexOf(S.combo) > -1) live("Combo: " + S.combo + " dobrych odpowiedzi z rzędu");
-    if (S.days[t] === S.goal) live("Cel dzienny osiągnięty: " + S.goal + " odpowiedzi");
+    if (S.gx.combo && [5, 10, 25, 50].indexOf(S.combo) > -1) live("Combo: " + S.combo + L(" dobrych odpowiedzi z rzędu", " right answers in a row"));
+    if (S.days[t] === S.goal) live(L("Cel dzienny osiągnięty: ", "Daily goal reached: ") + S.goal + L(" odpowiedzi", " answers"));
   }
   /* Today does not count against the streak until it is over, and one missing day a week is forgiven. */
   function streak() {
@@ -797,7 +825,7 @@
     var rd = readiness(c), st = streak(), near = null, simBest = null;
     DOMS.forEach(function (d) {
       var p = c.per[d[0]];
-      if (p.t && p.k < p.t && (!near || p.k / p.t > near.k / near.t)) near = { n: d[1], k: p.k, t: p.t };
+      if (p.t && p.k < p.t && (!near || p.k / p.t > near.k / near.t)) near = { n: dn(d[0]), k: p.k, t: p.t };
     });
     S.sims.forEach(function (x) { if (!simBest || x.s / (x.n || SIM_Q) > simBest.s / (simBest.n || SIM_Q)) simBest = x; });
     if (st > S.best) S.best = st;
@@ -805,7 +833,7 @@
       total: S.total, today: todayN(), goal: S.goal, streak: st, best: S.best, comboBest: S.comboBest, kf: c.kf, ready: rd.v, rd: rd,
       goalHit: Object.keys(S.days).some(function (k) { return S.days[k] >= S.goal; }),
       simPass: S.sims.some(function (x) { var n = x.n || SIM_Q; return x.s >= Math.ceil(n * 0.8); }),
-      simBest: simBest ? "Najlepiej " + simBest.s + " / " + (simBest.n || SIM_Q) + ", próg " + Math.ceil((simBest.n || SIM_Q) * 0.8) : "Jeszcze żadnej symulacji",
+      simBest: simBest ? L("Najlepiej ", "Best ") + simBest.s + " / " + (simBest.n || SIM_Q) + L(", próg ", ", pass mark ") + Math.ceil((simBest.n || SIM_Q) * 0.8) : L("Jeszcze żadnej symulacji", "No simulation yet"),
       domFull: DOMS.some(function (d) { var p = c.per[d[0]]; return p.t && p.k === p.t; }),
       domNear: near ? near.n + " " + near.k + " / " + near.t : "–"
     };
@@ -820,9 +848,10 @@
     save();
     if (quiet || !S.gx.toast) return;
     var b = fresh[fresh.length - 1], el = $("#gx-toast");
-    el.innerHTML = '<span class="toast-i" aria-hidden="true">' + ICON.medal + '</span><span class="toast-t"><strong>Nowa odznaka: ' + esc(b.n) + "</strong><span>" +
-      esc(fresh.length > 1 ? b.d + " (i " + (fresh.length - 1) + " więcej)" : b.d) + '</span></span><button type="button" class="linkbtn" data-go="postep">Zobacz</button>' +
-      '<button type="button" class="toast-x" aria-label="Zamknij powiadomienie">' + ICON.x + "</button>";
+    el.innerHTML = '<span class="toast-i" aria-hidden="true">' + ICON.medal + '</span><span class="toast-t"><strong>' + L("Nowa odznaka: ", "New badge: ") + esc(T(b.n)) + "</strong><span>" +
+      esc(fresh.length > 1 ? T(b.d) + L(" (i " + (fresh.length - 1) + " więcej)", " (and " + (fresh.length - 1) + " more)") : T(b.d)) +
+      '</span></span><button type="button" class="linkbtn" data-go="postep">' + L("Zobacz", "View") + "</button>" +
+      '<button type="button" class="toast-x" aria-label="' + L("Zamknij powiadomienie", "Close notification") + '">' + ICON.x + "</button>";
     el.hidden = false;
     toastTimer();
   }
@@ -836,23 +865,24 @@
     $("#gx-head").hidden = !S.gx.head;
     if (!S.gx.head) return;
     var st = streak(), t = todayN();
-    $("#gx-streak").innerHTML = ICON.flame + st + " " + (st === 1 ? "dzień" : "dni");
-    $("#gx-streak").setAttribute("aria-label", "Seria: " + st + " " + (st === 1 ? "dzień" : "dni") + " nauki z rzędu");
+    $("#gx-streak").innerHTML = ICON.flame + st + " " + days(st);
+    $("#gx-streak").setAttribute("aria-label", L("Seria: ", "Streak: ") + st + " " + days(st) + L(" nauki z rzędu", " of study in a row"));
     $("#gx-gv").textContent = t + "/" + S.goal;
     bar("#gx-gm", Math.min(t / S.goal, 1) * 100, t >= S.goal ? "ok" : "");
   }
+  function days(n) { return n === 1 ? L("dzień", "day") : L("dni", "days"); }
   function fmtDay(d) { return pad(d.getDate()) + "." + pad(d.getMonth() + 1); }
   function renderGx(c) {
     var x = gxCtx(c), rd = x.rd, w = rd.weak;
     $("#gx-ready").innerHTML =
-      '<div class="cardh"><h2 id="gx-ready-h">Gotowość do egzaminu</h2><span class="meter-label">próg 80</span></div>' +
+      '<div class="cardh"><h2 id="gx-ready-h">' + L("Gotowość do egzaminu", "Exam readiness") + '</h2><span class="meter-label">' + L("próg 80", "pass mark 80") + "</span></div>" +
       '<p class="bign"><b>' + rd.v + "</b> <small>/ 100</small></p>" +
-      '<div class="meter th big" role="img" aria-label="Gotowość ' + rd.v + ' na 100, próg 80"><i class="' + (rd.v >= 80 ? "ok" : "") + '" style="width:' + rd.v + '%"></i></div>' +
-      '<dl class="rdl"><dt>Opanowanie obszarów · 50%</dt><dd>' + Math.round(rd.m * 100) + "%</dd>" +
-      "<dt>Trafność · 30%</dt><dd>" + (rd.accOk ? Math.round(rd.acc * 100) + "%" : "od 20 odpowiedzi") + "</dd>" +
-      "<dt>Najlepsza z 3 symulacji · 20%</dt><dd>" + (S.sims.length ? Math.round(rd.sim * 100) + "%" : "–") + "</dd></dl>" +
-      (w && w.r < 1 ? '<p class="weak">Najsłabiej: <strong>' + esc(w.d[1]) + "</strong> · " + w.p.k + " / " + w.p.t +
-        ' <button type="button" class="linkbtn" data-go-dom="' + esc(w.d[0]) + '">Ćwicz ten obszar</button></p>' : "");
+      '<div class="meter th big" role="img" aria-label="' + L("Gotowość ", "Readiness ") + rd.v + L(" na 100, próg 80", " of 100, pass mark 80") + '"><i class="' + (rd.v >= 80 ? "ok" : "") + '" style="width:' + rd.v + '%"></i></div>' +
+      '<dl class="rdl"><dt>' + L("Opanowanie obszarów", "Areas mastered") + ' · 50%</dt><dd>' + Math.round(rd.m * 100) + "%</dd>" +
+      "<dt>" + L("Trafność", "Accuracy") + " · 30%</dt><dd>" + (rd.accOk ? Math.round(rd.acc * 100) + "%" : L("od 20 odpowiedzi", "from 20 answers")) + "</dd>" +
+      "<dt>" + L("Najlepsza z 3 symulacji", "Best of 3 simulations") + " · 20%</dt><dd>" + (S.sims.length ? Math.round(rd.sim * 100) + "%" : "–") + "</dd></dl>" +
+      (w && w.r < 1 ? '<p class="weak">' + L("Najsłabiej: ", "Weakest: ") + "<strong>" + esc(dn(w.d[0])) + "</strong> · " + w.p.k + " / " + w.p.t +
+        ' <button type="button" class="linkbtn" data-go-dom="' + esc(w.d[0]) + '">' + L("Ćwicz ten obszar", "Practise this area") + "</button></p>" : "");
     var t = x.today, heat = "";
     for (var k = 83; k >= 0; k--) {
       var d = daysAgo(k), n = S.days[dayKey(d)] || 0;
@@ -860,22 +890,23 @@
       heat += '<i class="h' + lv + '" title="' + fmtDay(d) + ": " + n + '"></i>';
     }
     $("#gx-days").innerHTML =
-      '<div class="cardh"><h2 id="gx-days-h">Seria i cel dzienny</h2><span class="meter-label">rekord ' + x.best + " " + (x.best === 1 ? "dzień" : "dni") + "</span></div>" +
-      '<div class="dayrow"><p class="bign"><b>' + x.streak + "</b> <small>" + (x.streak === 1 ? "dzień" : "dni") + "</small></p>" +
-      '<div class="dayg"><div class="dayl"><span>Dziś</span><span class="meter-label">' + t + " / " + S.goal + "</span></div>" +
+      '<div class="cardh"><h2 id="gx-days-h">' + L("Seria i cel dzienny", "Streak and daily goal") + '</h2><span class="meter-label">' + L("rekord ", "best ") + x.best + " " + days(x.best) + "</span></div>" +
+      '<div class="dayrow"><p class="bign"><b>' + x.streak + "</b> <small>" + days(x.streak) + "</small></p>" +
+      '<div class="dayg"><div class="dayl"><span>' + L("Dziś", "Today") + '</span><span class="meter-label">' + t + " / " + S.goal + "</span></div>" +
       '<div class="meter big" aria-hidden="true"><i class="' + (t >= S.goal ? "ok" : "") + '" style="width:' + Math.min(t / S.goal, 1) * 100 + '%"></i></div>' +
-      '<p class="seth">' + (t >= S.goal ? "Cel na dziś osiągnięty." : "Jeszcze " + (S.goal - t) + " do celu.") + "</p></div></div>" +
-      '<div class="heat" role="img" aria-label="Aktywność z ostatnich 12 tygodni, dziś ' + t + ' odpowiedzi">' + heat + "</div>" +
-      '<div class="heatl" aria-hidden="true"><span>12 tygodni temu</span><span>mniej <i class="h0"></i><i class="h1"></i><i class="h2"></i><i class="h3"></i> cel</span><span>dziś</span></div>' +
-      '<p class="seth">Jeden dzień przerwy w tygodniu nie zrywa serii. Każda karta liczy się raz dziennie.</p>';
+      '<p class="seth">' + (t >= S.goal ? L("Cel na dziś osiągnięty.", "Today's goal reached.") : L("Jeszcze " + (S.goal - t) + " do celu.", (S.goal - t) + " more to the goal.")) + "</p></div></div>" +
+      '<div class="heat" role="img" aria-label="' + L("Aktywność z ostatnich 12 tygodni, dziś ", "Activity over the last 12 weeks, today ") + t + L(" odpowiedzi", " answers") + '">' + heat + "</div>" +
+      '<div class="heatl" aria-hidden="true"><span>' + L("12 tygodni temu", "12 weeks ago") + "</span><span>" + L("mniej", "less") + ' <i class="h0"></i><i class="h1"></i><i class="h2"></i><i class="h3"></i> ' +
+      L("cel", "goal") + "</span><span>" + L("dziś", "today") + "</span></div>" +
+      '<p class="seth">' + L("Jeden dzień przerwy w tygodniu nie zrywa serii. Każda karta liczy się raz dziennie.", "One day off a week does not break the streak. Each card counts once a day.") + "</p>";
     var got = BADGES.filter(function (b) { return S.badges[b.id]; }).length;
     $("#gx-badges").innerHTML =
-      '<div class="cardh"><h2 id="gx-badges-h">Odznaki</h2><span class="meter-label">' + got + " / " + BADGES.length + "</span></div>" +
+      '<div class="cardh"><h2 id="gx-badges-h">' + L("Odznaki", "Badges") + '</h2><span class="meter-label">' + got + " / " + BADGES.length + "</span></div>" +
       '<ul class="badges">' + BADGES.map(function (b) {
         var at = S.badges[b.id];
         return '<li class="badge' + (at ? " on" : "") + '"><span class="badge-i" aria-hidden="true">' + (at ? ICON.check : ICON.lock) + "</span>" +
-          '<span class="badge-t"><strong>' + esc(b.n) + '</strong><span>' + esc(at ? b.d + " · " + fmtDay(new Date(at)) : b.p(x)) + "</span>" +
-          '<span class="sr">' + (at ? "zdobyta" : "do zdobycia") + "</span></span></li>";
+          '<span class="badge-t"><strong>' + esc(T(b.n)) + '</strong><span>' + esc(at ? T(b.d) + " · " + fmtDay(new Date(at)) : b.p(x)) + "</span>" +
+          '<span class="sr">' + (at ? L("zdobyta", "earned") : L("do zdobycia", "to earn")) + "</span></span></li>";
       }).join("") + "</ul>";
   }
   document.addEventListener("click", function (ev) {
@@ -890,6 +921,7 @@
   function renderSettings() {
     $("#set-goal").querySelectorAll(".seg-b").forEach(function (b) { b.setAttribute("aria-pressed", +b.dataset.goal === S.goal); });
     $("#set-theme").querySelectorAll(".seg-b").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.themeSet === S.theme); });
+    $("#set-lang").querySelectorAll(".seg-b").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.langSet === S.lang); });
     $("#set-hint").checked = S.hint;
     $("#set-hide").checked = S.hide;
     $("#set-min").value = S.simMin;
@@ -901,6 +933,7 @@
     if (!b || b.getAttribute("aria-pressed") === "true") return;
     if (b.dataset.goal) { S.goal = +b.dataset.goal; save(); header(); }
     else if (b.dataset.themeSet) { S.theme = b.dataset.themeSet; save(); paintTheme(); }
+    else if (b.dataset.langSet === "pl" || b.dataset.langSet === "en") setLang(b.dataset.langSet);
     renderSettings();
   });
   $("#p-ustawienia").addEventListener("change", function (ev) {
@@ -921,9 +954,9 @@
   /* ---------- Postęp ---------- */
   function simLine(x) {
     var n = x.n || SIM_Q, ok = x.s >= Math.ceil(n * 0.8), d = new Date(x.t);
-    return '<li><span class="' + (ok ? "p" : "f") + '">' + x.s + " / " + n + " · " + Math.round(x.s / n * 100) + "% · " + (ok ? "zdane" : "niezdane") + "</span>" +
-      (x.pn ? " · praktyczne " + (x.pd ? x.p + " / " + x.pn : "bez oceny") : "") + " · " +
-      esc(d.toLocaleDateString("pl-PL") + " " + d.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" })) + "</li>";
+    return '<li><span class="' + (ok ? "p" : "f") + '">' + x.s + " / " + n + " · " + Math.round(x.s / n * 100) + "% · " + (ok ? L("zdane", "passed") : L("niezdane", "failed")) + "</span>" +
+      (x.pn ? L(" · praktyczne ", " · practical ") + (x.pd ? x.p + " / " + x.pn : L("bez oceny", "not graded")) : "") + " · " +
+      esc(d.toLocaleDateString(L("pl-PL", "en-GB")) + " " + d.toLocaleTimeString(L("pl-PL", "en-GB"), { hour: "2-digit", minute: "2-digit" })) + "</li>";
   }
   function renderStats() {
     var c = counts();
@@ -931,33 +964,33 @@
     var acc = c.ans ? Math.round(c.right / c.ans * 100) + "%" : "–";
     var multi = Q.filter(function (q) { return nRight(q) > 1; }).length;
     $("#stats").innerHTML =
-      "<div><dt>Pytania opanowane</dt><dd>" + c.kq + " <small>/ " + Q.length + "</small></dd></div>" +
-      "<div><dt>Fiszki opanowane</dt><dd>" + c.kf + " <small>/ " + F.length + "</small></dd></div>" +
-      "<div><dt>Trafność odpowiedzi</dt><dd>" + acc + " <small>" + c.right + " / " + c.ans + "</small></dd></div>" +
+      "<div><dt>" + L("Pytania opanowane", "Questions mastered") + "</dt><dd>" + c.kq + " <small>/ " + Q.length + "</small></dd></div>" +
+      "<div><dt>" + L("Fiszki opanowane", "Flashcards mastered") + "</dt><dd>" + c.kf + " <small>/ " + F.length + "</small></dd></div>" +
+      "<div><dt>" + L("Trafność odpowiedzi", "Answer accuracy") + "</dt><dd>" + acc + " <small>" + c.right + " / " + c.ans + "</small></dd></div>" +
       [1, 2].map(function (r) {
         var k = 0, t = 0;
         Q.forEach(function (q, i) { if (q.r === r) { t++; if (S.known[i]) k++; } });
-        return "<div><dt>Runda " + r + (r === 2 ? " (luki)" : "") + "</dt><dd>" + k + " <small>/ " + t + " pytań</small></dd></div>";
+        return "<div><dt>" + L("Runda ", "Round ") + r + (r === 2 ? L(" (luki)", " (gaps)") : "") + "</dt><dd>" + k + " <small>/ " + t + L(" pytań", " questions") + "</small></dd></div>";
       }).join("") +
-      "<div><dt>Format bazy</dt><dd>" + multi + " <small>z kilkoma poprawnymi, " + (Q.length - multi) + " z jedną</small></dd></div>";
+      "<div><dt>" + L("Format bazy", "Bank format") + "</dt><dd>" + multi + " <small>" + L("z kilkoma poprawnymi, ", "with several right, ") + (Q.length - multi) + L(" z jedną", " with one") + "</small></dd></div>";
     $("#domrows").innerHTML = DOMS.map(function (d) {
       var p = c.per[d[0]];
-      return '<div class="domrow"><span class="nm">' + esc(d[1]) + '</span><div class="meter"><i style="width:' +
+      return '<div class="domrow"><span class="nm">' + esc(dn(d[0])) + '</span><div class="meter"><i style="width:' +
         (p.k / p.t * 100) + '%"></i></div><span class="ct">' + p.k + " / " + p.t + "</span></div>";
     }).join("");
-    $("#hist").innerHTML = S.sims.length ? S.sims.map(simLine).join("") : "<li>Jeszcze żadnej. Uruchom ją w zakładce Symulacja.</li>";
+    $("#hist").innerHTML = S.sims.length ? S.sims.map(simLine).join("") : "<li>" + L("Jeszcze żadnej. Uruchom ją w zakładce Symulacja.", "None yet. Start one in the Simulation tab.") + "</li>";
   }
   function renderGrids() {
     $("#qgrid").innerHTML = Q.map(function (q, i) {
       var st = S.ans[i] === undefined ? "" : isRight(i, S.ans[i]) ? " st-right" : " st-wrong";
-      return '<label class="cell' + st + '" for="gq-' + (i + 1) + '" title="' + esc(DOM_NAME[q.d]) + " · runda " + q.r +
+      return '<label class="cell' + st + '" for="gq-' + (i + 1) + '" title="' + esc(dn(q.d)) + L(" · runda ", " · round ") + q.r +
         '"><input type="checkbox" class="sr" id="gq-' + (i + 1) + '" data-q="' + i + '"' + (S.known[i] ? " checked" : "") +
-        ' aria-label="Pytanie ' + (i + 1) + ' opanowane"><span>' + (i + 1) + "</span></label>";
+        ' aria-label="' + L("Pytanie ", "Question ") + (i + 1) + L(" opanowane", " mastered") + '"><span>' + (i + 1) + "</span></label>";
     }).join("");
     $("#fgrid").innerHTML = F.map(function (f, i) {
-      return '<label class="cell" for="gf-' + (i + 1) + '" title="' + esc(DOM_NAME[f.d]) +
+      return '<label class="cell" for="gf-' + (i + 1) + '" title="' + esc(dn(f.d)) +
         '"><input type="checkbox" class="sr" id="gf-' + (i + 1) + '" data-f="' + i + '"' + (S.fknown[i] ? " checked" : "") +
-        ' aria-label="Fiszka ' + (i + 1) + ' opanowana"><span>F' + (i + 1) + "</span></label>";
+        ' aria-label="' + L("Fiszka ", "Flashcard ") + (i + 1) + L(" opanowana", " mastered") + '"><span>F' + (i + 1) + "</span></label>";
     }).join("");
   }
   $("#p-postep").addEventListener("change", function (ev) {
@@ -974,12 +1007,12 @@
   $("#reset-all").addEventListener("click", function (ev) {
     var b = ev.currentTarget;
     if (!armed) {
-      b.textContent = "Na pewno? Kliknij jeszcze raz";
-      armed = setTimeout(function () { armed = null; b.textContent = "Zresetuj cały postęp"; }, 4000);
+      b.textContent = L("Na pewno? Kliknij jeszcze raz", "Sure? Click once more");
+      armed = setTimeout(function () { armed = null; b.textContent = L("Zresetuj cały postęp", "Reset all progress"); }, 4000);
       return;
     }
     clearTimeout(armed); armed = null;
-    b.textContent = "Zresetuj cały postęp";
+    b.textContent = L("Zresetuj cały postęp", "Reset all progress");
     S.known = {}; S.fknown = {}; S.ans = {}; S.sims = []; S.sim = null; DRAFT = {}; stopTick();
     S.fans = {}; S.ptxt = {}; S.fo = { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" };
     S.days = {}; S.tday = { d: "", ids: {} }; S.total = 0; S.combo = 0; S.comboBest = 0; S.best = 0; S.badges = {};
@@ -1003,31 +1036,31 @@
     a.href = url; a.download = "vtex-drill-postep-" + day + ".json";
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    impMsg("<p>Zapisano plik <strong>" + esc(a.download) + "</strong>. Otwórz go tutaj na innym urządzeniu lub w innej przeglądarce.</p>");
+    impMsg("<p>" + L("Zapisano plik ", "Saved the file ") + "<strong>" + esc(a.download) + "</strong>. " + L("Otwórz go tutaj na innym urządzeniu lub w innej przeglądarce.", "Open it here on another device or in another browser.") + "</p>");
   });
   $("#imp-prog").addEventListener("click", function () { $("#imp-file").click(); });
   $("#imp-file").addEventListener("change", function (ev) {
     var f = ev.target.files[0];
     ev.target.value = "";
     if (!f) return;
-    if (f.size > 5e6) return impMsg("<p>Ten plik jest za duży jak na eksport postępu.</p>", true);
+    if (f.size > 5e6) return impMsg("<p>" + L("Ten plik jest za duży jak na eksport postępu.", "This file is too big to be a progress export.") + "</p>", true);
     var r = new FileReader();
     r.onload = function () {
       var p = null;
       try { p = JSON.parse(r.result); } catch (e) { /* handled below */ }
       if (!isObj(p) || p.app !== "vtex-api-drill" || !isObj(p.data) || !isObj(p.data[KEY])) {
         IMP = null;
-        return impMsg("<p>To nie jest plik eksportu z VTEX API Drill. Wybierz plik zapisany przyciskiem „Eksportuj postęp do pliku”.</p>", true);
+        return impMsg("<p>" + L("To nie jest plik eksportu z VTEX API Drill. Wybierz plik zapisany przyciskiem „Eksportuj postęp do pliku”.", "This is not a VTEX API Drill export file. Pick a file saved with “Export progress to a file”.") + "</p>", true);
       }
       IMP = p.data;
       var d = p.data[KEY], cnt = function (o) { return isObj(o) ? Object.keys(o).length : 0; };
-      var when = +p.at > 0 ? new Date(+p.at).toLocaleDateString("pl-PL") : "nieznana data";
-      impMsg("<p>Plik z " + esc(when) + ". Opanowane pytania: " + cnt(d.known) + ", fiszki: " + cnt(d.fknown) + ", odpowiedzi: " +
-        (Math.floor(+d.total) || 0) + ". Import zastąpi obecny postęp.</p>" +
-        '<button type="button" class="btn small danger" id="imp-ok">Zastąp postęp</button><button type="button" class="btn small" id="imp-no">Anuluj</button>');
+      var when = +p.at > 0 ? new Date(+p.at).toLocaleDateString(L("pl-PL", "en-GB")) : L("nieznana data", "an unknown date");
+      impMsg("<p>" + L("Plik z ", "File from ") + esc(when) + L(". Opanowane pytania: ", ". Questions mastered: ") + cnt(d.known) + L(", fiszki: ", ", flashcards: ") + cnt(d.fknown) +
+        L(", odpowiedzi: ", ", answers: ") + (Math.floor(+d.total) || 0) + L(". Import zastąpi obecny postęp.", ". Importing replaces your current progress.") + "</p>" +
+        '<button type="button" class="btn small danger" id="imp-ok">' + L("Zastąp postęp", "Replace progress") + '</button><button type="button" class="btn small" id="imp-no">' + L("Anuluj", "Cancel") + "</button>");
       $("#imp-ok").focus();
     };
-    r.onerror = function () { impMsg("<p>Nie udało się odczytać pliku.</p>", true); };
+    r.onerror = function () { impMsg("<p>" + L("Nie udało się odczytać pliku.", "Could not read the file.") + "</p>", true); };
     r.readAsText(f);
   });
   $("#imp-box").addEventListener("click", function (ev) {
@@ -1036,11 +1069,11 @@
     try {
       STORES.forEach(function (k) { if (isObj(IMP[k])) localStorage.setItem(k, JSON.stringify(IMP[k])); else localStorage.removeItem(k); });
       try { sessionStorage.setItem(KEY + "-imported", "1"); } catch (e) { /* message only */ }
-    } catch (e) { return impMsg("<p>Przeglądarka blokuje zapis lokalny, więc nie da się zaimportować postępu.</p>", true); }
+    } catch (e) { return impMsg("<p>" + L("Przeglądarka blokuje zapis lokalny, więc nie da się zaimportować postępu.", "Your browser blocks local storage, so progress cannot be imported.") + "</p>", true); }
     location.reload();
   });
   try {
-    if (sessionStorage.getItem(KEY + "-imported")) { sessionStorage.removeItem(KEY + "-imported"); impMsg("<p>Postęp zaimportowany.</p>"); }
+    if (sessionStorage.getItem(KEY + "-imported")) { sessionStorage.removeItem(KEY + "-imported"); impMsg("<p>" + L("Postęp zaimportowany.", "Progress imported.") + "</p>"); }
   } catch (e) { /* no message */ }
 
   /* ---------- Focus: one card at a time across questions, flashcards and practical tasks ----------
@@ -1057,7 +1090,7 @@
   });
   CARDS.forEach(function (c, n) { c.n = n; BY_ID[c.id] = c; });
   var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0 };
-  var DECKS = [["all", "Wszystko"], ["q", "Pytania"], ["f", "Fiszki"], ["p", "Praktyczne"]];
+  var DECKS = [["all", ["Wszystko", "Everything"]], ["q", ["Pytania", "Questions"]], ["f", ["Fiszki", "Flashcards"]], ["p", ["Praktyczne", "Practical"]]];
   function svg(p) { return '<svg viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>"; }
   var ICON = {
     psec: svg('<path d="M6 5v14M19 5l-9 7 9 7z"/>'),
@@ -1104,26 +1137,26 @@
 
   function fFlash(c) {
     var f = F[c.i], prac = c.t === "p", open = FOC.open, g = S.fans[c.i];
-    var head = '<div class="q-head"><span class="num">F' + (c.i + 1) + '</span><span class="dom">' + esc(DOM_NAME[f.d]) + '</span><span class="rnd">R' + f.r + "</span>" +
-      '<span class="rnd">' + (prac ? "zadanie praktyczne" : "fiszka") + "</span>" + (S.fknown[c.i] ? '<span class="kbadge">Umiem</span>' : "") + "</div>";
-    var grade = '<div class="fgrade" role="group" aria-label="Ocena własna"><span class="how">' + (prac ? "Zaliczasz swoją odpowiedź?" : "Znałeś odpowiedź?") + "</span>" +
-      '<button type="button" class="btn grade ok" data-g="1" aria-pressed="' + (g === 1) + '">Umiem <kbd>U</kbd></button>' +
-      '<button type="button" class="btn grade no" data-g="0" aria-pressed="' + (g === 0) + '">Jeszcze nie <kbd>N</kbd></button></div>';
+    var head = '<div class="q-head"><span class="num">F' + (c.i + 1) + '</span><span class="dom">' + esc(dn(f.d)) + '</span><span class="rnd">R' + f.r + "</span>" +
+      '<span class="rnd">' + (prac ? L("zadanie praktyczne", "practical task") : L("fiszka", "flashcard")) + "</span>" + (S.fknown[c.i] ? '<span class="kbadge">' + L("Umiem", "Known") + "</span>" : "") + "</div>";
+    var grade = '<div class="fgrade" role="group" aria-label="' + L("Ocena własna", "Self-grade") + '"><span class="how">' + (prac ? L("Zaliczasz swoją odpowiedź?", "Does your answer pass?") : L("Znałeś odpowiedź?", "Did you know the answer?")) + "</span>" +
+      '<button type="button" class="btn grade ok" data-g="1" aria-pressed="' + (g === 1) + '">' + L("Umiem", "I know it") + " <kbd>U</kbd></button>" +
+      '<button type="button" class="btn grade no" data-g="0" aria-pressed="' + (g === 0) + '">' + L("Jeszcze nie", "Not yet") + " <kbd>N</kbd></button></div>";
     /* One bar, one place: the strip at the bottom edge of the card flips the card both ways. */
     var bar = '<button type="button" class="fhint fbar" id="' + (open ? "fo-hide" : "fo-flip") + '" aria-expanded="' + open + '">' + ICON.flip +
-      "Kliknij, aby " + (open ? "ukryć " : "odsłonić ") + (prac ? "wzorzec" : "odpowiedź") + "</button>";
+      L("Kliknij, aby " + (open ? "ukryć " : "odsłonić ") + (prac ? "wzorzec" : "odpowiedź"), "Click to " + (open ? "hide " : "reveal ") + (prac ? "the model answer" : "the answer")) + "</button>";
     if (prac) {
       return '<article class="fc fcard prac' + (S.fknown[c.i] ? " is-known" : "") + '" data-f="' + c.i + '">' + head +
         '<div class="fbody"><p class="qt">' + fmt(pTitle(f)) + "</p>" +
-        '<label class="how" for="fo-ta">Twoja odpowiedź: metoda, ścieżka, nagłówki, body. Zapisuje się sama.</label>' +
+        '<label class="how" for="fo-ta">' + L("Twoja odpowiedź: metoda, ścieżka, nagłówki, body. Zapisuje się sama.", "Your answer: method, path, headers, body. It saves itself.") + "</label>" +
         '<textarea class="ta" id="fo-ta" rows="8" spellcheck="false" autocapitalize="off" autocomplete="off">' + esc(S.ptxt[c.i] || "") + "</textarea>" +
-        (open ? '<div id="fo-ans" tabindex="-1"><p class="how">Wzorzec</p><div class="model">' + fmt(f.a) + "</div></div>" + docLinks(f) + httpChips(f) + grade : "") +
+        (open ? '<div id="fo-ans" tabindex="-1"><p class="how">' + L("Wzorzec", "Model answer") + '</p><div class="model">' + fmt(f.a) + "</div></div>" + docLinks(f) + httpChips(f) + grade : "") +
         "</div>" + bar + "</article>";
     }
     return '<article class="fc fcard' + (S.fknown[c.i] ? " is-known" : "") + '" data-f="' + c.i + '">' + head +
       (open
         ? '<div class="fbody"><p class="qt">' + fmt(f.q) + '</p><div class="ans" id="fo-ans" tabindex="-1">' + fmt(f.a) + docLinks(f) + httpChips(f) + "</div>" + grade + "</div>" + bar
-        : '<button type="button" class="fface" id="fo-flip" aria-expanded="false"><span class="fq">' + fmt(f.q) + '</span><span class="fhint">' + ICON.flip + "Kliknij, aby odsłonić odpowiedź</span></button>") +
+        : '<button type="button" class="fface" id="fo-flip" aria-expanded="false"><span class="fq">' + fmt(f.q) + '</span><span class="fhint">' + ICON.flip + L("Kliknij, aby odsłonić odpowiedź", "Click to reveal the answer") + "</span></button>") +
       "</article>";
   }
   function fSettings(base, cur) {
@@ -1134,18 +1167,20 @@
     }
     var fd = S.fo.dom !== "all" ? S.fo.dom : cur ? cur.d : "";
     return '<div class="setup fset" id="fo-set"' + (FOC.set ? "" : " hidden") + ">" +
-      (fd ? '<div class="fs"><h3 id="fo-h-dom">Kategoria</h3><div class="chips" role="group" aria-labelledby="fo-h-dom">' +
-        chip("fdom", fd, esc(DOM_ICO[fd] + " " + DOM_NAME[fd]), null, S.fo.dom !== "all") + chip("fdom", "all", "Wszystkie kategorie", null, S.fo.dom === "all") + "</div></div>" : "") +
-      '<div class="fs"><h3 id="fo-h-flt">Które karty</h3><div class="chips" role="group" aria-labelledby="fo-h-flt">' +
-      chip("flt", "all", "Wszystkie", base.length, S.fo.flt === "all") + chip("flt", "todo", "Do nauki", todo, S.fo.flt === "todo") + chip("flt", "wrong", "Tylko błędne", wrong, S.fo.flt === "wrong") +
-      '</div><p class="how">„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem.</p></div>' +
-      '<div class="fs"><h3 id="fo-h-set">Runda</h3><div class="chips" role="group" aria-labelledby="fo-h-set">' +
-      chip("set", "all", "Obie rundy", null, S.set === "all") + chip("set", "1", "Runda 1", null, S.set === "1") + chip("set", "2", "Runda 2 (luki)", null, S.set === "2") + "</div></div>" +
-      '<div class="fs"><h3 id="fo-h-ord">Kolejność</h3><div class="chips" role="group" aria-labelledby="fo-h-ord">' +
-      chip("ord", "dom", "Po obszarach", null, !S.fo.shuf) + chip("ord", "rnd", "Losowa", null, !!S.fo.shuf) +
-      (S.fo.shuf ? '<button type="button" class="btn small" id="fo-reshuffle">Przetasuj</button>' : "") + "</div></div>" +
-      '<label class="check" for="fo-hint"><input type="checkbox" id="fo-hint"' + (S.hint ? " checked" : "") + "> Pokazuj, ile odpowiedzi jest poprawnych</label>" +
-      '<p class="how keys"><strong>Skróty:</strong> <kbd>←</kbd> <kbd>→</kbd> karta · <kbd>A</kbd>–<kbd>E</kbd> zaznacz · <kbd>Enter</kbd> sprawdź, potem dalej · <kbd>Spacja</kbd> odsłoń / ukryj · <kbd>U</kbd> umiem · <kbd>N</kbd> jeszcze nie · <kbd>Esc</kbd> lista</p>' +
+      (fd ? '<div class="fs"><h3 id="fo-h-dom">' + L("Kategoria", "Category") + '</h3><div class="chips" role="group" aria-labelledby="fo-h-dom">' +
+        chip("fdom", fd, esc(DOM_ICO[fd] + " " + dn(fd)), null, S.fo.dom !== "all") + chip("fdom", "all", L("Wszystkie kategorie", "All categories"), null, S.fo.dom === "all") + "</div></div>" : "") +
+      '<div class="fs"><h3 id="fo-h-flt">' + L("Które karty", "Which cards") + '</h3><div class="chips" role="group" aria-labelledby="fo-h-flt">' +
+      chip("flt", "all", L("Wszystkie", "All"), base.length, S.fo.flt === "all") + chip("flt", "todo", L("Do nauki", "To learn"), todo, S.fo.flt === "todo") +
+      chip("flt", "wrong", L("Tylko błędne", "Only wrong"), wrong, S.fo.flt === "wrong") +
+      '</div><p class="how">' + L("„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem.", "“To learn” skips cards answered right and cards marked Known.") + "</p></div>" +
+      '<div class="fs"><h3 id="fo-h-set">' + L("Runda", "Round") + '</h3><div class="chips" role="group" aria-labelledby="fo-h-set">' +
+      chip("set", "all", L("Obie rundy", "Both rounds"), null, S.set === "all") + chip("set", "1", L("Runda 1", "Round 1"), null, S.set === "1") + chip("set", "2", L("Runda 2 (luki)", "Round 2 (gaps)"), null, S.set === "2") + "</div></div>" +
+      '<div class="fs"><h3 id="fo-h-ord">' + L("Kolejność", "Order") + '</h3><div class="chips" role="group" aria-labelledby="fo-h-ord">' +
+      chip("ord", "dom", L("Po obszarach", "By area"), null, !S.fo.shuf) + chip("ord", "rnd", L("Losowa", "Random"), null, !!S.fo.shuf) +
+      (S.fo.shuf ? '<button type="button" class="btn small" id="fo-reshuffle">' + L("Przetasuj", "Reshuffle") + "</button>" : "") + "</div></div>" +
+      '<label class="check" for="fo-hint"><input type="checkbox" id="fo-hint"' + (S.hint ? " checked" : "") + "> " + L("Pokazuj, ile odpowiedzi jest poprawnych", "Show how many answers are right") + "</label>" +
+      '<p class="how keys">' + L('<strong>Skróty:</strong> <kbd>←</kbd> <kbd>→</kbd> karta · <kbd>A</kbd>–<kbd>E</kbd> zaznacz · <kbd>Enter</kbd> sprawdź, potem dalej · <kbd>Spacja</kbd> odsłoń / ukryj · <kbd>U</kbd> umiem · <kbd>N</kbd> jeszcze nie · <kbd>Esc</kbd> lista',
+        '<strong>Shortcuts:</strong> <kbd>←</kbd> <kbd>→</kbd> card · <kbd>A</kbd>–<kbd>E</kbd> select · <kbd>Enter</kbd> check, then next · <kbd>Space</kbd> reveal / hide · <kbd>U</kbd> I know it · <kbd>N</kbd> not yet · <kbd>Esc</kbd> list') + "</p>" +
       "</div>";
   }
   function renderFocus() {
@@ -1163,48 +1198,51 @@
     }
 
     var top = '<div class="ftop">' +
-      '<div class="seg" role="group" aria-label="Tryb nauki"><button type="button" class="seg-b" data-mode="lista" aria-pressed="false">Lista</button>' +
+      '<div class="seg" role="group" aria-label="' + L("Tryb nauki", "Study mode") + '"><button type="button" class="seg-b" data-mode="lista" aria-pressed="false">' + L("Lista", "List") + "</button>" +
       '<button type="button" class="seg-b" data-mode="focus" aria-pressed="true">Focus</button></div>' +
-      '<span class="ftop-r">' + (S.gx.combo && S.combo >= 3 ? '<span class="combo' + (S.combo > FOC.combo ? " up" : "") + '" title="Dobre odpowiedzi z rzędu">' + ICON.bolt + "Combo ×" + S.combo + "</span>" : "") +
-      '<button type="button" class="icn" id="fo-gear" aria-label="Ustawienia trybu Focus" aria-expanded="' + FOC.set + '" aria-controls="fo-set">' + ICON.gear + "</button>" +
-      '<button type="button" class="icn" id="fo-close" aria-label="Zamknij tryb Focus i wróć do listy">' + ICON.x + "</button></span>" +
-      '<label class="sr" for="fo-deck">Talia</label><select id="fo-deck" class="fsel deck">' + DECKS.map(function (d) {
-        return '<option value="' + d[0] + '"' + (S.fo.deck === d[0] ? " selected" : "") + ">" + d[1] + "</option>";
+      '<span class="ftop-r">' + (S.gx.combo && S.combo >= 3 ? '<span class="combo' + (S.combo > FOC.combo ? " up" : "") + '" title="' + L("Dobre odpowiedzi z rzędu", "Right answers in a row") + '">' + ICON.bolt + "Combo ×" + S.combo + "</span>" : "") +
+      '<button type="button" class="icn" id="fo-gear" aria-label="' + L("Ustawienia trybu Focus", "Focus mode settings") + '" aria-expanded="' + FOC.set + '" aria-controls="fo-set">' + ICON.gear + "</button>" +
+      '<button type="button" class="icn" id="fo-close" aria-label="' + L("Zamknij tryb Focus i wróć do listy", "Close Focus mode and go back to the list") + '">' + ICON.x + "</button></span>" +
+      '<label class="sr" for="fo-deck">' + L("Talia", "Deck") + '</label><select id="fo-deck" class="fsel deck">' + DECKS.map(function (d) {
+        return '<option value="' + d[0] + '"' + (S.fo.deck === d[0] ? " selected" : "") + ">" + T(d[1]) + "</option>";
       }).join("") + "</select>" +
       '<div class="fpick">' +
-      '<button type="button" class="icn" id="fo-psec" aria-label="Poprzedni obszar"' + (si > 0 ? "" : " disabled") + ">" + ICON.psec + "</button>" +
-      '<button type="button" class="icn" id="fo-nsec" aria-label="Następny obszar"' + (si > -1 && si < secs.length - 1 ? "" : " disabled") + ">" + ICON.nsec + "</button>" +
-      '<label class="sr" for="fo-sec">Obszar</label><select id="fo-sec" class="fsel big"' + (secs.length ? "" : " disabled") + ">" +
+      '<button type="button" class="icn" id="fo-psec" aria-label="' + L("Poprzedni obszar", "Previous area") + '"' + (si > 0 ? "" : " disabled") + ">" + ICON.psec + "</button>" +
+      '<button type="button" class="icn" id="fo-nsec" aria-label="' + L("Następny obszar", "Next area") + '"' + (si > -1 && si < secs.length - 1 ? "" : " disabled") + ">" + ICON.nsec + "</button>" +
+      '<label class="sr" for="fo-sec">' + L("Obszar", "Area") + '</label><select id="fo-sec" class="fsel big"' + (secs.length ? "" : " disabled") + ">" +
       (secs.length ? secs.map(function (s, k) {
         var d = s.list.filter(function (x) { return cState(x) > 0; }).length;
-        return '<option value="' + k + '"' + (k === si ? " selected" : "") + ">" + esc(s.d[1]) + " · " + d + "/" + s.list.length + "</option>";
-      }).join("") : "<option>" + (S.fo.shuf && deck.length ? "Losowa kolejność" : "Brak kart") + "</option>") + "</select></div></div>";
+        return '<option value="' + k + '"' + (k === si ? " selected" : "") + ">" + esc(dn(s.d[0])) + " · " + d + "/" + s.list.length + "</option>";
+      }).join("") : "<option>" + (S.fo.shuf && deck.length ? L("Losowa kolejność", "Random order") : L("Brak kart", "No cards")) + "</option>") + "</select></div></div>";
 
     var C = 2 * Math.PI * 27;
-    var head = '<div class="fhead"><div class="fh-t"><h2>' + (c ? (S.fo.shuf ? "Losowa kolejność" : esc(DOM_ICO[c.d] + " " + DOM_NAME[c.d])) : "Brak kart") + "</h2>" +
-      "<p>" + (c ? "Karta <strong>" + (sp + 1) + " z " + sec.length + "</strong>" + (S.fo.shuf ? " w talii" : " w tym obszarze") : "Zmień filtr, aby zobaczyć karty.") + "</p></div>" +
-      '<div class="fh-p"><div class="fh-pl"><span class="fh-k">Postęp talii</span><span class="fh-v"><span><b class="g">' + right + "</b> z " + done + " dobrze</span><span><b>" + (total - done) + "</b> zostało</span><span>" + total + " razem</span></span></div>" +
-      '<div class="meter2" role="img" aria-label="Poprawne ' + right + ", błędne " + wrong + ", zostało " + (total - done) + '"><i class="r" style="width:' + (total ? right / total * 100 : 0) + '%"></i><i class="w" style="width:' + (total ? wrong / total * 100 : 0) + '%"></i></div></div>' +
+    var head = '<div class="fhead"><div class="fh-t"><h2>' + (c ? (S.fo.shuf ? L("Losowa kolejność", "Random order") : esc(DOM_ICO[c.d] + " " + dn(c.d))) : L("Brak kart", "No cards")) + "</h2>" +
+      "<p>" + (c ? L("Karta ", "Card ") + "<strong>" + (sp + 1) + L(" z ", " of ") + sec.length + "</strong>" + (S.fo.shuf ? L(" w talii", " in the deck") : L(" w tym obszarze", " in this area")) : L("Zmień filtr, aby zobaczyć karty.", "Change the filter to see cards.")) + "</p></div>" +
+      '<div class="fh-p"><div class="fh-pl"><span class="fh-k">' + L("Postęp talii", "Deck progress") + '</span><span class="fh-v"><span><b class="g">' + right + "</b>" + L(" z ", " of ") + done + L(" dobrze", " right") +
+      "</span><span><b>" + (total - done) + "</b>" + L(" zostało", " left") + "</span><span>" + total + L(" razem", " total") + "</span></span></div>" +
+      '<div class="meter2" role="img" aria-label="' + L("Poprawne ", "Right ") + right + L(", błędne ", ", wrong ") + wrong + L(", zostało ", ", left ") + (total - done) + '"><i class="r" style="width:' + (total ? right / total * 100 : 0) + '%"></i><i class="w" style="width:' + (total ? wrong / total * 100 : 0) + '%"></i></div></div>' +
       '<div class="ring' + (done && acc < 80 ? " no" : "") + '"><div class="ring-w"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="tr" cx="32" cy="32" r="27"/>' +
       (acc ? '<circle class="ar" cx="32" cy="32" r="27" stroke-dasharray="' + (acc / 100 * C).toFixed(1) + " " + C.toFixed(1) + '"/>' : "") + '</svg><span class="ring-v">' + (done ? acc + "%" : "–") + "</span></div>" +
-      '<span class="fh-k">Trafność</span></div></div>';
+      '<span class="fh-k">' + L("Trafność", "Accuracy") + "</span></div></div>";
 
     var card = !c
-      ? '<p class="empty">W tej talii nie ma kart pasujących do filtra. <button type="button" class="btn small" id="fo-reset">Pokaż wszystkie karty</button></p>'
+      ? '<p class="empty">' + L("W tej talii nie ma kart pasujących do filtra.", "No cards in this deck match the filter.") + ' <button type="button" class="btn small" id="fo-reset">' + L("Pokaż wszystkie karty", "Show all cards") + "</button></p>"
       : c.t === "q" ? qCard(c.i, "learn", learnSel(c.i)) : fFlash(c);
 
     var strip = "";
     if (c && sec.length <= 60) {
-      strip = '<div class="fstrip" role="group" aria-label="' + (S.fo.shuf ? "Karty w talii" : "Karty w tym obszarze") + '">' + sec.map(function (x) {
+      strip = '<div class="fstrip" role="group" aria-label="' + (S.fo.shuf ? L("Karty w talii", "Cards in the deck") : L("Karty w tym obszarze", "Cards in this area")) + '">' + sec.map(function (x) {
         var s = cState(x);
         return '<button type="button" class="fd' + (s ? " s" + s : "") + (cKnown(x) ? " kn" : "") + '" data-id="' + x.id + '"' + (x === c ? ' aria-current="true"' : "") +
-          ' aria-label="' + (x.t === "q" ? "Pytanie " + (x.i + 1) : "Fiszka " + (x.i + 1)) + (s === 1 ? ", dobrze" : s === 2 ? ", źle" : ", bez odpowiedzi") + (cKnown(x) ? ", opanowane" : "") + '">' + cLabel(x) + "</button>";
+          ' aria-label="' + (x.t === "q" ? L("Pytanie ", "Question ") + (x.i + 1) : L("Fiszka ", "Flashcard ") + (x.i + 1)) +
+          (s === 1 ? L(", dobrze", ", right") : s === 2 ? L(", źle", ", wrong") : L(", bez odpowiedzi", ", not answered")) + (cKnown(x) ? L(", opanowane", ", mastered") : "") + '">' + cLabel(x) + "</button>";
       }).join("") + "</div>" +
-      '<ul class="legend fleg"><li><span class="sw r"></span>dobrze</li><li><span class="sw w"></span>źle</li><li><span class="sw u"></span>opanowane</li><li><span class="sw"></span>bez odpowiedzi</li></ul>';
+      '<ul class="legend fleg"><li><span class="sw r"></span>' + L("dobrze", "right") + '</li><li><span class="sw w"></span>' + L("źle", "wrong") + '</li><li><span class="sw u"></span>' + L("opanowane", "mastered") +
+        '</li><li><span class="sw"></span>' + L("bez odpowiedzi", "not answered") + "</li></ul>";
     }
-    var nav = '<div class="fnav"><button type="button" class="btn big" id="fo-prev"' + (pos > 0 ? "" : " disabled") + ">‹ Poprzednia</button>" +
+    var nav = '<div class="fnav"><button type="button" class="btn big" id="fo-prev"' + (pos > 0 ? "" : " disabled") + ">‹ " + L("Poprzednia", "Previous") + "</button>" +
       '<span class="fpos">' + (c ? (pos + 1) + " / " + deck.length : "") + "</span>" +
-      '<button type="button" class="btn primary big" id="fo-next"' + (pos > -1 && pos < deck.length - 1 ? "" : " disabled") + ">Następna ›</button></div>";
+      '<button type="button" class="btn primary big" id="fo-next"' + (pos > -1 && pos < deck.length - 1 ? "" : " disabled") + ">" + L("Następna", "Next") + " ›</button></div>";
 
     FOC.combo = S.combo;
     $("#focusroot").innerHTML = top + fSettings(base, c) + head + '<div class="fstage" id="fo-stage" tabindex="-1">' + card + "</div>" + nav + strip;
@@ -1438,13 +1476,14 @@
       root.appendChild($("#apimap-tpl").content.cloneNode(true));
       /* Picking an API is its own history entry, as with HTTP Koty modules. */
       APIM = bootApiMap(root, function (api) { if (!NAV.mute) go({ tab: "api", sub: api }, false, true); });
+      if (S.lang === "en") localize(root);
     }
     kotyTop();
   }
   function paintBack() {
     var b = $("#back-q"), from = NAV.cur.from;
     b.hidden = !(CUR === "http" && from);
-    if (from) b.textContent = "← Wróć do " + from;
+    if (from) b.textContent = L("← Wróć do ", "← Back to ") + from;
     if (CUR === "http" || CUR === "api" || CUR === "pytania") kotyTop();
   }
   document.addEventListener("click", function (ev) {
@@ -1453,7 +1492,7 @@
     var card = c.closest(".q, .fc"), from = "";
     if (card) {
       var num = card.querySelector(".num").textContent;
-      from = /^F\d/.test(num) ? "fiszki " + num : /^#/.test(num) ? "pytania " + num : "symulacji";
+      from = /^F\d/.test(num) ? L("fiszki ", "flashcard ") + num : /^#/.test(num) ? L("pytania ", "question ") + num : L("symulacji", "the simulation");
     }
     go({ tab: "http", sub: "kody", code: +c.dataset.code, from: from });
   });
@@ -1600,7 +1639,7 @@
   }, { passive: true });
   /* Theme: "auto" leaves data-theme off so the CSS follows the system setting. The head script applies the saved value before first paint. */
   var THEME_NEXT = { auto: "light", light: "dark", dark: "auto" };
-  var THEME_NAME = { auto: "systemowy", light: "jasny", dark: "ciemny" };
+  var THEME_NAME = { auto: ["systemowy", "system"], light: ["jasny", "light"], dark: ["ciemny", "dark"] };
   var THEME_ICO = {
     auto: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg>',
     light: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
@@ -1610,7 +1649,7 @@
     if (S.theme === "auto") document.documentElement.removeAttribute("data-theme");
     else document.documentElement.setAttribute("data-theme", S.theme);
     var b = $("#theme-btn");
-    var label = "Motyw: " + THEME_NAME[S.theme] + ". Zmień na: " + THEME_NAME[THEME_NEXT[S.theme]];
+    var label = L("Motyw: ", "Theme: ") + T(THEME_NAME[S.theme]) + L(". Zmień na: ", ". Switch to: ") + T(THEME_NAME[THEME_NEXT[S.theme]]);
     b.setAttribute("aria-label", label);
     b.title = label;
     b.innerHTML = THEME_ICO[S.theme];
@@ -1622,6 +1661,14 @@
     if (CUR === "ustawienia") renderSettings();
   });
   paintTheme();
+  /* Language: the static markup swaps in place, then the open view renders again with the new strings. */
+  function setLang(l) {
+    S.lang = l; save();
+    document.documentElement.lang = l;
+    localize(document);
+    [["#apimap", APIM], ["#catapi", CATAPI]].forEach(function (m) { if (m[1]) { localize($(m[0]).shadowRoot); m[1].relang(); } });
+    paintTheme(); clearDocs(); header(true); apply(NAV.cur, true);
+  }
 
   document.querySelector(".tabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".tab");
@@ -1635,6 +1682,7 @@
   /* A click on the backdrop lands on the dialog element itself, never on its content. */
   infoDlg.addEventListener("click", function (ev) { if (ev.target === infoDlg) infoDlg.close(); });
 
+  if (S.lang === "en") localize(document);
   header(true);
   if (S.sim && !S.sim.done) startTick();
   /* First paint: a reload comes back to the same entry and scroll position; a fresh open follows the hash. */

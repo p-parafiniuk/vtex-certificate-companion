@@ -17,7 +17,7 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 | `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json` |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
-| `npm run shots -- <hash>…` | screenshots of the built page into `shots/` (gitignored) at 375 and 1280 px, light and dark. Exits 1 on a console error. Flags: `--w=375`, `--theme=dark`, `--full` |
+| `npm run shots -- <hash>…` | screenshots of the built page into `shots/` (gitignored) at 375 and 1280 px, light and dark. Exits 1 on a console error. Flags: `--w=375`, `--theme=dark`, `--lang=en`, `--full` |
 
 ## Layout
 ```
@@ -46,7 +46,7 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 
 **F** (`flashcards.json`): `d, r, q, a, l, h?`. A `q` starting with `Practical:` makes a hands-on task. The user writes their answer and self-grades it against `a`.
 
-**DOMS** (`domains.json`): `[key, name, emoji]`. The emoji labels the category in the side panel.
+**DOMS** (`domains.json`): `[key, name, emoji, enName?]`. The emoji labels the category in the side panel. `enName` replaces `name` when the UI language is English; leave it out when the name is already English.
 
 **API Reference links** are built, not stored: `https://developers.vtex.com/docs/api-reference/<slug>` for an API, plus `#<method>-<path>` with `{param}` written as `-param-` for an endpoint (the same format as the endpoint links in `docs.json`).
 

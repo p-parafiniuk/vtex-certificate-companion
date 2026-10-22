@@ -9,8 +9,8 @@ const err = [], warn = [];
 const E = (w, m) => err.push(w + ": " + m), W = (w, m) => warn.push(w + ": " + m);
 const doms = new Set(D.DOMS.map(d => d[0]));
 const isStr = s => typeof s === "string" && s.trim() !== "";
-/* [key, name, emoji]: the emoji labels the category in the side panel */
-D.DOMS.forEach((d, i) => { if (!Array.isArray(d) || d.length !== 3 || !d.every(isStr)) E("DOMS[" + i + "]", "must be [key, name, emoji]"); });
+/* [key, name, emoji, enName?]: the emoji labels the category in the side panel; enName replaces name in the English UI */
+D.DOMS.forEach((d, i) => { if (!Array.isArray(d) || d.length < 3 || d.length > 4 || !d.every(isStr)) E("DOMS[" + i + "]", "must be [key, name, emoji, enName?]"); });
 
 function markup(w, s) {
   if (typeof s !== "string") return;

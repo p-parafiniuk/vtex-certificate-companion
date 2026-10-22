@@ -6,8 +6,11 @@ function bootApiMap(root, onNav, embed) {
 /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated, q query (* = required), a auth, b body, r responses}] */
 /*@data APIMAP*/
 const METHODS = ["GET","POST","PUT","PATCH","DELETE"];
-const SCOPES = [["pvt","pvt","Ścieżki z /pvt/: prywatne, wymagają klucza API albo tokenu"],["pub","pub","Ścieżki z /pub/: publiczne, wołane m.in. ze sklepu"],
-  ["other","inne","Ścieżki bez /pvt/ i /pub/ w adresie"],["open","tylko OPEN","Tylko endpointy bez autoryzacji w schemacie"]];
+/* UI language comes from <html lang>, which the main app sets; relang() redraws after a switch. */
+const L = (pl, en) => document.documentElement.lang === "en" ? en : pl;
+const scopes = () => [["pvt","pvt",L("Ścieżki z /pvt/: prywatne, wymagają klucza API albo tokenu","Paths with /pvt/: private, need an API key or token")],
+  ["pub","pub",L("Ścieżki z /pub/: publiczne, wołane m.in. ze sklepu","Paths with /pub/: public, called from the storefront among others")],
+  ["other",L("inne","other"),L("Ścieżki bez /pvt/ i /pub/ w adresie","Paths without /pvt/ or /pub/")],["open",L("tylko OPEN","OPEN only"),L("Tylko endpointy bez autoryzacji w schemacie","Only endpoints with no auth in the schema")]];
 const LIMIT = 150;
 const KEY = "apimap.v1";
 const KEYS = ["all", ...APIMAP.map(a => a.key)];
@@ -35,15 +38,18 @@ function save(){ if (embed) return; try{ localStorage.setItem(KEY, JSON.stringif
 function buildApis(){
   const total = LIST.reduce((n,a)=>n+a.eps.length,0);
   $("apis").hidden = LIST.length < 2;
-  $("apis").innerHTML = [`<button type="button" class="chip" data-k="all">Wszystkie <span>${total}</span></button>`,
+  $("apis").innerHTML = [`<button type="button" class="chip" data-k="all">${L("Wszystkie","All")} <span>${total}</span></button>`,
     ...LIST.map(a=>`<button type="button" class="chip" data-k="${esc(a.key)}">${esc(a.name)} <span>${a.eps.length}</span></button>`)].join("");
 }
-function buildControls(){
+function buildLabels(){
   buildApis();
+  $("scopes").innerHTML = scopes().map(([k,l,t])=>`<button type="button" data-s="${k}" title="${esc(t)}" aria-label="${esc(l+": "+t)}">${l}</button>`).join("");
+  $("depth").innerHTML = [["0",L("zwiń","collapse")],["1","1"],["2","2"],["3","3"],["99",L("wszystko","all")]].map(([d,l])=>`<button type="button" data-d="${d}">${l}</button>`).join("");
+}
+function buildControls(){
+  buildLabels();
   if (embed) root.querySelector(".top").hidden = true;
   $("methods").innerHTML = METHODS.map(m=>`<button type="button" data-m="${m}" style="--c:var(--${m.toLowerCase()})">${m}<span class="mc"></span></button>`).join("");
-  $("scopes").innerHTML = SCOPES.map(([k,l,t])=>`<button type="button" data-s="${k}" title="${esc(t)}" aria-label="${esc(l+": "+t)}">${l}</button>`).join("");
-  $("depth").innerHTML = [["0","zwiń"],["1","1"],["2","2"],["3","3"],["99","wszystko"]].map(([d,l])=>`<button type="button" data-d="${d}">${l}</button>`).join("");
 
   $("apis").onclick = e => { const b=e.target.closest(".chip"); if(!b || b.dataset.k===state.api) return; show(b.dataset.k); if(onNav) onNav(state.api); };
   /* Alt/Shift-click, or a click while all are on, isolates one method. */
@@ -152,7 +158,7 @@ function renderNode(n, depth, isApiRoot){
   const segHtml = esc(n.name).replace(/\{[^}]+\}/g, m=>`<span class="seg param">${m}</span>`);
   let h = `<details data-key="${esc(n.key)}"${open?" open":""}><summary${isApiRoot?' class="apiroot"':""}><span class="caret" aria-hidden="true">▸</span><span class="seg">${segHtml}${isApiRoot?"":"/"}</span><span class="n">${total}</span></summary><div class="kids">`;
   for (const ep of [...n.eps].sort((a,b)=>ord(a.m)-ord(b.m)))
-    h += `<button type="button" class="ep" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span><span class="s">${hl(ep.s||"(brak opisu)")}</span>${ep.a?"":'<span class="flag open">OPEN</span>'}${ep.d?'<span class="flag dep">DEPR</span>':""}<span class="t">${esc(ep.t)}</span></button>`;
+    h += `<button type="button" class="ep" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span><span class="s">${hl(ep.s||L("(brak opisu)","(no description)"))}</span>${ep.a?"":'<span class="flag open">OPEN</span>'}${ep.d?'<span class="flag dep">DEPR</span>':""}<span class="t">${esc(ep.t)}</span></button>`;
   for (const c of [...n.kids.values()].sort((a,b)=>a.name.localeCompare(b.name))) h += renderNode(c, depth+1, false);
   return h + "</div></details>";
 }
@@ -160,7 +166,7 @@ function renderNode(n, depth, isApiRoot){
 const pathHtml = p => hl(p).replace(/\{[^}<]*\}/g, m=>`<span class="param">${m}</span>`);
 function hitRow(ep, many){
   return `<button type="button" class="ep hit" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span>` +
-    `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s||"(brak opisu)")} · ${esc(ep.t||"—")}${many?" · "+esc(ep.api.name):""}</span></span>` +
+    `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s||L("(brak opisu)","(no description)"))} · ${esc(ep.t||"—")}${many?" · "+esc(ep.api.name):""}</span></span>` +
     `${ep.a?"":'<span class="flag open">OPEN</span>'}${ep.d?'<span class="flag dep">DEPR</span>':""}</button>`;
 }
 /* While searching, each API chip shows its own number of hits, so results in another API are never invisible. */
@@ -187,7 +193,7 @@ function render(){
   $("qscope").hidden = !showIn;
   if (showIn){
     const name = LIST.find(a=>a.key===state.api).name;
-    $("qin").innerHTML = `<button type="button" data-q="all" aria-pressed="${state.qAll}">wszędzie <span class="mc">${hits.get("all")}</span></button>` +
+    $("qin").innerHTML = `<button type="button" data-q="all" aria-pressed="${state.qAll}">${L("wszędzie","everywhere")} <span class="mc">${hits.get("all")}</span></button>` +
       `<button type="button" data-q="one" aria-pressed="${!state.qAll}">${esc(name)} <span class="mc">${hits.get(state.api)}</span></button>`;
   }
   if (state.q){
@@ -197,7 +203,7 @@ function render(){
     found.forEach(ep=>{ EPS.set(idOf(ep), ep); c[ep.m]++; tot++; if(!ep.a) open++; });
     const many = apis.length > 1;
     if (found.length) html = `<div class="hits">${found.slice(0,LIMIT).map(ep=>hitRow(ep, many)).join("")}</div>` +
-      (found.length>LIMIT ? `<div class="more">Pokazano ${LIMIT} z ${found.length}. Doprecyzuj wyszukiwanie albo zawęź metody.</div>` : "");
+      (found.length>LIMIT ? `<div class="more">${L(`Pokazano ${LIMIT} z ${found.length}. Doprecyzuj wyszukiwanie albo zawęź metody.`, `Showing ${LIMIT} of ${found.length}. Refine the search or narrow the methods.`)}</div>` : "");
   }
   else for (const a of apis){
     const top = trieFor(a);
@@ -206,12 +212,12 @@ function render(){
     if (state.api==="all") html += renderNode(top, 0, true);
     else html += [...top.kids.values()].sort((x,y)=>x.name.localeCompare(y.name)).map(k=>renderNode(k,0,false)).join("");
   }
-  $("tree").innerHTML = html || `<div class="empty">Nic nie pasuje do filtrów. Wyczyść wyszukiwanie (Esc) albo włącz więcej metod.</div>`;
+  $("tree").innerHTML = html || `<div class="empty">${L("Nic nie pasuje do filtrów. Wyczyść wyszukiwanie (Esc) albo włącz więcej metod.","Nothing matches the filters. Clear the search (Esc) or turn on more methods.")}</div>`;
   $("tree").classList.toggle("flat", !!state.q);
   const inApis = wide ? new Set([...EPS.values()].map(ep=>ep.api.key)).size : 0;
-  $("stats").innerHTML = `<span><b>${plural(tot,"endpoint","endpointy","endpointów")}</b>${inApis>1?" w "+inApis+" API":""}</span>` + METHODS.filter(m=>c[m]).map(m=>`<span><span class="m ${m}" style="width:auto">${m}</span> <b>${c[m]}</b></span>`).join("") + (open?`<span><b>${open}</b> OPEN</span>`:"");
-  if (state.api==="all" || inApis > 1) $("server").innerHTML = `Auth (wszystkie API): <code>X-VTEX-API-AppKey</code> + <code>X-VTEX-API-AppToken</code> lub <code>VtexIdclientAutCookie</code>`;
-  else { const a=sel[0]; $("server").innerHTML = `Base URL: <code>${esc(a.server)}</code> · schemat: <code>${esc(a.file)}</code> · ${refLink(apiRef(a), a.name+" API", "API Reference")}`; }
+  $("stats").innerHTML = `<span><b>${plural(tot,"endpoint",L("endpointy","endpoints"),L("endpointów","endpoints"))}</b>${inApis>1?L(" w "," in ")+inApis+" API":""}</span>` + METHODS.filter(m=>c[m]).map(m=>`<span><span class="m ${m}" style="width:auto">${m}</span> <b>${c[m]}</b></span>`).join("") + (open?`<span><b>${open}</b> OPEN</span>`:"");
+  if (state.api==="all" || inApis > 1) $("server").innerHTML = `Auth (${L("wszystkie API","all APIs")}): <code>X-VTEX-API-AppKey</code> + <code>X-VTEX-API-AppToken</code> ${L("lub","or")} <code>VtexIdclientAutCookie</code>`;
+  else { const a=sel[0]; $("server").innerHTML = `Base URL: <code>${esc(a.server)}</code> · ${L("schemat","schema")}: <code>${esc(a.file)}</code> · ${refLink(apiRef(a), a.name+" API", "API Reference")}`; }
 }
 
 /* ---------- endpoint detail ---------- */
@@ -248,7 +254,7 @@ function curl(ep){
 function detailHtml(ep){
   const url = esc(fullUrl(ep)).replace(/\{[^}]+\}/g, m=>`<i>${m}</i>`);
   const qs = ep.q.length ? `<div><span class="k">query</span><span class="qs">${ep.q.map(x=>`<span class="${x.endsWith("*")?"req":""}">${esc(x.replace(/\*$/,""))}${x.endsWith("*")?" *":""}</span>`).join("")}</span></div>` : "";
-  const auth = ep.a ? "X-VTEX-API-AppKey + X-VTEX-API-AppToken (lub VtexIdclientAutCookie)" : "brak autoryzacji w schemacie";
+  const auth = ep.a ? "X-VTEX-API-AppKey + X-VTEX-API-AppToken (" + L("lub","or") + " VtexIdclientAutCookie)" : L("brak autoryzacji w schemacie","no auth in the schema");
   return `<div class="detail" data-id="${esc(idOf(ep))}">
     <div><span class="k">${ep.m}</span><span class="url">${url}</span></div>
     <div><span class="k">auth</span>${esc(auth)}</div>
@@ -256,13 +262,13 @@ function detailHtml(ep){
     ${qs}
     ${bodyHtml(ep)}
     ${respHtml(ep)}
-    <div class="acts">${refLink(epRef(ep), ep.m+" "+ep.p, "Dokumentacja endpointu")}<button type="button" data-copy="url">Kopiuj URL</button><button type="button" data-copy="curl">Kopiuj curl</button>${ep.b&&ep.b.ex?'<button type="button" data-copy="body">Kopiuj body</button>':""}</div>
+    <div class="acts">${refLink(epRef(ep), ep.m+" "+ep.p, L("Dokumentacja endpointu","Endpoint docs"))}<button type="button" data-copy="url">${L("Kopiuj URL","Copy URL")}</button><button type="button" data-copy="curl">${L("Kopiuj curl","Copy curl")}</button>${ep.b&&ep.b.ex?`<button type="button" data-copy="body">${L("Kopiuj body","Copy body")}</button>`:""}</div>
   </div>`;
 }
-const srcNote = s => s==="schema" ? "przykład ze schematu" : s==="gen" ? "złożone z przykładów pól w schemacie" : "";
+const srcNote = s => s==="schema" ? L("przykład ze schematu","example from the schema") : s==="gen" ? L("złożone z przykładów pól w schemacie","built from field examples in the schema") : "";
 function bodyHtml(ep){
-  if (!ep.b) return ["POST","PUT","PATCH"].includes(ep.m) ? `<h4>Request body <span class="note">brak w schemacie</span></h4>` : "";
-  const req = ep.b.req.length ? `<div><span class="k">wymagane</span><span class="qs">${ep.b.req.map(x=>`<span class="req">${esc(x)}</span>`).join("")}</span></div>` : "";
+  if (!ep.b) return ["POST","PUT","PATCH"].includes(ep.m) ? `<h4>Request body <span class="note">${L("brak w schemacie","not in the schema")}</span></h4>` : "";
+  const req = ep.b.req.length ? `<div><span class="k">${L("wymagane","required")}</span><span class="qs">${ep.b.req.map(x=>`<span class="req">${esc(x)}</span>`).join("")}</span></div>` : "";
   return `<h4>Request body <span class="note">${esc(ep.b.ct)} · ${srcNote(ep.b.src)}</span></h4>${req}${ep.b.ex?`<pre>${esc(ep.b.ex)}</pre>`:""}`;
 }
 function respHtml(ep){
@@ -270,18 +276,18 @@ function respHtml(ep){
   const rows = ep.r.map((r,i)=>{
     const head = `<span class="code c${esc(r.c[0])}">${esc(r.c)}</span><span class="rd">${esc(r.d||"")}</span>`;
     if (!r.ex) return `<div class="nx">${head}</div>`;
-    return `<details${r.ex.length>600?"":" open"}><summary><span class="caret" aria-hidden="true">▸</span>${head}<span class="n">${srcNote(r.src)}</span></summary><pre>${esc(r.ex)}</pre><div class="acts"><button type="button" data-copy="r:${i}">Kopiuj response</button></div></details>`;
+    return `<details${r.ex.length>600?"":" open"}><summary><span class="caret" aria-hidden="true">▸</span>${head}<span class="n">${srcNote(r.src)}</span></summary><pre>${esc(r.ex)}</pre><div class="acts"><button type="button" data-copy="r:${i}">${L("Kopiuj response","Copy response")}</button></div></details>`;
   }).join("");
-  return `<h4>Odpowiedzi</h4><div class="resp">${rows}</div>`;
+  return `<h4>${L("Odpowiedzi","Responses")}</h4><div class="resp">${rows}</div>`;
 }
 async function copy(btn, text){
   const old = btn.textContent;
-  try { await navigator.clipboard.writeText(text); btn.textContent="Skopiowano"; }
+  try { await navigator.clipboard.writeText(text); btn.textContent=L("Skopiowano","Copied"); }
   catch(e){
     /* file:// and older browsers have no async clipboard */
     const ta=document.createElement("textarea"); ta.value=text; ta.style.cssText="position:fixed;left:0;top:0;opacity:0";
     root.appendChild(ta); ta.select();
-    try{ document.execCommand("copy"); btn.textContent="Skopiowano"; }catch(_){ btn.textContent="Zaznacz ręcznie"; }
+    try{ document.execCommand("copy"); btn.textContent=L("Skopiowano","Copied"); }catch(_){ btn.textContent=L("Zaznacz ręcznie","Select it manually"); }
     ta.remove();
   }
   setTimeout(()=>{ btn.textContent=old; }, 1400);
@@ -301,5 +307,5 @@ function scope(list){
 }
 
 buildControls(); render(); requestAnimationFrame(revealChip);
-return { show: api => show(api), api: () => state.api, scope };
+return { show: api => show(api), api: () => state.api, scope, relang: () => { buildLabels(); render(); revealChip(); } };
 }
