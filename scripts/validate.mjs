@@ -86,7 +86,7 @@ D.APIMAP.forEach(a => a.eps.forEach(ep => {
   if (!EP_URL.test(u)) W("APIMAP." + a.key, "endpoint doc link not accepted by EP_URL: " + ep.m + " " + ep.p);
 }));
 
-/* Notes: one entry per category plus "all". The TL;DR is never folded, so it stays short; app.js folds long blocks itself. */
+/* Notes: one entry per category plus "all". The TL;DR sits above the questions, so it stays short; app.js folds long blocks itself. */
 for (const d of [...doms, "all"]) if (!D.NOTES[d]) W("NOTES", "no notes for " + d);
 for (const [k, n] of Object.entries(D.NOTES)) {
   const w = "NOTES." + k, txt = (x, ww) => {

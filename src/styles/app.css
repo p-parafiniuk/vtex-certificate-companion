@@ -379,11 +379,9 @@ body[data-view="pytania"] .bar-in, body[data-view="pytania"] .wrap { max-width: 
 .ctab .num { margin-left: 2px; }
 .ctab-s { display: none; }
 @media (max-width: 520px) { .ctab-l { display: none; } .ctab-s { display: inline; } }
-/* Notes: the TL;DR is never folded; a block folds by the rule in noteOpen (app.js). */
+/* Notes: blocks fold by the rule in noteOpen (app.js); the TL;DR folds only on phones. */
 .tl { font: 600 0.75rem var(--f-mono); letter-spacing: 0.06em; color: var(--accent); }
-.tldr { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 2px 16px 12px; }
-.tldr-h { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.tldr-h a { margin-left: auto; font-size: 0.9rem; min-height: 44px; display: inline-flex; align-items: center; }
+.tldr-more { font-size: 0.9rem; min-height: 44px; display: inline-flex; align-items: center; margin-bottom: -10px; }
 .tldr ul, .note ul { margin: 0; padding-left: 1.15em; display: grid; gap: 4px; font-size: 0.95rem; max-width: 72ch; }
 .notes { display: grid; gap: 8px; }
 #cat-tldr:empty { display: none; }

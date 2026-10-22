@@ -358,7 +358,7 @@
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
-    $("#ct-docs").innerHTML = '<span class="ctab-l">' + L("Dokumentacja", "Docs") + '</span><span class="ctab-s">Docs</span>' + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
+    $("#ct-docs").innerHTML = '<span class="ctab-l">' + L("Dokumentacja", "Docs") + '</span><span class="ctab-s">' + L("Dok.", "Docs") + "</span>" + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
     $("#ct-info").innerHTML = L("Notatki", "Notes") + (NOTES[S.dom] ? ' <span class="num">' + NOTES[S.dom].s.length + "</span>" : "");
     renderTldr(S.dom);
     if (sec !== "docs") clearDocs();
@@ -383,16 +383,19 @@
     }).join("");
   }
   /* The boxes keep their open/closed state while the learner answers questions: they redraw only when the category or language changes. */
+  /* On a phone an open TL;DR pushes the first question below the fold, so there it starts folded. */
+  var PHONE = window.matchMedia("(max-width: 520px)");
   function renderTldr(d) {
     var el = $("#cat-tldr"), n = NOTES[d], k = d + " " + S.lang;
     if (el.dataset.k === k) return;
     el.dataset.k = k;
     if (!n) { el.innerHTML = ""; return; }
     el.innerHTML = d === "all"
-      ? '<details class="note basics" open><summary><span><b class="tl">TL;DR</b> ' + L("Podstawy API", "API basics") + "</span><small>" +
+      ? '<details class="note basics"' + (PHONE.matches ? "" : " open") + '><summary><span><b class="tl">TL;DR</b> ' + L("Podstawy API", "API basics") + "</span><small>" +
         plural(n.s.length, L("blok", "block"), L("bloki", "blocks"), L("bloków", "blocks")) + "</small></summary>" + noteList(n.t) + '<div class="notes">' + noteBlocks(n, false) + "</div></details>"
-      : '<section class="tldr" aria-labelledby="tldr-h"><div class="tldr-h"><b class="tl" id="tldr-h">TL;DR</b>' +
-        '<a data-nav href="' + catHref(d, "info") + '">' + L("Całe notatki", "All notes") + " →</a></div>" + noteList(n.t) + "</section>";
+      : '<details class="note tldr"' + (PHONE.matches ? "" : " open") + '><summary><span><b class="tl">TL;DR</b></span><small>' +
+        plural(n.t.length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + "</small></summary>" + noteList(n.t) +
+        '<a class="tldr-more" data-nav href="' + catHref(d, "info") + '">' + L("Całe notatki", "All notes") + " →</a></details>";
   }
   function renderInfo(d) {
     var el = $("#cs-info"), k = d + " " + S.lang;
@@ -472,8 +475,11 @@
     ev.preventDefault();
     var href = a.getAttribute("href"), r = parseHash(href);
     if (hashOf(r) !== hashOf(NAV.cur)) go(r);
-    /* The lists re-render on navigation; keep keyboard focus on the link that was used. */
-    var again = document.querySelector('a[data-nav][href="' + href.replace(/["\\]/g, "") + '"]');
+    /* The lists re-render on navigation; keep keyboard focus on the link that was used, searched in its own list
+       (the side panel carries the same href). The TL;DR link hands focus to the section tab it opened. */
+    if (a.closest("#cat-tldr")) { $("#ct-info").focus({ preventScroll: true }); return; }
+    var box = a.closest("#cats, .doclist") || document;
+    var again = box.querySelector('a[data-nav][href="' + href.replace(/["\\]/g, "") + '"]');
     if (again) again.focus({ preventScroll: true });
   });
 
