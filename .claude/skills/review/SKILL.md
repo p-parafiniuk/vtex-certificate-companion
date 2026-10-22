@@ -18,7 +18,7 @@ Run `npm run review-scope --silent` (base defaults to `main`; pass another base 
 ## 3. Run them in parallel
 Spawn each picked agent in **one message** with the Agent tool (`subagent_type` = the name). Give each a short, self-contained prompt with only what it needs:
 - **fact-checker**: the `files["fact-checker"]` map (file → indexes). If a file says `all (N, new file)` and N > 30, ask the user before checking everything. Otherwise pass the indexes as is.
-- **ui-reviewer**: the changed files, which tabs they affect (pytania / symulacja / fiszki / postep / http / focus), and one sentence on what changed for the user.
+- **ui-reviewer**: the changed files, which tabs they affect (pytania / symulacja / fiszki / postep / http / focus), and one sentence on what changed for the user. If `design/<topic>/compare.json` exists, also pass the topic: the reviewer runs the compare.
 - **security-reviewer**: the `reasons` list and the files.
 
 Run them in the foreground (`run_in_background: false`), since the next step needs their verdicts.

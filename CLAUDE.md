@@ -20,6 +20,7 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 | `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json` |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
+| `npm run compare -- <topic>` | mockup vs built page, side by side, into `shots/compare-<topic>-<board>.png`. Needs `design/<topic>/` (see Always show it). Exits 1 on a console error |
 | `npm run shots -- <hash>…` | screenshots of the built page into `shots/` (gitignored) at 375 and 1280 px, light and dark. Exits 1 on a console error. Flags: `--w=375`, `--theme=dark`, `--lang=en`, `--full` |
 
 ## Layout
@@ -73,6 +74,7 @@ Every answer that changes or proposes UI ends with a visualization the user can 
 - **Change made**: run `npm run build`, then `npm run shots -- <hash of each touched view>`, look at the PNGs yourself, and send the relevant ones to the user (SendUserFile, or attach them to the PR). At least 375 px dark and desktop light.
 - **Change proposed, not made yet**: a **Claude Design** mockup, before writing code. Use the Artifact tool (`quickstart` with intent `design`, then the Design type), build the screens from the tokens in `src/styles/app.css` (no other design system unless the user names one), with at least 390 px dark and desktop light, and give the user the link. When the user says "vis" or "dawaj vis", this is what they mean. ASCII or Mermaid is fine for a data flow, never as the only picture of a UI.
 - **Data or structure change**: a short table or diagram of what maps to what (e.g. category → APIs → doc pages).
+- **Change built from a mockup**: before saying it is done, prove it matches. Copy the canvas into `design/<topic>/` (gitignored): each artboard as `<Board>.dc.html`, the runtime from an Artifact `read` of `artifact-type/dc-runtime.js` saved as `support.js`, and a `compare.json` that maps each board to a hash, width, theme and the clicks that reach that state (format in the header of `scripts/compare.mjs`). Run `npm run compare -- <topic>`, open every `shots/compare-<topic>-<board>.png`, list each difference, then fix it or name it as deliberate (with the reason). Send the user the compare images. "Done" without them is not done.
 A report without a picture of a UI change is not finished.
 
 ## Formatting
