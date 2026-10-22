@@ -882,7 +882,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
     <!-- START -->
     <section class="panel" id="p-start" role="tabpanel" aria-labelledby="tab-start">
       <div class="block">
-        <h2>Ile mamy kodów?</h2>
+        <h2 data-en="How many codes are there?">Ile mamy kodów?</h2>
         <div class="count">
           <span class="big">78</span>
           <p class="lead"><b>78 kotów na http.cat.</b> Z tego <b>60 to kody oficjalne</b> (rejestr IANA), a <b>18 to nieoficjalne</b>: wynalazki nginx, Cloudflare, Laravela, Twittera i jeden żart primaaprilisowy.</p>
@@ -901,10 +901,10 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
       </div>
 
       <div class="block">
-        <h2>Pięć grup w jednym zdaniu</h2>
+        <h2 data-en="Five groups in one sentence">Pięć grup w jednym zdaniu</h2>
         <div class="tw">
           <table>
-            <thead><tr><th>Grupa</th><th>Serwer mówi</th><th>Czyja wina</th><th>Ponawiać?</th></tr></thead>
+            <thead><tr><th data-en="Group">Grupa</th><th data-en="Server says">Serwer mówi</th><th data-en="Whose fault">Czyja wina</th><th data-en="Retry?">Ponawiać?</th></tr></thead>
             <tbody>
               <tr data-k="1"><td class="num">1xx</td><td><b>„Czekaj”.</b> Informacja w trakcie, to jeszcze nie odpowiedź.</td><td>niczyja</td><td>nie dotyczy</td></tr>
               <tr data-k="2"><td class="num">2xx</td><td><b>„Masz”.</b> Udało się.</td><td>niczyja</td><td>nie trzeba</td></tr>
@@ -919,7 +919,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
 
       <div class="cols">
         <div class="sheet block">
-          <p class="eyebrow">Kolejność nauki</p>
+          <p class="eyebrow" data-en="Study order">Kolejność nauki</p>
           <ol class="tight">
             <li><b>Topka:</b> 21 kodów, które musisz mieć od ręki.</li>
             <li><b>VTEX:</b> co te kody znaczą w dokumentacji i integracjach.</li>
@@ -928,7 +928,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           </ol>
         </div>
         <div class="sheet block">
-          <p class="eyebrow">Egzamin, o który gramy</p>
+          <p class="eyebrow" data-en="The exam we are playing for">Egzamin, o który gramy</p>
           <ul class="tight">
             <li><b>36 pytań</b> wielokrotnego wyboru + <b>4 ćwiczenia</b> praktyczne</li>
             <li><b>2 godziny</b> od startu</li>
@@ -942,29 +942,29 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
     <!-- TOPKA -->
     <section class="panel" id="p-topka" role="tabpanel" aria-labelledby="tab-topka" hidden>
       <div class="block">
-        <h2>Oficjalna piętnastka VTEX</h2>
+        <h2 data-en="The official VTEX fifteen">Oficjalna piętnastka VTEX</h2>
         <p class="lead">Dokładnie te <b>15 kodów</b> wymienia strona „API response status codes” w dokumentacji VTEX. To jest lista na wczoraj.</p>
         <div class="toplist" id="top1"></div>
       </div>
       <div class="block">
-        <h2>Dokładka do integracji</h2>
+        <h2 data-en="Extras for integrations">Dokładka do integracji</h2>
         <p class="lead">Tych <b>6 kodów</b> nie ma w tabeli ogólnej, ale spotkasz je w endpointach i w pytaniach o czysty HTTP.</p>
         <div class="toplist" id="top2"></div>
       </div>
       <div class="block">
-        <h2>Pary, które się mylą</h2>
+        <h2 data-en="Pairs that get mixed up">Pary, które się mylą</h2>
         <div class="cols">
-          <div class="sheet block"><h3>401 kontra 403</h3><ul class="tight"><li><b>401:</b> nie wiem, kim jesteś. Brak albo złe dane logowania.</li><li><b>403:</b> wiem, kim jesteś, i mówię nie. Brak uprawnień.</li><li><b>Haczyk:</b> 401 = <b>1</b> krok do zrobienia (zaloguj się). 403 = drzwi zamknięte.</li></ul></div>
+          <div class="sheet block"><h3 data-en="401 vs 403">401 kontra 403</h3><ul class="tight"><li><b>401:</b> nie wiem, kim jesteś. Brak albo złe dane logowania.</li><li><b>403:</b> wiem, kim jesteś, i mówię nie. Brak uprawnień.</li><li><b>Haczyk:</b> 401 = <b>1</b> krok do zrobienia (zaloguj się). 403 = drzwi zamknięte.</li></ul></div>
           <div class="sheet block"><h3>502, 503, 504</h3><ul class="tight"><li><b>502:</b> pośrednik dostał od upstreamu <b>bzdurę</b>.</li><li><b>503:</b> serwer żyje, ale <b>chwilowo nie obsługuje</b>.</li><li><b>504:</b> pośrednik <b>nie doczekał się</b> odpowiedzi.</li></ul></div>
-          <div class="sheet block"><h3>204 kontra 205</h3><ul class="tight"><li><b>204:</b> sukces, nie ma nic do pokazania. Widok zostaje.</li><li><b>205:</b> sukces, <b>wyczyść formularz</b>.</li></ul></div>
-          <div class="sheet block"><h3>400 kontra 422</h3><ul class="tight"><li><b>400:</b> nie umiem tego przeczytać (zepsuty JSON, zły <code>Content-Type</code>).</li><li><b>422:</b> przeczytałem, ale to nie ma sensu (walidacja).</li></ul></div>
+          <div class="sheet block"><h3 data-en="204 vs 205">204 kontra 205</h3><ul class="tight"><li><b>204:</b> sukces, nie ma nic do pokazania. Widok zostaje.</li><li><b>205:</b> sukces, <b>wyczyść formularz</b>.</li></ul></div>
+          <div class="sheet block"><h3 data-en="400 vs 422">400 kontra 422</h3><ul class="tight"><li><b>400:</b> nie umiem tego przeczytać (zepsuty JSON, zły <code>Content-Type</code>).</li><li><b>422:</b> przeczytałem, ale to nie ma sensu (walidacja).</li></ul></div>
         </div>
       </div>
       <div class="block">
-        <h3>Przekierowania w jednej tabeli</h3>
+        <h3 data-en="Redirects in one table">Przekierowania w jednej tabeli</h3>
         <div class="tw">
           <table>
-            <thead><tr><th>Kod</th><th>Na jak długo</th><th>Metoda i body</th></tr></thead>
+            <thead><tr><th data-en="Code">Kod</th><th data-en="For how long">Na jak długo</th><th data-en="Method and body">Metoda i body</th></tr></thead>
             <tbody data-k="3">
               <tr><td class="num">301</td><td>na stałe</td><td>klient może zamienić POST na GET</td></tr>
               <tr><td class="num">302</td><td>tymczasowo</td><td>klient może zamienić POST na GET</td></tr>
@@ -1003,7 +1003,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
     <!-- BRAKI -->
     <section class="panel" id="p-braki" role="tabpanel" aria-labelledby="tab-braki" hidden>
       <div class="block">
-        <h2>Dlaczego nie ma 104, 209 albo 427?</h2>
+        <h2 data-en="Why is there no 104, 209 or 427?">Dlaczego nie ma 104, 209 albo 427?</h2>
         <p class="lead">Każda grupa ma <b>100 numerów</b>, razem 500. Zajętych jest garstka. Poniżej cała przestrzeń 100–599, jedna kratka to jeden numer.</p>
         <div class="legend small">
           <span><i class="key oc"></i><span data-en="official, has a cat">oficjalny, ma kota</span></span>
@@ -1015,29 +1015,29 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
         <div class="maps" id="maps"></div>
       </div>
       <div class="block">
-        <h2>Pięć powodów dziur</h2>
+        <h2 data-en="Five reasons for the gaps">Pięć powodów dziur</h2>
         <div class="cols">
-          <div class="sheet block"><h3>1. Nikt ich nie zdefiniował</h3><p>Numer istnieje dopiero, gdy trafi do <b>rejestru IANA</b>, a to wymaga dokumentu RFC i przeglądu IETF. Kodów nie przydziela się po kolei, tylko wtedy, gdy są potrzebne. Na stałe przydzielono <b>61</b>.</p></div>
-          <div class="sheet block"><h3>2. Pamiątki po kolejnych RFC</h3><p>RFC 6585 z 2012 r. dodał naraz <b>428, 429, 431 i 511</b>. Numery <b>427 i 430</b> zostały wolne. Tak samo wolne są 419, 420 i 509, dlatego „pożyczyli” je Laravel, Twitter i Apache.</p></div>
-          <div class="sheet block"><h3>3. Zarezerwowane i wycofane</h3><p><b>306</b> to dawny „Switch Proxy”, w rejestrze jako „(Unused)”. <b>418</b> też ma wpis „(Unused)”, żeby nikt nie zajął numeru czajnika. <b>305 Use Proxy</b> jest przestarzały ze względów bezpieczeństwa, ale kota ma.</p></div>
-          <div class="sheet block"><h3>4. http.cat to nie rejestr</h3><p>Koty rysuje się ręcznie. Brakuje kota dla oficjalnego <b>505 HTTP Version Not Supported</b>, dla 306 i dla tymczasowo zarejestrowanego <b>104</b>. Za to <b>18 kotów</b> ilustruje kody spoza rejestru.</p></div>
-          <div class="sheet block"><h3>5. Vendorzy trzymają się z boku</h3><p>Nieoficjalne kody lądują daleko od zajętych numerów: <b>nginx 444 i 495–499</b>, <b>Cloudflare 521–525</b>. Stąd skupiska na końcach zakresów i pustka w środku.</p></div>
+          <div class="sheet block"><h3 data-en="1. Nobody defined them">1. Nikt ich nie zdefiniował</h3><p>Numer istnieje dopiero, gdy trafi do <b>rejestru IANA</b>, a to wymaga dokumentu RFC i przeglądu IETF. Kodów nie przydziela się po kolei, tylko wtedy, gdy są potrzebne. Na stałe przydzielono <b>61</b>.</p></div>
+          <div class="sheet block"><h3 data-en="2. Leftovers from successive RFCs">2. Pamiątki po kolejnych RFC</h3><p>RFC 6585 z 2012 r. dodał naraz <b>428, 429, 431 i 511</b>. Numery <b>427 i 430</b> zostały wolne. Tak samo wolne są 419, 420 i 509, dlatego „pożyczyli” je Laravel, Twitter i Apache.</p></div>
+          <div class="sheet block"><h3 data-en="3. Reserved and retired">3. Zarezerwowane i wycofane</h3><p><b>306</b> to dawny „Switch Proxy”, w rejestrze jako „(Unused)”. <b>418</b> też ma wpis „(Unused)”, żeby nikt nie zajął numeru czajnika. <b>305 Use Proxy</b> jest przestarzały ze względów bezpieczeństwa, ale kota ma.</p></div>
+          <div class="sheet block"><h3 data-en="4. http.cat is not the registry">4. http.cat to nie rejestr</h3><p>Koty rysuje się ręcznie. Brakuje kota dla oficjalnego <b>505 HTTP Version Not Supported</b>, dla 306 i dla tymczasowo zarejestrowanego <b>104</b>. Za to <b>18 kotów</b> ilustruje kody spoza rejestru.</p></div>
+          <div class="sheet block"><h3 data-en="5. Vendors keep to the side">5. Vendorzy trzymają się z boku</h3><p>Nieoficjalne kody lądują daleko od zajętych numerów: <b>nginx 444 i 495–499</b>, <b>Cloudflare 521–525</b>. Stąd skupiska na końcach zakresów i pustka w środku.</p></div>
         </div>
       </div>
       <div class="block">
-        <h2>Skąd wzięło się 18 nieoficjalnych</h2>
-        <div class="tw"><table><thead><tr><th>Kod</th><th>Nazwa</th><th>Kto go wymyślił</th></tr></thead><tbody id="unofftable"></tbody></table></div>
+        <h2 data-en="Where the 18 unofficial ones came from">Skąd wzięło się 18 nieoficjalnych</h2>
+        <div class="tw"><table><thead><tr><th data-en="Code">Kod</th><th data-en="Name">Nazwa</th><th data-en="Who invented it">Kto go wymyślił</th></tr></thead><tbody id="unofftable"></tbody></table></div>
       </div>
     </section>
 
     <!-- VTEX -->
     <section class="panel" id="p-vtex" role="tabpanel" aria-labelledby="tab-vtex" hidden>
       <div class="block">
-        <h2>Jak VTEX czyta kody</h2>
+        <h2 data-en="How VTEX reads the codes">Jak VTEX czyta kody</h2>
         <p class="lead">Tabela ogólna VTEX ma <b>15 kodów</b>. Kolumna „co robisz” to zalecenia z tej samej strony.</p>
         <div class="tw">
           <table>
-            <thead><tr><th>Kod</th><th>Znaczenie wg VTEX</th><th>Co robisz</th></tr></thead>
+            <thead><tr><th data-en="Code">Kod</th><th data-en="Meaning per VTEX">Znaczenie wg VTEX</th><th data-en="What you do">Co robisz</th></tr></thead>
             <tbody>
               <tr data-k="2"><td class="num">200</td><td>Request przetworzony poprawnie.</td><td>–</td></tr>
               <tr data-k="2"><td class="num">201</td><td>Utworzono nowy zasób. Zwykle po <b>POST</b> i części <b>PUT</b>.</td><td>–</td></tr>
@@ -1062,7 +1062,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
 
       <div class="cols">
         <div class="sheet block">
-          <h3>401 i 403: uwierzytelnienie</h3>
+          <h3 data-en="401 and 403: authentication">401 i 403: uwierzytelnienie</h3>
           <ul class="tight">
             <li>Klucz idzie w dwóch nagłówkach: <code>X-VTEX-API-AppKey</code> i <code>X-VTEX-API-AppToken</code>.</li>
             <li>Nazwy nagłówków są <b>niewrażliwe na wielkość liter</b>.</li>
@@ -1072,7 +1072,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           </ul>
         </div>
         <div class="sheet block">
-          <h3>429: rate limity</h3>
+          <h3 data-en="429: rate limits">429: rate limity</h3>
           <ul class="tight">
             <li>Przykład z Pricing API: <b>POST i PUT 2000/min</b> (ok. 33/s) z <b>500 burst credits</b>. <b>DELETE 1000/min</b> (ok. 16/s) z <b>300</b>.</li>
             <li>Każdy request ponad limit zjada 1 credit. <b>Credits = 0 → 429.</b></li>
@@ -1083,7 +1083,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           <p class="small muted">Starsze materiały podają 40 req/s, 1000 credits i nagłówki <code>X-RateLimit-*</code>. Jeśli pytanie używa tych liczb, chodzi o ten sam mechanizm.</p>
         </div>
         <div class="sheet block">
-          <h3>Hook i Feed v3 (zamówienia)</h3>
+          <h3 data-en="Hook and Feed v3 (orders)">Hook i Feed v3 (zamówienia)</h3>
           <ul class="tight">
             <li><b>Hook = push</b>, VTEX woła Ciebie. <b>Feed = pull</b>, Ty pobierasz i robisz commit.</li>
             <li>Przy konfiguracji Hooka VTEX wysyła ping <code>{"hookConfig": "ping"}</code>. Endpoint musi zwrócić <b>200</b>.</li>
@@ -1095,7 +1095,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           </ul>
         </div>
         <div class="sheet block">
-          <h3>Marketplace i external seller</h3>
+          <h3 data-en="Marketplace and external seller">Marketplace i external seller</h3>
           <ul class="tight">
             <li>Change notification (<code>sellerId</code> + <code>sellerSkuId</code>): <b>200 = SKU już jest</b> w marketplace, <b>404 = nie ma</b>.</li>
             <li>Po 404 wysyłasz <b>SKU suggestion</b> (PUT), marketplace ją akceptuje albo odrzuca.</li>
@@ -1103,7 +1103,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           </ul>
         </div>
         <div class="sheet block">
-          <h3>Płatności (Payment Provider Protocol)</h3>
+          <h3 data-en="Payments (Payment Provider Protocol)">Płatności (Payment Provider Protocol)</h3>
           <ul class="tight">
             <li>Connector odpowiada w <b>5 s</b> na testach homologacyjnych i w <b>20 s</b> na produkcji.</li>
             <li>Tylko <b>HTTPS, port 443, TLS 1.2</b>.</li>
@@ -1112,7 +1112,7 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
           </ul>
         </div>
         <div class="sheet block">
-          <h3>Master Data i Search: paginacja</h3>
+          <h3 data-en="Master Data and Search: pagination">Master Data i Search: paginacja</h3>
           <ul class="tight">
             <li>MD search: nagłówek <code>REST-Range: resources=0-100</code>, maks. <b>100 dokumentów</b> na zapytanie.</li>
             <li>Odpowiedź niesie <code>REST-Content-Range: resources=0-100/{total}</code>.</li>
@@ -1123,10 +1123,10 @@ footer ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:3px
       </div>
 
       <div class="block">
-        <h2>Ściąga: dostałem kod, co dalej</h2>
+        <h2 data-en="Cheat sheet: I got a code, what next">Ściąga: dostałem kod, co dalej</h2>
         <div class="tw">
           <table>
-            <thead><tr><th>Kod</th><th>Ponawiać?</th><th>Pierwszy ruch</th></tr></thead>
+            <thead><tr><th data-en="Code">Kod</th><th data-en="Retry?">Ponawiać?</th><th data-en="First move">Pierwszy ruch</th></tr></thead>
             <tbody>
               <tr data-k="4"><td class="num">400, 404, 405</td><td><b>Nie</b></td><td>Popraw request: body, ścieżkę, metodę.</td></tr>
               <tr data-k="4"><td class="num">401</td><td><b>Nie</b></td><td>Dodaj lub popraw AppKey i AppToken.</td></tr>
