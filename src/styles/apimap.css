@@ -790,8 +790,19 @@ mark {
     padding-inline: 2px;
   }
 }
+@media (max-width: 560px) {
+  .fpanel .pair {
+    display: grid;
+    width: 100%;
+  }
+  #scopes {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
 @media (max-width: 420px) {
-  #methods .mc {
+  #methods .mc,
+  #methods .mx {
     display: none;
   }
 }

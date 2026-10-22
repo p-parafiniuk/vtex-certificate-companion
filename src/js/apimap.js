@@ -123,7 +123,7 @@ function bootApiMap(root, onNav, embed) {
     if (embed) root.querySelector(".top").hidden = true;
     $("methods").innerHTML = METHODS.map(
       m =>
-        `<button type="button" data-m="${m}" style="--c:var(--${m.toLowerCase()})">${m}<span class="mc"></span></button>`
+        `<button type="button" data-m="${m}" aria-label="${m}" style="--c:var(--${m.toLowerCase()})">${m === "DELETE" ? 'DEL<span class="mx">ETE</span>' : m}<span class="mc" aria-hidden="true"></span></button>`
     ).join("");
 
     $("apis").onclick = e => {
