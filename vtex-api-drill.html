@@ -206,11 +206,24 @@ h3 { font: 600 1rem/1.3 var(--f-body); margin: 0; }
 .stats dt { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); }
 .stats dd { margin: 2px 0 0; font: 700 1.7rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
 .stats dd small { font: 500 0.85rem var(--f-mono); color: var(--muted); }
+.stats .hl { border-top-color: var(--accent); background: var(--accent-soft); padding: 8px 10px 10px; border-radius: 0 0 8px 8px; }
+.stats .hl dd { color: var(--accent); }
+.incl { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 24px; }
+.incl legend { float: left; padding: 0; margin-right: 4px; font-size: 0.9rem; color: var(--muted); }
+.incl .check { min-height: 44px; }
+@media (max-width: 520px) { .incl { flex-direction: column; align-items: stretch; } .incl legend { float: none; } #gx-total .cardh .meter-label { display: none; } }
 .domrows { display: grid; gap: 8px; }
-.domrow { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.domrow { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 4.5rem minmax(0, 1fr) 4.5rem; gap: 4px 12px; align-items: center; }
+.domrow.dh .ct { font-weight: 600; }
+.domrow .ct.n { color: var(--accent); }
+.domrow .meter.mq i { background: var(--ink); }
 .domrow .nm { font-size: 0.92rem; }
 .domrow .ct { font: 500 0.8rem var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-@media (max-width: 520px) { .domrow { grid-template-columns: minmax(0, 1fr) auto; } .domrow .meter { grid-column: 1 / -1; grid-row: 2; } }
+@media (max-width: 520px) {
+  .domrow { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+  .domrow .nm { grid-column: 1 / -1; font-weight: 600; }
+  .domrow.dh { display: none; }
+}
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
 .cell { position: relative; display: block; cursor: pointer; }
 .cell span { display: grid; place-items: center; height: 38px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font: 500 0.82rem var(--f-mono); font-variant-numeric: tabular-nums; }
@@ -408,6 +421,22 @@ body[data-view="pytania"] .bar-in, body[data-view="pytania"] .wrap { max-width: 
 .note.basics > ul { margin-bottom: 12px; }
 .note.basics .note { border-radius: 8px; }
 @media (prefers-reduced-motion: reduce) { .note summary::before { transition: none; } }
+/* "Umiem" on a note block: same accent border as a known question. */
+.note.is-known { border-color: var(--accent); }
+.note summary .nk { flex: none; min-height: 44px; padding-left: 12px; border-left: 1px solid var(--line); font-weight: 400; }
+.cat-sub .nk-sub { color: var(--accent); font-weight: 600; }
+.nprog { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; gap: 4px 16px; }
+.np-v { grid-row: span 2; font: 700 1.9rem/1 var(--f-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.np-t { font-weight: 600; }
+.nprog .meter { grid-column: 2; grid-row: 2; flex: none; }
+.nprog .meter-label { grid-column: 3; grid-row: 1 / span 2; }
+@media (max-width: 520px) {
+  .note summary small { display: none; }
+  .note summary .nk { padding-left: 8px; }
+  .nprog { grid-template-columns: auto minmax(0, 1fr); }
+  .nprog .meter-label { display: none; }
+}
 .docs { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; align-items: start; }
 .doclist { display: grid; gap: 2px; max-height: 76vh; overflow-y: auto; }
 .docg { margin: 10px 0 2px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); }
@@ -531,7 +560,7 @@ div.setrow { cursor: default; }
         <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu" data-en-title="Streak: days of study in a row"></span>
         <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego" data-en-title="Today's answers against your daily goal"><span class="pg-k" data-en="Today">Dziś</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span><span class="pg-v" id="gx-gv">0/20</span></span>
       </span>
-      <span class="total" title="Opanowane pytania i fiszki razem" data-en-title="Questions and flashcards mastered, together"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> <span data-en="mastered">opanowane</span></span>
+      <span class="total" title="Opanowane razem (ustawiasz w Postęp)" data-en-title="Mastered together (set in Progress)"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> <span data-en="mastered">opanowane</span></span>
     </div>
     <div class="prog" aria-label="Postęp nauki" data-en-aria="Study progress">
       <div class="pg" title="Pytania oznaczone jako Umiem" data-en-title="Questions marked as known"><span class="pg-k" data-en="Questions">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
@@ -611,6 +640,7 @@ div.setrow { cursor: default; }
       <section class="card" id="gx-days" aria-labelledby="gx-days-h"></section>
     </div>
     <section class="card" id="gx-badges" aria-labelledby="gx-badges-h"></section>
+    <section class="card" id="gx-total" aria-labelledby="gx-total-h"></section>
     <dl class="stats" id="stats"></dl>
     <h3 data-en="Areas">Obszary</h3>
     <div class="domrows" id="domrows"></div>
@@ -2444,7 +2474,11 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
   /* v2: answers are arrays of selected option indexes (multi-select). Older single-index answers are dropped, "Umiem" marks stay. */
   var S = { v: 2, known: {}, fknown: {}, ans: {}, sims: [], hide: false, dom: "all", set: "all", hint: false, sim: null, simMin: 120, simPrac: true,
     fans: {}, ptxt: {}, fo: { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" }, theme: "auto",
-    days: {}, tday: { d: "", ids: {} }, total: 0, combo: 0, comboBest: 0, best: 0, badges: {}, goal: 20, gx: { head: true, combo: true, toast: true }, lang: "pl" };
+    days: {}, tday: { d: "", ids: {} }, total: 0, combo: 0, comboBest: 0, best: 0, badges: {}, goal: 20, gx: { head: true, combo: true, toast: true }, lang: "pl",
+    nknown: {}, cnt: { q: true, f: true, n: true } };
+  /* Note blocks are not keyed by index (they may be reordered), so "Umiem" is stored by category and heading. */
+  var NKEY = Object.create(null), NTOTAL = 0;
+  Object.keys(NOTES).forEach(function (d) { NOTES[d].s.forEach(function (s) { NKEY[d + "|" + s[0]] = d; NTOTAL++; }); });
   var GOALS = [10, 20, 40];
   var DAY_RE = /^\d{4}-\d\d-\d\d$/;
   /* Append only: unlock dates are stored by id. */
@@ -2460,7 +2494,9 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     { id: "sim", n: ["Zdana symulacja", "Simulation passed"], d: ["Co najmniej 80% w symulacji", "At least 80% in a simulation"], ok: function (x) { return x.simPass; }, p: function (x) { return x.simBest; } },
     { id: "dom", n: ["Obszar na 100%", "Area at 100%"], d: ["Wszystkie pytania z obszaru opanowane", "Every question in one area mastered"], ok: function (x) { return x.domFull; }, p: function (x) { return L("Najbliżej: ", "Closest: ") + x.domNear; } },
     { id: "fall", n: ["Wszystkie fiszki", "All flashcards"], d: ["Każda fiszka oznaczona Umiem", "Every flashcard marked Known"], ok: function (x) { return x.kf >= F.length; }, p: function (x) { return x.kf + " / " + F.length + L(" fiszek", " flashcards"); } },
-    { id: "ready", n: ["Gotowy", "Ready"], d: ["Gotowość co najmniej 80", "Readiness of at least 80"], ok: function (x) { return x.ready >= 80; }, p: function (x) { return L("Gotowość ", "Readiness ") + x.ready + " / 80"; } }
+    { id: "ready", n: ["Gotowy", "Ready"], d: ["Gotowość co najmniej 80", "Readiness of at least 80"], ok: function (x) { return x.ready >= 80; }, p: function (x) { return L("Gotowość ", "Readiness ") + x.ready + " / 80"; } },
+    { id: "ndom", n: ["Notatki obszaru", "Notes of an area"], d: ["Każdy blok notatek jednego obszaru oznaczony Umiem", "Every note block of one area marked Known"], ok: function (x) { return x.nDomFull; }, p: function (x) { return L("Najbliżej: ", "Closest: ") + x.nDomNear; } },
+    { id: "nall", n: ["Wszystkie notatki", "All notes"], d: ["Każdy blok notatek oznaczony Umiem", "Every note block marked Known"], ok: function (x) { return x.kn >= NTOTAL; }, p: function (x) { return x.kn + " / " + NTOTAL + L(" bloków", " blocks"); } }
   ];
   var BADGE_ID = Object.create(null);
   BADGES.forEach(function (b) { BADGE_ID[b.id] = true; });
@@ -2470,6 +2506,11 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
       ["known", "fknown"].forEach(function (k) {
         if (raw[k] && typeof raw[k] === "object" && !Array.isArray(raw[k])) S[k] = raw[k];
       });
+      if (raw.nknown && typeof raw.nknown === "object" && !Array.isArray(raw.nknown)) {
+        Object.keys(raw.nknown).forEach(function (k) { if (NKEY[k] && raw.nknown[k]) S.nknown[k] = true; });
+      }
+      if (raw.cnt && typeof raw.cnt === "object") ["q", "f", "n"].forEach(function (k) { S.cnt[k] = raw.cnt[k] !== false; });
+      if (!S.cnt.q && !S.cnt.f && !S.cnt.n) S.cnt = { q: true, f: true, n: true };
       if (raw.v === 2 && raw.ans && typeof raw.ans === "object" && !Array.isArray(raw.ans)) {
         Object.keys(raw.ans).forEach(function (k) { if (Array.isArray(raw.ans[k]) && Q[k]) S.ans[k] = raw.ans[k]; });
       }
@@ -2655,7 +2696,28 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
       if (S.ans[i] !== undefined) { p.a++; ans++; if (isRight(i, S.ans[i])) { p.r++; right++; } }
     });
     F.forEach(function (f, i) { if (S.fknown[i]) kf++; });
-    return { per: per, kq: kq, kf: kf, ans: ans, right: right };
+    var kn = 0;
+    DOMS.forEach(function (d) { per[d[0]].nt = 0; per[d[0]].nk = 0; });
+    Object.keys(NKEY).forEach(function (k) {
+      var p = per[NKEY[k]];
+      if (p) p.nt++;
+      if (S.nknown[k]) { kn++; if (p) p.nk++; }
+    });
+    return { per: per, kq: kq, kf: kf, kn: kn, ans: ans, right: right };
+  }
+  /* The overall score counts only what the learner chose in Postęp › Wynik łączny. */
+  function overall(c) {
+    var done = 0, total = 0;
+    if (S.cnt.q) { done += c.kq; total += Q.length; }
+    if (S.cnt.f) { done += c.kf; total += F.length; }
+    if (S.cnt.n) { done += c.kn; total += NTOTAL; }
+    return { done: done, total: total };
+  }
+  function noteCount(d) {
+    var n = NOTES[d], k = 0;
+    if (!n) return null;
+    n.s.forEach(function (s) { if (S.nknown[d + "|" + s[0]]) k++; });
+    return { k: k, t: n.s.length };
   }
 
   /* ---------- question card ----------
@@ -2753,7 +2815,8 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     F.forEach(function (f) { if (all || f.d === S.dom) nf++; });
     $("#cat-head").innerHTML = '<h2><span class="cat-i" aria-hidden="true">' + esc(all ? "📚" : DOM_ICO[S.dom]) + "</span>" + esc(all ? L("Wszystkie pytania", "All questions") : dn(S.dom)) + "</h2>" +
       '<p class="cat-sub">' + plural(nq, L("pytanie", "question"), L("pytania", "questions"), L("pytań", "questions")) + " · " + plural(nf, L("fiszka", "flashcard"), L("fiszki", "flashcards"), L("fiszek", "flashcards")) +
-      (all ? "" : " · " + plural(catDocs(S.dom, {}).length, L("strona", "doc page"), L("strony", "doc pages"), L("stron", "doc pages")) + L(" dokumentacji", "")) + L(" · opanowane ", " · mastered ") + kq + "/" + nq + "</p>";
+      (all ? "" : " · " + plural(catDocs(S.dom, {}).length, L("strona", "doc page"), L("strony", "doc pages"), L("stron", "doc pages")) + L(" dokumentacji", "")) + L(" · opanowane ", " · mastered ") + kq + "/" + nq +
+      (all || !NOTES[S.dom] ? "" : ' · <b class="nk-sub">' + L("notatki ", "notes ") + noteCount(S.dom).k + "/" + noteCount(S.dom).t + "</b>") + "</p>";
   }
   function renderQ() {
     var html = "";
@@ -2783,7 +2846,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
     $("#ct-docs").innerHTML = '<span class="ctab-l">' + L("Dokumentacja", "Docs") + '</span><span class="ctab-s">' + L("Dok.", "Docs") + "</span>" + (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
-    $("#ct-info").innerHTML = L("Notatki", "Notes") + (NOTES[S.dom] ? ' <span class="num">' + NOTES[S.dom].s.length + "</span>" : "");
+    paintNoteTab();
     renderTldr(S.dom);
     if (sec !== "docs") clearDocs();
     if (sec === "pytania") renderQ(); else renderChips();
@@ -2800,12 +2863,33 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
   function noteList(xs) {
     return "<ul>" + xs.map(function (x) { return "<li>" + fmt(x) + "</li>"; }).join("") + "</ul>";
   }
-  function noteBlocks(n, firstOpen) {
+  /* "Umiem" sits in the summary: a click on the checkbox or its label does not toggle the block. */
+  function noteBlocks(n, firstOpen, d) {
     return n.s.map(function (s, i) {
-      return '<details class="note' + (s[0] === "Pułapki" ? " trap" : "") + '"' + (noteOpen(s, firstOpen && i === 0) ? " open" : "") + "><summary><span>" + esc(s[0]) + "</span><small>" +
-        plural(s[1].length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + "</small></summary>" + noteList(s[1]) + docLinks({ l: s[2] }) + "</details>";
+      var k = d + "|" + s[0], on = !!S.nknown[k];
+      return '<details class="note' + (s[0] === "Pułapki" ? " trap" : "") + (on ? " is-known" : "") + '"' + (noteOpen(s, firstOpen && i === 0) ? " open" : "") + "><summary><span>" + esc(s[0]) + "</span><small>" +
+        plural(s[1].length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + '</small><label class="check nk"><input type="checkbox" data-nk="' + esc(k) + '"' + (on ? " checked" : "") +
+        ' aria-label="' + L("Umiem notatkę: ", "Known note: ") + esc(s[0]) + '"> ' + L("Umiem", "Known") + "</label></summary>" + noteList(s[1]) + docLinks({ l: s[2] }) + "</details>";
     }).join("");
   }
+  function paintNoteTab() {
+    var c = noteCount(S.dom);
+    $("#ct-info").innerHTML = L("Notatki", "Notes") + (c ? ' <span class="num">' + c.k + "/" + c.t + "</span>" : "");
+  }
+  function paintNoteProg() {
+    var el = $("#nprog"), c = noteCount(S.dom);
+    if (!el || !c) return;
+    var pct = Math.round(c.k / c.t * 100), all = counts().kn;
+    el.innerHTML = '<b class="np-v">' + pct + '%</b><span class="np-t">' + L("Pamiętasz " + c.k + " z " + c.t + " bloków notatek", "You know " + c.k + " of " + c.t + " note blocks") + "</span>" +
+      '<div class="meter" aria-hidden="true"><i style="width:' + pct + '%"></i></div><span class="meter-label">' + L("wszystkie: ", "all: ") + all + " / " + NTOTAL + "</span>";
+  }
+  document.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (!t.dataset || t.dataset.nk === undefined || !NKEY[t.dataset.nk]) return;
+    if (t.checked) S.nknown[t.dataset.nk] = true; else delete S.nknown[t.dataset.nk];
+    t.closest(".note").classList.toggle("is-known", t.checked);
+    save(); paintNoteTab(); paintNoteProg(); renderChips(); header();
+  });
   /* The boxes keep their open/closed state while the learner answers questions: they redraw only when the category or language changes. */
   /* On a phone an open TL;DR pushes the first question below the fold, so there it starts folded. */
   var PHONE = window.matchMedia("(max-width: 520px)");
@@ -2816,7 +2900,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     if (!n) { el.innerHTML = ""; return; }
     el.innerHTML = d === "all"
       ? '<details class="note basics"' + (PHONE.matches ? "" : " open") + '><summary><span><b class="tl">TL;DR</b> ' + L("Podstawy API", "API basics") + "</span><small>" +
-        plural(n.s.length, L("blok", "block"), L("bloki", "blocks"), L("bloków", "blocks")) + "</small></summary>" + noteList(n.t) + '<div class="notes">' + noteBlocks(n, false) + "</div></details>"
+        plural(n.s.length, L("blok", "block"), L("bloki", "blocks"), L("bloków", "blocks")) + "</small></summary>" + noteList(n.t) + '<div class="notes">' + noteBlocks(n, false, d) + "</div></details>"
       : '<details class="note tldr"' + (PHONE.matches ? "" : " open") + '><summary><span><b class="tl">TL;DR</b></span><small>' +
         plural(n.t.length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + "</small></summary>" + noteList(n.t) +
         '<a class="tldr-more" data-nav href="' + catHref(d, "info") + '">' + L("Całe notatki", "All notes") + " →</a></details>";
@@ -2825,9 +2909,10 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     var el = $("#cs-info"), k = d + " " + S.lang;
     if (el.dataset.k === k) return;
     el.dataset.k = k;
-    el.innerHTML = '<p class="lead">' + L("Notatki z dokumentacji VTEX. Krótkie bloki są otwarte, dłuższe niż 4 punkty są zwinięte: kliknij nagłówek.",
-      "Notes from the VTEX docs, in Polish. Short blocks are open, blocks longer than 4 points are folded: click the heading.") + "</p>" +
-      (NOTES[d] ? '<div class="notes">' + noteBlocks(NOTES[d], true) + "</div>" : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
+    el.innerHTML = '<p class="lead">' + L("Notatki z dokumentacji VTEX. Zaznacz <strong>Umiem</strong> przy bloku, który pamiętasz bez zaglądania. Dłuższe bloki są zwinięte: kliknij nagłówek.",
+      "Notes from the VTEX docs, in Polish. Tick <strong>Known</strong> on a block you remember without looking. Longer blocks are folded: click the heading.") + "</p>" +
+      (NOTES[d] ? '<div class="nprog" id="nprog"></div><div class="notes">' + noteBlocks(NOTES[d], true, d) + "</div>" : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
+    paintNoteProg();
   }
   function renderCatApi(d) {
     var list = CATMAP[d].api;
@@ -3290,10 +3375,11 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     return { v: Math.round(50 * m + 30 * acc + 20 * sim), m: m, acc: acc, accOk: c.ans >= 20, sim: sim, weak: weak };
   }
   function gxCtx(c) {
-    var rd = readiness(c), st = streak(), near = null, simBest = null;
+    var rd = readiness(c), st = streak(), near = null, nNear = null, simBest = null;
     DOMS.forEach(function (d) {
       var p = c.per[d[0]];
       if (p.t && p.k < p.t && (!near || p.k / p.t > near.k / near.t)) near = { n: dn(d[0]), k: p.k, t: p.t };
+      if (p.nt && p.nk < p.nt && (!nNear || p.nk / p.nt > nNear.k / nNear.t)) nNear = { n: dn(d[0]), k: p.nk, t: p.nt };
     });
     S.sims.forEach(function (x) { if (!simBest || x.s / (x.n || SIM_Q) > simBest.s / (simBest.n || SIM_Q)) simBest = x; });
     if (st > S.best) S.best = st;
@@ -3303,7 +3389,10 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
       simPass: S.sims.some(function (x) { var n = x.n || SIM_Q; return x.s >= Math.ceil(n * 0.8); }),
       simBest: simBest ? L("Najlepiej ", "Best ") + simBest.s + " / " + (simBest.n || SIM_Q) + L(", próg ", ", pass mark ") + Math.ceil((simBest.n || SIM_Q) * 0.8) : L("Jeszcze żadnej symulacji", "No simulation yet"),
       domFull: DOMS.some(function (d) { var p = c.per[d[0]]; return p.t && p.k === p.t; }),
-      domNear: near ? near.n + " " + near.k + " / " + near.t : "–"
+      domNear: near ? near.n + " " + near.k + " / " + near.t : "–",
+      kn: c.kn,
+      nDomFull: DOMS.some(function (d) { var p = c.per[d[0]]; return p.nt && p.nk === p.nt; }),
+      nDomNear: nNear ? nNear.n + " " + nNear.k + " / " + nNear.t : "–"
     };
   }
   var TOAST_T = null;
@@ -3434,6 +3523,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     $("#stats").innerHTML =
       "<div><dt>" + L("Pytania opanowane", "Questions mastered") + "</dt><dd>" + c.kq + " <small>/ " + Q.length + "</small></dd></div>" +
       "<div><dt>" + L("Fiszki opanowane", "Flashcards mastered") + "</dt><dd>" + c.kf + " <small>/ " + F.length + "</small></dd></div>" +
+      '<div class="hl"><dt>' + L("Notatki, które pamiętasz", "Notes you know") + "</dt><dd>" + Math.round(c.kn / NTOTAL * 100) + "% <small>" + c.kn + " / " + NTOTAL + L(" bloków", " blocks") + "</small></dd></div>" +
       "<div><dt>" + L("Trafność odpowiedzi", "Answer accuracy") + "</dt><dd>" + acc + " <small>" + c.right + " / " + c.ans + "</small></dd></div>" +
       [1, 2].map(function (r) {
         var k = 0, t = 0;
@@ -3441,12 +3531,27 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
         return "<div><dt>" + L("Runda ", "Round ") + r + (r === 2 ? L(" (luki)", " (gaps)") : "") + "</dt><dd>" + k + " <small>/ " + t + L(" pytań", " questions") + "</small></dd></div>";
       }).join("") +
       "<div><dt>" + L("Format bazy", "Bank format") + "</dt><dd>" + multi + " <small>" + L("z kilkoma poprawnymi, ", "with several right, ") + (Q.length - multi) + L(" z jedną", " with one") + "</small></dd></div>";
-    $("#domrows").innerHTML = DOMS.map(function (d) {
-      var p = c.per[d[0]];
-      return '<div class="domrow"><span class="nm">' + esc(dn(d[0])) + '</span><div class="meter"><i style="width:' +
-        (p.k / p.t * 100) + '%"></i></div><span class="ct">' + p.k + " / " + p.t + "</span></div>";
-    }).join("");
+    $("#domrows").innerHTML = '<div class="domrow dh" aria-hidden="true"><span></span><span class="ct">' + L("pytania", "questions") + '</span><span></span><span class="ct n">' + L("notatki", "notes") + "</span><span></span></div>" +
+      DOMS.map(function (d) {
+        var p = c.per[d[0]];
+        return '<div class="domrow"><span class="nm">' + esc(dn(d[0])) + '</span><div class="meter mq" role="img" aria-label="' + L("Pytania ", "Questions ") + p.k + " / " + p.t + '"><i style="width:' +
+          (p.k / p.t * 100) + '%"></i></div><span class="ct">' + L("pyt. ", "q. ") + p.k + "/" + p.t + '</span><div class="meter mn" role="img" aria-label="' + L("Notatki ", "Notes ") + p.nk + " / " + p.nt + '"><i style="width:' +
+          (p.nt ? p.nk / p.nt * 100 : 0) + '%"></i></div><span class="ct n">' + L("not. ", "notes ") + p.nk + "/" + p.nt + "</span></div>";
+      }).join("");
+    paintTotal(c);
     $("#hist").innerHTML = S.sims.length ? S.sims.map(simLine).join("") : "<li>" + L("Jeszcze żadnej. Uruchom ją w zakładce Symulacja.", "None yet. Start one in the Simulation tab.") + "</li>";
+  }
+  function paintTotal(c) {
+    var o = overall(c), pct = o.total ? Math.round(o.done / o.total * 100) : null;
+    $("#gx-total").innerHTML =
+      '<div class="cardh"><h2 id="gx-total-h">' + L("Wynik łączny", "Overall score") + '</h2><span class="meter-label">' + L("ten sam co w pasku u góry", "the same as in the top bar") + "</span></div>" +
+      '<p class="bign"><b>' + (pct === null ? "–" : pct + "%") + "</b> <small>" + o.done + " / " + o.total + "</small></p>" +
+      '<div class="meter big" aria-hidden="true"><i style="width:' + (pct || 0) + '%"></i></div>' +
+      '<fieldset class="incl"><legend>' + L("Wliczaj:", "Count:") + "</legend>" +
+      [["q", L("Pytania", "Questions"), c.kq, Q.length], ["f", L("Fiszki", "Flashcards"), c.kf, F.length], ["n", L("Notatki", "Notes"), c.kn, NTOTAL]].map(function (x) {
+        return '<label class="check"><input type="checkbox" data-cnt="' + x[0] + '"' + (S.cnt[x[0]] ? " checked" : "") + "> " + x[1] + ' <small class="meter-label">' + x[2] + "/" + x[3] + "</small></label>";
+      }).join("") + "</fieldset>" +
+      '<p class="seth">' + L("Co najmniej jedno zostaje zaznaczone.", "At least one stays ticked.") + "</p>";
   }
   function renderGrids() {
     $("#qgrid").innerHTML = Q.map(function (q, i) {
@@ -3463,6 +3568,11 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
   }
   $("#p-postep").addEventListener("change", function (ev) {
     var t = ev.target;
+    if (["q", "f", "n"].indexOf(t.dataset.cnt) > -1) {
+      /* An empty score would leave the top bar at "0 / 0": the last ticked box stays ticked. */
+      if (!t.checked && ["q", "f", "n"].every(function (k) { return k === t.dataset.cnt || !S.cnt[k]; })) { t.checked = true; return; }
+      S.cnt[t.dataset.cnt] = t.checked; save(); paintTotal(counts()); header(); $('#gx-total [data-cnt="' + t.dataset.cnt + '"]').focus(); return;
+    }
     if (t.dataset.q !== undefined) { if (t.checked) S.known[t.dataset.q] = true; else delete S.known[t.dataset.q]; }
     else if (t.dataset.f !== undefined) { if (t.checked) S.fknown[t.dataset.f] = true; else delete S.fknown[t.dataset.f]; }
     else return;
@@ -3484,6 +3594,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     S.known = {}; S.fknown = {}; S.ans = {}; S.sims = []; S.sim = null; DRAFT = {}; stopTick();
     S.fans = {}; S.ptxt = {}; S.fo = { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" };
     S.days = {}; S.tday = { d: "", ids: {} }; S.total = 0; S.combo = 0; S.comboBest = 0; S.best = 0; S.badges = {};
+    S.nknown = {}; $("#cs-info").dataset.k = ""; $("#cat-tldr").dataset.k = "";
     save(); renderStats(); renderGrids(); header(true);
   });
 
@@ -3523,7 +3634,7 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
       IMP = p.data;
       var d = p.data[KEY], cnt = function (o) { return isObj(o) ? Object.keys(o).length : 0; };
       var when = +p.at > 0 ? new Date(+p.at).toLocaleDateString(L("pl-PL", "en-GB")) : L("nieznana data", "an unknown date");
-      impMsg("<p>" + L("Plik z ", "File from ") + esc(when) + L(". Opanowane pytania: ", ". Questions mastered: ") + cnt(d.known) + L(", fiszki: ", ", flashcards: ") + cnt(d.fknown) +
+      impMsg("<p>" + L("Plik z ", "File from ") + esc(when) + L(". Opanowane pytania: ", ". Questions mastered: ") + cnt(d.known) + L(", fiszki: ", ", flashcards: ") + cnt(d.fknown) + L(", notatki: ", ", notes: ") + cnt(d.nknown) +
         L(", odpowiedzi: ", ", answers: ") + (Math.floor(+d.total) || 0) + L(". Import zastąpi obecny postęp.", ". Importing replaces your current progress.") + "</p>" +
         '<button type="button" class="btn small danger" id="imp-ok">' + L("Zastąp postęp", "Replace progress") + '</button><button type="button" class="btn small" id="imp-no">' + L("Anuluj", "Cancel") + "</button>");
       $("#imp-ok").focus();
@@ -3896,11 +4007,11 @@ return { show: api => show(api), api: () => state.api, scope, relang: () => { bu
     el.className = cls || "";
   }
   function header(quiet) {
-    var c = counts(), total = Q.length + F.length, done = c.kq + c.kf;
+    var c = counts(), o = overall(c);
     checkBadges(c, quiet);
     paintGx();
-    $("#m-all-pct").textContent = Math.round(done / total * 100) + "%";
-    $("#m-all-label").textContent = done + " / " + total;
+    $("#m-all-pct").textContent = o.total ? Math.round(o.done / o.total * 100) + "%" : "–";
+    $("#m-all-label").textContent = o.done + " / " + o.total;
     $("#pg-q").textContent = c.kq + "/" + Q.length;
     bar("#pm-q", c.kq / Q.length * 100);
     $("#pg-f").textContent = c.kf + "/" + F.length;

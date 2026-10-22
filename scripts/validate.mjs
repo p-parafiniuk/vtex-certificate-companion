@@ -98,8 +98,11 @@ for (const [k, n] of Object.entries(D.NOTES)) {
   for (const f of Object.keys(n)) if (f !== "t" && f !== "s") E(w, "unknown field `" + f + "`");
   if (!Array.isArray(n.t) || n.t.length < 1 || n.t.length > 4) E(w, "t (TL;DR) needs 1 to 4 bullets");
   else n.t.forEach((x, i) => { txt(x, w + ".t[" + i + "]"); if (x.split(/\s+/).length > 25) W(w + ".t[" + i + "]", "TL;DR bullet over 25 words"); });
+  /* "Umiem" on a note is stored as `<category>|<heading>`: a duplicate heading would share one mark, a renamed one loses it. */
+  const heads = new Set();
   if (!Array.isArray(n.s) || !n.s.length) E(w, "s needs at least one block");
   else n.s.forEach((s, i) => {
+    if (Array.isArray(s) && isStr(s[0])) { if (heads.has(s[0])) E(w + ".s[" + i + "]", "duplicate heading `" + s[0] + "`"); heads.add(s[0]); }
     const ws = w + ".s[" + i + "]";
     if (!Array.isArray(s) || s.length !== 3 || !isStr(s[0]) || !Array.isArray(s[1]) || !s[1].length || !Array.isArray(s[2]) || !s[2].length) return E(ws, "must be [heading, bullets[], DOCS keys[]]");
     s[1].forEach((x, j) => txt(x, ws + "[" + j + "]"));
