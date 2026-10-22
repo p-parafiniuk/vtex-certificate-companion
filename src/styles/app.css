@@ -196,11 +196,24 @@ h3 { font: 600 1rem/1.3 var(--f-body); margin: 0; }
 .stats dt { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); }
 .stats dd { margin: 2px 0 0; font: 700 1.7rem/1.1 var(--f-display); font-variant-numeric: tabular-nums; }
 .stats dd small { font: 500 0.85rem var(--f-mono); color: var(--muted); }
+.stats .hl { border-top-color: var(--accent); background: var(--accent-soft); padding: 8px 10px 10px; border-radius: 0 0 8px 8px; }
+.stats .hl dd { color: var(--accent); }
+.incl { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 0 24px; }
+.incl legend { float: left; padding: 0; margin-right: 4px; font-size: 0.9rem; color: var(--muted); }
+.incl .check { min-height: 44px; }
+@media (max-width: 520px) { .incl { flex-direction: column; align-items: stretch; } .incl legend { float: none; } #gx-total .cardh .meter-label { display: none; } }
 .domrows { display: grid; gap: 8px; }
-.domrow { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+.domrow { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr) 4.5rem minmax(0, 1fr) 4.5rem; gap: 4px 12px; align-items: center; }
+.domrow.dh .ct { font-weight: 600; }
+.domrow .ct.n { color: var(--accent); }
+.domrow .meter.mq i { background: var(--ink); }
 .domrow .nm { font-size: 0.92rem; }
 .domrow .ct { font: 500 0.8rem var(--f-mono); color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
-@media (max-width: 520px) { .domrow { grid-template-columns: minmax(0, 1fr) auto; } .domrow .meter { grid-column: 1 / -1; grid-row: 2; } }
+@media (max-width: 520px) {
+  .domrow { grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; }
+  .domrow .nm { grid-column: 1 / -1; font-weight: 600; }
+  .domrow.dh { display: none; }
+}
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
 .cell { position: relative; display: block; cursor: pointer; }
 .cell span { display: grid; place-items: center; height: 38px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font: 500 0.82rem var(--f-mono); font-variant-numeric: tabular-nums; }
@@ -398,6 +411,22 @@ body[data-view="pytania"] .bar-in, body[data-view="pytania"] .wrap { max-width: 
 .note.basics > ul { margin-bottom: 12px; }
 .note.basics .note { border-radius: 8px; }
 @media (prefers-reduced-motion: reduce) { .note summary::before { transition: none; } }
+/* "Umiem" on a note block: same accent border as a known question. */
+.note.is-known { border-color: var(--accent); }
+.note summary .nk { flex: none; min-height: 44px; padding-left: 12px; border-left: 1px solid var(--line); font-weight: 400; }
+.cat-sub .nk-sub { color: var(--accent); font-weight: 600; }
+.nprog { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin-bottom: 8px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto auto; align-items: center; gap: 4px 16px; }
+.np-v { grid-row: span 2; font: 700 1.9rem/1 var(--f-display); color: var(--accent); font-variant-numeric: tabular-nums; }
+.np-t { font-weight: 600; }
+.nprog .meter { grid-column: 2; grid-row: 2; flex: none; }
+.nprog .meter-label { grid-column: 3; grid-row: 1 / span 2; }
+@media (max-width: 520px) {
+  .note summary small { display: none; }
+  .note summary .nk { padding-left: 8px; }
+  .nprog { grid-template-columns: auto minmax(0, 1fr); }
+  .nprog .meter-label { display: none; }
+}
 .docs { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 16px; align-items: start; }
 .doclist { display: grid; gap: 2px; max-height: 76vh; overflow-y: auto; }
 .docg { margin: 10px 0 2px; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--muted); }
