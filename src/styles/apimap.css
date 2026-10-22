@@ -208,6 +208,16 @@ h1 b {
   background: var(--hover);
   box-shadow: inset 0 -2px 0 var(--c, var(--accent));
 }
+/* Method names carry their colour even when off, so the row reads like the method column below it. */
+#methods button,
+#methods button[aria-pressed="true"] {
+  color: var(--c);
+}
+#scopes button[aria-pressed="true"] {
+  color: var(--bg);
+  background: var(--fg);
+  box-shadow: none;
+}
 .view button {
   display: inline-flex;
   align-items: center;
@@ -305,13 +315,9 @@ h1 b {
 }
 .lh {
   font: 700 14px var(--f-display);
-  padding: 10px 6px 4px;
-  margin-top: 6px;
+  padding: 10px 14px 6px;
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
-}
-.lh:first-child {
-  margin-top: 0;
-  padding-top: 2px;
 }
 .lh span {
   font: 500 11px var(--f-mono);
@@ -626,14 +632,36 @@ summary.apiroot .seg {
 .resp pre {
   margin: 4px 0 6px 22px;
 }
+/* The flat list is a card of ruled rows: method, path over summary, tag on the right. */
+.tree.flat {
+  padding: 0;
+  overflow: hidden;
+}
 .hits {
   display: grid;
-  gap: 2px;
 }
 .ep.hit {
   align-items: flex-start;
   white-space: normal;
-  padding: 6px;
+  padding: 8px 14px;
+  gap: 12px;
+  border-radius: 0;
+  border-bottom: 1px solid var(--line);
+}
+.hits > .ep.hit:last-child {
+  border-bottom: 0;
+}
+.ep.hit .ht {
+  flex: none;
+  max-width: 28%;
+  margin-left: auto;
+  padding-top: 2px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--muted);
+}
+.hits > .detail {
+  margin: 8px 14px 8px 78px;
 }
 .ep.hit .m {
   padding-top: 2px;
@@ -655,12 +683,13 @@ summary.apiroot .seg {
   color: var(--muted);
 }
 .more {
-  padding: 10px 6px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--line);
   color: var(--muted);
   font-family: var(--f-body);
 }
 .empty {
-  padding: 24px 8px;
+  padding: 24px 14px;
   color: var(--muted);
   font-family: var(--f-body);
 }
@@ -693,14 +722,19 @@ mark {
   .deck {
     position: static;
   }
-  .ep .t {
+  .ep .t,
+  .ep.hit .ht {
     display: none;
   }
   .ep .s {
     white-space: normal;
   }
-  .detail {
+  .detail,
+  .hits > .detail {
     margin-left: 8px;
+  }
+  .hits > .detail {
+    margin-right: 8px;
   }
 }
 @media (pointer: coarse), (max-width: 560px) {
