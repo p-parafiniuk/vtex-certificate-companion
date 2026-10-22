@@ -5,8 +5,9 @@
   "description": "VTEX API Drill: study app built from src/ into one self-contained vtex-api-drill.html",
   "scripts": {
     "build": "node scripts/validate.mjs && node scripts/build.mjs",
-    "check": "node scripts/validate.mjs && node scripts/build.mjs --check",
+    "check": "node scripts/branch.mjs && node scripts/validate.mjs && node scripts/build.mjs --check",
     "validate": "node scripts/validate.mjs",
+    "branch": "node scripts/branch.mjs",
     "lock": "node scripts/validate.mjs --update-lock",
     "stats": "node scripts/stats.mjs",
     "extract": "node scripts/extract.mjs",

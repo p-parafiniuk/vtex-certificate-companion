@@ -15,6 +15,7 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 | `npm run check` | validate, then confirm the built file matches `src/`. Run it before every commit. |
 | `npm run stats` | table of questions per domain × round, to find gaps |
 | `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
+| `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json` |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
 | `npm run shots -- <hash>…` | screenshots of the built page into `shots/` (gitignored) at 375 and 1280 px, light and dark. Exits 1 on a console error. Flags: `--w=375`, `--theme=dark`, `--lang=en`, `--full` |
@@ -72,7 +73,9 @@ A report without a picture of a UI change is not finished.
 - One branch per PR, cut from fresh `main`: `git fetch origin main && git checkout -b <type>/<topic> origin/main`.
 - Name it `<type>/<short-kebab-topic>`, 2 to 5 words that say what changes. Types: `feat` (behaviour), `content` (questions, flashcards, DOCS), `fix`, `ux`, `security`, `chore` (scripts, harness, docs). Examples: `feat/category-side-panel`, `content/logistics-round-2`, `fix/focus-resume-after-filter`.
 - Never reuse a branch whose PR is merged, and never stack an unrelated change on an open PR's branch. Start a new branch.
-- If the session dictates a branch name (cloud sessions do), use it as told, and put the `<type>/<topic>` name in the PR title prefix instead, e.g. `feat(category-side-panel): …`.
+- Cloud sessions start on a generated `claude/<words>` branch. That name never reaches a PR. Before any work, run `git fetch origin main` and fast-forward onto it. Before the first commit, cut `<type>/<topic>` from `origin/main`, then commit, push (`git push -u origin <type>/<topic>`) and open the PR from that branch. This rule is the user's standing permission to push to it instead of the session branch.
+- `npm run branch` checks the current name. `npm run check` runs it too and fails on a `claude/*` branch or a name outside the pattern (`main` and a detached HEAD pass).
+- PR title prefix repeats the topic: `feat(category-side-panel): …`.
 - PR title in English, imperative. The body lists what changed, how it was verified (`npm run check`, the shots), and includes the screenshots.
 
 ## Skills and reviewers
