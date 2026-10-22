@@ -1,31 +1,74 @@
 <style>
-<!--@include styles/apimap.css-->
+  <!--@include styles/apimap.css-->
 </style>
 <div class="wrap">
   <header class="top">
     <h1>VTEX <b>API</b> Map</h1>
-    <p class="src"><span class="src-l" data-en="Endpoint tree from ">Drzewo endpointów z </span><a href="https://github.com/vtex/openapi-schemas" target="_blank" rel="noopener">vtex/openapi-schemas</a><span data-en=" · as of 20.10.2026"> · stan z 20.10.2026</span></p>
+    <p class="src">
+      <span class="src-l" data-en="Endpoint tree from ">Drzewo endpointów z </span
+      ><a href="https://github.com/vtex/openapi-schemas" target="_blank" rel="noopener">vtex/openapi-schemas</a
+      ><span data-en=" · as of 20.10.2026"> · stan z 20.10.2026</span>
+    </p>
   </header>
 
   <div class="deck">
     <div class="apis-wrap" id="apis-wrap">
-      <button type="button" class="scr l" id="apis-l" tabindex="-1" aria-label="Przewiń listę API w lewo" data-en-aria="Scroll the API list left">‹</button>
+      <button
+        type="button"
+        class="scr l"
+        id="apis-l"
+        tabindex="-1"
+        aria-label="Przewiń listę API w lewo"
+        data-en-aria="Scroll the API list left"
+      >
+        ‹
+      </button>
       <div class="apis" id="apis" role="group" aria-label="API"></div>
-      <button type="button" class="scr r" id="apis-r" tabindex="-1" aria-label="Przewiń listę API w prawo" data-en-aria="Scroll the API list right">›</button>
+      <button
+        type="button"
+        class="scr r"
+        id="apis-r"
+        tabindex="-1"
+        aria-label="Przewiń listę API w prawo"
+        data-en-aria="Scroll the API list right"
+      >
+        ›
+      </button>
     </div>
     <div class="row">
-      <span class="sbox"><input id="q" class="search" type="search" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" placeholder="Szukaj: ścieżka, opis, tag… np. orderForm, {skuId}, invoice" aria-label="Szukaj endpointów" data-en-ph="Search: path, summary, tag… e.g. orderForm, {skuId}, invoice" data-en-aria="Search endpoints" aria-keyshortcuts="/"><kbd class="kb" aria-hidden="true">/</kbd></span>
+      <span class="sbox"
+        ><input
+          id="q"
+          class="search"
+          type="search"
+          spellcheck="false"
+          autocapitalize="off"
+          autocomplete="off"
+          autocorrect="off"
+          placeholder="Szukaj: ścieżka, opis, tag… np. orderForm, {skuId}, invoice"
+          aria-label="Szukaj endpointów"
+          data-en-ph="Search: path, summary, tag… e.g. orderForm, {skuId}, invoice"
+          data-en-aria="Search endpoints"
+          aria-keyshortcuts="/"
+        /><kbd class="kb" aria-hidden="true">/</kbd></span
+      >
       <div class="group" id="methods" role="group" aria-label="Metody" data-en-aria="Methods"></div>
     </div>
     <div class="row" id="qscope" hidden>
-      <span class="pair"><span class="lbl" id="qin-l" data-en="Search in">Szukaj w</span>
-      <span class="group" id="qin" role="group" aria-labelledby="qin-l"></span></span>
+      <span class="pair"
+        ><span class="lbl" id="qin-l" data-en="Search in">Szukaj w</span>
+        <span class="group" id="qin" role="group" aria-labelledby="qin-l"></span
+      ></span>
     </div>
     <div class="row">
-      <span class="pair"><span class="lbl" data-en="Scope">Zakres</span>
-      <span class="group" id="scopes" role="group" aria-label="Zakres" data-en-aria="Scope"></span></span>
-      <span class="pair" id="depth-pair"><span class="lbl" data-en="Expand">Rozwiń</span>
-      <span class="group" id="depth" role="group" aria-label="Głębokość" data-en-aria="Depth"></span></span>
+      <span class="pair"
+        ><span class="lbl" data-en="Scope">Zakres</span>
+        <span class="group" id="scopes" role="group" aria-label="Zakres" data-en-aria="Scope"></span
+      ></span>
+      <span class="pair" id="depth-pair"
+        ><span class="lbl" data-en="Expand">Rozwiń</span>
+        <span class="group" id="depth" role="group" aria-label="Głębokość" data-en-aria="Depth"></span
+      ></span>
     </div>
   </div>
 
@@ -35,6 +78,8 @@
   <div class="legend">
     <span><b class="flag open">OPEN</b> <span data-en="no auth in the schema">bez autoryzacji w schemacie</span></span>
     <span><b class="flag dep">DEPR</b> deprecated</span>
-    <span data-en="Click an endpoint to see the full URL, auth, query params, sample body, response codes and curl.">Kliknij endpoint, żeby zobaczyć pełny URL, auth, query params, przykładowe body, kody odpowiedzi i curl.</span>
+    <span data-en="Click an endpoint to see the full URL, auth, query params, sample body, response codes and curl."
+      >Kliknij endpoint, żeby zobaczyć pełny URL, auth, query params, przykładowe body, kody odpowiedzi i curl.</span
+    >
   </div>
 </div>

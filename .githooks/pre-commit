@@ -1,0 +1,3 @@
+#!/bin/sh
+# Formats staged files before every commit. Enabled by `npm install` (package.json › prepare).
+exec node scripts/format.mjs --staged

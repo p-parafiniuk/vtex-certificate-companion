@@ -5,7 +5,10 @@
   "description": "VTEX API Drill: study app built from src/ into one self-contained vtex-api-drill.html",
   "scripts": {
     "build": "node scripts/validate.mjs && node scripts/build.mjs",
-    "check": "node scripts/branch.mjs && node scripts/validate.mjs && node scripts/build.mjs --check",
+    "check": "node scripts/branch.mjs && node scripts/format.mjs --check && node scripts/validate.mjs && node scripts/build.mjs --check",
+    "format": "prettier --write . --log-level warn",
+    "format:check": "node scripts/format.mjs --check",
+    "prepare": "git config core.hooksPath .githooks && git config blame.ignoreRevsFile .git-blame-ignore-revs || true",
     "validate": "node scripts/validate.mjs",
     "branch": "node scripts/branch.mjs",
     "lock": "node scripts/validate.mjs --update-lock",
@@ -17,5 +20,8 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
   }
 }

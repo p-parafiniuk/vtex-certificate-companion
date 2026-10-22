@@ -35,7 +35,7 @@ Adding a badge: **append** an entry to `BADGES` with a new id. Never rename or r
 Show the change as a Claude Design mockup (`CLAUDE.md` › Always show it) and wait for the go.
 
 ## 4. Verify
-- `npm run check` is green.
+- `npm run format`, then `npm run check` is green.
 - `npm run shots -- postep ustawienia focus-q1 pytania` and look at 375 px dark and 1280 px light.
 - Seed `localStorage` with a few `days` (including a one-day gap) and answers, reload, and check the streak, the heatmap, readiness and the unlocked badges. Answer three questions right in Focus and see `Combo ×3`. Load an old state with none of the new fields: no console error.
 - Then `/review`.

@@ -27,7 +27,7 @@ Trace from the symptom to the cause. Do not patch the symptom where the cause is
 
 ## 4. Verify
 - Repeat the reproduction steps and confirm the bug is gone. Also check one neighbouring case (light/dark mode, the other deck, single vs multi-select).
-- `npm run check` must be green. A "q text changed" warning is expected only for the item you reworded.
+- `npm run format`, then `npm run check` must be green. A "q text changed" warning is expected only for the item you reworded.
 - Run `/review` (the review skill) unless the fix is a one-line typo.
 - For a visible bug, run `npm run shots -- <hash>` and send the user a before/after pair (build `main` for the "before" shot when it helps).
 - Report the cause, the fix and how you verified it, in three short lines.
