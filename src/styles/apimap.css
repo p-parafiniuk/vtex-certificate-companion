@@ -208,6 +208,115 @@ h1 b {
   background: var(--hover);
   box-shadow: inset 0 -2px 0 var(--c, var(--accent));
 }
+.view button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 13px/1 var(--f-body);
+  letter-spacing: 0;
+  padding-inline: 12px;
+}
+.view button[aria-pressed="true"],
+.fbtn[aria-expanded="true"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+.fbtn {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 600 13px/1 var(--f-body);
+  color: var(--fg);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+.fbtn:hover {
+  background: var(--hover);
+}
+.fbtn[aria-expanded="true"] {
+  border-color: var(--accent);
+}
+.badge {
+  font: 600 11px/1 var(--f-mono);
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 3px 6px;
+}
+.fpanel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 24px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.chk {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 13px var(--f-body);
+  cursor: pointer;
+}
+.chk input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+}
+.tool,
+.more button {
+  border: 0;
+  background: none;
+  padding: 4px 0;
+  color: var(--accent);
+  font: 500 12.5px var(--f-body);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.pill {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+  border-radius: 999px;
+  padding: 3px 9px;
+  font: 12px var(--f-mono);
+  cursor: pointer;
+}
+.pill:hover {
+  background: var(--hover);
+}
+.tgap {
+  width: 4px;
+}
+.lh {
+  font: 700 14px var(--f-display);
+  padding: 10px 6px 4px;
+  margin-top: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.lh:first-child {
+  margin-top: 0;
+  padding-top: 2px;
+}
+.lh span {
+  font: 500 11px var(--f-mono);
+  color: var(--muted);
+}
 .lbl {
   font: 600 10.5px/1 var(--f-body);
   text-transform: uppercase;
@@ -220,11 +329,18 @@ summary:focus-visible {
   outline-offset: 1px;
 }
 
+.bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px 16px;
+  padding-block: 12px 4px;
+}
 .stats {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 16px;
-  padding-block: 12px 4px;
   font: 12.5px var(--f-mono);
   color: var(--muted);
   font-variant-numeric: tabular-nums;
@@ -591,10 +707,17 @@ mark {
   .chip,
   .group button,
   .detail button,
-  .search {
+  .search,
+  .fbtn,
+  .pill,
+  .tool,
+  .more button,
+  .chk {
     min-height: 44px;
   }
-  .group button {
+  .group button,
+  .fbtn,
+  .tool {
     min-width: 44px;
   }
   .ep {
@@ -607,6 +730,35 @@ mark {
   .server a.ref {
     display: inline-block;
     padding-block: 12px;
+  }
+}
+/* Phones: view and filter buttons go icon-only (the label stays for screen readers), methods share one row. */
+@media (max-width: 560px) {
+  .vl {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .view button {
+    padding-inline: 0;
+    justify-content: center;
+  }
+  #methods {
+    flex: 1;
+    min-width: 0;
+  }
+  #methods button {
+    flex: 1;
+    min-width: 0;
+    padding-inline: 2px;
+  }
+}
+@media (max-width: 420px) {
+  #methods .mc {
+    display: none;
   }
 }
 @media (max-width: 560px) {
