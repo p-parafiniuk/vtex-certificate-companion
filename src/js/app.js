@@ -369,16 +369,16 @@
   }
   /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
   /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.
-     The first block is always open, so the section never opens as a bare list of headings. */
-  function noteOpen(s, i) {
-    return i === 0 || (s[1].length <= 4 && s[1].join(" ").split(/\s+/).length <= 60);
+     The first block of the Notatki section is always open, so it never opens as a bare list of headings. */
+  function noteOpen(s, first) {
+    return first || (s[1].length <= 4 && s[1].join(" ").split(/\s+/).length <= 60);
   }
   function noteList(xs) {
     return "<ul>" + xs.map(function (x) { return "<li>" + fmt(x) + "</li>"; }).join("") + "</ul>";
   }
-  function noteBlocks(n) {
+  function noteBlocks(n, firstOpen) {
     return n.s.map(function (s, i) {
-      return '<details class="note' + (s[0] === "Pułapki" ? " trap" : "") + '"' + (noteOpen(s, i) ? " open" : "") + "><summary><span>" + esc(s[0]) + "</span><small>" +
+      return '<details class="note' + (s[0] === "Pułapki" ? " trap" : "") + '"' + (noteOpen(s, firstOpen && i === 0) ? " open" : "") + "><summary><span>" + esc(s[0]) + "</span><small>" +
         plural(s[1].length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) + "</small></summary>" + noteList(s[1]) + docLinks({ l: s[2] }) + "</details>";
     }).join("");
   }
@@ -390,7 +390,7 @@
     if (!n) { el.innerHTML = ""; return; }
     el.innerHTML = d === "all"
       ? '<details class="note basics" open><summary><span><b class="tl">TL;DR</b> ' + L("Podstawy API", "API basics") + "</span><small>" +
-        plural(n.s.length, L("blok", "block"), L("bloki", "blocks"), L("bloków", "blocks")) + "</small></summary>" + noteList(n.t) + '<div class="notes">' + noteBlocks(n) + "</div></details>"
+        plural(n.s.length, L("blok", "block"), L("bloki", "blocks"), L("bloków", "blocks")) + "</small></summary>" + noteList(n.t) + '<div class="notes">' + noteBlocks(n, false) + "</div></details>"
       : '<section class="tldr" aria-labelledby="tldr-h"><div class="tldr-h"><b class="tl" id="tldr-h">TL;DR</b>' +
         '<a data-nav href="' + catHref(d, "info") + '">' + L("Całe notatki", "All notes") + " →</a></div>" + noteList(n.t) + "</section>";
   }
@@ -400,7 +400,7 @@
     el.dataset.k = k;
     el.innerHTML = '<p class="lead">' + L("Notatki z dokumentacji VTEX. Krótkie bloki są otwarte, dłuższe niż 4 punkty są zwinięte: kliknij nagłówek.",
       "Notes from the VTEX docs, in Polish. Short blocks are open, blocks longer than 4 points are folded: click the heading.") + "</p>" +
-      (NOTES[d] ? '<div class="notes">' + noteBlocks(NOTES[d]) + "</div>" : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
+      (NOTES[d] ? '<div class="notes">' + noteBlocks(NOTES[d], true) + "</div>" : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
   }
   function renderCatApi(d) {
     var list = CATMAP[d].api;
