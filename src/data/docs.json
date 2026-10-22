@@ -116,7 +116,7 @@
   "invsku": ["https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/inventory/skus/-skuId-","Logistics API: List inventory by SKU"],
   "invlead": ["https://developers.vtex.com/docs/api-reference/logistics-api#patch-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-/lead-time","Logistics API: Update inventory lead time by SKU and warehouse"],
   "invbatch": ["https://developers.vtex.com/docs/api-reference/logistics-api#post-/availability/v1/inventory/batch","Logistics API: Create batch inventory job"],
-  "cartorder": ["https://developers.vtex.com/docs/guides/create-a-regular-order-from-an-existing-cart","Guide: Create a regular order from an existing cart"],
+  "cartorder": ["https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart","Guide: Creating a regular order from an existing cart"],
   "headless": ["https://developers.vtex.com/docs/guides/headless-cart-and-checkout","Guide: Headless cart and checkout"],
   "placeord": ["https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders","Checkout API: Place order"],
   "gwcb": ["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/gatewayCallback/-orderGroup-","Checkout API: Process order"],
