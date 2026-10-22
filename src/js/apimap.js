@@ -365,11 +365,11 @@ function bootApiMap(root, onNav, embed) {
   }
 
   const pathHtml = p => hl(p).replace(/\{[^}<]*\}/g, m => `<span class="param">${m}</span>`);
-  function hitRow(ep, many) {
+  function hitRow(ep, many, inTag) {
     return (
       `<button type="button" class="ep hit" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span>` +
       `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s || L("(brak opisu)", "(no description)"))}${many ? " · " + esc(ep.api.name) : ""}</span></span>` +
-      `${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? '<span class="flag dep">DEPR</span>' : ""}<span class="ht">${hl(ep.t || "")}</span></button>`
+      `${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? '<span class="flag dep">DEPR</span>' : ""}${inTag ? "" : `<span class="ht">${hl(ep.t || "")}</span>`}</button>`
     );
   }
   /* While searching, each API chip shows its own number of hits, so results in another API are never invisible. */
@@ -419,7 +419,8 @@ function bootApiMap(root, onNav, embed) {
     EPS = new Map();
     let html = "",
       tot = 0,
-      open = 0;
+      open = 0,
+      groups = 0;
     const c = { GET: 0, POST: 0, PUT: 0, PATCH: 0, DELETE: 0 },
       mc = { GET: 0, POST: 0, PUT: 0, PATCH: 0, DELETE: 0 };
     for (const a of apis) for (const ep of a.eps) if (match(ep, true)) mc[ep.m]++;
@@ -438,31 +439,53 @@ function bootApiMap(root, onNav, embed) {
     if (flat) {
       const found = [];
       for (const a of apis) for (const ep of a.eps) if (match(ep)) found.push({ ...ep, api: a });
-      /* Search ranks paths across APIs; the list keeps each API together under its own heading. */
-      const grouped = !state.q && apis.length > 1;
+      /* Search ranks paths across APIs. The list keeps each API together under its own heading, and inside it
+         groups endpoints by tag in schema order, the same groups as the API Reference sidebar. */
+      const grouped = !state.q,
+        tagged = !state.q;
       const at = new Map(apis.map((a, i) => [a.key, i]));
+      const tagAt = new Map();
+      if (tagged)
+        for (const a of apis)
+          a.eps.forEach((ep, i) => {
+            const k = a.key + "|" + ep.t;
+            if (!tagAt.has(k)) tagAt.set(k, i);
+          });
+      const tk = ep => ep.api.key + "|" + ep.t;
       found.sort(
-        (x, y) => (grouped ? at.get(x.api.key) - at.get(y.api.key) : 0) || x.p.localeCompare(y.p) || ord(x.m) - ord(y.m)
+        (x, y) =>
+          (grouped || tagged ? at.get(x.api.key) - at.get(y.api.key) : 0) ||
+          (tagged ? tagAt.get(tk(x)) - tagAt.get(tk(y)) : 0) ||
+          x.p.localeCompare(y.p) ||
+          ord(x.m) - ord(y.m)
       );
-      const per = new Map();
+      const per = new Map(),
+        perTag = new Map();
       found.forEach(ep => {
         EPS.set(idOf(ep), ep);
         c[ep.m]++;
         tot++;
         if (!ep.a) open++;
         per.set(ep.api.key, (per.get(ep.api.key) || 0) + 1);
+        perTag.set(tk(ep), (perTag.get(tk(ep)) || 0) + 1);
       });
+      if (tagged) groups = perTag.size;
       const many = !!state.q && apis.length > 1;
-      let last = "";
+      let last = "",
+        lastTag = "";
       const rows = found.slice(0, state.shown).map(ep => {
         let h = "";
         if (grouped && ep.api.key !== last) {
           last = ep.api.key;
           const n = per.get(last),
             all = ep.api.eps.length;
-          h = `<div class="lh">${esc(ep.api.name)} <span>${n < all ? L(`${n} z ${all}`, `${n} of ${all}`) : n}</span></div>`;
+          h = `<div class="lh" role="heading" aria-level="3">${esc(ep.api.name)} <span>${n < all ? L(`${n} z ${all}`, `${n} of ${all}`) : n}</span></div>`;
         }
-        return h + hitRow(ep, many);
+        if (tagged && tk(ep) !== lastTag) {
+          lastTag = tk(ep);
+          h += `<div class="lg" role="heading" aria-level="4">${esc(ep.t || "—")} <span>${perTag.get(lastTag)}</span></div>`;
+        }
+        return h + hitRow(ep, many, tagged);
       });
       const left = found.length - state.shown;
       if (found.length)
@@ -498,7 +521,7 @@ function bootApiMap(root, onNav, embed) {
     $("tools").innerHTML = toolsHtml(flat);
     const inApis = wide ? new Set([...EPS.values()].map(ep => ep.api.key)).size : 0;
     $("stats").innerHTML =
-      `<span><b>${plural(tot, "endpoint", L("endpointy", "endpoints"), L("endpointów", "endpoints"))}</b>${inApis > 1 ? L(" w ", " in ") + inApis + " API" : ""}</span>` +
+      `<span><b>${plural(tot, "endpoint", L("endpointy", "endpoints"), L("endpointów", "endpoints"))}</b>${inApis > 1 ? L(" w ", " in ") + inApis + " API" : ""}${groups ? " · " + plural(groups, L("grupa", "group"), L("grupy", "groups"), L("grup", "groups")) : ""}</span>` +
       METHODS.filter(m => c[m])
         .map(m => `<span><span class="m ${m}" style="width:auto">${m}</span> <b>${c[m]}</b></span>`)
         .join("") +
@@ -552,6 +575,13 @@ function bootApiMap(root, onNav, embed) {
       b.insertAdjacentHTML("afterend", detailHtml(ep));
       return;
     }
+    const doc = e.target.closest("[data-doc]");
+    if (doc) {
+      const d = doc.closest(".detail"),
+        ep = EPS.get(d.dataset.id);
+      if (ep) toggleDoc(d, doc, ep);
+      return;
+    }
     const act = e.target.closest("[data-copy]");
     if (act) {
       const ep = EPS.get(act.closest(".detail").dataset.id);
@@ -569,6 +599,26 @@ function bootApiMap(root, onNav, embed) {
       );
     }
   });
+  /* Endpoint docs open in a frame inside the detail, loaded only on demand, always next to a new-tab link. */
+  function toggleDoc(d, btn, ep) {
+    const old = d.querySelector(".epdoc");
+    const on = !old;
+    if (old) old.remove();
+    /* Frame only a plain API slug, so the frame never leaves the API Reference pages. */
+    else if (/^[a-z0-9-]+$/.test(ep.api.ref || "")) {
+      const url = epRef(ep);
+      d.insertAdjacentHTML(
+        "beforeend",
+        `<div class="epdoc"><div class="docbar"><span class="docurl">${esc(url.replace(/^https:\/\//, ""))}</span><a href="${esc(url)}" target="_blank" rel="noopener">${L("Otwórz w nowej karcie", "Open in a new tab")} ↗</a></div>` +
+          `<iframe src="${esc(url)}" title="${esc(ep.m + " " + ep.p)}" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>` +
+          `<p class="how">${L("Pusta ramka? Ta strona VTEX blokuje osadzanie. Otwórz ją w nowej karcie.", "Empty frame? This VTEX page blocks embedding. Open it in a new tab.")}</p></div>`
+      );
+    } else window.open(epRef(ep), "_blank", "noopener");
+    btn.setAttribute("aria-expanded", on && !!d.querySelector(".epdoc"));
+    btn.textContent = d.querySelector(".epdoc")
+      ? L("Zwiń dokumentację", "Hide docs")
+      : L("Dokumentacja endpointu", "Endpoint docs");
+  }
   const fullUrl = ep => ep.api.server.replace(/\/$/, "") + ep.p;
   const shq = s => String(s).replace(/'/g, "'\\''");
   function curl(ep) {
@@ -600,7 +650,7 @@ function bootApiMap(root, onNav, embed) {
     ${qs}
     ${bodyHtml(ep)}
     ${respHtml(ep)}
-    <div class="acts">${refLink(epRef(ep), ep.m + " " + ep.p, L("Dokumentacja endpointu", "Endpoint docs"))}<button type="button" data-copy="url">${L("Kopiuj URL", "Copy URL")}</button><button type="button" data-copy="curl">${L("Kopiuj curl", "Copy curl")}</button>${ep.b && ep.b.ex ? `<button type="button" data-copy="body">${L("Kopiuj body", "Copy body")}</button>` : ""}</div>
+    <div class="acts"><button type="button" class="docb" data-doc aria-expanded="false">${L("Dokumentacja endpointu", "Endpoint docs")}</button><button type="button" data-copy="url">${L("Kopiuj URL", "Copy URL")}</button><button type="button" data-copy="curl">${L("Kopiuj curl", "Copy curl")}</button>${ep.b && ep.b.ex ? `<button type="button" data-copy="body">${L("Kopiuj body", "Copy body")}</button>` : ""}</div>
   </div>`;
   }
   const srcNote = s =>
