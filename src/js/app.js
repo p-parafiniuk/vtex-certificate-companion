@@ -336,7 +336,7 @@
           done: !!rs.done,
           used: rs.used | 0,
           timeUp: !!rs.timeUp,
-          only: rs.only === "wrong" ? "wrong" : "all"
+          only: rs.only === "wrong" || rs.only === "flag" ? rs.only : "all"
         };
       }
     }
@@ -682,7 +682,7 @@
 
   /* ---------- question card ----------
      mode "learn": pick, then "Sprawdź". mode "sim": pick only. mode "review": finished simulation. */
-  function qCard(i, mode, sel, head) {
+  function qCard(i, mode, sel, head, cls) {
     var q = Q[i],
       n = i + 1,
       need = nRight(q);
@@ -792,6 +792,7 @@
     return (
       '<article class="q' +
       (mode === "learn" && S.known[i] ? " is-known" : "") +
+      (cls ? " " + cls : "") +
       '" id="' +
       (mode === "learn" ? "q-" : "s-") +
       n +
@@ -1754,6 +1755,10 @@
     var wrong = m.ids.filter(function (i) {
       return !isRight(i, m.ans[i]);
     });
+    var flagged = m.ids.filter(function (i, p) {
+      return m.flag[p];
+    });
+    var shown = m.only === "wrong" ? wrong : m.only === "flag" ? flagged : m.ids;
     html +=
       "<h3>" +
       L("Pytania", "Questions") +
@@ -1761,7 +1766,7 @@
       '<div class="chips" role="group" aria-label="' +
       L("Filtr przeglądu", "Review filter") +
       '"><button type="button" class="chip" data-only="all" aria-pressed="' +
-      (m.only !== "wrong") +
+      (m.only !== "wrong" && m.only !== "flag") +
       '">' +
       L("Wszystkie", "All") +
       " <small>" +
@@ -1773,10 +1778,18 @@
       L("Tylko błędne", "Only wrong") +
       " <small>" +
       wrong.length +
+      "</small></button>" +
+      '<button type="button" class="chip" data-only="flag" aria-pressed="' +
+      (m.only === "flag") +
+      '"><span class="fdot" aria-hidden="true"></span>' +
+      L("Do powrotu", "Flagged") +
+      " <small>" +
+      flagged.length +
       "</small></button></div>" +
       '<div class="list">' +
-      ((m.only === "wrong" ? wrong : m.ids)
+      (shown
         .map(function (i) {
+          var p = m.ids.indexOf(i);
           return qCard(
             i,
             "review",
@@ -1788,10 +1801,21 @@
               esc(dn(Q[i].d)) +
               '</span><span class="rnd">#' +
               (i + 1) +
-              "</span>"
+              "</span>" +
+              (m.flag[p]
+                ? '<span class="flagb"><span class="fdot" aria-hidden="true"></span>' +
+                  L("do powrotu", "flagged") +
+                  "</span>"
+                : ""),
+            m.flag[p] ? "is-flag" : ""
           );
         })
-        .join("") || '<p class="empty">' + L("Brak błędnych odpowiedzi.", "No wrong answers.") + "</p>") +
+        .join("") ||
+        '<p class="empty">' +
+          (m.only === "flag"
+            ? L("Nie oznaczono żadnego pytania do powrotu.", "No question was flagged to revisit.")
+            : L("Brak błędnych odpowiedzi.", "No wrong answers.")) +
+          "</p>") +
       "</div>";
     return html;
   }
@@ -1949,6 +1973,8 @@
         var y2 = window.scrollY;
         renderSim();
         window.scrollTo(0, y2);
+        var f = $('#simroot [data-only="' + m.only + '"]');
+        if (f) f.focus({ preventScroll: true });
       }
       return;
     }
