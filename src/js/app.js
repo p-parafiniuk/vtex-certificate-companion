@@ -1973,6 +1973,8 @@
         var y2 = window.scrollY;
         renderSim();
         window.scrollTo(0, y2);
+        var f = $('#simroot [data-only="' + m.only + '"]');
+        if (f) f.focus({ preventScroll: true });
       }
       return;
     }

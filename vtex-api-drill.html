@@ -53,7 +53,6 @@
     --k1: #8fb0ff;
     --k3: #e3ae52;
     --k3-soft: #3a2a12;
-    --k3-soft: #3a2a12;
     --k5: #c0a0ff;
     --kshadow: rgb(0 0 0 / 0.55);
     color-scheme: dark;
@@ -9758,6 +9757,8 @@ const APIMAP = [
         var y2 = window.scrollY;
         renderSim();
         window.scrollTo(0, y2);
+        var f = $('#simroot [data-only="' + m.only + '"]');
+        if (f) f.focus({ preventScroll: true });
       }
       return;
     }
