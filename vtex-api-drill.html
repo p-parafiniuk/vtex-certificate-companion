@@ -28,6 +28,7 @@
   --code: #eee8f2;
   --k1: #2f66cf;
   --k3: #96600d;
+  --k3-soft: #fbf3e6;
   --k5: #7238bd;
   --kshadow: rgb(28 22 34 / 0.22);
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
@@ -51,6 +52,8 @@
     --code: #2d2434;
     --k1: #8fb0ff;
     --k3: #e3ae52;
+    --k3-soft: #3a2a12;
+    --k3-soft: #3a2a12;
     --k5: #c0a0ff;
     --kshadow: rgb(0 0 0 / 0.55);
     color-scheme: dark;
@@ -72,6 +75,7 @@
   --code: #2d2434;
   --k1: #8fb0ff;
   --k3: #e3ae52;
+  --k3-soft: #3a2a12;
   --k5: #c0a0ff;
   --kshadow: rgb(0 0 0 / 0.55);
   color-scheme: dark;
@@ -438,6 +442,31 @@ h3 {
 .q.is-known,
 .fc.is-known {
   border-color: var(--accent);
+}
+/* Flags set during the simulation share the palette dot's amber, so the results read as the same marks. */
+.q.is-flag {
+  border-color: var(--k3);
+  box-shadow: inset 0 0 0 1px var(--k3);
+}
+.fdot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--k3);
+  flex: none;
+  align-self: center;
+}
+.flagb {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--k3);
+  background: var(--k3-soft);
+  border-radius: 99px;
+  padding: 2px 9px 2px 7px;
 }
 .q-head {
   display: flex;
@@ -8092,7 +8121,7 @@ const APIMAP = [
           done: !!rs.done,
           used: rs.used | 0,
           timeUp: !!rs.timeUp,
-          only: rs.only === "wrong" ? "wrong" : "all"
+          only: rs.only === "wrong" || rs.only === "flag" ? rs.only : "all"
         };
       }
     }
@@ -8438,7 +8467,7 @@ const APIMAP = [
 
   /* ---------- question card ----------
      mode "learn": pick, then "Sprawdź". mode "sim": pick only. mode "review": finished simulation. */
-  function qCard(i, mode, sel, head) {
+  function qCard(i, mode, sel, head, cls) {
     var q = Q[i],
       n = i + 1,
       need = nRight(q);
@@ -8548,6 +8577,7 @@ const APIMAP = [
     return (
       '<article class="q' +
       (mode === "learn" && S.known[i] ? " is-known" : "") +
+      (cls ? " " + cls : "") +
       '" id="' +
       (mode === "learn" ? "q-" : "s-") +
       n +
@@ -9510,6 +9540,10 @@ const APIMAP = [
     var wrong = m.ids.filter(function (i) {
       return !isRight(i, m.ans[i]);
     });
+    var flagged = m.ids.filter(function (i, p) {
+      return m.flag[p];
+    });
+    var shown = m.only === "wrong" ? wrong : m.only === "flag" ? flagged : m.ids;
     html +=
       "<h3>" +
       L("Pytania", "Questions") +
@@ -9517,7 +9551,7 @@ const APIMAP = [
       '<div class="chips" role="group" aria-label="' +
       L("Filtr przeglądu", "Review filter") +
       '"><button type="button" class="chip" data-only="all" aria-pressed="' +
-      (m.only !== "wrong") +
+      (m.only !== "wrong" && m.only !== "flag") +
       '">' +
       L("Wszystkie", "All") +
       " <small>" +
@@ -9529,10 +9563,18 @@ const APIMAP = [
       L("Tylko błędne", "Only wrong") +
       " <small>" +
       wrong.length +
+      "</small></button>" +
+      '<button type="button" class="chip" data-only="flag" aria-pressed="' +
+      (m.only === "flag") +
+      '"><span class="fdot" aria-hidden="true"></span>' +
+      L("Do powrotu", "Flagged") +
+      " <small>" +
+      flagged.length +
       "</small></button></div>" +
       '<div class="list">' +
-      ((m.only === "wrong" ? wrong : m.ids)
+      (shown
         .map(function (i) {
+          var p = m.ids.indexOf(i);
           return qCard(
             i,
             "review",
@@ -9544,10 +9586,21 @@ const APIMAP = [
               esc(dn(Q[i].d)) +
               '</span><span class="rnd">#' +
               (i + 1) +
-              "</span>"
+              "</span>" +
+              (m.flag[p]
+                ? '<span class="flagb"><span class="fdot" aria-hidden="true"></span>' +
+                  L("do powrotu", "flagged") +
+                  "</span>"
+                : ""),
+            m.flag[p] ? "is-flag" : ""
           );
         })
-        .join("") || '<p class="empty">' + L("Brak błędnych odpowiedzi.", "No wrong answers.") + "</p>") +
+        .join("") ||
+        '<p class="empty">' +
+          (m.only === "flag"
+            ? L("Nie oznaczono żadnego pytania do powrotu.", "No question was flagged to revisit.")
+            : L("Brak błędnych odpowiedzi.", "No wrong answers.")) +
+          "</p>") +
       "</div>";
     return html;
   }
