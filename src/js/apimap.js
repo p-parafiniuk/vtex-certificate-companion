@@ -43,7 +43,9 @@ function bootApiMap(root, onNav, embed) {
   ];
   const LIMIT = 150;
   const KEY = "apimap.v1";
-  const KEYS = ["all", ...APIMAP.map(a => a.key)];
+  /* "overview" is the bird's-eye page (APIOV, per category in DOMS order); only the API Map tab has it. */
+  const OV = embed ? [] : DOMS.filter(d => APIOV[d[0]]).map(d => [d, APIOV[d[0]]]);
+  const KEYS = ["all", ...(embed ? [] : ["overview"]), ...APIMAP.map(a => a.key)];
   let LIST = APIMAP;
 
   const $ = id => root.getElementById(id);
@@ -60,10 +62,14 @@ function bootApiMap(root, onNav, embed) {
       h = n % 100;
     return n + " " + (n === 1 ? one : t >= 2 && t <= 4 && (h < 12 || h > 14) ? few : many);
   };
+  const fmt = s =>
+    esc(s)
+      .replace(/`([^`]+)`/g, "<code>$1</code>")
+      .replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
   const scopeOf = p => (p.includes("/pvt/") || p.endsWith("/pvt") ? "pvt" : p.includes("/pub/") ? "pub" : "other");
 
   const state = {
-    api: "catalog",
+    api: embed ? "catalog" : "overview",
     depth: 2,
     q: "",
     qAll: true,
@@ -109,7 +115,13 @@ function bootApiMap(root, onNav, embed) {
   function buildApis() {
     const total = LIST.reduce((n, a) => n + a.eps.length, 0);
     $("apis").hidden = LIST.length < 2;
+    const cards = OV.reduce((n, g) => n + g[1].length, 0);
     $("apis").innerHTML = [
+      ...(OV.length
+        ? [
+            `<button type="button" class="chip" data-k="overview">${L("Z lotu ptaka", "Bird's-eye view")} <span>${cards}</span></button>`
+          ]
+        : []),
       `<button type="button" class="chip" data-k="all">${L("Wszystkie", "All")} <span>${total}</span></button>`,
       ...LIST.map(
         a =>
@@ -247,6 +259,16 @@ function bootApiMap(root, onNav, embed) {
     $("apis-r").onclick = () => {
       apisEl.scrollLeft += apisEl.clientWidth * 0.7;
     };
+    $("ov").onclick = e => {
+      const b = e.target.closest("button[data-k]");
+      if (!b) return;
+      show(b.dataset.k);
+      if (onNav) onNav(state.api);
+      /* The cards are gone after the switch, so focus moves to the chip of the API just opened. */
+      const c = root.querySelector('#apis [aria-pressed="true"]');
+      if (c) c.focus({ preventScroll: true });
+      window.scrollTo(0, 0);
+    };
     apisEl.addEventListener("scroll", edges, { passive: true });
     window.addEventListener("resize", edges);
   }
@@ -296,6 +318,7 @@ function bootApiMap(root, onNav, embed) {
   /* "/" jumps to search, as on GitHub and MDN, but only in the copy that is on screen. */
   document.addEventListener("keydown", e => {
     if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || !root.host.getClientRects().length) return;
+    if (state.api === "overview") return;
     const t = e.composedPath()[0];
     if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
     e.preventDefault();
@@ -431,6 +454,7 @@ function bootApiMap(root, onNav, embed) {
       [...n.values()].reduce((x, y) => x + y, 0)
     );
     root.querySelectorAll("#apis .chip").forEach(b => {
+      if (b.dataset.k === "overview") return;
       const k = n.get(b.dataset.k);
       b.querySelector("span").textContent = k;
       b.classList.toggle("zero", hit && !k);
@@ -467,6 +491,15 @@ function bootApiMap(root, onNav, embed) {
   function render(more) {
     if (!more) state.shown = LIMIT;
     syncControls();
+    const ov = state.api === "overview";
+    root.querySelector(".wrap").classList.toggle("ovmode", ov);
+    if (ov) {
+      $("ov").innerHTML = ovHtml();
+      $("tree").innerHTML = "";
+      chipCounts();
+      return;
+    }
+    $("ov").innerHTML = "";
     const flat = !!state.q || state.view === "list";
     const sel = state.api === "all" ? LIST : LIST.filter(a => a.key === state.api);
     const wide = !!state.q && state.qAll;
@@ -595,6 +628,44 @@ function bootApiMap(root, onNav, embed) {
       $("server").innerHTML =
         `Base URL: <code>${esc(a.server)}</code> · ${L("schemat", "schema")}: <code>${esc(a.file)}</code> · ${refLink(apiRef(a), a.name + " API", "API Reference")}`;
     }
+  }
+
+  /* ---------- bird's-eye view ---------- */
+  /* One card per API: what it is for, what it is not for and which API to take instead, plus an edge case. */
+  function ovHtml() {
+    const api = k => APIMAP.find(a => a.key === k);
+    const link = (k, label) =>
+      k ? `<button type="button" class="ovk" data-k="${esc(k)}">${fmt(label || api(k).name)}</button>` : fmt(label);
+    const line = (cls, tag, html) => `<b class="ovt ${cls}">${tag}</b><span>${html}</span>`;
+    const card = c => {
+      const a = api(c.k);
+      const alt = (c.alt || []).map(([k, l]) => link(k, l)).join(" · ");
+      return (
+        `<article class="ovc"><div class="ovh"><button type="button" class="ovn" data-k="${esc(a.key)}">${esc(a.name)}</button>` +
+        `<span class="ovc-n">${a.eps.length} ep.</span>` +
+        refLink(apiRef(a), a.name + " API", "Reference") +
+        `</div><div class="ovl">` +
+        line("do", L("DO", "USE"), fmt(c.do)) +
+        (c.no ? line("no", L("NIE", "NOT"), fmt(c.no) + (alt ? ` <span class="ova">→</span> ${alt}` : "")) : "") +
+        (c.edge ? line("edge", L("UWAGA", "TRAP"), fmt(c.edge)) : "") +
+        `</div></article>`
+      );
+    };
+    return (
+      `<div class="ovhead"><h2>${L("Z lotu ptaka", "Bird's-eye view")}</h2>` +
+      `<p>${L("Każde API w trzech linijkach: do czego służy, czego nie robi i co wziąć zamiast. Kliknij nazwę, żeby zobaczyć jego endpointy.", "Each API in three lines: what it is for, what it does not do and what to use instead. Click a name to see its endpoints. The notes are in Polish.")}</p>` +
+      `<p class="ovleg">${[
+        ["do", L("DO", "USE"), L("do czego służy", "what it is for")],
+        ["no", L("NIE", "NOT"), L("czego nie robi → lepsze API", "what it does not do → better API")],
+        ["edge", L("UWAGA", "TRAP"), L("pułapka lub edge case", "trap or edge case")]
+      ]
+        .map(([c, t, x]) => `<span>${line(c, t, x)}</span>`)
+        .join("")}</p></div>` +
+      OV.map(
+        ([d, cards]) =>
+          `<section class="ovg"><h3>${esc(L(d[1], d[3] || d[1]))}</h3><div class="ovgrid">${cards.map(card).join("")}</div></section>`
+      ).join("")
+    );
   }
 
   /* ---------- endpoint detail ---------- */
@@ -768,7 +839,8 @@ function bootApiMap(root, onNav, embed) {
   }
 
   function show(api) {
-    if (!(api === "all" || LIST.some(a => a.key === api)) || (api === state.api && $("tree").childElementCount)) return;
+    if (!KEYS.includes(api) || !(api === "all" || api === "overview" || LIST.some(a => a.key === api))) return;
+    if (api === state.api && ($("tree").childElementCount || $("ov").childElementCount)) return;
     /* Picking an API while searching means "search here". */
     state.api = api;
     state.open.clear();

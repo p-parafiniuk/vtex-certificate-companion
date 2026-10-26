@@ -27,7 +27,8 @@ export const BLOCKS = {
   KCAT: { images: true, keys: "json", layout: "inline" },
   APIMAP: { file: "data/apimap.json", keys: "json", layout: "lines", indent: "" },
   CATMAP: { file: "data/categories.json", keys: "json", layout: "inline" },
-  NOTES: { file: "data/notes.json", keys: "json", layout: "inline" }
+  NOTES: { file: "data/notes.json", keys: "json", layout: "inline" },
+  APIOV: { file: "data/apioverview.json", keys: "json", layout: "inline" }
 };
 
 export const MARKER = /^\s*(?:<!--|\/\*)\s*@(include|data)\s+(\S+)\s*(?:-->|\*\/)\s*$/;

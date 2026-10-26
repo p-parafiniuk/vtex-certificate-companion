@@ -150,5 +150,12 @@
   "ratebp": ["https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors","Guide: Best practices for avoiding rate limit errors"],
   "errors": ["https://developers.vtex.com/docs/guides/handling-errors-and-exceptions","Guide: Handling errors and exceptions"],
   "adsrl": ["https://developers.vtex.com/updates/release-notes/2026-08-04-vtex-ads-api-reports-rate-limit","Release note: VTEX Ads API Reports rate limit"],
-  "keysint": ["https://help.vtex.com/en/docs/tracks/api-keys-for-integrations","Help Center: API keys for integrations"]
+  "keysint": ["https://help.vtex.com/en/docs/tracks/api-keys-for-integrations","Help Center: API keys for integrations"],
+  "o_promo": ["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api","Promotions & Taxes API: overview"],
+  "o_promo2": ["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api-v2","Promotions & Taxes API v2: overview (coupons)"],
+  "o_gift": ["https://developers.vtex.com/docs/api-reference/giftcard-api","Giftcard API: overview"],
+  "o_gifthub": ["https://developers.vtex.com/docs/api-reference/giftcard-hub-api","GiftCard Hub API: overview"],
+  "o_search": ["https://developers.vtex.com/docs/api-reference/search-api","Legacy Search API: overview"],
+  "o_mktapi": ["https://developers.vtex.com/docs/api-reference/marketplace-apis","Marketplace API: overview"],
+  "md1scroll": ["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/scroll","Master Data API v1: Scroll documents"]
 }
