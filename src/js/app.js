@@ -358,7 +358,7 @@
           done: !!rs.done,
           used: rs.used | 0,
           timeUp: !!rs.timeUp,
-          only: rs.only === "wrong" || rs.only === "flag" ? rs.only : "all"
+          only: /^(wrong|flag|both)$/.test(rs.only) ? rs.only : "all"
         };
       }
     }
@@ -1855,7 +1855,11 @@
     var flagged = m.ids.filter(function (i, p) {
       return m.flag[p];
     });
-    var shown = m.only === "wrong" ? wrong : m.only === "flag" ? flagged : m.ids;
+    var ow = m.only === "wrong" || m.only === "both";
+    var of = m.only === "flag" || m.only === "both";
+    var shown = m.ids.filter(function (i, p) {
+      return (!ow || !isRight(i, m.ans[i])) && (!of || m.flag[p]);
+    });
     html +=
       "<h3>" +
       L("Pytania", "Questions") +
@@ -1863,21 +1867,21 @@
       '<div class="chips" role="group" aria-label="' +
       L("Filtr przeglądu", "Review filter") +
       '"><button type="button" class="chip" data-only="all" aria-pressed="' +
-      (m.only !== "wrong" && m.only !== "flag") +
+      (!ow && !of) +
       '">' +
       L("Wszystkie", "All") +
       " <small>" +
       nq +
       "</small></button>" +
       '<button type="button" class="chip" data-only="wrong" aria-pressed="' +
-      (m.only === "wrong") +
+      ow +
       '">' +
       L("Tylko błędne", "Only wrong") +
       " <small>" +
       wrong.length +
       "</small></button>" +
       '<button type="button" class="chip" data-only="flag" aria-pressed="' +
-      (m.only === "flag") +
+      of +
       '"><span class="fdot" aria-hidden="true"></span>' +
       L("Do powrotu", "Flagged") +
       " <small>" +
@@ -1909,9 +1913,11 @@
         })
         .join("") ||
         '<p class="empty">' +
-          (m.only === "flag"
-            ? L("Nie oznaczono żadnego pytania do powrotu.", "No question was flagged to revisit.")
-            : L("Brak błędnych odpowiedzi.", "No wrong answers.")) +
+          (ow && of
+            ? L("Brak błędnych pytań oznaczonych do powrotu.", "No wrong answers among the flagged questions.")
+            : of
+              ? L("Nie oznaczono żadnego pytania do powrotu.", "No question was flagged to revisit.")
+              : L("Brak błędnych odpowiedzi.", "No wrong answers.")) +
           "</p>") +
       "</div>";
     return html;
@@ -2066,12 +2072,18 @@
       }
       b = t.closest("[data-only]");
       if (b) {
-        m.only = b.dataset.only;
+        var k = b.dataset.only;
+        var w = m.only === "wrong" || m.only === "both";
+        var fl = m.only === "flag" || m.only === "both";
+        if (k === "all") w = fl = false;
+        else if (k === "wrong") w = !w;
+        else fl = !fl;
+        m.only = w && fl ? "both" : w ? "wrong" : fl ? "flag" : "all";
         save();
         var y2 = window.scrollY;
         renderSim();
         window.scrollTo(0, y2);
-        var f = $('#simroot [data-only="' + m.only + '"]');
+        var f = $('#simroot [data-only="' + k + '"]');
         if (f) f.focus({ preventScroll: true });
       }
       return;
