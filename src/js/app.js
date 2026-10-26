@@ -4551,6 +4551,14 @@
     apply(NAV.cur, true);
   }
 
+  /* Modified clicks keep the browser's own new-tab behaviour; a plain click goes home through history. */
+  $(".brand").addEventListener("click", function (ev) {
+    if (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    ev.preventDefault();
+    if (CUR === "pytania" && !NAV.cur.cat) window.scrollTo(0, 0);
+    else go({ tab: "pytania" });
+  });
+
   document.querySelector(".tabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".tab");
     if (b && b.dataset.tab !== CUR)
