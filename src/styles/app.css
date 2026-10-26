@@ -1443,6 +1443,11 @@ body:has(.info-dlg[open]) {
   color: var(--bg);
   cursor: default;
 }
+/* Until app.js has rendered (see the boot script in index.html); a focus link also keeps the bar it would hide. */
+:root[data-boot] .wrap,
+:root[data-boot="focus"] .bar {
+  display: none;
+}
 body[data-view="focus"] .bar,
 body[data-view="focus"] .pcard,
 body[data-view="focus"] .src {
