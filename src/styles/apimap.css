@@ -213,7 +213,8 @@ h1 b {
 #methods button[aria-pressed="true"] {
   color: var(--c);
 }
-#scopes button[aria-pressed="true"] {
+#scopes button[aria-pressed="true"],
+#status button[aria-pressed="true"] {
   color: var(--bg);
   background: var(--fg);
   box-shadow: none;
@@ -898,11 +899,13 @@ mark {
   display: grid;
   gap: 8px;
 }
-.sidemode #scopes {
+.sidemode #scopes,
+.sidemode #status {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.sidemode #scopes button {
+.sidemode #scopes button,
+.sidemode #status button {
   min-height: 44px;
 }
 .sidemode .chk {
@@ -910,14 +913,17 @@ mark {
 }
 .sidemode .chip:focus-visible,
 .sidemode #methods button:focus-visible,
-.sidemode #scopes button:focus-visible {
+.sidemode #scopes button:focus-visible,
+.sidemode #status button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
-.sidemode #scopes button:nth-child(2n) {
+.sidemode #scopes button:nth-child(2n),
+.sidemode #status button:nth-child(2n) {
   border-right: 0;
 }
-.sidemode #scopes button:nth-child(n + 3) {
+.sidemode #scopes button:nth-child(n + 3),
+.sidemode #status button:nth-child(n + 3) {
   border-top: 1px solid var(--line);
 }
 /* Phones: the deck scrolls away so the tree keeps the screen, and summaries wrap instead of hiding off the right edge. */
@@ -1001,6 +1007,17 @@ mark {
   #scopes {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  /* "DEPR + LEGACY 14" is too long for a row of four: two columns, like the side panel. */
+  #status {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  #status button:nth-child(2n) {
+    border-right: 0;
+  }
+  #status button:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
   }
 }
 @media (max-width: 420px) {

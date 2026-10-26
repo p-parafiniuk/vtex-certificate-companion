@@ -8,6 +8,19 @@ function bootApiMap(root, onNav, embed) {
   const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
   /* UI language comes from <html lang>, which the main app sets; relang() redraws after a switch. */
   const L = (pl, en) => (document.documentElement.lang === "en" ? en : pl);
+  /* Status filter: dep = deprecated, leg = legacy, old = either; a deprecated endpoint never counts as legacy. */
+  const STATUS = {
+    all: () => true,
+    dep: ep => !!ep.d,
+    leg: ep => !ep.d && !!ep.lg,
+    old: ep => !!(ep.d || ep.lg)
+  };
+  const statuses = () => [
+    ["all", L("wszystkie", "all")],
+    ["dep", "DEPR"],
+    ["leg", "LEGACY"],
+    ["old", "DEPR + LEGACY"]
+  ];
   const scopes = () => [
     ["all", L("wszystkie", "all"), L("Wszystkie ścieżki", "All paths")],
     [
@@ -57,6 +70,7 @@ function bootApiMap(root, onNav, embed) {
     methods: new Set(METHODS),
     scope: "all",
     onlyOpen: false,
+    status: "all",
     view: "tree",
     filters: false,
     shown: LIMIT,
@@ -108,6 +122,12 @@ function bootApiMap(root, onNav, embed) {
     $("scopes").innerHTML = scopes()
       .map(([k, l, t]) => `<button type="button" data-s="${k}" title="${esc(t)}">${l}</button>`)
       .join("");
+    $("status").innerHTML = statuses()
+      .map(
+        ([k, l]) =>
+          `<button type="button" data-st="${k}">${l}${k === "all" ? "" : ' <span class="mc"></span>'}</button>`
+      )
+      .join("");
     $("view").innerHTML = [
       ["tree", L("Drzewo", "Tree"), "M3 2v12M3 5h5M3 10h5M8 3.5h5v3H8zM8 8.5h5v3H8z"],
       ["list", L("Lista", "List"), "M2 3.5h12M2 8h12M2 12.5h12"]
@@ -150,6 +170,12 @@ function bootApiMap(root, onNav, embed) {
       state.scope = b.dataset.s;
       render();
     };
+    $("status").onclick = e => {
+      const b = e.target.closest("button");
+      if (!b || !(b.dataset.st in STATUS) || b.dataset.st === state.status) return;
+      state.status = b.dataset.st;
+      render();
+    };
     $("onlyopen").onchange = e => {
       state.onlyOpen = e.target.checked;
       render();
@@ -177,6 +203,7 @@ function bootApiMap(root, onNav, embed) {
       }
       if (k === "scope" || k === "clear") state.scope = "all";
       if (k === "open" || k === "clear") state.onlyOpen = false;
+      if (k === "status" || k === "clear") state.status = "all";
       if (k === "clear") METHODS.forEach(m => state.methods.add(m));
       render();
       const n = [`[data-t="${k}"]`, ".pill", '[data-t="clear"]', '[data-t="expand"]']
@@ -282,8 +309,9 @@ function bootApiMap(root, onNav, embed) {
       .forEach(b => b.setAttribute("aria-pressed", !allM && state.methods.has(b.dataset.m)));
     root.querySelectorAll("#scopes button").forEach(b => b.setAttribute("aria-pressed", b.dataset.s === state.scope));
     root.querySelectorAll("#view button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === state.view));
+    root.querySelectorAll("#status button").forEach(b => b.setAttribute("aria-pressed", b.dataset.st === state.status));
     $("onlyopen").checked = state.onlyOpen;
-    const n = (state.scope !== "all") + state.onlyOpen;
+    const n = (state.scope !== "all") + state.onlyOpen + (state.status !== "all");
     $("fcount").hidden = !n;
     $("fcount").textContent = n;
     $("fbtn").setAttribute("aria-label", L("Filtry", "Filters") + (n ? ` (${L("aktywne", "active")}: ${n})` : ""));
@@ -293,9 +321,10 @@ function bootApiMap(root, onNav, embed) {
 
   /* ---------- tree ---------- */
   const words = () => (state.q ? state.q.split(/\s+/) : []);
-  /* anyMethod: count per method buttons ignores the method filter itself. */
-  function match(ep, anyMethod) {
+  /* anyMethod / anyStatus: the counts on those buttons ignore their own filter. */
+  function match(ep, anyMethod, anyStatus) {
     if (!anyMethod && !state.methods.has(ep.m)) return false;
+    if (!anyStatus && !STATUS[state.status](ep)) return false;
     if (state.scope !== "all" && scopeOf(ep.p) !== state.scope) return false;
     if (state.onlyOpen && ep.a) return false;
     if (state.q) {
@@ -393,9 +422,10 @@ function bootApiMap(root, onNav, embed) {
       `${flags(ep)}${inTag ? "" : `<span class="ht">${hl(ep.t || "")}</span>`}</button>`
     );
   }
-  /* While searching, each API chip shows its own number of hits, so results in another API are never invisible. */
+  /* While searching or filtering by status, each API chip shows its own number of hits, so results in another API are never invisible. */
   function chipCounts() {
-    const n = new Map(LIST.map(a => [a.key, state.q ? a.eps.filter(ep => match(ep)).length : a.eps.length]));
+    const hit = !!state.q || state.status !== "all";
+    const n = new Map(LIST.map(a => [a.key, hit ? a.eps.filter(ep => match(ep)).length : a.eps.length]));
     n.set(
       "all",
       [...n.values()].reduce((x, y) => x + y, 0)
@@ -403,7 +433,7 @@ function bootApiMap(root, onNav, embed) {
     root.querySelectorAll("#apis .chip").forEach(b => {
       const k = n.get(b.dataset.k);
       b.querySelector("span").textContent = k;
-      b.classList.toggle("zero", !!state.q && !k);
+      b.classList.toggle("zero", hit && !k);
     });
     return n;
   }
@@ -411,7 +441,7 @@ function bootApiMap(root, onNav, embed) {
   /* Active filters as removable pills, plus expand/collapse while the tree is on screen. */
   function toolsHtml(flat) {
     const btn = (k, text, aria) =>
-      `<button type="button" class="${k === "scope" || k === "open" ? "pill" : "tool"}" data-t="${k}"${aria ? ` aria-label="${esc(aria)}"` : ""}>${text}</button>`;
+      `<button type="button" class="${k === "scope" || k === "open" || k === "status" ? "pill" : "tool"}" data-t="${k}"${aria ? ` aria-label="${esc(aria)}"` : ""}>${text}</button>`;
     const rm = L("Usuń filtr: ", "Remove filter: ");
     let h = "";
     if (state.scope !== "all") {
@@ -419,6 +449,10 @@ function bootApiMap(root, onNav, embed) {
       h += btn("scope", esc(l) + " ×", rm + l);
     }
     if (state.onlyOpen) h += btn("open", "OPEN ×", rm + "OPEN");
+    if (state.status !== "all") {
+      const l = statuses().find(x => x[0] === state.status)[1];
+      h += btn("status", l + " ×", rm + l);
+    }
     if (h || state.methods.size < METHODS.length) h += btn("clear", L("Wyczyść filtry", "Clear filters"));
     if (!flat)
       h +=
@@ -447,6 +481,12 @@ function bootApiMap(root, onNav, embed) {
     for (const a of apis) for (const ep of a.eps) if (match(ep, true)) mc[ep.m]++;
     root.querySelectorAll("#methods button").forEach(b => {
       b.querySelector(".mc").textContent = mc[b.dataset.m];
+    });
+    const sc = { all: 0, dep: 0, leg: 0, old: 0 };
+    for (const a of apis)
+      for (const ep of a.eps) if (match(ep, false, true)) for (const k in sc) sc[k] += STATUS[k](ep);
+    root.querySelectorAll("#status .mc").forEach(m => {
+      m.textContent = sc[m.parentNode.dataset.st];
     });
     const hits = chipCounts();
     const showIn = !!state.q && LIST.length > 1 && state.api !== "all";
