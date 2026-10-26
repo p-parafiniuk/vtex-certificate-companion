@@ -2,7 +2,8 @@
 
 A study app for VTEX certifications, starting with the **VTEX APIs badge**. It ships as one self-contained HTML file, `vtex-api-drill.html`. Open it from disk and it works offline, with no server, no account and no tracking. Progress stays in your browser's localStorage, and you can export it to a file.
 
-<img width="1321" height="1205" alt="VTEX API Drill: the Pytania tab with the category side panel" src="https://github.com/user-attachments/assets/655f82a7-deec-4b7b-8ace-828d7bcec34f" />
+<img width="944" height="1249" alt="Screenshot 2026-10-26 at 15 38 22" src="https://github.com/user-attachments/assets/49108d83-89da-4108-868d-9a1ac282d17d" />
+
 
 > Unofficial study material. Not affiliated with, endorsed or sponsored by VTEX. The questions do not come from the real exam.
 
