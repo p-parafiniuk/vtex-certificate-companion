@@ -18,6 +18,7 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 | `npm run stats` | table of questions per domain × round, to find gaps |
 | `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
 | `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
+| `npm run prune` | list branches merged into `origin/main` and the unmerged ones with their PR state; `-- --apply` deletes the merged ones (see `/maintenance`) |
 | `node scripts/apimap-import.mjs <key> "<name>" "<schema file>" <ref>` | add or refresh one API Map entry from vtex/openapi-schemas (keeps hand-set LEGACY/DEPR flags) |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json` |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
@@ -96,7 +97,7 @@ Prettier formats the code (`.prettierrc.json`: 120 columns, double quotes, no tr
 - PR title in English, imperative. The body lists what changed, how it was verified (`npm run format`, `npm run check`, the shots), and includes the screenshots.
 
 ## Skills and reviewers
-`/feature`, `/fix`, `/ux`, `/security`, `/gamify` do the work. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.
+`/feature`, `/fix`, `/ux`, `/security`, `/gamify` do the work. `/maintenance` prunes branches and checks repo health. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.
 
 ## Verifying a change
 1. Run `npm run check`. It must be green, with no warnings you didn't expect.
