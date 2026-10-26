@@ -1457,8 +1457,11 @@ body:has(.info-dlg[open]) {
   color: var(--bg);
   cursor: default;
 }
-/* Until app.js has rendered (see the boot script in index.html); a focus link also keeps the bar it would hide. */
-:root[data-boot] .wrap,
+/* Until app.js has rendered (see the boot script in index.html). data-boot is "" on a normal load, so match on presence.
+   visibility, not display: app.js measures the category strip while it renders. A focus link also drops the bar it hides. */
+:root[data-boot] .wrap {
+  visibility: hidden;
+}
 :root[data-boot="focus"] .bar {
   display: none;
 }
