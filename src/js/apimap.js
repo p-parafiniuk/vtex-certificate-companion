@@ -3,7 +3,7 @@
    the shared tree/list choice, and opens API Reference links through onDoc (the category's docs frame) instead of a new tab. */
 function bootApiMap(root, onNav, embed) {
   "use strict";
-  /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated (dt date, dr replacement), q query (* = required), a auth, b body, r responses}] */
+  /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated (dt date), lg legacy, dr replacement, q query (* = required), a auth, b body, r responses}] */
   /*@data APIMAP*/
   const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
   /* UI language comes from <html lang>, which the main app sets; relang() redraws after a switch. */
@@ -358,15 +358,20 @@ function bootApiMap(root, onNav, embed) {
     const segHtml = esc(n.name).replace(/\{[^}]+\}/g, m => `<span class="seg param">${m}</span>`);
     let h = `<details data-key="${esc(n.key)}"${open ? " open" : ""}><summary${isApiRoot ? ' class="apiroot"' : ""}><span class="caret" aria-hidden="true">▸</span><span class="seg">${segHtml}${isApiRoot ? "" : "/"}</span><span class="n">${total}</span></summary><div class="kids">`;
     for (const ep of [...n.eps].sort((a, b) => ord(a.m) - ord(b.m)))
-      h += `<button type="button" class="ep${ep.d ? " depr" : ""}" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span><span class="s">${hl(ep.s || L("(brak opisu)", "(no description)"))}</span>${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? depFlag() : ""}<span class="t">${esc(ep.t)}</span></button>`;
+      h += `<button type="button" class="ep${ep.d ? " depr" : ""}" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span><span class="s">${hl(ep.s || L("(brak opisu)", "(no description)"))}</span>${flags(ep)}<span class="t">${esc(ep.t)}</span></button>`;
     for (const c of [...n.kids.values()].sort((a, b) => a.name.localeCompare(b.name)))
       h += renderNode(c, depth + 1, false);
     return h + "</div></details>";
   }
 
   const depFlag = () => `<span class="flag dep" title="${L("Wycofywany (deprecated)", "Deprecated")}">DEPR</span>`;
-  /* d comes from the schema text, not a flag: vtex/openapi-schemas marks none of these operations deprecated: true. */
+  const legFlag = () =>
+    `<span class="flag leg" title="${L("Endpoint legacy: schemat zaleca nowszy", "Legacy: the schema recommends a newer endpoint")}">LEGACY</span>`;
+  const flags = ep => (ep.a ? "" : '<span class="flag open">OPEN</span>') + (ep.d ? depFlag() : ep.lg ? legFlag() : "");
+  /* d and lg come from the schema text, not a flag: vtex/openapi-schemas marks none of these operations deprecated: true. */
   function depHtml(ep) {
+    if (!ep.d && ep.lg)
+      return `<div class="dep-note leg">${legFlag()}<span><b>${L("Endpoint legacy", "Legacy endpoint")}</b>${ep.dr ? `. ${L("Zalecany zamiennik", "Recommended instead")}: <code>${esc(ep.dr)}</code>` : ""}</span></div>`;
     if (!ep.d) return "";
     const day = /^\d{4}-\d{2}-\d{2}$/.test(ep.dt || "")
       ? new Date(ep.dt + "T00:00:00Z").toLocaleDateString(L("pl-PL", "en-GB"), {
@@ -385,7 +390,7 @@ function bootApiMap(root, onNav, embed) {
     return (
       `<button type="button" class="ep hit${ep.d ? " depr" : ""}" aria-expanded="false" data-id="${esc(idOf(ep))}"><span class="m ${ep.m}">${ep.m}</span>` +
       `<span class="hp"><span class="p">${pathHtml(ep.p)}</span><span class="hs">${hl(ep.s || L("(brak opisu)", "(no description)"))}${many ? " · " + esc(ep.api.name) : ""}</span></span>` +
-      `${ep.a ? "" : '<span class="flag open">OPEN</span>'}${ep.d ? depFlag() : ""}${inTag ? "" : `<span class="ht">${hl(ep.t || "")}</span>`}</button>`
+      `${flags(ep)}${inTag ? "" : `<span class="ht">${hl(ep.t || "")}</span>`}</button>`
     );
   }
   /* While searching, each API chip shows its own number of hits, so results in another API are never invisible. */
