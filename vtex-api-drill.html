@@ -10,7 +10,7 @@
 <script>(function () { try { var d = JSON.parse(localStorage.getItem("vtex-drill-v1") || "{}"), t = d.theme; if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); if (d.lang === "en") document.documentElement.lang = "en"; } catch (e) { /* system theme, Polish */ } })();</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one 860px working column under a sticky bar that always shows progress: mastered questions, flashcards, accuracy and last simulation against the 80% pass line.
+/* Layout: one 860px working column under a dark sticky navigation bar. A progress card opens the page: mastered overall, then questions, flashcards, accuracy and last simulation against the 80% pass line.
    Surfaces stay flat and quiet; colour is reserved for answer state and for what is mastered. */
 :root {
   --bg: #f5f2f6;
@@ -31,6 +31,10 @@
   --k3-soft: #fbf3e6;
   --k5: #7238bd;
   --kshadow: rgb(28 22 34 / 0.22);
+  --nav-bg: #1c1622;
+  --nav-ink: #f2edf5;
+  --nav-muted: #c9bfd2;
+  --nav-line: #4a3f52;
   --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -55,6 +59,10 @@
     --k3-soft: #3a2a12;
     --k5: #c0a0ff;
     --kshadow: rgb(0 0 0 / 0.55);
+    --nav-bg: #0f0b12;
+    --nav-ink: #f2edf5;
+    --nav-muted: #a89db2;
+    --nav-line: #382e40;
     color-scheme: dark;
   }
 }
@@ -77,6 +85,10 @@
   --k3-soft: #3a2a12;
   --k5: #c0a0ff;
   --kshadow: rgb(0 0 0 / 0.55);
+  --nav-bg: #0f0b12;
+  --nav-ink: #f2edf5;
+  --nav-muted: #a89db2;
+  --nav-line: #382e40;
   color-scheme: dark;
 }
 
@@ -124,50 +136,33 @@ a {
   white-space: nowrap;
 }
 
-/* sticky bar */
+/* sticky bar: navigation only, on its own dark band so it never blends with the page below */
 .bar {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
   z-index: 5;
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
+  background: var(--nav-bg);
+  color: var(--nav-ink);
+}
+.bar :focus-visible {
+  outline-color: var(--nav-ink);
 }
 .bar-in {
-  max-width: 860px;
+  max-width: 1112px;
   margin-inline: auto;
-  padding: 10px 16px 0;
-  display: grid;
-  gap: 8px;
-}
-.brand {
+  padding: 8px 16px;
   display: flex;
   align-items: center;
-  gap: 12px 16px;
-  flex-wrap: wrap;
+  gap: 4px 24px;
+  min-height: 60px;
 }
-.brand h1 {
-  font: 700 1.25rem/1.1 var(--f-display);
+.bar h1 {
+  font: 700 1.3rem/1.1 var(--f-display);
   margin: 0;
   letter-spacing: -0.01em;
-}
-.total {
-  margin-left: auto;
-  font: 500 0.82rem var(--f-mono);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.total b {
-  color: var(--ink);
-  font: 700 1.05rem var(--f-display);
-}
-.navrow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-.navrow .tabs {
+.bar .tabs {
   flex: 1;
   min-width: 0;
 }
@@ -177,46 +172,220 @@ a {
   height: 44px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--surface);
-  color: var(--ink);
+  border: 0;
+  border-radius: 99px;
+  background: none;
+  color: var(--nav-muted);
   padding: 0;
   cursor: pointer;
 }
+.bar .tabs + .theme-btn {
+  margin-left: -20px;
+}
 .theme-btn:hover {
-  border-color: var(--muted);
+  color: var(--nav-ink);
+}
+/* The back link to a question only shows in HTTP Koty; there it takes its own line under the tabs. */
+#back-q {
+  order: 4;
+  min-height: 44px;
+}
+.bar-in:has(#back-q:not([hidden])) {
+  flex-wrap: wrap;
+}
+.bar-in:has(#back-q:not([hidden]))::after {
+  content: "";
+  order: 3;
+  flex-basis: 100%;
+}
+@media (max-width: 920px) {
+  .bar-in {
+    flex-wrap: wrap;
+    padding-block: 6px 8px;
+    min-height: 0;
+  }
+  .bar-in {
+    position: relative;
+  }
+  .bar h1 {
+    flex: 1;
+  }
+  /* On two rows Settings joins the theme switch on the top row, so the tabs fit a phone without scrolling. */
+  .tab-set {
+    position: absolute;
+    top: 6px;
+    right: 60px;
+  }
+  .bar .tabs {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+
+/* progress card: the overall score leads, the four parts follow as quiet KPIs */
+.pcard {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px 22px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px 28px;
+  align-items: center;
+}
+.pc-all {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.ring {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  transform: rotate(-90deg);
+}
+.ring circle {
+  fill: none;
+  stroke: var(--code);
+  stroke-width: 6;
+}
+.ring #pm-all {
+  stroke: var(--accent);
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.3s ease;
+}
+/* A round cap would draw a dot at 0%. */
+.ring #pm-all[stroke-dasharray^="0 "] {
+  stroke: none;
+}
+.pc-sum {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pc-sum > b {
+  font: 700 1.85rem/1 var(--f-display);
+}
+.pc-sub {
+  font-size: 0.82rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.pc-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
 }
 .prog {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px 14px;
+  gap: 10px 24px;
+  border-left: 1px solid var(--line);
+  padding-left: 28px;
 }
 .pg {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: baseline;
-  gap: 2px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   min-width: 0;
 }
 .pg-k {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
+  font-size: 0.78rem;
   color: var(--muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .pg-v {
-  font: 500 0.84rem var(--f-mono);
+  font: 500 1.2rem var(--f-mono);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+.pg:has(i.ok) .pg-v {
+  color: var(--ok);
+}
+.pg:has(i.no) .pg-v {
+  color: var(--bad);
+}
 .pg .meter {
-  grid-column: 1 / -1;
-  height: 5px;
+  flex: none;
+  height: 4px;
+  background: var(--code);
+}
+.pg .meter i:not(.ok):not(.no) {
+  background: var(--ink);
+}
+@media (max-width: 760px) {
+  .pcard {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 12px 14px;
+    gap: 10px;
+    border-radius: 14px;
+  }
+  .prog {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    padding-top: 12px;
+    gap: 10px;
+  }
+}
+@media (max-width: 480px) {
+  .ring {
+    width: 44px;
+    height: 44px;
+  }
+  .pc-sum > b {
+    font-size: 1.5rem;
+  }
+  /* Phone: streak and goal stack on the right of the score, so the card stays two rows tall. */
+  .pc-sum {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 8px;
+  }
+  .pc-chips {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-top: 0;
+  }
+  .pc-sub {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.78rem;
+  }
+  .pc-chips .goal {
+    padding: 0;
+    background: none;
+  }
+  .pc-chips .goal .meter {
+    display: none;
+  }
+  .pc-chips .gx-head {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .pg-k {
+    font-size: 0.7rem;
+  }
+  .pg-v {
+    font-size: 0.86rem;
+  }
+  .pg {
+    gap: 5px;
+  }
+  .pg .meter {
+    height: 3px;
+  }
 }
 .meter {
   position: relative;
@@ -242,14 +411,6 @@ a {
 .meter i.no {
   background: var(--bad);
 }
-@media (max-width: 480px) {
-  .prog {
-    gap: 8px 10px;
-  }
-  .pg {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 .meter i {
   display: block;
   height: 100%;
@@ -266,57 +427,57 @@ a {
 }
 .tabs {
   display: flex;
-  gap: 4px;
+  align-items: center;
+  gap: 2px;
   overflow-x: auto;
+  scrollbar-width: none;
 }
-/* No shrinking below the label: on the narrowest phones the row scrolls instead of overlapping. */
+/* The transparent border keeps a 44 px hit area around a 36 px pill. No shrinking: narrow phones scroll the row. */
 .tab {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  border: 4px solid transparent;
+  border-radius: 99px;
   background: none;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  padding: 8px 12px;
+  background-clip: padding-box;
+  padding: 0 10px;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--nav-muted);
   cursor: pointer;
   white-space: nowrap;
 }
+.tab .num {
+  font: 500 0.75rem var(--f-mono);
+  opacity: 0.8;
+}
 .tab:hover {
-  color: var(--ink);
+  color: var(--nav-ink);
 }
 @media (max-width: 480px) {
+  .bar .tabs {
+    gap: 0;
+  }
   .tab {
+    justify-content: center;
     min-width: 44px;
-    min-height: 44px;
-    padding: 8px 4px;
-    font-size: 0.92rem;
+    border-inline-width: 0;
+    padding: 0 7px;
+    font-size: 0.9rem;
   }
-  .navrow {
-    gap: 6px;
+  .tab-x {
+    margin-left: 11px;
   }
-  .theme-btn {
-    width: 36px;
-  }
-  .tabs {
-    justify-content: space-between;
-  }
-}
-/* Seven tabs: still one row without scrolling from 375 to 430 px. */
-@media (max-width: 430px) {
-  .tab {
-    min-width: 44px;
-    min-height: 44px;
-    padding: 8px 4px;
-    font-size: 0.84rem;
-  }
-  .tabs {
-    gap: 2px;
-    justify-content: flex-start;
+  .tab-x::before {
+    left: -10px;
   }
 }
 .tab[aria-selected="true"] {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
+  background-color: var(--nav-ink);
+  color: var(--nav-bg);
+  font-weight: 600;
 }
 
 /* page */
@@ -1258,6 +1419,7 @@ body:has(.info-dlg[open]) {
   cursor: default;
 }
 body[data-view="focus"] .bar,
+body[data-view="focus"] .pcard,
 body[data-view="focus"] .src {
   display: none;
 }
@@ -1754,8 +1916,19 @@ kbd {
 }
 
 /* HTTP Koty: a separate view. It inherits the drill's neutrals and fonts; only the status-class hues are its own. */
+/* Supplements sit after a thin rule; Settings is pushed to the far end, next to the theme switch. */
 .tab-x {
-  margin-left: auto;
+  position: relative;
+  margin-left: 17px;
+}
+.tab-x::before {
+  content: "";
+  position: absolute;
+  left: -13px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: var(--nav-line);
 }
 /* Long tab names ("Symulacja", English labels) get a short form on phones. */
 .tab-short {
@@ -1768,9 +1941,6 @@ kbd {
   }
   .tab-short {
     display: inline;
-  }
-  .tab-x {
-    margin-left: 0;
   }
 }
 #koty {
@@ -1789,15 +1959,11 @@ kbd {
   --font-body: var(--f-body);
   --font-mono: var(--f-mono);
 }
-body[data-view="http"] .brand,
-body[data-view="http"] .prog,
-body[data-view="api"] .brand,
-body[data-view="api"] .prog {
+body[data-view="http"] .pcard,
+body[data-view="api"] .pcard {
   display: none;
 }
-body[data-view="http"] .bar-in,
 body[data-view="http"] .wrap,
-body[data-view="api"] .bar-in,
 body[data-view="api"] .wrap {
   max-width: 1112px;
 }
@@ -1822,9 +1988,6 @@ body[data-view="api"] .wrap {
   --warn: var(--k3);
   --warn-soft: var(--k3-soft);
 }
-#back-q {
-  margin-bottom: 2px;
-}
 .hchip {
   font: 500 0.82rem var(--f-mono);
   border: 1px solid var(--line);
@@ -1838,7 +2001,6 @@ body[data-view="api"] .wrap {
 }
 
 /* Categories: a side panel of areas next to the working column. Under 760 px it turns into one scrolling row above it. */
-body[data-view="pytania"] .bar-in,
 body[data-view="pytania"] .wrap {
   max-width: 1112px;
 }
@@ -2255,7 +2417,7 @@ body[data-view="pytania"] .wrap {
 .gx-head {
   display: inline-flex;
   align-items: center;
-  gap: 8px 12px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .streak {
@@ -2289,40 +2451,27 @@ body[data-view="pytania"] .wrap {
 .goal {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  background: var(--code);
+  color: var(--muted);
+  font: 500 0.8rem var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .goal .meter {
-  width: 96px;
+  margin-left: 3px;
+  background: var(--line);
+  width: 40px;
   flex: none;
   height: 6px;
 }
-@media (max-width: 480px) {
-  .gx-head {
-    order: 3;
-    flex-basis: 100%;
-  }
-  .goal {
-    flex: 1;
-  }
-  .goal .meter {
-    flex: 1;
-    width: auto;
-  }
-}
 .tab-set {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-@media (max-width: 480px) {
-  .tab-set {
-    justify-content: center;
-  }
-}
-@media (max-width: 430px) {
-  .theme-btn {
-    display: none;
-  }
+  margin-left: auto;
+  justify-content: center;
+  min-width: 44px;
+  padding: 0 6px;
 }
 .linkbtn {
   border: 0;
@@ -2954,38 +3103,44 @@ div.setrow {
 
 <header class="bar">
   <div class="bar-in">
-    <div class="brand">
-      <h1>VTEX API Drill</h1>
-      <span class="gx-head" id="gx-head">
-        <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu" data-en-title="Streak: days of study in a row"></span>
-        <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego" data-en-title="Today's answers against your daily goal"><span class="pg-k" data-en="Today">Dziś</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span><span class="pg-v" id="gx-gv">0/20</span></span>
-      </span>
-      <button type="button" class="due" id="gx-due" title="Karty, których termin powtórki minął. Kliknij, aby powtarzać w trybie Focus." data-en-title="Cards whose review day has come. Click to review them in Focus mode." hidden></button>
-      <span class="total" title="Opanowane razem (ustawiasz w Postęp)" data-en-title="Mastered together (set in Progress)"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> <span data-en="mastered">opanowane</span></span>
-    </div>
-    <div class="prog" aria-label="Postęp nauki" data-en-aria="Study progress">
-      <div class="pg" title="Pytania oznaczone jako Umiem" data-en-title="Questions marked as known"><span class="pg-k" data-en="Questions">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
-      <div class="pg" title="Fiszki oznaczone jako Umiem" data-en-title="Flashcards marked as known"><span class="pg-k" data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
-      <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%" data-en-title="Share of right answers in study mode. Line = 80% pass mark"><span class="pg-k" data-en="Accuracy">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
-      <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%" data-en-title="Score of the last simulation. Line = 80% pass mark"><span class="pg-k" data-en="Simulation">Symulacja</span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
-    </div>
+    <h1>VTEX API Drill</h1>
+    <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
+      <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
+      <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja"><span data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span> <span class="num">36+4</span></button>
+      <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
+      <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
+      <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
+      <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
+      <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button>
+    </nav>
+    <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
     <button type="button" class="btn small" id="back-q" hidden></button>
-    <div class="navrow">
-      <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
-        <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
-        <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja"><span data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span> <span class="num">36+4</span></button>
-        <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
-        <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
-        <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
-        <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
-        <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg><span class="tab-long" data-en="Settings">Ustawienia</span></button>
-      </nav>
-      <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
-    </div>
   </div>
 </header>
 
 <main class="wrap">
+  <section class="pcard" aria-label="Postęp nauki" data-en-aria="Study progress">
+    <div class="pc-all" title="Opanowane razem (ustawiasz w Postęp)" data-en-title="Mastered together (set in Progress)">
+      <svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" pathLength="100"/><circle id="pm-all" cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="0 100"/></svg>
+      <div class="pc-sum">
+        <b id="m-all-pct">0%</b>
+        <span class="pc-sub"><span data-en="mastered">opanowane</span> · <span id="m-all-label">0 / 196</span></span>
+        <span class="pc-chips">
+          <span class="gx-head" id="gx-head">
+            <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu" data-en-title="Streak: days of study in a row"></span>
+            <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego" data-en-title="Today's answers against your daily goal"><span data-en="Today">Dziś</span> <span id="gx-gv">0/20</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span></span>
+          </span>
+          <button type="button" class="due" id="gx-due" title="Karty, których termin powtórki minął. Kliknij, aby powtarzać w trybie Focus." data-en-title="Cards whose review day has come. Click to review them in Focus mode." hidden></button>
+        </span>
+      </div>
+    </div>
+    <div class="prog">
+      <div class="pg" title="Pytania oznaczone jako Umiem" data-en-title="Questions marked as known"><span class="pg-k" data-en="Questions">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
+      <div class="pg" title="Fiszki oznaczone jako Umiem" data-en-title="Flashcards marked as known"><span class="pg-k" data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
+      <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%" data-en-title="Share of right answers in study mode. Line = 80% pass mark"><span class="pg-k" data-en="Accuracy">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
+      <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%" data-en-title="Score of the last simulation. Line = 80% pass mark"><span class="pg-k" data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
+    </div>
+  </section>
   <p class="notice" id="storage-warn" data-en="Your browser blocks local storage. Progress will be lost when you close this page." hidden>Przeglądarka blokuje zapis lokalny. Postęp zniknie po zamknięciu tej strony.</p>
 
   <section class="panel" id="p-pytania" role="tabpanel" aria-labelledby="t-pytania" hidden>
@@ -12289,6 +12444,7 @@ const APIMAP = [
     checkBadges(c, quiet);
     paintGx();
     $("#m-all-pct").textContent = o.total ? Math.round((o.done / o.total) * 100) + "%" : "–";
+    $("#pm-all").setAttribute("stroke-dasharray", (o.total ? (o.done / o.total) * 100 : 0) + " 100");
     $("#m-all-label").textContent = o.done + " / " + o.total;
     $("#pg-q").textContent = c.kq + "/" + Q.length;
     bar("#pm-q", (c.kq / Q.length) * 100);

@@ -15,38 +15,44 @@
 
 <header class="bar">
   <div class="bar-in">
-    <div class="brand">
-      <h1>VTEX API Drill</h1>
-      <span class="gx-head" id="gx-head">
-        <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu" data-en-title="Streak: days of study in a row"></span>
-        <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego" data-en-title="Today's answers against your daily goal"><span class="pg-k" data-en="Today">Dziś</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span><span class="pg-v" id="gx-gv">0/20</span></span>
-      </span>
-      <button type="button" class="due" id="gx-due" title="Karty, których termin powtórki minął. Kliknij, aby powtarzać w trybie Focus." data-en-title="Cards whose review day has come. Click to review them in Focus mode." hidden></button>
-      <span class="total" title="Opanowane razem (ustawiasz w Postęp)" data-en-title="Mastered together (set in Progress)"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> <span data-en="mastered">opanowane</span></span>
-    </div>
-    <div class="prog" aria-label="Postęp nauki" data-en-aria="Study progress">
-      <div class="pg" title="Pytania oznaczone jako Umiem" data-en-title="Questions marked as known"><span class="pg-k" data-en="Questions">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
-      <div class="pg" title="Fiszki oznaczone jako Umiem" data-en-title="Flashcards marked as known"><span class="pg-k" data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
-      <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%" data-en-title="Share of right answers in study mode. Line = 80% pass mark"><span class="pg-k" data-en="Accuracy">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
-      <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%" data-en-title="Score of the last simulation. Line = 80% pass mark"><span class="pg-k" data-en="Simulation">Symulacja</span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
-    </div>
+    <h1>VTEX API Drill</h1>
+    <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
+      <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
+      <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja"><span data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span> <span class="num">36+4</span></button>
+      <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
+      <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
+      <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
+      <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
+      <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button>
+    </nav>
+    <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
     <button type="button" class="btn small" id="back-q" hidden></button>
-    <div class="navrow">
-      <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
-        <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
-        <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja"><span data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span> <span class="num">36+4</span></button>
-        <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
-        <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
-        <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
-        <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
-        <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg><span class="tab-long" data-en="Settings">Ustawienia</span></button>
-      </nav>
-      <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
-    </div>
   </div>
 </header>
 
 <main class="wrap">
+  <section class="pcard" aria-label="Postęp nauki" data-en-aria="Study progress">
+    <div class="pc-all" title="Opanowane razem (ustawiasz w Postęp)" data-en-title="Mastered together (set in Progress)">
+      <svg class="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" pathLength="100"/><circle id="pm-all" cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="0 100"/></svg>
+      <div class="pc-sum">
+        <b id="m-all-pct">0%</b>
+        <span class="pc-sub"><span data-en="mastered">opanowane</span> · <span id="m-all-label">0 / 196</span></span>
+        <span class="pc-chips">
+          <span class="gx-head" id="gx-head">
+            <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu" data-en-title="Streak: days of study in a row"></span>
+            <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego" data-en-title="Today's answers against your daily goal"><span data-en="Today">Dziś</span> <span id="gx-gv">0/20</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span></span>
+          </span>
+          <button type="button" class="due" id="gx-due" title="Karty, których termin powtórki minął. Kliknij, aby powtarzać w trybie Focus." data-en-title="Cards whose review day has come. Click to review them in Focus mode." hidden></button>
+        </span>
+      </div>
+    </div>
+    <div class="prog">
+      <div class="pg" title="Pytania oznaczone jako Umiem" data-en-title="Questions marked as known"><span class="pg-k" data-en="Questions">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
+      <div class="pg" title="Fiszki oznaczone jako Umiem" data-en-title="Flashcards marked as known"><span class="pg-k" data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
+      <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%" data-en-title="Share of right answers in study mode. Line = 80% pass mark"><span class="pg-k" data-en="Accuracy">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
+      <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%" data-en-title="Score of the last simulation. Line = 80% pass mark"><span class="pg-k" data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
+    </div>
+  </section>
   <p class="notice" id="storage-warn" data-en="Your browser blocks local storage. Progress will be lost when you close this page." hidden>Przeglądarka blokuje zapis lokalny. Postęp zniknie po zamknięciu tej strony.</p>
 
   <section class="panel" id="p-pytania" role="tabpanel" aria-labelledby="t-pytania" hidden>

@@ -4226,6 +4226,7 @@
     checkBadges(c, quiet);
     paintGx();
     $("#m-all-pct").textContent = o.total ? Math.round((o.done / o.total) * 100) + "%" : "–";
+    $("#pm-all").setAttribute("stroke-dasharray", (o.total ? (o.done / o.total) * 100 : 0) + " 100");
     $("#m-all-label").textContent = o.done + " / " + o.total;
     $("#pg-q").textContent = c.kq + "/" + Q.length;
     bar("#pm-q", (c.kq / Q.length) * 100);
