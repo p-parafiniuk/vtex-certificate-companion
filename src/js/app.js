@@ -774,7 +774,8 @@
         " " +
         fmt(q.e) +
         "</p>" +
-        (ok ? "" : docLinks(q) + httpChips(q)) +
+        docLinks(q) +
+        httpChips(q) +
         (mode === "learn"
           ? rvLine("q" + n) +
             '<button type="button" class="btn small retry">' +
