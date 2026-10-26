@@ -353,7 +353,7 @@
           self: rs.self || {},
           cur: rs.cur | 0,
           start: +rs.start || Date.now(),
-          endAt: +rs.endAt || Date.now(),
+          endAt: isFinite(+rs.endAt) && +rs.endAt ? +rs.endAt : Date.now(),
           dur: +rs.dur || 120,
           done: !!rs.done,
           used: rs.used | 0,
@@ -1482,12 +1482,42 @@
       return;
     }
     var left = m.endAt - Date.now();
+    paintCta(left);
     var el = $("#sim-timer");
     if (el) {
       el.textContent = clock(left);
       el.classList.toggle("low", left < 600000);
     }
     if (left <= 0) finishSim(true);
+  }
+  /* The header button: a fresh start, or the way back to a running exam with its clock. */
+  function paintCta(left) {
+    var a = $("#sim-cta"),
+      run = S.sim && !S.sim.done;
+    if (run && left === undefined) left = S.sim.endAt - Date.now();
+    var html = run
+      ? ICON.clock +
+        '<span class="tab-long">' +
+        L("Wróć do testu", "Back to the exam") +
+        "</span> " +
+        '<span class="num">' +
+        esc(clock(left)) +
+        "</span>"
+      : ICON.play +
+        '<span class="tab-long">' +
+        L("Zacznij symulację", "Start the simulation") +
+        '</span><span class="tab-short">' +
+        L("Test", "Exam") +
+        '</span> <span class="num tab-long">' +
+        SIM_Q +
+        "+" +
+        SIM_P +
+        "</span>";
+    if (a.dataset.html !== html) a.innerHTML = a.dataset.html = html;
+    a.classList.toggle("run", !!run);
+    a.title = run ? L("Symulacja trwa: zostało ", "Exam running: ") + clock(left) + L("", " left") : "";
+    if (CUR === "symulacja") a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
   }
   function startTick() {
     stopTick();
@@ -1889,6 +1919,7 @@
   function renderSim() {
     var root = $("#simroot");
     $("#p-symulacja").dataset.state = !S.sim ? "setup" : S.sim.done ? "done" : "run";
+    paintCta();
     if (!S.sim) {
       stopTick();
       root.innerHTML = simSetup();
@@ -3381,6 +3412,8 @@
     return '<svg viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>";
   }
   var ICON = {
+    play: svg('<path class="fill" d="M8 5.5v13l10-6.5z"/>'),
+    clock: svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/>'),
     psec: svg('<path d="M6 5v14M19 5l-9 7 9 7z"/>'),
     nsec: svg('<path d="M18 5v14M5 5l9 7-9 7z"/>'),
     flame: svg(
@@ -4225,6 +4258,7 @@
       o = overall(c);
     checkBadges(c, quiet);
     paintGx();
+    paintCta();
     $("#m-all-pct").textContent = o.total ? Math.round((o.done / o.total) * 100) + "%" : "–";
     $("#pm-all").setAttribute("stroke-dasharray", (o.total ? (o.done / o.total) * 100 : 0) + " 100");
     $("#m-all-label").textContent = o.done + " / " + o.total;
@@ -4398,7 +4432,8 @@
     r.tab = tab;
     TABS.forEach(function (t) {
       $("#p-" + t).hidden = t !== tab;
-      $("#t-" + t).setAttribute("aria-selected", t === tab);
+      var tb = $("#t-" + t);
+      if (tb) tb.setAttribute("aria-selected", t === tab);
     });
     $("#p-focus").hidden = tab !== "focus";
     /* Focus reuses the list's card markup and ids, so only one of the two is ever in the document. */
@@ -4406,6 +4441,7 @@
     if (tab !== "pytania") clearDocs();
     document.body.dataset.view = tab;
     CUR = tab;
+    paintCta();
     if (tab === "pytania") {
       /* history.state is stored data: keep only a known category and section. */
       if (!DOM_NAME[r.cat]) {
@@ -4557,6 +4593,13 @@
     ev.preventDefault();
     if (CUR === "pytania" && !NAV.cur.cat) window.scrollTo(0, 0);
     else go({ tab: "pytania" });
+  });
+
+  $("#sim-cta").addEventListener("click", function (ev) {
+    if (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    ev.preventDefault();
+    if (CUR === "symulacja") window.scrollTo(0, 0);
+    else go({ tab: "symulacja" });
   });
 
   document.querySelector(".tabs").addEventListener("click", function (ev) {
