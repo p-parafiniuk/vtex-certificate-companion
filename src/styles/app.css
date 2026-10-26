@@ -2731,3 +2731,209 @@ div.setrow {
 .setrow .seg-b {
   min-height: 44px;
 }
+
+/* Reviews: the due chip uses the amber pair, kept apart from the accent of the streak and from right/wrong colours. */
+.due {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 2px 10px;
+  border: 1px solid var(--k3);
+  border-radius: 99px;
+  background: var(--k3-soft);
+  color: var(--k3);
+  font: 700 0.8rem var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+@media (max-width: 520px) {
+  .due {
+    min-height: 44px;
+  }
+}
+.due:hover {
+  color: var(--ink);
+}
+.due svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.conf {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+.conf .how {
+  margin: 0;
+}
+.conf .seg {
+  align-self: flex-start;
+}
+.seg-b.cf {
+  min-height: 44px;
+  cursor: pointer;
+}
+.seg-b.cf[aria-pressed="true"] {
+  cursor: pointer;
+}
+@media (max-width: 520px) {
+  .conf .seg {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .seg-b.cf {
+    padding: 5px 6px;
+  }
+}
+.rv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  font: 0.8rem var(--f-mono);
+  color: var(--muted);
+}
+.rv-pips {
+  display: inline-flex;
+  gap: 3px;
+}
+.rv-pips i {
+  width: 14px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.rv-pips i.on {
+  background: var(--ok);
+}
+.rv-pips i.no {
+  background: var(--bad);
+}
+.rv-sure {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--k3);
+  border-radius: 10px;
+  background: var(--k3-soft);
+  font-size: 0.9rem;
+}
+.rv-sure strong {
+  color: var(--k3);
+}
+.rv-when {
+  margin: 0 0 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.rv-when div {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--code);
+}
+.rv-when div.now {
+  background: var(--k3-soft);
+}
+.rv-when dt {
+  font: 600 0.7rem var(--f-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rv-when dd {
+  margin: 0;
+  font: 700 1.3rem var(--f-mono);
+}
+.rv-when div.now dd {
+  color: var(--k3);
+}
+.rv-boxes,
+.rv-cal,
+.rv-miss ul {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rv-boxes li,
+.rv-cal li {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 70px;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.rv-boxes li {
+  grid-template-columns: 76px minmax(0, 1fr) 32px;
+}
+.rv-boxes .rv-k {
+  font: 0.75rem var(--f-mono);
+  color: var(--muted);
+}
+.rv-boxes b {
+  text-align: right;
+  font-family: var(--f-mono);
+}
+.rv-cal .meter-label {
+  text-align: right;
+}
+.meter i.b1 {
+  background: var(--bad);
+}
+.meter i.b2 {
+  background: var(--k3);
+}
+.meter i.b3 {
+  background: var(--k1);
+}
+.meter i.b4 {
+  background: var(--k5);
+}
+.meter i.b5,
+.meter i.c3 {
+  background: var(--ok);
+}
+.meter i.c1 {
+  background: var(--muted);
+}
+.meter i.c2 {
+  background: var(--k1);
+}
+.rv-miss {
+  margin-top: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--k3);
+  border-radius: 10px;
+  background: var(--k3-soft);
+}
+.rv-miss h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  color: var(--k3);
+}
+.rv-miss ul {
+  margin: 8px 0 0;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.rv-miss li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+.rv-miss .linkbtn {
+  font-family: var(--f-mono);
+  font-weight: 700;
+}

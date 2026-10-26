@@ -2743,6 +2743,212 @@ div.setrow {
 .setrow .seg-b {
   min-height: 44px;
 }
+
+/* Reviews: the due chip uses the amber pair, kept apart from the accent of the streak and from right/wrong colours. */
+.due {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  padding: 2px 10px;
+  border: 1px solid var(--k3);
+  border-radius: 99px;
+  background: var(--k3-soft);
+  color: var(--k3);
+  font: 700 0.8rem var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  cursor: pointer;
+}
+@media (max-width: 520px) {
+  .due {
+    min-height: 44px;
+  }
+}
+.due:hover {
+  color: var(--ink);
+}
+.due svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.conf {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 12px;
+}
+.conf .how {
+  margin: 0;
+}
+.conf .seg {
+  align-self: flex-start;
+}
+.seg-b.cf {
+  min-height: 44px;
+  cursor: pointer;
+}
+.seg-b.cf[aria-pressed="true"] {
+  cursor: pointer;
+}
+@media (max-width: 520px) {
+  .conf .seg {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .seg-b.cf {
+    padding: 5px 6px;
+  }
+}
+.rv {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+  font: 0.8rem var(--f-mono);
+  color: var(--muted);
+}
+.rv-pips {
+  display: inline-flex;
+  gap: 3px;
+}
+.rv-pips i {
+  width: 14px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--line);
+}
+.rv-pips i.on {
+  background: var(--ok);
+}
+.rv-pips i.no {
+  background: var(--bad);
+}
+.rv-sure {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  border: 1px solid var(--k3);
+  border-radius: 10px;
+  background: var(--k3-soft);
+  font-size: 0.9rem;
+}
+.rv-sure strong {
+  color: var(--k3);
+}
+.rv-when {
+  margin: 0 0 14px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.rv-when div {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--code);
+}
+.rv-when div.now {
+  background: var(--k3-soft);
+}
+.rv-when dt {
+  font: 600 0.7rem var(--f-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rv-when dd {
+  margin: 0;
+  font: 700 1.3rem var(--f-mono);
+}
+.rv-when div.now dd {
+  color: var(--k3);
+}
+.rv-boxes,
+.rv-cal,
+.rv-miss ul {
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rv-boxes li,
+.rv-cal li {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr) 70px;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+.rv-boxes li {
+  grid-template-columns: 76px minmax(0, 1fr) 32px;
+}
+.rv-boxes .rv-k {
+  font: 0.75rem var(--f-mono);
+  color: var(--muted);
+}
+.rv-boxes b {
+  text-align: right;
+  font-family: var(--f-mono);
+}
+.rv-cal .meter-label {
+  text-align: right;
+}
+.meter i.b1 {
+  background: var(--bad);
+}
+.meter i.b2 {
+  background: var(--k3);
+}
+.meter i.b3 {
+  background: var(--k1);
+}
+.meter i.b4 {
+  background: var(--k5);
+}
+.meter i.b5,
+.meter i.c3 {
+  background: var(--ok);
+}
+.meter i.c1 {
+  background: var(--muted);
+}
+.meter i.c2 {
+  background: var(--k1);
+}
+.rv-miss {
+  margin-top: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--k3);
+  border-radius: 10px;
+  background: var(--k3-soft);
+}
+.rv-miss h3 {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  color: var(--k3);
+}
+.rv-miss ul {
+  margin: 8px 0 0;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.rv-miss li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+.rv-miss .linkbtn {
+  font-family: var(--f-mono);
+  font-weight: 700;
+}
 </style>
 
 <header class="bar">
@@ -2753,6 +2959,7 @@ div.setrow {
         <span class="streak" id="gx-streak" title="Seria: dni nauki z rzędu" data-en-title="Streak: days of study in a row"></span>
         <span class="goal" title="Dzisiejsze odpowiedzi względem celu dziennego" data-en-title="Today's answers against your daily goal"><span class="pg-k" data-en="Today">Dziś</span><span class="meter" aria-hidden="true"><i id="gx-gm"></i></span><span class="pg-v" id="gx-gv">0/20</span></span>
       </span>
+      <button type="button" class="due" id="gx-due" title="Karty, których termin powtórki minął. Kliknij, aby powtarzać w trybie Focus." data-en-title="Cards whose review day has come. Click to review them in Focus mode." hidden></button>
       <span class="total" title="Opanowane razem (ustawiasz w Postęp)" data-en-title="Mastered together (set in Progress)"><b id="m-all-pct">0%</b> · <span id="m-all-label">0 / 196</span> <span data-en="mastered">opanowane</span></span>
     </div>
     <div class="prog" aria-label="Postęp nauki" data-en-aria="Study progress">
@@ -2832,6 +3039,10 @@ div.setrow {
       <section class="card" id="gx-ready" aria-labelledby="gx-ready-h"></section>
       <section class="card" id="gx-days" aria-labelledby="gx-days-h"></section>
     </div>
+    <div class="gx-cards">
+      <section class="card" id="rv-box" aria-labelledby="rv-box-h"></section>
+      <section class="card" id="rv-cal" aria-labelledby="rv-cal-h"></section>
+    </div>
     <section class="card" id="gx-badges" aria-labelledby="gx-badges-h"></section>
     <section class="card" id="gx-total" aria-labelledby="gx-total-h"></section>
     <dl class="stats" id="stats"></dl>
@@ -2863,6 +3074,7 @@ div.setrow {
         <span class="setl"><span class="setn" id="set-goal-l" data-en="Daily goal">Cel dzienny</span><span class="seth" data-en="How many answers a day count toward the goal.">Ile odpowiedzi dziennie liczy się do celu.</span></span>
         <div class="seg" role="group" aria-labelledby="set-goal-l" id="set-goal"><button type="button" class="seg-b" data-goal="10">10</button><button type="button" class="seg-b" data-goal="20">20</button><button type="button" class="seg-b" data-goal="40">40</button></div>
       </div>
+      <label class="setrow" for="set-conf"><span class="setl"><span class="setn" data-en="Ask how sure I am">Pytaj o pewność odpowiedzi</span><span class="seth" data-en="Guessing, fairly sure or sure before you check. Off: plain reviews.">Zgaduję, raczej albo na pewno przed sprawdzeniem. Wyłączone: zwykłe powtórki.</span></span><input type="checkbox" id="set-conf"></label>
       <label class="setrow" for="set-hint"><span class="setl"><span class="setn" data-en="Show how many answers are right">Pokazuj, ile odpowiedzi jest poprawnych</span><span class="seth" data-en="A hint on questions with several right answers.">Podpowiedź przy pytaniach z kilkoma poprawnymi.</span></span><input type="checkbox" id="set-hint"></label>
       <label class="setrow" for="set-hide"><span class="setl"><span class="setn" data-en="Hide mastered">Ukryj opanowane</span><span class="seth" data-en="The list keeps only questions not marked Known.">Na liście zostają pytania bez znacznika Umiem.</span></span><input type="checkbox" id="set-hide"></label>
     </section>
@@ -2918,13 +3130,14 @@ div.setrow {
 
   <footer class="src">
     <div class="src-row">
-      <span>© qlogic 2026</span>
+      <span>© <a href="https://github.com/p-parafiniuk/vtex-certificate-companion" target="_blank" rel="noopener">p-parafiniuk</a> 2026</span>
       <button type="button" class="info-btn" id="info-open" aria-haspopup="dialog" aria-controls="info-dlg" title="O pytaniach i źródłach" data-en-title="About the questions and sources"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v6M12 7.5v.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><span>Info</span></button>
     </div>
     <dialog class="info-dlg" id="info-dlg" aria-labelledby="info-h">
       <div class="info-head"><h2 id="info-h" data-en="About the questions and sources">O pytaniach i źródłach</h2><button type="button" class="info-x" id="info-close" aria-label="Zamknij" data-en-aria="Close">✕</button></div>
       <div class="info-body">
     <p data-en-html="<strong>Unofficial practice questions.</strong> They do not come from the real exam. Written from the public VTEX documentation and OpenAPI schemas, and checked against them on 7 and 8 October 2026. Banks merged on 9 October 2026."><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
+    <p data-en-html="<strong>Reviews and confidence:</strong> every answer puts the card in a box from 1 to 5. A right answer moves it up and pushes the next review further (1, 3, 7, 16, 35 days); a wrong one sends it back to box 1. Before you check, you can say how sure you are: a right guess does not move up, and a mistake made while sure comes back the same day. Confidence is optional; turn it off in &lt;button type=&quot;button&quot; class=&quot;linkbtn&quot; data-go=&quot;ustawienia&quot;&gt;Settings&lt;/button&gt;."><strong>Powtórki i pewność:</strong> każda odpowiedź trafia do pudełka 1–5. Dobra przesuwa kartę wyżej i odsuwa następną powtórkę (1, 3, 7, 16, 35 dni), zła wraca do pudełka 1. Przed sprawdzeniem możesz zaznaczyć pewność: zgadnięta dobra odpowiedź nie awansuje, a błąd „na pewno” wraca jeszcze tego samego dnia. Pewność jest opcjonalna, wyłączysz ją w <button type="button" class="linkbtn" data-go="ustawienia">Ustawieniach</button>.</p>
     <p data-en-html="<strong>Focus mode:</strong> questions count as right when every right answer is selected; flashcards and practical tasks by your own grade."><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
     <p data-en-html="<strong>Format:</strong> on 9 October 2026 the bank was rebuilt as multiple choice (one or several right answers). Every added right answer repeats a fact confirmed in the VTEX docs or API Reference."><strong>Format:</strong> 9 października 2026 baza została przebudowana na wielokrotny wybór (jedna lub kilka poprawnych). Każda dodana poprawna odpowiedź powtarza fakt potwierdzony w dokumentacji albo w API Reference VTEX.</p>
     <p data-en-html="<strong>Links on questions and flashcards</strong> lead to the VTEX docs (Developer Portal, Help Center, VTEX Learning). Each address was opened twice and compared with the question on 9 October 2026."><strong>Linki przy pytaniach i fiszkach</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
@@ -7838,7 +8051,14 @@ const APIMAP = [
     gx: { head: true, combo: true, toast: true },
     lang: "pl",
     nknown: {},
-    cnt: { q: true, f: true, n: true }
+    cnt: { q: true, f: true, n: true },
+    rv: {},
+    cal: [
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    conf: true
   };
   /* Note blocks are not keyed by index (they may be reordered), so "Umiem" is stored by category and heading. */
   var NKEY = Object.create(null),
@@ -8085,10 +8305,25 @@ const APIMAP = [
           if (F[k] && typeof raw.ptxt[k] === "string") S.ptxt[k] = raw.ptxt[k];
         });
       }
+      /* rv: card id -> [box 1-5, due day, last answer ms, confidence 0-3, last answer right 0|1] */
+      if (raw.rv && typeof raw.rv === "object" && !Array.isArray(raw.rv)) {
+        Object.keys(raw.rv).forEach(function (k) {
+          var e = raw.rv[k],
+            m = /^([qf])(\d+)$/.exec(k);
+          if (m && (m[1] === "q" ? Q : F)[m[2] - 1] && Array.isArray(e) && e[0] >= 1 && e[0] <= 5 && DAY_RE.test(e[1]))
+            S.rv[k] = [e[0] | 0, e[1], +e[2] || 0, e[3] >= 0 && e[3] <= 3 ? e[3] | 0 : 0, e[4] ? 1 : 0];
+        });
+      }
+      if (Array.isArray(raw.cal) && raw.cal.length === 3)
+        raw.cal.forEach(function (x, k) {
+          var n = Array.isArray(x) ? Math.min(x[1] >>> 0, 1e6) : 0;
+          S.cal[k] = [Math.min(x && x[0] >>> 0, n) || 0, n];
+        });
+      if (raw.conf === false) S.conf = false;
       var rf = raw.fo;
       if (rf && typeof rf === "object") {
         if (["all", "q", "f", "p"].indexOf(rf.deck) > -1) S.fo.deck = rf.deck;
-        if (["all", "todo", "wrong"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
+        if (["all", "todo", "wrong", "due"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
         S.fo.shuf = rf.shuf >>> 0;
         if (typeof rf.id === "string") S.fo.id = rf.id;
         if (rf.dom === "all" || DOM_NAME[rf.dom]) S.fo.dom = rf.dom;
@@ -8205,7 +8440,13 @@ const APIMAP = [
       })
     );
   });
-  var DRAFT = {};
+  var DRAFT = {},
+    CONF = {};
+  var CONFS = [
+    ["Zgaduję", "Guessing"],
+    ["Raczej", "Fairly sure"],
+    ["Na pewno", "Sure"]
+  ];
   var DOM_POS = {};
   DOMS.forEach(function (d, n) {
     DOM_POS[d[0]] = n;
@@ -8470,7 +8711,7 @@ const APIMAP = [
     var q = Q[i],
       n = i + 1,
       need = nRight(q);
-    var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined);
+    var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined && !qFresh(i));
     sel = sel || [];
     var rightLetters = [],
       opts = "";
@@ -8532,11 +8773,15 @@ const APIMAP = [
         "</p>" +
         (ok ? "" : docLinks(q) + httpChips(q)) +
         (mode === "learn"
-          ? '<button type="button" class="btn small retry">' + L("Spróbuj jeszcze raz", "Try again") + "</button>"
+          ? rvLine("q" + n) +
+            '<button type="button" class="btn small retry">' +
+            L("Spróbuj jeszcze raz", "Try again") +
+            "</button>"
           : "") +
         "</div>";
     } else if (mode === "learn") {
       tail =
+        (S.conf ? confRow(i) : "") +
         '<div class="row"><button type="button" class="btn primary chk"' +
         (sel.length ? "" : " disabled") +
         ">" +
@@ -8598,8 +8843,39 @@ const APIMAP = [
       "</article>"
     );
   }
+  function confRow(i) {
+    var c = CONF[i] || 0;
+    return (
+      '<div class="conf" role="group" aria-labelledby="cf-' +
+      i +
+      '"><span class="how" id="cf-' +
+      i +
+      '">' +
+      L("Jak bardzo jesteś pewien? (opcjonalnie)", "How sure are you? (optional)") +
+      '</span><span class="seg">' +
+      CONFS.map(function (x, k) {
+        return (
+          '<button type="button" class="seg-b cf" data-cf="' +
+          (k + 1) +
+          '" aria-pressed="' +
+          (c === k + 1) +
+          '">' +
+          T(x) +
+          "</button>"
+        );
+      }).join("") +
+      "</span></div>"
+    );
+  }
+  /* A second press on the chosen level clears it: confidence stays optional. */
+  function pickConf(card, i, v) {
+    CONF[i] = CONF[i] === v ? 0 : v;
+    card.querySelectorAll(".cf").forEach(function (b) {
+      b.setAttribute("aria-pressed", +b.dataset.cf === CONF[i]);
+    });
+  }
   function learnSel(i) {
-    if (S.ans[i] !== undefined) return S.ans[i];
+    if (S.ans[i] !== undefined && !qFresh(i)) return S.ans[i];
     return DRAFT[i] || [];
   }
   /* Toggle one option in place, without re-rendering the card. */
@@ -9104,6 +9380,8 @@ const APIMAP = [
     var card = ev.target.closest(".q");
     if (!card) return;
     var i = +card.dataset.i;
+    var cf = ev.target.closest(".cf");
+    if (cf) return pickConf(card, i, +cf.dataset.cf);
     var opt = ev.target.closest(".opt");
     if (opt && !opt.disabled) {
       if (!DRAFT[i]) DRAFT[i] = [];
@@ -9115,7 +9393,8 @@ const APIMAP = [
       if (!DRAFT[i] || !DRAFT[i].length) return;
       S.ans[i] = DRAFT[i].slice().sort();
       delete DRAFT[i];
-      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]));
+      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]), CONF[i]);
+      delete CONF[i];
       save();
       swapCard(card, i, ".retry");
       header();
@@ -9929,7 +10208,85 @@ const APIMAP = [
       el.textContent = msg;
     }, 50);
   }
-  function recordAnswer(id, ok) {
+  /* Leitner boxes: a right answer moves a due card one box up, a wrong one sends it back to box 1.
+     A right guess stays in its box, and a confident mistake comes back the same day, because it is the one worth fixing fast.
+     A right answer before the due day changes nothing, so retrying a card cannot push it up. */
+  var RV_DAYS = [0, 1, 3, 7, 16, 35],
+    RV_GAP = 6e5;
+  function review(id, ok, cf) {
+    var t = dayKey(new Date()),
+      e = S.rv[id],
+      box = e ? e[0] : 0,
+      due = e ? e[1] : t;
+    if (cf) {
+      S.cal[cf - 1][1]++;
+      if (ok) S.cal[cf - 1][0]++;
+    }
+    if (!ok) {
+      box = 1;
+      due = cf === 3 ? t : dayKey(daysAgo(-1));
+    } else if (due <= t) {
+      if (cf !== 1 || !box) box = Math.min(box + 1, 5);
+      due = dayKey(daysAgo(-RV_DAYS[box]));
+    }
+    S.rv[id] = [box, due, Date.now(), cf || 0, ok ? 1 : 0];
+  }
+  function isDue(id) {
+    var e = S.rv[id];
+    return !!e && e[1] <= dayKey(new Date());
+  }
+  function dueIds() {
+    return Object.keys(S.rv).filter(isDue);
+  }
+  /* A due question shows unanswered again, so it is recalled, not re-read. Not in the first minutes after an answer. */
+  function qFresh(i) {
+    var e = S.rv["q" + (i + 1)];
+    return S.ans[i] !== undefined && isDue("q" + (i + 1)) && Date.now() - e[2] > RV_GAP;
+  }
+  function sureMiss() {
+    return Object.keys(S.rv).filter(function (k) {
+      return S.rv[k][3] === 3 && !S.rv[k][4];
+    });
+  }
+  function rvWhen(day) {
+    var n = Math.round((new Date(day + "T12:00:00") - daysAgo(0)) / 864e5);
+    return n <= 0 ? L("dziś", "today") : n === 1 ? L("jutro", "tomorrow") : L("za " + n + " dni", "in " + n + " days");
+  }
+  function rvLine(id) {
+    var e = S.rv[id];
+    if (!e) return "";
+    var pips = "";
+    for (var k = 1; k <= 5; k++) pips += "<i" + (k <= e[0] ? ' class="' + (e[4] ? "on" : "no") + '"' : "") + "></i>";
+    var note =
+      e[3] === 3 && !e[4]
+        ? '<p class="rv-sure"><strong>' +
+          L("Pewny błąd: wraca jeszcze dziś.", "Confident mistake: it comes back today.") +
+          "</strong> " +
+          L(
+            "Błąd popełniony „na pewno” najlepiej zapamiętasz, gdy poprawisz go szybko.",
+            "A mistake made while sure sticks best when you fix it fast."
+          ) +
+          "</p>"
+        : e[3] === 1 && e[4]
+          ? '<p class="how">' +
+            L("Zgadnięta dobra odpowiedź zostaje w tym samym pudełku.", "A right guess stays in the same box.") +
+            "</p>"
+          : "";
+    return (
+      note +
+      '<p class="rv"><span class="rv-pips" aria-hidden="true">' +
+      pips +
+      "</span>" +
+      L("Pudełko ", "Box ") +
+      e[0] +
+      "/5 · " +
+      L("powtórka ", "review ") +
+      rvWhen(e[1]) +
+      "</p>"
+    );
+  }
+  function recordAnswer(id, ok, cf) {
+    review(id, ok, cf);
     var t = dayKey(new Date());
     if (S.tday.d !== t) {
       S.tday = { d: t, ids: {} };
@@ -10091,6 +10448,10 @@ const APIMAP = [
     }
   });
   function paintGx() {
+    var due = dueIds().length,
+      dz = $("#gx-due");
+    dz.hidden = !due;
+    dz.innerHTML = ICON.again + due + " " + L("do powtórki", "to review");
     $("#gx-head").hidden = !S.gx.head;
     if (!S.gx.head) return;
     var st = streak(),
@@ -10222,6 +10583,7 @@ const APIMAP = [
         "One day off a week does not break the streak. Each card counts once a day."
       ) +
       "</p>";
+    renderRv();
     var got = BADGES.filter(function (b) {
       return S.badges[b.id];
     }).length;
@@ -10254,6 +10616,161 @@ const APIMAP = [
       }).join("") +
       "</ul>";
   }
+  function renderRv() {
+    var ids = Object.keys(S.rv),
+      t = dayKey(new Date()),
+      per = [0, 0, 0, 0, 0],
+      by = [0, 0, 0];
+    ids.forEach(function (k) {
+      var e = S.rv[k];
+      per[e[0] - 1]++;
+      if (e[1] <= t) by[0]++;
+      else if (e[1] <= dayKey(daysAgo(-1))) by[1]++;
+      if (e[1] > t && e[1] <= dayKey(daysAgo(-7))) by[2]++;
+    });
+    var top = Math.max.apply(null, per) || 1;
+    $("#rv-box").innerHTML =
+      '<div class="cardh"><h2 id="rv-box-h">' +
+      L("Powtórki", "Reviews") +
+      '</h2><span class="meter-label">' +
+      L(plural(ids.length, "karta", "karty", "kart"), ids.length + (ids.length === 1 ? " card" : " cards")) +
+      "</span></div>" +
+      '<p class="seth">' +
+      L(
+        "Każda odpowiedź trafia do pudełka 1–5. Dobra przesuwa ją wyżej i odsuwa powtórkę, zła wraca do pudełka 1.",
+        "Every answer goes into a box from 1 to 5. A right one moves it up and pushes the review further, a wrong one sends it back to box 1."
+      ) +
+      "</p>" +
+      (ids.length
+        ? '<dl class="rv-when"><div class="' +
+          (by[0] ? "now" : "") +
+          '"><dt>' +
+          L("Dziś", "Today") +
+          "</dt><dd>" +
+          by[0] +
+          "</dd></div><div><dt>" +
+          L("Jutro", "Tomorrow") +
+          "</dt><dd>" +
+          by[1] +
+          "</dd></div><div><dt>" +
+          L("7 dni", "7 days") +
+          "</dt><dd>" +
+          by[2] +
+          "</dd></div></dl>" +
+          '<ul class="rv-boxes">' +
+          per
+            .map(function (n, k) {
+              return (
+                '<li><span class="rv-k">' +
+                (k + 1) +
+                " · " +
+                RV_DAYS[k + 1] +
+                " " +
+                L("d", "d") +
+                '</span><span class="meter" aria-hidden="true"><i class="b' +
+                (k + 1) +
+                '" style="width:' +
+                (n / top) * 100 +
+                '%"></i></span><b>' +
+                n +
+                "</b></li>"
+              );
+            })
+            .join("") +
+          "</ul>" +
+          (by[0]
+            ? '<button type="button" class="btn primary" data-rv-start>' +
+              L("Powtarzaj teraz", "Review now") +
+              " (" +
+              by[0] +
+              ")</button>"
+            : '<p class="seth">' + L("Na dziś wszystko powtórzone.", "Everything is reviewed for today.") + "</p>")
+        : "");
+    var miss = sureMiss(),
+      cal = S.cal.some(function (x) {
+        return x[1];
+      });
+    $("#rv-cal").innerHTML =
+      '<div class="cardh"><h2 id="rv-cal-h">' +
+      L("Kalibracja pewności", "Confidence calibration") +
+      "</h2></div>" +
+      (cal
+        ? '<p class="seth">' +
+          L(
+            "Ile odpowiedzi było dobrych przy każdym poziomie pewności. „Na pewno” powinno być blisko 100%.",
+            "How many answers were right at each confidence level. “Sure” should be close to 100%."
+          ) +
+          '</p><ul class="rv-cal">' +
+          S.cal
+            .map(function (x, k) {
+              var p = x[1] ? Math.round((x[0] / x[1]) * 100) : 0;
+              return (
+                "<li><span>" +
+                T(CONFS[k]) +
+                '</span><span class="meter" aria-hidden="true"><i class="c' +
+                (k + 1) +
+                '" style="width:' +
+                p +
+                '%"></i></span><span class="meter-label">' +
+                (x[1] ? "<b>" + p + "%</b> / " + x[1] : "–") +
+                "</span></li>"
+              );
+            })
+            .join("") +
+          "</ul>"
+        : '<p class="seth">' +
+          (S.conf
+            ? L(
+                "Zaznacz pewność przed sprawdzeniem odpowiedzi, a zobaczysz tu, czy Twoje „na pewno” naprawdę znaczy na pewno.",
+                "Mark your confidence before you check an answer, and this shows whether your “sure” really means sure."
+              )
+            : L("Pytanie o pewność jest wyłączone w ", "Confidence is turned off in ") +
+              '<button type="button" class="linkbtn" data-go="ustawienia">' +
+              L("Ustawieniach", "Settings") +
+              "</button>.") +
+          "</p>") +
+      (miss.length
+        ? '<div class="rv-miss"><h3>' +
+          L("Pewne błędy", "Confident mistakes") +
+          " (" +
+          miss.length +
+          ')</h3><p class="seth">' +
+          L(
+            "Odpowiedziałeś źle „na pewno”. To Twoje pułapki egzaminacyjne.",
+            "You got these wrong while sure. They are your exam traps."
+          ) +
+          "</p><ul>" +
+          miss
+            .slice(0, 8)
+            .map(function (k) {
+              var c = BY_ID[k],
+                txt = (c.t === "q" ? Q[c.i].q : F[c.i].q).replace(/[`*]/g, "");
+              return (
+                '<li><button type="button" class="linkbtn" data-rv-go="' +
+                k +
+                '">' +
+                (c.t === "q" ? "#" : "F") +
+                (c.i + 1) +
+                "</button> " +
+                esc(txt.length > 70 ? txt.slice(0, 68) + "…" : txt) +
+                "</li>"
+              );
+            })
+            .join("") +
+          "</ul></div>"
+        : "");
+  }
+  $("#p-postep").addEventListener("click", function (ev) {
+    if (ev.target.closest("[data-rv-start]")) return startDue();
+    var b = ev.target.closest("[data-rv-go]");
+    if (b && BY_ID[b.dataset.rvGo]) {
+      S.fo.flt = "all";
+      S.fo.deck = "all";
+      S.fo.dom = "all";
+      save();
+      go({ tab: "focus", id: b.dataset.rvGo });
+    }
+  });
   document.addEventListener("click", function (ev) {
     var b = ev.target.closest ? ev.target.closest("[data-go], [data-go-dom]") : null;
     if (!b) return;
@@ -10279,6 +10796,7 @@ const APIMAP = [
       .forEach(function (b) {
         b.setAttribute("aria-pressed", b.dataset.langSet === S.lang);
       });
+    $("#set-conf").checked = S.conf;
     $("#set-hint").checked = S.hint;
     $("#set-hide").checked = S.hide;
     $("#set-min").value = S.simMin;
@@ -10303,7 +10821,10 @@ const APIMAP = [
   });
   $("#p-ustawienia").addEventListener("change", function (ev) {
     var t = ev.target;
-    if (t.id === "set-hint") S.hint = t.checked;
+    if (t.id === "set-conf") {
+      S.conf = t.checked;
+      renderQ();
+    } else if (t.id === "set-hint") S.hint = t.checked;
     else if (t.id === "set-hide") S.hide = t.checked;
     else if (t.id === "set-prac") S.simPrac = t.checked;
     else if (t.id === "set-min") {
@@ -10637,6 +11158,13 @@ const APIMAP = [
     S.best = 0;
     S.badges = {};
     S.nknown = {};
+    S.rv = {};
+    S.cal = [
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ];
+    CONF = {};
     $("#cs-info").dataset.k = "";
     $("#cat-tldr").dataset.k = "";
     save();
@@ -10862,6 +11390,7 @@ const APIMAP = [
       '<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/>'
     ),
     x: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
+    again: svg('<path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/>'),
     flip: svg('<path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/>')
   };
 
@@ -10892,6 +11421,7 @@ const APIMAP = [
   function fPass(c) {
     if (S.fo.flt === "todo") return !cKnown(c) && cState(c) !== 1;
     if (S.fo.flt === "wrong") return cState(c) === 2;
+    if (S.fo.flt === "due") return isDue(c.id);
     return true;
   }
   /* The card on screen stays in the deck even after it stops matching the filter, so it does not vanish mid-answer. */
@@ -11025,10 +11555,12 @@ const APIMAP = [
   }
   function fSettings(base, cur) {
     var todo = 0,
-      wrong = 0;
+      wrong = 0,
+      due = 0;
     base.forEach(function (c) {
       var s = cState(c);
       if (s === 2) wrong++;
+      if (isDue(c.id)) due++;
       if (!cKnown(c) && s !== 1) todo++;
     });
     function chip(attr, val, label, n, on) {
@@ -11064,10 +11596,11 @@ const APIMAP = [
       chip("flt", "all", L("Wszystkie", "All"), base.length, S.fo.flt === "all") +
       chip("flt", "todo", L("Do nauki", "To learn"), todo, S.fo.flt === "todo") +
       chip("flt", "wrong", L("Tylko błędne", "Only wrong"), wrong, S.fo.flt === "wrong") +
+      chip("flt", "due", L("Do powtórki dziś", "Due today"), due, S.fo.flt === "due") +
       '</div><p class="how">' +
       L(
-        "„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem.",
-        "“To learn” skips cards answered right and cards marked Known."
+        "„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem. „Do powtórki” to karty, których termin minął.",
+        "“To learn” skips cards answered right and cards marked Known. “Due today” holds cards whose review day has come."
       ) +
       "</p></div>" +
       '<div class="fs"><h3 id="fo-h-set">' +
@@ -11288,7 +11821,14 @@ const APIMAP = [
 
     var card = !c
       ? '<p class="empty">' +
-        L("W tej talii nie ma kart pasujących do filtra.", "No cards in this deck match the filter.") +
+        (S.fo.flt === "due"
+          ? L("Powtórki na dziś zrobione. ", "Today's reviews are done. ") +
+            L("Jutro: ", "Tomorrow: ") +
+            Object.keys(S.rv).filter(function (k) {
+              return S.rv[k][1] <= dayKey(daysAgo(-1));
+            }).length +
+            "."
+          : L("W tej talii nie ma kart pasujących do filtra.", "No cards in this deck match the filter.")) +
         ' <button type="button" class="btn small" id="fo-reset">' +
         L("Pokaż wszystkie karty", "Show all cards") +
         "</button></p>"
@@ -11393,7 +11933,7 @@ const APIMAP = [
     S.fans[c.i] = v ? 1 : 0;
     if (v) S.fknown[c.i] = true;
     else delete S.fknown[c.i];
-    recordAnswer("f" + (c.i + 1), !!v);
+    recordAnswer("f" + (c.i + 1), !!v, 0);
     FOC.dirty = false;
     save();
     header();
@@ -11419,6 +11959,15 @@ const APIMAP = [
     if (!(c && strict.indexOf(c) > -1 && fits(c))) c = strict.filter(fits)[0] || strict[0];
     go({ tab: "focus", id: c ? c.id : "" });
   }
+  function startDue() {
+    S.fo.flt = "due";
+    S.fo.deck = "all";
+    S.fo.dom = "all";
+    var d = fDeck(null)[0];
+    save();
+    go({ tab: "focus", id: d ? d.id : "" });
+  }
+  $("#gx-due").addEventListener("click", startDue);
   function exitFocus() {
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
@@ -11500,6 +12049,8 @@ const APIMAP = [
     var card = t.closest(".q");
     if (!card) return;
     var i = +card.dataset.i;
+    b = t.closest(".cf");
+    if (b) return pickConf(card, i, +b.dataset.cf);
     b = t.closest(".opt");
     if (b && !b.disabled) {
       if (!DRAFT[i]) DRAFT[i] = [];
@@ -11511,7 +12062,8 @@ const APIMAP = [
       if (!DRAFT[i] || !DRAFT[i].length) return;
       S.ans[i] = DRAFT[i].slice().sort();
       delete DRAFT[i];
-      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]));
+      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]), CONF[i]);
+      delete CONF[i];
       save();
       header();
       renderFocus();
@@ -12010,7 +12562,7 @@ const APIMAP = [
   });
   /* A click on the backdrop lands on the dialog element itself, never on its content. */
   infoDlg.addEventListener("click", function (ev) {
-    if (ev.target === infoDlg) infoDlg.close();
+    if (ev.target === infoDlg || ev.target.closest("[data-go]")) infoDlg.close();
   });
 
   if (S.lang === "en") localize(document);

@@ -54,7 +54,14 @@
     gx: { head: true, combo: true, toast: true },
     lang: "pl",
     nknown: {},
-    cnt: { q: true, f: true, n: true }
+    cnt: { q: true, f: true, n: true },
+    rv: {},
+    cal: [
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ],
+    conf: true
   };
   /* Note blocks are not keyed by index (they may be reordered), so "Umiem" is stored by category and heading. */
   var NKEY = Object.create(null),
@@ -301,10 +308,25 @@
           if (F[k] && typeof raw.ptxt[k] === "string") S.ptxt[k] = raw.ptxt[k];
         });
       }
+      /* rv: card id -> [box 1-5, due day, last answer ms, confidence 0-3, last answer right 0|1] */
+      if (raw.rv && typeof raw.rv === "object" && !Array.isArray(raw.rv)) {
+        Object.keys(raw.rv).forEach(function (k) {
+          var e = raw.rv[k],
+            m = /^([qf])(\d+)$/.exec(k);
+          if (m && (m[1] === "q" ? Q : F)[m[2] - 1] && Array.isArray(e) && e[0] >= 1 && e[0] <= 5 && DAY_RE.test(e[1]))
+            S.rv[k] = [e[0] | 0, e[1], +e[2] || 0, e[3] >= 0 && e[3] <= 3 ? e[3] | 0 : 0, e[4] ? 1 : 0];
+        });
+      }
+      if (Array.isArray(raw.cal) && raw.cal.length === 3)
+        raw.cal.forEach(function (x, k) {
+          var n = Array.isArray(x) ? Math.min(x[1] >>> 0, 1e6) : 0;
+          S.cal[k] = [Math.min(x && x[0] >>> 0, n) || 0, n];
+        });
+      if (raw.conf === false) S.conf = false;
       var rf = raw.fo;
       if (rf && typeof rf === "object") {
         if (["all", "q", "f", "p"].indexOf(rf.deck) > -1) S.fo.deck = rf.deck;
-        if (["all", "todo", "wrong"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
+        if (["all", "todo", "wrong", "due"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
         S.fo.shuf = rf.shuf >>> 0;
         if (typeof rf.id === "string") S.fo.id = rf.id;
         if (rf.dom === "all" || DOM_NAME[rf.dom]) S.fo.dom = rf.dom;
@@ -421,7 +443,13 @@
       })
     );
   });
-  var DRAFT = {};
+  var DRAFT = {},
+    CONF = {};
+  var CONFS = [
+    ["Zgaduję", "Guessing"],
+    ["Raczej", "Fairly sure"],
+    ["Na pewno", "Sure"]
+  ];
   var DOM_POS = {};
   DOMS.forEach(function (d, n) {
     DOM_POS[d[0]] = n;
@@ -686,7 +714,7 @@
     var q = Q[i],
       n = i + 1,
       need = nRight(q);
-    var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined);
+    var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined && !qFresh(i));
     sel = sel || [];
     var rightLetters = [],
       opts = "";
@@ -748,11 +776,15 @@
         "</p>" +
         (ok ? "" : docLinks(q) + httpChips(q)) +
         (mode === "learn"
-          ? '<button type="button" class="btn small retry">' + L("Spróbuj jeszcze raz", "Try again") + "</button>"
+          ? rvLine("q" + n) +
+            '<button type="button" class="btn small retry">' +
+            L("Spróbuj jeszcze raz", "Try again") +
+            "</button>"
           : "") +
         "</div>";
     } else if (mode === "learn") {
       tail =
+        (S.conf ? confRow(i) : "") +
         '<div class="row"><button type="button" class="btn primary chk"' +
         (sel.length ? "" : " disabled") +
         ">" +
@@ -814,8 +846,39 @@
       "</article>"
     );
   }
+  function confRow(i) {
+    var c = CONF[i] || 0;
+    return (
+      '<div class="conf" role="group" aria-labelledby="cf-' +
+      i +
+      '"><span class="how" id="cf-' +
+      i +
+      '">' +
+      L("Jak bardzo jesteś pewien? (opcjonalnie)", "How sure are you? (optional)") +
+      '</span><span class="seg">' +
+      CONFS.map(function (x, k) {
+        return (
+          '<button type="button" class="seg-b cf" data-cf="' +
+          (k + 1) +
+          '" aria-pressed="' +
+          (c === k + 1) +
+          '">' +
+          T(x) +
+          "</button>"
+        );
+      }).join("") +
+      "</span></div>"
+    );
+  }
+  /* A second press on the chosen level clears it: confidence stays optional. */
+  function pickConf(card, i, v) {
+    CONF[i] = CONF[i] === v ? 0 : v;
+    card.querySelectorAll(".cf").forEach(function (b) {
+      b.setAttribute("aria-pressed", +b.dataset.cf === CONF[i]);
+    });
+  }
   function learnSel(i) {
-    if (S.ans[i] !== undefined) return S.ans[i];
+    if (S.ans[i] !== undefined && !qFresh(i)) return S.ans[i];
     return DRAFT[i] || [];
   }
   /* Toggle one option in place, without re-rendering the card. */
@@ -1320,6 +1383,8 @@
     var card = ev.target.closest(".q");
     if (!card) return;
     var i = +card.dataset.i;
+    var cf = ev.target.closest(".cf");
+    if (cf) return pickConf(card, i, +cf.dataset.cf);
     var opt = ev.target.closest(".opt");
     if (opt && !opt.disabled) {
       if (!DRAFT[i]) DRAFT[i] = [];
@@ -1331,7 +1396,8 @@
       if (!DRAFT[i] || !DRAFT[i].length) return;
       S.ans[i] = DRAFT[i].slice().sort();
       delete DRAFT[i];
-      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]));
+      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]), CONF[i]);
+      delete CONF[i];
       save();
       swapCard(card, i, ".retry");
       header();
@@ -2145,7 +2211,85 @@
       el.textContent = msg;
     }, 50);
   }
-  function recordAnswer(id, ok) {
+  /* Leitner boxes: a right answer moves a due card one box up, a wrong one sends it back to box 1.
+     A right guess stays in its box, and a confident mistake comes back the same day, because it is the one worth fixing fast.
+     A right answer before the due day changes nothing, so retrying a card cannot push it up. */
+  var RV_DAYS = [0, 1, 3, 7, 16, 35],
+    RV_GAP = 6e5;
+  function review(id, ok, cf) {
+    var t = dayKey(new Date()),
+      e = S.rv[id],
+      box = e ? e[0] : 0,
+      due = e ? e[1] : t;
+    if (cf) {
+      S.cal[cf - 1][1]++;
+      if (ok) S.cal[cf - 1][0]++;
+    }
+    if (!ok) {
+      box = 1;
+      due = cf === 3 ? t : dayKey(daysAgo(-1));
+    } else if (due <= t) {
+      if (cf !== 1 || !box) box = Math.min(box + 1, 5);
+      due = dayKey(daysAgo(-RV_DAYS[box]));
+    }
+    S.rv[id] = [box, due, Date.now(), cf || 0, ok ? 1 : 0];
+  }
+  function isDue(id) {
+    var e = S.rv[id];
+    return !!e && e[1] <= dayKey(new Date());
+  }
+  function dueIds() {
+    return Object.keys(S.rv).filter(isDue);
+  }
+  /* A due question shows unanswered again, so it is recalled, not re-read. Not in the first minutes after an answer. */
+  function qFresh(i) {
+    var e = S.rv["q" + (i + 1)];
+    return S.ans[i] !== undefined && isDue("q" + (i + 1)) && Date.now() - e[2] > RV_GAP;
+  }
+  function sureMiss() {
+    return Object.keys(S.rv).filter(function (k) {
+      return S.rv[k][3] === 3 && !S.rv[k][4];
+    });
+  }
+  function rvWhen(day) {
+    var n = Math.round((new Date(day + "T12:00:00") - daysAgo(0)) / 864e5);
+    return n <= 0 ? L("dziś", "today") : n === 1 ? L("jutro", "tomorrow") : L("za " + n + " dni", "in " + n + " days");
+  }
+  function rvLine(id) {
+    var e = S.rv[id];
+    if (!e) return "";
+    var pips = "";
+    for (var k = 1; k <= 5; k++) pips += "<i" + (k <= e[0] ? ' class="' + (e[4] ? "on" : "no") + '"' : "") + "></i>";
+    var note =
+      e[3] === 3 && !e[4]
+        ? '<p class="rv-sure"><strong>' +
+          L("Pewny błąd: wraca jeszcze dziś.", "Confident mistake: it comes back today.") +
+          "</strong> " +
+          L(
+            "Błąd popełniony „na pewno” najlepiej zapamiętasz, gdy poprawisz go szybko.",
+            "A mistake made while sure sticks best when you fix it fast."
+          ) +
+          "</p>"
+        : e[3] === 1 && e[4]
+          ? '<p class="how">' +
+            L("Zgadnięta dobra odpowiedź zostaje w tym samym pudełku.", "A right guess stays in the same box.") +
+            "</p>"
+          : "";
+    return (
+      note +
+      '<p class="rv"><span class="rv-pips" aria-hidden="true">' +
+      pips +
+      "</span>" +
+      L("Pudełko ", "Box ") +
+      e[0] +
+      "/5 · " +
+      L("powtórka ", "review ") +
+      rvWhen(e[1]) +
+      "</p>"
+    );
+  }
+  function recordAnswer(id, ok, cf) {
+    review(id, ok, cf);
     var t = dayKey(new Date());
     if (S.tday.d !== t) {
       S.tday = { d: t, ids: {} };
@@ -2307,6 +2451,10 @@
     }
   });
   function paintGx() {
+    var due = dueIds().length,
+      dz = $("#gx-due");
+    dz.hidden = !due;
+    dz.innerHTML = ICON.again + due + " " + L("do powtórki", "to review");
     $("#gx-head").hidden = !S.gx.head;
     if (!S.gx.head) return;
     var st = streak(),
@@ -2438,6 +2586,7 @@
         "One day off a week does not break the streak. Each card counts once a day."
       ) +
       "</p>";
+    renderRv();
     var got = BADGES.filter(function (b) {
       return S.badges[b.id];
     }).length;
@@ -2470,6 +2619,161 @@
       }).join("") +
       "</ul>";
   }
+  function renderRv() {
+    var ids = Object.keys(S.rv),
+      t = dayKey(new Date()),
+      per = [0, 0, 0, 0, 0],
+      by = [0, 0, 0];
+    ids.forEach(function (k) {
+      var e = S.rv[k];
+      per[e[0] - 1]++;
+      if (e[1] <= t) by[0]++;
+      else if (e[1] <= dayKey(daysAgo(-1))) by[1]++;
+      if (e[1] > t && e[1] <= dayKey(daysAgo(-7))) by[2]++;
+    });
+    var top = Math.max.apply(null, per) || 1;
+    $("#rv-box").innerHTML =
+      '<div class="cardh"><h2 id="rv-box-h">' +
+      L("Powtórki", "Reviews") +
+      '</h2><span class="meter-label">' +
+      L(plural(ids.length, "karta", "karty", "kart"), ids.length + (ids.length === 1 ? " card" : " cards")) +
+      "</span></div>" +
+      '<p class="seth">' +
+      L(
+        "Każda odpowiedź trafia do pudełka 1–5. Dobra przesuwa ją wyżej i odsuwa powtórkę, zła wraca do pudełka 1.",
+        "Every answer goes into a box from 1 to 5. A right one moves it up and pushes the review further, a wrong one sends it back to box 1."
+      ) +
+      "</p>" +
+      (ids.length
+        ? '<dl class="rv-when"><div class="' +
+          (by[0] ? "now" : "") +
+          '"><dt>' +
+          L("Dziś", "Today") +
+          "</dt><dd>" +
+          by[0] +
+          "</dd></div><div><dt>" +
+          L("Jutro", "Tomorrow") +
+          "</dt><dd>" +
+          by[1] +
+          "</dd></div><div><dt>" +
+          L("7 dni", "7 days") +
+          "</dt><dd>" +
+          by[2] +
+          "</dd></div></dl>" +
+          '<ul class="rv-boxes">' +
+          per
+            .map(function (n, k) {
+              return (
+                '<li><span class="rv-k">' +
+                (k + 1) +
+                " · " +
+                RV_DAYS[k + 1] +
+                " " +
+                L("d", "d") +
+                '</span><span class="meter" aria-hidden="true"><i class="b' +
+                (k + 1) +
+                '" style="width:' +
+                (n / top) * 100 +
+                '%"></i></span><b>' +
+                n +
+                "</b></li>"
+              );
+            })
+            .join("") +
+          "</ul>" +
+          (by[0]
+            ? '<button type="button" class="btn primary" data-rv-start>' +
+              L("Powtarzaj teraz", "Review now") +
+              " (" +
+              by[0] +
+              ")</button>"
+            : '<p class="seth">' + L("Na dziś wszystko powtórzone.", "Everything is reviewed for today.") + "</p>")
+        : "");
+    var miss = sureMiss(),
+      cal = S.cal.some(function (x) {
+        return x[1];
+      });
+    $("#rv-cal").innerHTML =
+      '<div class="cardh"><h2 id="rv-cal-h">' +
+      L("Kalibracja pewności", "Confidence calibration") +
+      "</h2></div>" +
+      (cal
+        ? '<p class="seth">' +
+          L(
+            "Ile odpowiedzi było dobrych przy każdym poziomie pewności. „Na pewno” powinno być blisko 100%.",
+            "How many answers were right at each confidence level. “Sure” should be close to 100%."
+          ) +
+          '</p><ul class="rv-cal">' +
+          S.cal
+            .map(function (x, k) {
+              var p = x[1] ? Math.round((x[0] / x[1]) * 100) : 0;
+              return (
+                "<li><span>" +
+                T(CONFS[k]) +
+                '</span><span class="meter" aria-hidden="true"><i class="c' +
+                (k + 1) +
+                '" style="width:' +
+                p +
+                '%"></i></span><span class="meter-label">' +
+                (x[1] ? "<b>" + p + "%</b> / " + x[1] : "–") +
+                "</span></li>"
+              );
+            })
+            .join("") +
+          "</ul>"
+        : '<p class="seth">' +
+          (S.conf
+            ? L(
+                "Zaznacz pewność przed sprawdzeniem odpowiedzi, a zobaczysz tu, czy Twoje „na pewno” naprawdę znaczy na pewno.",
+                "Mark your confidence before you check an answer, and this shows whether your “sure” really means sure."
+              )
+            : L("Pytanie o pewność jest wyłączone w ", "Confidence is turned off in ") +
+              '<button type="button" class="linkbtn" data-go="ustawienia">' +
+              L("Ustawieniach", "Settings") +
+              "</button>.") +
+          "</p>") +
+      (miss.length
+        ? '<div class="rv-miss"><h3>' +
+          L("Pewne błędy", "Confident mistakes") +
+          " (" +
+          miss.length +
+          ')</h3><p class="seth">' +
+          L(
+            "Odpowiedziałeś źle „na pewno”. To Twoje pułapki egzaminacyjne.",
+            "You got these wrong while sure. They are your exam traps."
+          ) +
+          "</p><ul>" +
+          miss
+            .slice(0, 8)
+            .map(function (k) {
+              var c = BY_ID[k],
+                txt = (c.t === "q" ? Q[c.i].q : F[c.i].q).replace(/[`*]/g, "");
+              return (
+                '<li><button type="button" class="linkbtn" data-rv-go="' +
+                k +
+                '">' +
+                (c.t === "q" ? "#" : "F") +
+                (c.i + 1) +
+                "</button> " +
+                esc(txt.length > 70 ? txt.slice(0, 68) + "…" : txt) +
+                "</li>"
+              );
+            })
+            .join("") +
+          "</ul></div>"
+        : "");
+  }
+  $("#p-postep").addEventListener("click", function (ev) {
+    if (ev.target.closest("[data-rv-start]")) return startDue();
+    var b = ev.target.closest("[data-rv-go]");
+    if (b && BY_ID[b.dataset.rvGo]) {
+      S.fo.flt = "all";
+      S.fo.deck = "all";
+      S.fo.dom = "all";
+      save();
+      go({ tab: "focus", id: b.dataset.rvGo });
+    }
+  });
   document.addEventListener("click", function (ev) {
     var b = ev.target.closest ? ev.target.closest("[data-go], [data-go-dom]") : null;
     if (!b) return;
@@ -2495,6 +2799,7 @@
       .forEach(function (b) {
         b.setAttribute("aria-pressed", b.dataset.langSet === S.lang);
       });
+    $("#set-conf").checked = S.conf;
     $("#set-hint").checked = S.hint;
     $("#set-hide").checked = S.hide;
     $("#set-min").value = S.simMin;
@@ -2519,7 +2824,10 @@
   });
   $("#p-ustawienia").addEventListener("change", function (ev) {
     var t = ev.target;
-    if (t.id === "set-hint") S.hint = t.checked;
+    if (t.id === "set-conf") {
+      S.conf = t.checked;
+      renderQ();
+    } else if (t.id === "set-hint") S.hint = t.checked;
     else if (t.id === "set-hide") S.hide = t.checked;
     else if (t.id === "set-prac") S.simPrac = t.checked;
     else if (t.id === "set-min") {
@@ -2853,6 +3161,13 @@
     S.best = 0;
     S.badges = {};
     S.nknown = {};
+    S.rv = {};
+    S.cal = [
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ];
+    CONF = {};
     $("#cs-info").dataset.k = "";
     $("#cat-tldr").dataset.k = "";
     save();
@@ -3078,6 +3393,7 @@
       '<path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/>'
     ),
     x: svg('<path d="M6 6l12 12M18 6L6 18"/>'),
+    again: svg('<path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"/>'),
     flip: svg('<path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/>')
   };
 
@@ -3108,6 +3424,7 @@
   function fPass(c) {
     if (S.fo.flt === "todo") return !cKnown(c) && cState(c) !== 1;
     if (S.fo.flt === "wrong") return cState(c) === 2;
+    if (S.fo.flt === "due") return isDue(c.id);
     return true;
   }
   /* The card on screen stays in the deck even after it stops matching the filter, so it does not vanish mid-answer. */
@@ -3241,10 +3558,12 @@
   }
   function fSettings(base, cur) {
     var todo = 0,
-      wrong = 0;
+      wrong = 0,
+      due = 0;
     base.forEach(function (c) {
       var s = cState(c);
       if (s === 2) wrong++;
+      if (isDue(c.id)) due++;
       if (!cKnown(c) && s !== 1) todo++;
     });
     function chip(attr, val, label, n, on) {
@@ -3280,10 +3599,11 @@
       chip("flt", "all", L("Wszystkie", "All"), base.length, S.fo.flt === "all") +
       chip("flt", "todo", L("Do nauki", "To learn"), todo, S.fo.flt === "todo") +
       chip("flt", "wrong", L("Tylko błędne", "Only wrong"), wrong, S.fo.flt === "wrong") +
+      chip("flt", "due", L("Do powtórki dziś", "Due today"), due, S.fo.flt === "due") +
       '</div><p class="how">' +
       L(
-        "„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem.",
-        "“To learn” skips cards answered right and cards marked Known."
+        "„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem. „Do powtórki” to karty, których termin minął.",
+        "“To learn” skips cards answered right and cards marked Known. “Due today” holds cards whose review day has come."
       ) +
       "</p></div>" +
       '<div class="fs"><h3 id="fo-h-set">' +
@@ -3504,7 +3824,14 @@
 
     var card = !c
       ? '<p class="empty">' +
-        L("W tej talii nie ma kart pasujących do filtra.", "No cards in this deck match the filter.") +
+        (S.fo.flt === "due"
+          ? L("Powtórki na dziś zrobione. ", "Today's reviews are done. ") +
+            L("Jutro: ", "Tomorrow: ") +
+            Object.keys(S.rv).filter(function (k) {
+              return S.rv[k][1] <= dayKey(daysAgo(-1));
+            }).length +
+            "."
+          : L("W tej talii nie ma kart pasujących do filtra.", "No cards in this deck match the filter.")) +
         ' <button type="button" class="btn small" id="fo-reset">' +
         L("Pokaż wszystkie karty", "Show all cards") +
         "</button></p>"
@@ -3609,7 +3936,7 @@
     S.fans[c.i] = v ? 1 : 0;
     if (v) S.fknown[c.i] = true;
     else delete S.fknown[c.i];
-    recordAnswer("f" + (c.i + 1), !!v);
+    recordAnswer("f" + (c.i + 1), !!v, 0);
     FOC.dirty = false;
     save();
     header();
@@ -3635,6 +3962,15 @@
     if (!(c && strict.indexOf(c) > -1 && fits(c))) c = strict.filter(fits)[0] || strict[0];
     go({ tab: "focus", id: c ? c.id : "" });
   }
+  function startDue() {
+    S.fo.flt = "due";
+    S.fo.deck = "all";
+    S.fo.dom = "all";
+    var d = fDeck(null)[0];
+    save();
+    go({ tab: "focus", id: d ? d.id : "" });
+  }
+  $("#gx-due").addEventListener("click", startDue);
   function exitFocus() {
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
@@ -3716,6 +4052,8 @@
     var card = t.closest(".q");
     if (!card) return;
     var i = +card.dataset.i;
+    b = t.closest(".cf");
+    if (b) return pickConf(card, i, +b.dataset.cf);
     b = t.closest(".opt");
     if (b && !b.disabled) {
       if (!DRAFT[i]) DRAFT[i] = [];
@@ -3727,7 +4065,8 @@
       if (!DRAFT[i] || !DRAFT[i].length) return;
       S.ans[i] = DRAFT[i].slice().sort();
       delete DRAFT[i];
-      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]));
+      recordAnswer("q" + (i + 1), isRight(i, S.ans[i]), CONF[i]);
+      delete CONF[i];
       save();
       header();
       renderFocus();
@@ -4226,7 +4565,7 @@
   });
   /* A click on the backdrop lands on the dialog element itself, never on its content. */
   infoDlg.addEventListener("click", function (ev) {
-    if (ev.target === infoDlg) infoDlg.close();
+    if (ev.target === infoDlg || ev.target.closest("[data-go]")) infoDlg.close();
   });
 
   if (S.lang === "en") localize(document);
