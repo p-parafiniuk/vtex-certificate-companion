@@ -178,6 +178,22 @@ a {
 .brand:hover .brand-mark rect {
   fill: var(--nav-ink);
 }
+/* The exam button shares the top row on a phone: the name shrinks, and on the narrowest screens only the mark shows. */
+@media (max-width: 400px) {
+  .bar h1 {
+    font-size: 1.12rem;
+  }
+}
+@media (max-width: 340px) {
+  .brand-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
 @media (max-width: 480px) {
   .brand {
     gap: 9px;
@@ -204,11 +220,60 @@ a {
   padding: 0;
   cursor: pointer;
 }
-.bar .tabs + .theme-btn {
+.bar .tabs + .sim-cta + .theme-btn {
   margin-left: -20px;
 }
 .theme-btn:hover {
   color: var(--nav-ink);
+}
+/* The one primary action in the bar. Desktop: far right, after the icon buttons. Phone: top row, left of Settings. */
+.sim-cta {
+  order: 2;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  margin-left: -12px;
+  padding: 0 16px 0 12px;
+  border-radius: 99px;
+  background: var(--nav-accent);
+  color: var(--nav-bg);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sim-cta svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.sim-cta svg .fill {
+  fill: currentColor;
+  stroke: none;
+}
+.sim-cta .num {
+  font: 500 0.75rem var(--f-mono);
+  color: inherit;
+  opacity: 0.8;
+}
+.sim-cta.run .num {
+  font-size: 0.85rem;
+  opacity: 1;
+}
+.sim-cta:hover,
+.sim-cta[aria-current="page"] {
+  background: var(--nav-ink);
+}
+.bar .sim-cta:focus-visible {
+  outline-offset: 3px;
+}
+.bar .theme-btn {
+  order: 1;
 }
 /* The back link to a question only shows in HTTP Koty; there it takes its own line under the tabs. */
 #back-q {
@@ -244,6 +309,27 @@ a {
   .bar .tabs {
     order: 3;
     flex-basis: 100%;
+  }
+  /* Settings is pinned 60 px from the right edge, so the button keeps that slot free. */
+  .bar-in {
+    column-gap: 4px;
+  }
+  .bar .tabs + .sim-cta + .theme-btn {
+    margin-left: 0;
+  }
+  /* A 36 px pill inside a 44 px hit area, like the tabs. */
+  .sim-cta {
+    order: 0;
+    min-height: 44px;
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    margin: 0 44px 0 0;
+    padding: 0 12px 0 9px;
+    font-size: 0.95rem;
+  }
+  .sim-cta svg {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -1962,6 +2048,12 @@ kbd {
   bottom: 8px;
   width: 1px;
   background: var(--nav-line);
+}
+/* With the exam out of the tabs a phone has room for the question count again (not on the narrowest). */
+@media (min-width: 361px) and (max-width: 480px) {
+  #t-pytania .num {
+    display: inline;
+  }
 }
 /* Long tab names ("Symulacja", English labels) get a short form on phones. */
 .tab-short {

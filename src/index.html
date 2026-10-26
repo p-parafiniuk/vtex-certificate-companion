@@ -17,16 +17,17 @@
 
 <header class="bar">
   <div class="bar-in">
-    <h1><a class="brand" href="#pytania" title="Wszystkie pytania" data-en-title="All questions"><svg class="brand-mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M16 18l14 30h4l14-30"/></svg>VTEX API Drill</a></h1>
+    <h1><a class="brand" href="#pytania" title="Wszystkie pytania" data-en-title="All questions"><svg class="brand-mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M16 18l14 30h4l14-30"/></svg><span class="brand-name">VTEX API Drill</span></a></h1>
     <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
       <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
-      <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja"><span data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span> <span class="num">36+4</span></button>
       <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
       <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
       <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
       <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
       <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button>
     </nav>
+    <!-- Not a tab: starting the exam is an action, so it sits apart as the one primary button. app.js fills it. -->
+    <a class="sim-cta" id="sim-cta" href="#symulacja"></a>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
     <button type="button" class="btn small" id="back-q" hidden></button>
   </div>
@@ -89,8 +90,8 @@
     </div>
   </section>
 
-  <section class="panel" id="p-symulacja" role="tabpanel" aria-labelledby="t-symulacja" hidden>
-    <h2 data-en="Exam simulation">Symulacja egzaminu</h2>
+  <section class="panel" id="p-symulacja" aria-labelledby="sim-h" hidden>
+    <h2 id="sim-h" data-en="Exam simulation">Symulacja egzaminu</h2>
     <ul class="facts" aria-label="Format prawdziwego egzaminu" data-en-aria="Format of the real exam">
       <li data-en="36 multiple-choice questions">36 pytań wielokrotnego wyboru</li><li data-en="4 practical tasks">4 zadania praktyczne</li><li data-en="2 h in total">2 h na całość</li><li data-en="80% pass mark">próg 80%</li>
     </ul>

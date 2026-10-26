@@ -192,6 +192,22 @@ a {
 .brand:hover .brand-mark rect {
   fill: var(--nav-ink);
 }
+/* The exam button shares the top row on a phone: the name shrinks, and on the narrowest screens only the mark shows. */
+@media (max-width: 400px) {
+  .bar h1 {
+    font-size: 1.12rem;
+  }
+}
+@media (max-width: 340px) {
+  .brand-name {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
 @media (max-width: 480px) {
   .brand {
     gap: 9px;
@@ -218,11 +234,60 @@ a {
   padding: 0;
   cursor: pointer;
 }
-.bar .tabs + .theme-btn {
+.bar .tabs + .sim-cta + .theme-btn {
   margin-left: -20px;
 }
 .theme-btn:hover {
   color: var(--nav-ink);
+}
+/* The one primary action in the bar. Desktop: far right, after the icon buttons. Phone: top row, left of Settings. */
+.sim-cta {
+  order: 2;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  margin-left: -12px;
+  padding: 0 16px 0 12px;
+  border-radius: 99px;
+  background: var(--nav-accent);
+  color: var(--nav-bg);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sim-cta svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+.sim-cta svg .fill {
+  fill: currentColor;
+  stroke: none;
+}
+.sim-cta .num {
+  font: 500 0.75rem var(--f-mono);
+  color: inherit;
+  opacity: 0.8;
+}
+.sim-cta.run .num {
+  font-size: 0.85rem;
+  opacity: 1;
+}
+.sim-cta:hover,
+.sim-cta[aria-current="page"] {
+  background: var(--nav-ink);
+}
+.bar .sim-cta:focus-visible {
+  outline-offset: 3px;
+}
+.bar .theme-btn {
+  order: 1;
 }
 /* The back link to a question only shows in HTTP Koty; there it takes its own line under the tabs. */
 #back-q {
@@ -258,6 +323,27 @@ a {
   .bar .tabs {
     order: 3;
     flex-basis: 100%;
+  }
+  /* Settings is pinned 60 px from the right edge, so the button keeps that slot free. */
+  .bar-in {
+    column-gap: 4px;
+  }
+  .bar .tabs + .sim-cta + .theme-btn {
+    margin-left: 0;
+  }
+  /* A 36 px pill inside a 44 px hit area, like the tabs. */
+  .sim-cta {
+    order: 0;
+    min-height: 44px;
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    margin: 0 44px 0 0;
+    padding: 0 12px 0 9px;
+    font-size: 0.95rem;
+  }
+  .sim-cta svg {
+    width: 14px;
+    height: 14px;
   }
 }
 
@@ -1977,6 +2063,12 @@ kbd {
   width: 1px;
   background: var(--nav-line);
 }
+/* With the exam out of the tabs a phone has room for the question count again (not on the narrowest). */
+@media (min-width: 361px) and (max-width: 480px) {
+  #t-pytania .num {
+    display: inline;
+  }
+}
 /* Long tab names ("Symulacja", English labels) get a short form on phones. */
 .tab-short {
   display: none;
@@ -3150,16 +3242,17 @@ div.setrow {
 
 <header class="bar">
   <div class="bar-in">
-    <h1><a class="brand" href="#pytania" title="Wszystkie pytania" data-en-title="All questions"><svg class="brand-mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M16 18l14 30h4l14-30"/></svg>VTEX API Drill</a></h1>
+    <h1><a class="brand" href="#pytania" title="Wszystkie pytania" data-en-title="All questions"><svg class="brand-mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M16 18l14 30h4l14-30"/></svg><span class="brand-name">VTEX API Drill</span></a></h1>
     <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
       <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
-      <button class="tab" role="tab" id="t-symulacja" data-tab="symulacja" aria-controls="p-symulacja"><span data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span> <span class="num">36+4</span></button>
       <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
       <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
       <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
       <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
       <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button>
     </nav>
+    <!-- Not a tab: starting the exam is an action, so it sits apart as the one primary button. app.js fills it. -->
+    <a class="sim-cta" id="sim-cta" href="#symulacja"></a>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
     <button type="button" class="btn small" id="back-q" hidden></button>
   </div>
@@ -3222,8 +3315,8 @@ div.setrow {
     </div>
   </section>
 
-  <section class="panel" id="p-symulacja" role="tabpanel" aria-labelledby="t-symulacja" hidden>
-    <h2 data-en="Exam simulation">Symulacja egzaminu</h2>
+  <section class="panel" id="p-symulacja" aria-labelledby="sim-h" hidden>
+    <h2 id="sim-h" data-en="Exam simulation">Symulacja egzaminu</h2>
     <ul class="facts" aria-label="Format prawdziwego egzaminu" data-en-aria="Format of the real exam">
       <li data-en="36 multiple-choice questions">36 pytań wielokrotnego wyboru</li><li data-en="4 practical tasks">4 zadania praktyczne</li><li data-en="2 h in total">2 h na całość</li><li data-en="80% pass mark">próg 80%</li>
     </ul>
@@ -8914,7 +9007,7 @@ const APIMAP = [
           self: rs.self || {},
           cur: rs.cur | 0,
           start: +rs.start || Date.now(),
-          endAt: +rs.endAt || Date.now(),
+          endAt: isFinite(+rs.endAt) && +rs.endAt ? +rs.endAt : Date.now(),
           dur: +rs.dur || 120,
           done: !!rs.done,
           used: rs.used | 0,
@@ -10043,12 +10136,42 @@ const APIMAP = [
       return;
     }
     var left = m.endAt - Date.now();
+    paintCta(left);
     var el = $("#sim-timer");
     if (el) {
       el.textContent = clock(left);
       el.classList.toggle("low", left < 600000);
     }
     if (left <= 0) finishSim(true);
+  }
+  /* The header button: a fresh start, or the way back to a running exam with its clock. */
+  function paintCta(left) {
+    var a = $("#sim-cta"),
+      run = S.sim && !S.sim.done;
+    if (run && left === undefined) left = S.sim.endAt - Date.now();
+    var html = run
+      ? ICON.clock +
+        '<span class="tab-long">' +
+        L("Wróć do testu", "Back to the exam") +
+        "</span> " +
+        '<span class="num">' +
+        esc(clock(left)) +
+        "</span>"
+      : ICON.play +
+        '<span class="tab-long">' +
+        L("Zacznij symulację", "Start the simulation") +
+        '</span><span class="tab-short">' +
+        L("Test", "Exam") +
+        '</span> <span class="num tab-long">' +
+        SIM_Q +
+        "+" +
+        SIM_P +
+        "</span>";
+    if (a.dataset.html !== html) a.innerHTML = a.dataset.html = html;
+    a.classList.toggle("run", !!run);
+    a.title = run ? L("Symulacja trwa: zostało ", "Exam running: ") + clock(left) + L("", " left") : "";
+    if (CUR === "symulacja") a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
   }
   function startTick() {
     stopTick();
@@ -10450,6 +10573,7 @@ const APIMAP = [
   function renderSim() {
     var root = $("#simroot");
     $("#p-symulacja").dataset.state = !S.sim ? "setup" : S.sim.done ? "done" : "run";
+    paintCta();
     if (!S.sim) {
       stopTick();
       root.innerHTML = simSetup();
@@ -11942,6 +12066,8 @@ const APIMAP = [
     return '<svg viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>";
   }
   var ICON = {
+    play: svg('<path class="fill" d="M8 5.5v13l10-6.5z"/>'),
+    clock: svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/>'),
     psec: svg('<path d="M6 5v14M19 5l-9 7 9 7z"/>'),
     nsec: svg('<path d="M18 5v14M5 5l9 7-9 7z"/>'),
     flame: svg(
@@ -12786,6 +12912,7 @@ const APIMAP = [
       o = overall(c);
     checkBadges(c, quiet);
     paintGx();
+    paintCta();
     $("#m-all-pct").textContent = o.total ? Math.round((o.done / o.total) * 100) + "%" : "–";
     $("#pm-all").setAttribute("stroke-dasharray", (o.total ? (o.done / o.total) * 100 : 0) + " 100");
     $("#m-all-label").textContent = o.done + " / " + o.total;
@@ -12959,7 +13086,8 @@ const APIMAP = [
     r.tab = tab;
     TABS.forEach(function (t) {
       $("#p-" + t).hidden = t !== tab;
-      $("#t-" + t).setAttribute("aria-selected", t === tab);
+      var tb = $("#t-" + t);
+      if (tb) tb.setAttribute("aria-selected", t === tab);
     });
     $("#p-focus").hidden = tab !== "focus";
     /* Focus reuses the list's card markup and ids, so only one of the two is ever in the document. */
@@ -12967,6 +13095,7 @@ const APIMAP = [
     if (tab !== "pytania") clearDocs();
     document.body.dataset.view = tab;
     CUR = tab;
+    paintCta();
     if (tab === "pytania") {
       /* history.state is stored data: keep only a known category and section. */
       if (!DOM_NAME[r.cat]) {
@@ -13118,6 +13247,13 @@ const APIMAP = [
     ev.preventDefault();
     if (CUR === "pytania" && !NAV.cur.cat) window.scrollTo(0, 0);
     else go({ tab: "pytania" });
+  });
+
+  $("#sim-cta").addEventListener("click", function (ev) {
+    if (ev.button || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+    ev.preventDefault();
+    if (CUR === "symulacja") window.scrollTo(0, 0);
+    else go({ tab: "symulacja" });
   });
 
   document.querySelector(".tabs").addEventListener("click", function (ev) {
