@@ -1028,6 +1028,10 @@ mark {
 .flag.dep {
   background: var(--warn-soft);
 }
+.flag.leg {
+  color: var(--muted);
+  background: var(--hover);
+}
 .ep.depr .s,
 .ep.depr .hs {
   color: var(--muted);
@@ -1043,6 +1047,9 @@ mark {
   border-radius: 4px;
   background: var(--warn-soft);
   font-family: var(--f-body);
+}
+.dep-note.leg {
+  background: var(--hover);
 }
 .dep-note code {
   font-family: var(--f-mono);
