@@ -8,6 +8,8 @@
 <!-- Inline so the page stays one offline file; the tile flips in dark mode so it never melts into a dark tab bar. -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cstyle%3Erect%7Bfill:%231c1622%7Dpath%7Bstroke:%23ff6b9d%7D@media (prefers-color-scheme:dark)%7Brect%7Bfill:%23f2edf5%7Dpath%7Bstroke:%23b5124a%7D%7D%3C/style%3E%3Crect width='64' height='64' rx='14'/%3E%3Cpath d='M16 18l14 30h4l14-30' fill='none' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <script>(function () { try { var d = JSON.parse(localStorage.getItem("vtex-drill-v1") || "{}"), t = d.theme; if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); if (d.lang === "en") document.documentElement.lang = "en"; } catch (e) { /* system theme, Polish */ } })();</script>
+<!-- The page paints while the 4 MB body still parses: keep the unrendered main out of sight until app.js has drawn it, so nothing jumps. -->
+<script>(function () { var r = document.documentElement; r.setAttribute("data-boot", /^#focus/.test(location.hash) ? "focus" : ""); document.addEventListener("DOMContentLoaded", function () { r.removeAttribute("data-boot"); }); })();</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Layout: one 860px working column under a dark sticky navigation bar. A progress card opens the page: mastered overall, then questions, flashcards, accuracy and last simulation against the 80% pass line.
@@ -1454,6 +1456,14 @@ body:has(.info-dlg[open]) {
   background: var(--ink);
   color: var(--bg);
   cursor: default;
+}
+/* Until app.js has rendered (see the boot script in index.html). data-boot is "" on a normal load, so match on presence.
+   visibility, not display: app.js measures the category strip while it renders. A focus link also drops the bar it hides. */
+:root[data-boot] .wrap {
+  visibility: hidden;
+}
+:root[data-boot="focus"] .bar {
+  display: none;
 }
 body[data-view="focus"] .bar,
 body[data-view="focus"] .pcard,

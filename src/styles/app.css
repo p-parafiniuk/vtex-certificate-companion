@@ -1443,6 +1443,14 @@ body:has(.info-dlg[open]) {
   color: var(--bg);
   cursor: default;
 }
+/* Until app.js has rendered (see the boot script in index.html). data-boot is "" on a normal load, so match on presence.
+   visibility, not display: app.js measures the category strip while it renders. A focus link also drops the bar it hides. */
+:root[data-boot] .wrap {
+  visibility: hidden;
+}
+:root[data-boot="focus"] .bar {
+  display: none;
+}
 body[data-view="focus"] .bar,
 body[data-view="focus"] .pcard,
 body[data-view="focus"] .src {
