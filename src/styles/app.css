@@ -1808,6 +1808,7 @@ body[data-view="api"] .wrap {
   --patch: var(--k5);
   --delete: var(--bad);
   --warn: var(--k3);
+  --warn-soft: var(--k3-soft);
 }
 #back-q {
   margin-bottom: 2px;

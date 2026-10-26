@@ -1025,3 +1025,35 @@ mark {
     transition: none;
   }
 }
+.flag.dep {
+  background: var(--warn-soft);
+}
+.ep.depr .s,
+.ep.depr .hs {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--warn);
+}
+.dep-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 4px;
+  background: var(--warn-soft);
+  font-family: var(--f-body);
+}
+.dep-note code {
+  font-family: var(--f-mono);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+.dep-note .w {
+  color: var(--warn);
+}
+@media (max-width: 560px) {
+  .dep-note > .flag {
+    display: none;
+  }
+}
