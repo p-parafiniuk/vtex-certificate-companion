@@ -19,7 +19,8 @@
     "serve": "node scripts/serve.mjs 8000",
     "review-scope": "node scripts/review-scope.mjs",
     "shots": "node scripts/shots.mjs",
-    "compare": "node scripts/compare.mjs"
+    "compare": "node scripts/compare.mjs",
+    "prune": "node scripts/prune.mjs"
   },
   "engines": {
     "node": ">=18"
