@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "description": "VTEX API Drill: study app built from src/ into one self-contained vtex-api-drill.html",
+  "author": "Paweł Parafiniuk",
+  "license": "SEE LICENSE IN LICENSE",
   "scripts": {
     "build": "node scripts/validate.mjs && node scripts/build.mjs",
     "check": "node scripts/branch.mjs && node scripts/format.mjs --check && node scripts/validate.mjs && node scripts/build.mjs --check",
