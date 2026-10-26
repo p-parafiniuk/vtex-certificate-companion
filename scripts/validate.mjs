@@ -86,6 +86,7 @@ const used = new Set(
   [...D.Q, ...D.F]
     .flatMap(x => x.l || [])
     .concat(Object.values(D.NOTES).flatMap(n => (n.s || []).flatMap(s => s[2] || [])))
+    .concat(Object.values(D.APIOV).flatMap(cs => (Array.isArray(cs) ? cs : []).flatMap(c => c.l || [])))
 );
 for (const [k, v] of Object.entries(D.DOCS)) {
   if (!Array.isArray(v) || v.length !== 2 || !isStr(v[1])) E("DOCS." + k, "must be [url, label]");
@@ -169,6 +170,47 @@ for (const [k, n] of Object.entries(D.NOTES)) {
         if (!D.DOCS[d]) E(ws, "DOCS key `" + d + "` not in DOCS");
       });
     });
+}
+
+/* API Map bird's-eye view: per category, one card per API. Same fact rule as notes; every APIMAP API gets one card. */
+{
+  const seen = new Set();
+  for (const [k, cards] of Object.entries(D.APIOV)) {
+    const w = "APIOV." + k;
+    if (!doms.has(k)) E(w, "not in DOMS");
+    if (!Array.isArray(cards) || !cards.length) {
+      E(w, "needs at least one card");
+      continue;
+    }
+    cards.forEach((c, i) => {
+      const wc = w + "[" + i + "]";
+      for (const f of Object.keys(c))
+        if (!["k", "do", "no", "alt", "edge", "l"].includes(f)) E(wc, "unknown field `" + f + "`");
+      if (!apis.has(c.k)) return E(wc, "api `" + c.k + "` not in APIMAP");
+      if (seen.has(c.k)) E(wc, "second card for `" + c.k + "`");
+      seen.add(c.k);
+      for (const f of ["do", "no", "edge"]) {
+        if (c[f] === undefined && f !== "do") continue;
+        const x = c[f];
+        if (!isStr(x)) {
+          E(wc + "." + f, "empty text");
+          continue;
+        }
+        markup(wc + "." + f, x);
+        if (/\[UNVERIFIED|https?:|</i.test(x))
+          E(wc + "." + f, "no [UNVERIFIED], URLs or raw < : sources go in DOCS keys");
+        if (x.split(/\s+/).length > 20) W(wc + "." + f, "over 20 words: the card is a one-glance summary");
+      }
+      if (c.alt !== undefined && !c.no) E(wc, "alt without no");
+      (c.alt || []).forEach(x => {
+        if (!Array.isArray(x) || (x[0] === null ? !isStr(x[1]) : !apis.has(x[0])))
+          E(wc, "alt must be [apiKey] / [apiKey, label] / [null, label]");
+      });
+      if (!Array.isArray(c.l) || !c.l.length) E(wc, "needs DOCS keys in l");
+      else c.l.forEach(d => D.DOCS[d] || E(wc, "DOCS key `" + d + "` not in DOCS"));
+    });
+  }
+  for (const a of apis.keys()) if (!seen.has(a)) W("APIOV", "no card for API `" + a + "`");
 }
 
 /* HTTP Koty */

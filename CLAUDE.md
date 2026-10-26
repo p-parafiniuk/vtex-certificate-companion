@@ -18,6 +18,7 @@ A study app for the VTEX APIs badge. It ships as **one self-contained HTML file*
 | `npm run stats` | table of questions per domain × round, to find gaps |
 | `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
 | `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
+| `node scripts/apimap-import.mjs <key> "<name>" "<schema file>" <ref>` | add or refresh one API Map entry from vtex/openapi-schemas (keeps hand-set LEGACY/DEPR flags) |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json` |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
 | `npm run compare -- <topic>` | mockup vs built page, side by side, into `shots/compare-<topic>-<board>.png`. Needs `design/<topic>/` (see Always show it). Exits 1 on a console error |
@@ -36,6 +37,7 @@ src/js/koty.js          bootKoty(root, onNav), with its own state under localSto
 src/apimap/template.html, src/styles/apimap.css, src/js/apimap.js
                         VTEX API Map, same pattern in #apimap: bootApiMap(root, onNav), state in "apimap.v1"
 src/data/*.json         all content, one item per line (apimap.json: one API per line, from vtex/openapi-schemas, `ref` = api-reference slug)
+src/data/apioverview.json per category: API Map "Z lotu ptaka" cards {k, do, no?, alt?, edge?, l}. Polish only, same fact rule as notes
 src/data/notes.json      per category (+ "all"): TL;DR and study notes for the Notatki section
 src/data/categories.json per category: `api` = [apiKey, tags?] for its embedded API Map, `ref` = [slug, label] API Reference pages
 src/img/cats/<code>.jpg http.cat images, inlined as KCAT at build time
