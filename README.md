@@ -38,12 +38,10 @@ See [`CLAUDE.md`](CLAUDE.md) for the content schema, writing rules and the branc
 ### Built with Claude Code
 The app is developed with [Claude Code](https://claude.com/claude-code). The repo carries its own skills (`/feature`, `/fix`, `/ux`, `/security`, `/gamify`, `/copy`) and a `/review` gate that runs only the Sonnet reviewers a diff needs (fact-checker, UI, security). The author directs, reviews and selects every change.
 
-## License and copyright
-**Copyright © 2026 Paweł Parafiniuk. All rights reserved.**
+## License
+[MIT](LICENSE) © 2026 Paweł Parafiniuk. You may use, copy, modify and share the code and the study content, as long as the copyright and license notice stay with it.
 
-This is proprietary software, not open source. The source is public so it can be read, but no license is granted to copy, modify, distribute or reuse it, in whole or in part, without the author's prior written permission. Full terms in [`LICENSE`](LICENSE). To ask for permission, open an issue in this repository.
-
-Third-party material keeps its own terms (details in [`LICENSE`](LICENSE)):
+The MIT License covers the author's own work only. Third-party material keeps its own terms (details in [`LICENSE`](LICENSE)):
 - **http.cat** images: MIT License, © 2015 Rogério Vicente, illustrations by Tomomi Imura (@girliemac).
 - **VTEX** names, trademarks, documentation and OpenAPI schemas belong to VTEX. The app links to their pages and summarizes public facts.
 - **Google Fonts** are loaded from Google under the SIL Open Font License; the page falls back to system fonts.
