@@ -350,6 +350,7 @@
           ans: rs.ans || {},
           txt: rs.txt || {},
           flag: rs.flag || {},
+          cf: simConfLoad(rs.cf, rs.ids),
           self: rs.self || {},
           cur: rs.cur | 0,
           start: +rs.start || Date.now(),
@@ -791,6 +792,8 @@
         ">" +
         L("Sprawdź odpowiedź", "Check answer") +
         "</button></div>";
+    } else if (mode === "sim" && S.conf) {
+      tail = confRow(i, S.sim.cf[i] || 0);
     }
 
     var know =
@@ -847,8 +850,8 @@
       "</article>"
     );
   }
-  function confRow(i) {
-    var c = CONF[i] || 0;
+  function confRow(i, c) {
+    if (c === undefined) c = CONF[i] || 0;
     return (
       '<div class="conf" role="group" aria-labelledby="cf-' +
       i +
@@ -1702,6 +1705,70 @@
       "</button></div>"
     );
   }
+  /* Confidence lives in the sim only, so an exam run never touches the calibration in Postęp. */
+  function simConfLoad(x, ids) {
+    var o = {};
+    if (isObj(x))
+      ids.forEach(function (i) {
+        var v = x[i];
+        if (v === 1 || v === 2 || v === 3) o[i] = v;
+      });
+    return o;
+  }
+  function simConfStats(m) {
+    var lv = [
+        [0, 0],
+        [0, 0],
+        [0, 0]
+      ],
+      none = 0,
+      trap = 0;
+    m.ids.forEach(function (i) {
+      var c = m.cf[i],
+        ok = isRight(i, m.ans[i]);
+      if (!c) return none++;
+      lv[c - 1][1]++;
+      if (ok) lv[c - 1][0]++;
+      else if (c === 3) trap++;
+    });
+    if (none === m.ids.length) return "";
+    return (
+      "<h3>" +
+      L("Pewność odpowiedzi", "Answer confidence") +
+      "</h3>" +
+      '<p class="seth">' +
+      L(
+        "Ile odpowiedzi było dobrych przy każdym poziomie pewności. „Na pewno” powinno być blisko 100%.",
+        "How many answers were right at each confidence level. “Sure” should be close to 100%."
+      ) +
+      '</p><ul class="rv-cal">' +
+      lv
+        .map(function (x, k) {
+          var p = x[1] ? Math.round((x[0] / x[1]) * 100) : 0;
+          return (
+            "<li><span>" +
+            T(CONFS[k]) +
+            '</span><span class="meter" aria-hidden="true"><i class="c' +
+            (k + 1) +
+            '" style="width:' +
+            p +
+            '%"></i></span><span class="meter-label">' +
+            (x[1] ? "<b>" + p + "%</b> / " + x[1] : "–") +
+            "</span></li>"
+          );
+        })
+        .join("") +
+      '</ul><p class="simcf">' +
+      L("Bez oceny pewności: ", "No confidence marked: ") +
+      "<b>" +
+      none +
+      "</b> · " +
+      L("Błędne „na pewno”: ", "Wrong but “sure”: ") +
+      "<b>" +
+      trap +
+      "</b></p>"
+    );
+  }
   function simResult() {
     var m = S.sim,
       nq = m.ids.length,
@@ -1796,7 +1863,8 @@
         : "<p>" + L("Bez błędów w części testowej.", "No mistakes in the test part.") + "</p>") +
       '<div class="row"><button type="button" class="btn primary" id="sim-new">' +
       L("Nowa symulacja", "New simulation") +
-      "</button></div></div>";
+      "</button></div></div>" +
+      simConfStats(m);
 
     if (m.pr.length) {
       html +=
@@ -1903,6 +1971,9 @@
               '</span><span class="rnd">#' +
               (i + 1) +
               "</span>" +
+              (m.cf[i]
+                ? '<span class="cfb">' + L("Pewność: ", "Confidence: ") + T(CONFS[m.cf[i] - 1]) + "</span>"
+                : "") +
               (m.flag[p]
                 ? '<span class="flagb"><span class="fdot" aria-hidden="true"></span>' +
                   L("do powrotu", "flagged") +
@@ -1984,6 +2055,7 @@
       ans: {},
       txt: {},
       flag: {},
+      cf: {},
       self: {},
       cur: 0,
       start: now,
@@ -2086,6 +2158,18 @@
         var f = $('#simroot [data-only="' + k + '"]');
         if (f) f.focus({ preventScroll: true });
       }
+      return;
+    }
+    b = t.closest(".cf");
+    if (b) {
+      var ci = +b.closest(".q").dataset.i,
+        cv = +b.dataset.cf;
+      if (m.cf[ci] === cv) delete m.cf[ci];
+      else m.cf[ci] = cv;
+      b.parentNode.querySelectorAll(".cf").forEach(function (x) {
+        x.setAttribute("aria-pressed", +x.dataset.cf === m.cf[ci]);
+      });
+      save();
       return;
     }
     b = t.closest(".opt");

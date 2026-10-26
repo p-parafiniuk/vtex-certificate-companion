@@ -739,6 +739,13 @@ h3 {
   border-radius: 99px;
   padding: 2px 9px 2px 7px;
 }
+.cfb {
+  font-size: 0.74rem;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  padding: 1px 8px;
+}
 .q-head {
   display: flex;
   align-items: center;
@@ -3174,6 +3181,10 @@ div.setrow {
 }
 .rv-cal .meter-label {
   text-align: right;
+}
+.simcf {
+  margin: -6px 0 0;
+  font-size: 0.9rem;
 }
 .meter i.b1 {
   background: var(--bad);
