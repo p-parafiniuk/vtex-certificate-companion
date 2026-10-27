@@ -3562,7 +3562,7 @@ div.setrow {
   <section class="panel" id="p-fiszki" role="tabpanel" aria-labelledby="t-fiszki" hidden>
     <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, flashcards and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
     <p class="lead" data-en-html="<strong>Answer out loud or write the request on paper first.</strong> Only then reveal the answer. The &ldquo;Practical&rdquo; flashcards train the 4 practical tasks: method, path, body. Under each answer there is a link to the VTEX docs. F1–20 are round 1, F21–35 are round 2."><strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce.</strong> Dopiero potem odsłoń odpowiedź. Fiszki „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body. Pod każdą odpowiedzią jest link do dokumentacji VTEX. F1–20 to runda 1, F21–35 to runda 2.</p>
-    <div class="row"><button type="button" class="btn small" id="f-hide-all" data-en="Hide all answers">Ukryj wszystkie odpowiedzi</button></div>
+    <div class="row"><button type="button" class="btn small" id="f-show-all" data-en="Show all answers">Pokaż wszystkie odpowiedzi</button><button type="button" class="btn small" id="f-hide-all" data-en="Hide all answers">Ukryj wszystkie odpowiedzi</button><span class="how" id="f-open-n"></span></div>
     <div class="list" id="flist"></div>
   </section>
 
@@ -12063,6 +12063,19 @@ function bootApiMap(root, onNav, embed) {
         "</div></article>"
       );
     }).join("");
+    fSync();
+  }
+  function fSync() {
+    var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length;
+    $("#f-show-all").disabled = n === F.length;
+    $("#f-hide-all").disabled = !n;
+    $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + F.length;
+  }
+  function setAll(open) {
+    document.querySelectorAll("#flist .rev").forEach(function (b) {
+      setRev(b, open);
+    });
+    fSync();
   }
   function setRev(btn, open) {
     var ans = document.getElementById(btn.getAttribute("aria-controls"));
@@ -12072,7 +12085,9 @@ function bootApiMap(root, onNav, embed) {
   }
   $("#flist").addEventListener("click", function (ev) {
     var b = ev.target.closest(".rev");
-    if (b) setRev(b, b.getAttribute("aria-expanded") !== "true");
+    if (!b) return;
+    setRev(b, b.getAttribute("aria-expanded") !== "true");
+    fSync();
   });
   $("#flist").addEventListener("change", function (ev) {
     if (!ev.target.classList.contains("kn")) return;
@@ -12084,10 +12099,14 @@ function bootApiMap(root, onNav, embed) {
     card.classList.toggle("is-known", !!S.fknown[i]);
     header();
   });
+  /* The pressed button disables itself, so focus moves to its twin instead of falling to <body>. */
+  $("#f-show-all").addEventListener("click", function () {
+    setAll(true);
+    $("#f-hide-all").focus();
+  });
   $("#f-hide-all").addEventListener("click", function () {
-    document.querySelectorAll("#flist .rev").forEach(function (b) {
-      setRev(b, false);
-    });
+    setAll(false);
+    $("#f-show-all").focus();
   });
 
   /* ---------- Grywalizacja: streak, daily goal, readiness, badges, combo ----------
