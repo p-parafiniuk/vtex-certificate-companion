@@ -4815,8 +4815,8 @@
         });
       });
     });
-    if (typeof APIMAP !== "undefined")
-      APIMAP.forEach(function (a) {
+    if (typeof apimapData === "function")
+      apimapData().forEach(function (a) {
         a.eps.forEach(function (e) {
           add("a", e.m + " " + e.p, (e.s || "") + " " + a.name, {
             k: a.key,
