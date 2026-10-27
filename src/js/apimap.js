@@ -1,10 +1,11 @@
 /* VTEX API Map, mounted on demand into the shadow root of #apimap. Data: vtex/openapi-schemas, one API per item.
    embed: a second copy inside a category view, { onDoc(url, label) }. It shows only the APIs given to scope(), stores only
    the shared tree/list choice, and opens API Reference links through onDoc (the category's docs frame) instead of a new tab. */
+/* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated (dt date), lg legacy, dr replacement, q query (* = required), a auth, b body, r responses}]
+   Top level, so the main app's search can read it without booting the map. */
+/*@data APIMAP*/
 function bootApiMap(root, onNav, embed) {
   "use strict";
-  /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated (dt date), lg legacy, dr replacement, q query (* = required), a auth, b body, r responses}] */
-  /*@data APIMAP*/
   const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
   /* UI language comes from <html lang>, which the main app sets; relang() redraws after a switch. */
   const L = (pl, en) => (document.documentElement.lang === "en" ? en : pl);
@@ -873,6 +874,13 @@ function bootApiMap(root, onNav, embed) {
   return {
     show: api => show(api),
     api: () => state.api,
+    /* The main app's search lands here with an endpoint path: search for it inside the API just shown. */
+    query: q => {
+      $("q").value = q;
+      state.q = q.trim().toLowerCase();
+      state.qAll = state.api === "all";
+      render();
+    },
     scope,
     relang: () => {
       buildLabels();

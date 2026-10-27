@@ -4766,6 +4766,245 @@
     else if (b) window.scrollTo(0, 0);
   });
 
+  /* ---------- Szukaj: one box over questions, flashcards, notes and API Map endpoints ---------- */
+  var GS = { idx: null, more: {}, t: 0 },
+    gsDlg = $("#gs-dlg"),
+    gsQ = $("#gs-q"),
+    GS_MAX = 5,
+    GS_GROUPS = [
+      ["q", ["Pytania", "Questions"]],
+      ["f", ["Fiszki", "Flashcards"]],
+      ["n", ["Notatki", "Notes"]],
+      ["a", ["API", "API"]]
+    ];
+  function gsPlain(s) {
+    return String(s)
+      .replace(/\*\*|`/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  /* One output character per input character, so match positions map straight back onto the shown text. */
+  function gsNorm(s) {
+    var o = "";
+    for (var i = 0; i < s.length; i++) o += s.charAt(i).toLowerCase().normalize("NFD").charAt(0);
+    return o;
+  }
+  function gsIndex() {
+    var x = [];
+    function add(g, text, more, o) {
+      o.g = g;
+      o.text = text;
+      o.nt = gsNorm(text);
+      o.hay = gsNorm(text + " " + gsPlain(more));
+      x.push(o);
+    }
+    Q.forEach(function (q, i) {
+      add("q", gsPlain(q.q), q.o.join(" ") + " " + q.e, { id: "q" + (i + 1), d: q.d, n: "#" + (i + 1) });
+    });
+    F.forEach(function (f, i) {
+      add("f", gsPlain(f.q), f.a, { id: "f" + (i + 1), d: f.d, n: "F" + (i + 1) });
+    });
+    Object.keys(NOTES).forEach(function (d) {
+      var n = NOTES[d];
+      (n.t || []).forEach(function (b) {
+        add("n", gsPlain(b), "", { d: d, h: "TL;DR" });
+      });
+      (n.s || []).forEach(function (s) {
+        s[1].forEach(function (b) {
+          add("n", gsPlain(b), s[0], { d: d, h: s[0] });
+        });
+      });
+    });
+    if (typeof APIMAP !== "undefined")
+      APIMAP.forEach(function (a) {
+        a.eps.forEach(function (e) {
+          add("a", e.m + " " + e.p, (e.s || "") + " " + a.name, {
+            k: a.key,
+            api: a.name,
+            m: e.m,
+            p: e.p,
+            s: e.s || ""
+          });
+        });
+      });
+    return x;
+  }
+  function gsMark(text, nt, words) {
+    var on = [],
+      out = "",
+      i;
+    words.forEach(function (w) {
+      for (var at = nt.indexOf(w); at > -1; at = nt.indexOf(w, at + 1)) for (i = at; i < at + w.length; i++) on[i] = 1;
+    });
+    for (i = 0; i < text.length;) {
+      var j = i;
+      while (j < text.length && !!on[j] === !!on[i]) j++;
+      out += on[i] ? "<mark>" + esc(text.slice(i, j)) + "</mark>" : esc(text.slice(i, j));
+      i = j;
+    }
+    return out;
+  }
+  function gsMeta(x) {
+    if (x.g === "a") return esc(x.api + (x.s ? " · " + x.s : ""));
+    var dom = x.d === "all" ? L("Podstawy API", "API basics") : dn(x.d);
+    return esc(x.g === "n" ? dom + " · " + x.h : x.n + " · " + dom);
+  }
+  function gsRender() {
+    if (!GS.idx) return;
+    var raw = gsQ.value.trim(),
+      words = gsNorm(raw).split(/\s+/).filter(Boolean);
+    if (raw.length < 2) {
+      $("#gs-sum").textContent = L(
+        "Wpisz co najmniej 2 znaki. Szuka w pytaniach, fiszkach, notatkach i endpointach API Map.",
+        "Type at least 2 characters. Searches questions, flashcards, notes and API Map endpoints."
+      );
+      $("#gs-res").innerHTML = "";
+      return;
+    }
+    var hits = { q: [], f: [], n: [], a: [] },
+      total = 0;
+    GS.idx.forEach(function (x, k) {
+      if (
+        words.every(function (w) {
+          return x.hay.indexOf(w) > -1;
+        })
+      ) {
+        hits[x.g].push(k);
+        total++;
+      }
+    });
+    var html = "";
+    GS_GROUPS.forEach(function (gr) {
+      var g = gr[0],
+        list = hits[g];
+      if (!list.length) return;
+      /* Items whose shown text holds every word come first; the rest matched in options, answers or summaries. */
+      list.sort(function (a, b) {
+        function shown(k) {
+          return words.every(function (w) {
+            return GS.idx[k].nt.indexOf(w) > -1;
+          })
+            ? 0
+            : 1;
+        }
+        return shown(a) - shown(b) || a - b;
+      });
+      var cut = GS.more[g] ? list.length : Math.min(list.length, GS_MAX);
+      html +=
+        '<section class="gs-g" aria-label="' +
+        L(gr[1][0], gr[1][1]) +
+        '"><h3>' +
+        L(gr[1][0], gr[1][1]) +
+        " · " +
+        list.length +
+        "</h3>";
+      list.slice(0, cut).forEach(function (k) {
+        var x = GS.idx[k];
+        html +=
+          '<button type="button" class="gs-it' +
+          (g === "a" ? " gs-api" : "") +
+          '" data-gs="' +
+          k +
+          '"><span class="gs-m">' +
+          gsMeta(x) +
+          '</span><span class="gs-t">' +
+          (g === "a"
+            ? '<span class="gs-mth">' + esc(x.m) + "</span> " + gsMark(x.p, gsNorm(x.p), words)
+            : gsMark(x.text, x.nt, words)) +
+          "</span></button>";
+      });
+      if (cut < list.length)
+        html +=
+          '<button type="button" class="linkbtn gs-more" data-gs-more="' +
+          g +
+          '">' +
+          L("+" + (list.length - cut) + " więcej", "+" + (list.length - cut) + " more") +
+          "</button>";
+      html += "</section>";
+    });
+    $("#gs-sum").textContent = total
+      ? L(plural(total, "wynik", "wyniki", "wyników"), plural(total, "result", "results", "results"))
+      : L("Brak wyników dla „" + raw + "”.", "No results for “" + raw + "”.");
+    $("#gs-res").innerHTML = html;
+  }
+  function gsOpen() {
+    if (gsDlg.open) return gsQ.select();
+    if (!GS.idx) GS.idx = gsIndex();
+    gsDlg.showModal();
+    gsQ.select();
+    gsRender();
+  }
+  function gsGo(x) {
+    gsDlg.close();
+    if (x.g === "q" || x.g === "f") {
+      var c = BY_ID[x.id];
+      /* The deck must hold the card: its own category, every card type, and its round. */
+      S.fo.dom = c.d;
+      S.fo.deck = "all";
+      if (!inSet(c)) S.set = "all";
+      save();
+      go({ tab: "focus", id: c.id });
+    } else if (x.g === "n") go(x.d === "all" ? { tab: "pytania" } : { tab: "pytania", cat: x.d, sec: "info" });
+    else {
+      go({ tab: "api", sub: x.k });
+      if (APIM) APIM.query(x.p);
+    }
+  }
+  $("#gs-open").addEventListener("click", gsOpen);
+  $("#gs-close").addEventListener("click", function () {
+    gsDlg.close();
+  });
+  gsQ.addEventListener("input", function () {
+    GS.more = {};
+    clearTimeout(GS.t);
+    GS.t = setTimeout(gsRender, 80);
+  });
+  gsDlg.addEventListener("click", function (ev) {
+    if (ev.target === gsDlg) return gsDlg.close();
+    var b = ev.target.closest("[data-gs]");
+    if (b) return gsGo(GS.idx[+b.dataset.gs]);
+    b = ev.target.closest("[data-gs-more]");
+    if (b) {
+      var g = b.dataset.gsMore,
+        n = b.parentNode.querySelectorAll(".gs-it").length;
+      GS.more[g] = 1;
+      gsRender();
+      /* The button vanishes on redraw, so focus moves to the first item it revealed. */
+      var its = Array.prototype.filter.call(document.querySelectorAll("#gs-res .gs-it"), function (el) {
+        return GS.idx[+el.dataset.gs].g === g;
+      });
+      if (its[n]) its[n].focus();
+    }
+  });
+  /* Arrows walk the input and the results as one list; Enter on a result is a native button press. */
+  gsDlg.addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter" && ev.target === gsQ) {
+      clearTimeout(GS.t);
+      gsRender();
+      var top = $("#gs-res .gs-it");
+      if (top) gsGo(GS.idx[+top.dataset.gs]);
+      return ev.preventDefault();
+    }
+    if (ev.key !== "ArrowDown" && ev.key !== "ArrowUp") return;
+    var its = [gsQ].concat(Array.prototype.slice.call(document.querySelectorAll("#gs-res .gs-it"))),
+      at = its.indexOf(document.activeElement);
+    if (at < 0) return;
+    ev.preventDefault();
+    var to = its[Math.max(0, Math.min(its.length - 1, at + (ev.key === "ArrowDown" ? 1 : -1)))];
+    to.focus();
+  });
+  document.addEventListener("keydown", function (ev) {
+    var t = ev.composedPath ? ev.composedPath()[0] : ev.target,
+      k = ev.key,
+      typing = t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+    var hot =
+      (k === "/" && !typing && !ev.ctrlKey && !ev.metaKey && !ev.altKey) ||
+      ((ev.ctrlKey || ev.metaKey) && (k === "k" || k === "K"));
+    if (!hot || ev.defaultPrevented || (document.querySelector("dialog[open]") && !gsDlg.open)) return;
+    ev.preventDefault();
+    gsOpen();
+  });
+
   var infoDlg = $("#info-dlg");
   $("#info-open").addEventListener("click", function () {
     infoDlg.showModal();

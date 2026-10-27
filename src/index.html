@@ -29,6 +29,7 @@
     <!-- Not a tab: starting the exam is an action, so it sits apart as the one primary button. app.js fills it. -->
     <a class="sim-cta" id="sim-cta" href="#symulacja"></a>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
+    <button type="button" class="theme-btn srch-btn" id="gs-open" aria-haspopup="dialog" aria-controls="gs-dlg" aria-label="Szukaj (/)" title="Szukaj (/)" data-en-aria="Search (/)" data-en-title="Search (/)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span class="srch-l" aria-hidden="true" data-en="Search">Szukaj</span><kbd aria-hidden="true">/</kbd></button>
     <button type="button" class="btn small" id="back-q" hidden></button>
   </div>
 </header>
@@ -198,6 +199,16 @@
   <section class="panel" id="p-api" role="tabpanel" aria-labelledby="t-api" hidden>
     <div id="apimap"></div>
   </section>
+
+  <dialog class="gs-dlg" id="gs-dlg" aria-label="Szukaj" data-en-aria="Search">
+    <div class="gs-head">
+      <label class="gs-field"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input type="search" id="gs-q" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-controls="gs-res" aria-label="Szukaj w pytaniach, fiszkach, notatkach i API Map" data-en-aria="Search questions, flashcards, notes and the API Map" placeholder="Pytania, fiszki, notatki, endpointy" data-en-ph="Questions, flashcards, notes, endpoints"></label>
+      <button type="button" class="gs-x" id="gs-close" data-en="Close">Zamknij</button>
+    </div>
+    <p class="gs-sum" id="gs-sum" aria-live="polite"></p>
+    <div class="gs-res" id="gs-res"></div>
+    <p class="gs-keys" data-en-html="&lt;kbd&gt;↑&lt;/kbd&gt; &lt;kbd&gt;↓&lt;/kbd&gt; choose · &lt;kbd&gt;Enter&lt;/kbd&gt; open · &lt;kbd&gt;Esc&lt;/kbd&gt; close · &lt;kbd&gt;/&lt;/kbd&gt; or &lt;kbd&gt;Ctrl&lt;/kbd&gt; &lt;kbd&gt;K&lt;/kbd&gt; anywhere opens search"><kbd>↑</kbd> <kbd>↓</kbd> wybór · <kbd>Enter</kbd> otwórz · <kbd>Esc</kbd> zamknij · <kbd>/</kbd> lub <kbd>Ctrl</kbd> <kbd>K</kbd> otwiera wyszukiwarkę z każdego miejsca</p>
+  </dialog>
 
   <footer class="src">
     <div class="src-row">

@@ -8,3 +8,5 @@ src/index.html
 package-lock.json
 shots/
 *.md
+# Claude Code worktrees are other checkouts of this repo, with their own ignore rules.
+.claude/
