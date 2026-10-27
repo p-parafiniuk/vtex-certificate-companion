@@ -4783,10 +4783,17 @@
       .replace(/\s+/g, " ")
       .trim();
   }
-  /* One output character per input character, so match positions map straight back onto the shown text. */
+  /* One output character per input character, so match positions map straight back onto the shown text.
+     normalize() per character is the slow part of the index, and the corpus uses few distinct characters. */
+  var GS_CH = {};
   function gsNorm(s) {
     var o = "";
-    for (var i = 0; i < s.length; i++) o += s.charAt(i).toLowerCase().normalize("NFD").charAt(0);
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charAt(i),
+        m = GS_CH[c];
+      if (m === undefined) m = GS_CH[c] = c.toLowerCase().normalize("NFD").charAt(0);
+      o += m;
+    }
     return o;
   }
   function gsIndex() {
@@ -5033,4 +5040,8 @@
   apply(first, true);
   NAV.ok = writeState(first, false);
   if (first.y) window.scrollTo(0, first.y);
+  /* Build the search index while idle, so the first open of Szukaj does not wait for it. */
+  (window.requestIdleCallback || setTimeout)(function () {
+    if (!GS.idx) GS.idx = gsIndex();
+  });
 })();
