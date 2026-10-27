@@ -1232,6 +1232,11 @@ mark {
 }
 
 /* Bird's-eye view, second page: License Manager resources and predefined roles behind the endpoints. */
+.ovpanel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
 .ovtabs {
   display: inline-flex;
   justify-self: start;
@@ -1655,6 +1660,30 @@ mark {
     justify-self: stretch;
     flex-basis: 100%;
   }
+  .ovtabs button,
+  .rlens button {
+    min-height: 44px;
+  }
+  .rsrc {
+    display: inline-block;
+    padding: 8px 10px;
+    margin: -8px -6px;
+  }
+  .ovhead .rsrcs a {
+    display: inline-block;
+    padding-block: 12px;
+    margin-block: -12px;
+  }
+  /* On a phone the folded traps sit right under the lead, before the lens switch, as in the mockup. */
+  .rlay {
+    display: contents;
+  }
+  .ovpanel > .ovhead {
+    order: -2;
+  }
+  .rtraps {
+    order: -1;
+  }
   .rq {
     flex-basis: 100%;
   }
@@ -1675,7 +1704,6 @@ mark {
     display: none;
   }
   .rtraps {
-    order: -1;
     flex-basis: 100%;
   }
   .rtraps summary {

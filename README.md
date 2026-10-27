@@ -10,17 +10,23 @@ A study app for VTEX certifications, starting with the **VTEX APIs badge**. It s
 ## What's inside
 | Tab | What it does |
 |---|---|
-| **Pytania** | 161 exam-style multiple-choice questions in 10 categories. Each category has a side panel entry with the question list or **Focus** mode, **Notatki** (TL;DR and verified study notes, exam traps included), **Ścieżki API** (the category's endpoints) and **Dokumentacja** (the official page in a frame). |
+| **Pytania** | 171 exam-style multiple-choice questions in 10 categories. Each category has a side panel entry with the question list or **Focus** mode, **Notatki** (TL;DR and verified study notes, exam traps included), **Ścieżki API** (the category's endpoints) and **Dokumentacja** (the official page in a frame). |
 | **Symulacja** | A timed exam simulation. Results can be filtered down to the questions you flagged to revisit. |
-| **Fiszki** | 35 flashcards, 14 of them hands-on practical tasks you grade yourself. |
+| **Fiszki** | 38 flashcards, 15 of them hands-on practical tasks you grade yourself. |
 | **Postęp** | Progress per category, Leitner spaced reviews (boxes 1 to 5, next review after 1, 3, 7, 16 or 35 days), optional confidence before you check, streaks, a daily goal, badges and an exam readiness score. Export and import progress as a file. |
 | **HTTP** | *HTTP Koty*: all 78 status codes from http.cat with memory hooks, how the VTEX docs use them, and a 24-question quiz. |
-| **API Map** | 11 VTEX APIs from `vtex/openapi-schemas`: endpoints grouped by tag, filters, a list view and the API Reference page next to each endpoint. |
+| **API Map** | 21 VTEX APIs from `vtex/openapi-schemas`: endpoints grouped by tag, filters, a list view and the API Reference page next to each endpoint. **Z lotu ptaka** sums up each API in three lines. Its **Role i uprawnienia** page shows the License Manager resources and predefined roles behind every endpoint, as a Product › Category › Resource tree or as role cards. It has an edge-case filter (custom role only, no permissions) and exam traps. |
 | **Ustawienia** | Polish or English UI, light or dark theme, and switches for the gamification. |
 
 Categories: Auth, codes, SSO · Catalog · Search & Session · Pricing & promotions · Logistics · Checkout · Orders, Feed, Hook · Payments & anti-fraud · Master Data · Marketplace / Seller.
 
-Every question, flashcard and note links at least one of 152 official VTEX sources (developers.vtex.com, help.vtex.com, learn.vtex.com, github.com/vtex), and each fact was checked against the page it links.
+Every question, flashcard and note links at least one of 166 official VTEX sources (developers.vtex.com, help.vtex.com, learn.vtex.com, github.com/vtex), and each fact was checked against the page it links.
+
+## Releases
+| Version | What's new |
+|---|---|
+| **1.1** | API Map **Role i uprawnienia**: the Permissions section of all 617 endpoints, imported from `vtex/openapi-schemas`, as a permission tree and role cards with an edge-case filter and sourced traps. Since 1.0: global search, weak-area drill, confidence stats in the simulation, Search & Session round 1, lazy-parsed data blocks. |
+| **1.0** | First release: questions, simulation, flashcards, progress, HTTP Koty, API Map. |
 
 ## Development
 `vtex-api-drill.html` is a build output. Edit `src/` (content lives in `src/data/*.json`), then rebuild. Requires Node 18+. The page has no runtime dependencies; `npm install` adds Prettier for development and enables the git hooks.

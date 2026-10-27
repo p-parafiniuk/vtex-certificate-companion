@@ -524,7 +524,9 @@ function bootApiMap(root, onNav, embed) {
     const ov = isOv(state.api);
     root.querySelector(".wrap").classList.toggle("ovmode", ov);
     if (ov) {
-      $("ov").innerHTML = ovTabs() + (state.api === "roles" ? rolesHtml() : ovHtml());
+      $("ov").innerHTML =
+        ovTabs() +
+        `<div class="ovpanel" role="tabpanel" aria-labelledby="ovt-${state.api}">${state.api === "roles" ? rolesHtml() : ovHtml()}</div>`;
       $("tree").innerHTML = "";
       chipCounts();
       return;
@@ -701,7 +703,7 @@ function bootApiMap(root, onNav, embed) {
   /* ---------- bird's-eye view: roles and permissions ---------- */
   function ovTabs() {
     const t = (k, label) =>
-      `<button type="button" role="tab" data-ov="${k}" aria-selected="${state.api === k}" tabindex="${state.api === k ? 0 : -1}">${label}</button>`;
+      `<button type="button" role="tab" id="ovt-${k}" data-ov="${k}" aria-selected="${state.api === k}" tabindex="${state.api === k ? 0 : -1}">${label}</button>`;
     return `<div class="ovtabs" role="tablist" aria-label="${L("Widok z lotu ptaka", "Bird's-eye view")}">${t("overview", L("API w trzech linijkach", "APIs in three lines"))}${t("roles", L("Role i uprawnienia", "Roles and permissions"))}</div>`;
   }
   /* pm.k: n = needs no resource, c = no predefined role in the docs (custom role only), r = predefined roles listed. x = no Permissions section. */
@@ -783,16 +785,21 @@ function bootApiMap(root, onNav, embed) {
       const hay = xs.join(" ").toLowerCase();
       return words.every(w => hay.includes(w));
     };
-    const mark = s => {
-      let h = esc(s);
-      for (const w of words)
-        if (w) h = h.replace(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), m => `<mark>${m}</mark>`);
-      return h;
-    };
+    /* Highlight on the raw text, then escape each piece, so a query like "amp" never lands inside an entity. */
+    const re = words.length
+      ? new RegExp("(" + words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")", "gi")
+      : null;
+    const mark = s =>
+      re
+        ? String(s)
+            .split(re)
+            .map((x, i) => (i % 2 ? `<mark>${esc(x)}</mark>` : esc(x)))
+            .join("")
+        : esc(s);
     return state.lens === "roles" ? rolesCards(hit, mark) : rolesTree(hit, mark);
   }
   const epLink = ep =>
-    `<button type="button" class="rep" data-k="${esc(ep.api.key)}" data-ep="${esc(ep.p)}"><span class="m ${ep.m}">${ep.m}</span><span class="p">${esc(ep.p)}</span><span class="ra">${esc(ep.api.name)} ›</span></button>`;
+    `<button type="button" class="rep" data-k="${esc(ep.api.key)}" data-ep="${esc(ep.p)}"><span class="m ${ep.m}">${ep.m}</span><span class="p">${esc(ep.p).replace(/\//g, "/<wbr>")}</span><span class="ra">${esc(ep.api.name)} ›</span></button>`;
   const roleTag = r => `<span class="rrole">${esc(r)}</span>`;
   const customTag = n => `<span class="rtag warn">${n ? n + " " : ""}${L("tylko custom", "custom only")}</span>`;
   function epList(key, eps) {
