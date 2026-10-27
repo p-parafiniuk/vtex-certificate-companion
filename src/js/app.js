@@ -2288,6 +2288,19 @@
         "</div></article>"
       );
     }).join("");
+    fSync();
+  }
+  function fSync() {
+    var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length;
+    $("#f-show-all").disabled = n === F.length;
+    $("#f-hide-all").disabled = !n;
+    $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + F.length;
+  }
+  function setAll(open) {
+    document.querySelectorAll("#flist .rev").forEach(function (b) {
+      setRev(b, open);
+    });
+    fSync();
   }
   function setRev(btn, open) {
     var ans = document.getElementById(btn.getAttribute("aria-controls"));
@@ -2297,7 +2310,9 @@
   }
   $("#flist").addEventListener("click", function (ev) {
     var b = ev.target.closest(".rev");
-    if (b) setRev(b, b.getAttribute("aria-expanded") !== "true");
+    if (!b) return;
+    setRev(b, b.getAttribute("aria-expanded") !== "true");
+    fSync();
   });
   $("#flist").addEventListener("change", function (ev) {
     if (!ev.target.classList.contains("kn")) return;
@@ -2309,10 +2324,14 @@
     card.classList.toggle("is-known", !!S.fknown[i]);
     header();
   });
+  /* The pressed button disables itself, so focus moves to its twin instead of falling to <body>. */
+  $("#f-show-all").addEventListener("click", function () {
+    setAll(true);
+    $("#f-hide-all").focus();
+  });
   $("#f-hide-all").addEventListener("click", function () {
-    document.querySelectorAll("#flist .rev").forEach(function (b) {
-      setRev(b, false);
-    });
+    setAll(false);
+    $("#f-show-all").focus();
   });
 
   /* ---------- Grywalizacja: streak, daily goal, readiness, badges, combo ----------
