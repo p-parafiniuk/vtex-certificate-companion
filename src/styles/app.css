@@ -388,7 +388,7 @@ a {
   border-radius: 16px;
   padding: 16px 22px;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: auto minmax(min-content, 1fr);
   gap: 16px 28px;
   align-items: center;
 }
@@ -439,9 +439,10 @@ a {
   gap: 6px;
   margin-top: 6px;
 }
+/* Columns never shrink below their content, so a long value or label cannot run into its neighbour. */
 .prog {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
   gap: 10px 24px;
   border-left: 1px solid var(--line);
   padding-left: 28px;
