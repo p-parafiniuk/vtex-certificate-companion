@@ -326,7 +326,7 @@
       var rf = raw.fo;
       if (rf && typeof rf === "object") {
         if (["all", "q", "f", "p"].indexOf(rf.deck) > -1) S.fo.deck = rf.deck;
-        if (["all", "todo", "wrong", "due"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
+        if (["all", "todo", "wrong", "weak", "due"].indexOf(rf.flt) > -1) S.fo.flt = rf.flt;
         S.fo.shuf = rf.shuf >>> 0;
         if (typeof rf.id === "string") S.fo.id = rf.id;
         if (rf.dom === "all" || DOM_NAME[rf.dom]) S.fo.dom = rf.dom;
@@ -2374,10 +2374,12 @@
     var e = S.rv["q" + (i + 1)];
     return S.ans[i] !== undefined && isDue("q" + (i + 1)) && Date.now() - e[2] > RV_GAP;
   }
+  function isSureMiss(id) {
+    var e = S.rv[id];
+    return !!e && e[3] === 3 && !e[4];
+  }
   function sureMiss() {
-    return Object.keys(S.rv).filter(function (k) {
-      return S.rv[k][3] === 3 && !S.rv[k][4];
-    });
+    return Object.keys(S.rv).filter(isSureMiss);
   }
   function rvWhen(day) {
     var n = Math.round((new Date(day + "T12:00:00") - daysAgo(0)) / 864e5);
@@ -2601,6 +2603,48 @@
   function fmtDay(d) {
     return pad(d.getDate()) + "." + pad(d.getMonth() + 1);
   }
+  function weakBox(w) {
+    var k = esc(w.d[0]),
+      wk = weakIn(w.d[0]),
+      parts = [];
+    if (wk.wrong) parts.push(L(plural(wk.wrong, "błędna", "błędne", "błędnych"), wk.wrong + " wrong"));
+    if (wk.sure)
+      parts.push(
+        L(
+          plural(wk.sure, "pewna pomyłka", "pewne pomyłki", "pewnych pomyłek"),
+          plural(wk.sure, "confident miss", "confident misses", "confident misses")
+        )
+      );
+    if (wk.todo)
+      parts.push(L(plural(wk.todo, "nieopanowana", "nieopanowane", "nieopanowanych"), wk.todo + " not mastered yet"));
+    return (
+      '<div class="weak"><p>' +
+      L("Najsłabiej: ", "Weakest: ") +
+      "<strong>" +
+      esc(dn(w.d[0])) +
+      "</strong> · " +
+      w.p.k +
+      " / " +
+      w.p.t +
+      "</p>" +
+      (wk.n ? '<p class="how">' + L("Do ćwiczenia: ", "To drill: ") + parts.join(", ") + ".</p>" : "") +
+      '<div class="weak-act">' +
+      (wk.n
+        ? '<button type="button" class="btn primary" data-weak-dom="' +
+          k +
+          '">' +
+          L("Ćwicz ten obszar", "Drill this area") +
+          " · " +
+          wk.n +
+          "</button>"
+        : "") +
+      '<button type="button" class="linkbtn" data-go-dom="' +
+      k +
+      '">' +
+      L("Otwórz kategorię", "Open the category") +
+      "</button></div></div>"
+    );
+  }
   function renderGx(c) {
     var x = gxCtx(c),
       rd = x.rd,
@@ -2638,21 +2682,7 @@
       " · 20%</dt><dd>" +
       (S.sims.length ? Math.round(rd.sim * 100) + "%" : "–") +
       "</dd></dl>" +
-      (w && w.r < 1
-        ? '<p class="weak">' +
-          L("Najsłabiej: ", "Weakest: ") +
-          "<strong>" +
-          esc(dn(w.d[0])) +
-          "</strong> · " +
-          w.p.k +
-          " / " +
-          w.p.t +
-          ' <button type="button" class="linkbtn" data-go-dom="' +
-          esc(w.d[0]) +
-          '">' +
-          L("Ćwicz ten obszar", "Practise this area") +
-          "</button></p>"
-        : "");
+      (w && w.r < 1 ? weakBox(w) : "");
     var t = x.today,
       heat = "";
     for (var k = 83; k >= 0; k--) {
@@ -3554,8 +3584,24 @@
   function fPass(c) {
     if (S.fo.flt === "todo") return !cKnown(c) && cState(c) !== 1;
     if (S.fo.flt === "wrong") return cState(c) === 2;
+    if (S.fo.flt === "weak") return isWeak(c);
     if (S.fo.flt === "due") return isDue(c.id);
     return true;
+  }
+  /* A confident miss stays weak after a later right answer, until a review clears it or the learner marks it Known. */
+  function isWeak(c) {
+    return !cKnown(c) && (cState(c) !== 1 || isSureMiss(c.id));
+  }
+  function weakIn(dom) {
+    var r = { n: 0, wrong: 0, sure: 0 };
+    CARDS.forEach(function (c) {
+      if (c.t !== "q" || c.d !== dom || !inSet(c) || !isWeak(c)) return;
+      r.n++;
+      if (isSureMiss(c.id)) r.sure++;
+      else if (cState(c) === 2) r.wrong++;
+    });
+    r.todo = r.n - r.wrong - r.sure;
+    return r;
   }
   /* The card on screen stays in the deck even after it stops matching the filter, so it does not vanish mid-answer. */
   function fDeck(cur) {
@@ -3689,10 +3735,12 @@
   function fSettings(base, cur) {
     var todo = 0,
       wrong = 0,
+      weak = 0,
       due = 0;
     base.forEach(function (c) {
       var s = cState(c);
       if (s === 2) wrong++;
+      if (isWeak(c)) weak++;
       if (isDue(c.id)) due++;
       if (!cKnown(c) && s !== 1) todo++;
     });
@@ -3729,11 +3777,12 @@
       chip("flt", "all", L("Wszystkie", "All"), base.length, S.fo.flt === "all") +
       chip("flt", "todo", L("Do nauki", "To learn"), todo, S.fo.flt === "todo") +
       chip("flt", "wrong", L("Tylko błędne", "Only wrong"), wrong, S.fo.flt === "wrong") +
+      chip("flt", "weak", L("Słabe", "Weak"), weak, S.fo.flt === "weak") +
       chip("flt", "due", L("Do powtórki dziś", "Due today"), due, S.fo.flt === "due") +
       '</div><p class="how">' +
       L(
-        "„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem. „Do powtórki” to karty, których termin minął.",
-        "“To learn” skips cards answered right and cards marked Known. “Due today” holds cards whose review day has come."
+        "„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem. „Słabe” to „Do nauki” plus pewne pomyłki. „Do powtórki” to karty, których termin minął.",
+        "“To learn” skips cards answered right and cards marked Known. “Weak” is “To learn” plus confident misses. “Due today” holds cards whose review day has come."
       ) +
       "</p></div>" +
       '<div class="fs"><h3 id="fo-h-set">' +
@@ -4101,6 +4150,18 @@
     go({ tab: "focus", id: d ? d.id : "" });
   }
   $("#gx-due").addEventListener("click", startDue);
+  function startWeak(dom) {
+    S.fo.flt = "weak";
+    S.fo.deck = "q";
+    S.fo.dom = dom;
+    var d = fDeck(null)[0];
+    save();
+    go({ tab: "focus", id: d ? d.id : "" });
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest("[data-weak-dom]") : null;
+    if (b && DOM_NAME[b.dataset.weakDom]) startWeak(b.dataset.weakDom);
+  });
   function exitFocus() {
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
