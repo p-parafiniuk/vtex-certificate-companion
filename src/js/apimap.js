@@ -2,10 +2,14 @@
    embed: a second copy inside a category view, { onDoc(url, label) }. It shows only the APIs given to scope(), stores only
    the shared tree/list choice, and opens API Reference links through onDoc (the category's docs frame) instead of a new tab. */
 /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated (dt date), lg legacy, dr replacement, q query (* = required), a auth, b body, r responses}]
-   Top level, so the main app's search can read it without booting the map. */
-/*@data APIMAP*/
+   It sits in a JSON tag and is parsed on first use: by the map, its embedded copy, or the main app's search. */
+let APIMAP_V = null;
+function apimapData() {
+  return APIMAP_V || (APIMAP_V = JSON.parse(document.getElementById("d-APIMAP").textContent));
+}
 function bootApiMap(root, onNav, embed) {
   "use strict";
+  const APIMAP = apimapData();
   const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
   /* UI language comes from <html lang>, which the main app sets; relang() redraws after a switch. */
   const L = (pl, en) => (document.documentElement.lang === "en" ? en : pl);

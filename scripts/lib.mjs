@@ -11,7 +11,9 @@ export const CATS = join(SRC, "img", "cats");
 export const LOCK = join(ROOT, "tests", "ids.lock.json");
 
 /* How each data block appears in the HTML.
-   json: keys quoted; js: bare keys. inline: one line; lines: one item per line with an item prefix. */
+   json: keys quoted; js: bare keys. inline: one line; lines: one item per line with an item prefix.
+   tag: a <script type="application/json" id="d-NAME"> in the page instead of a JS constant. The browser skips it
+   while parsing scripts, and the module that needs it calls JSON.parse on first use. */
 export const BLOCKS = {
   DOMS: { file: "data/domains.json", keys: "json", layout: "inline" },
   DOCS: { file: "data/docs.json", keys: "json", layout: "inline" },
@@ -24,8 +26,8 @@ export const BLOCKS = {
   IANA_NO_CAT: { file: "data/koty-meta.json", pick: "IANA_NO_CAT", keys: "js", layout: "inline" },
   KLASS_EN: { file: "data/koty-meta.json", pick: "KLASS_EN", keys: "js", layout: "inline" },
   IANA_NO_CAT_EN: { file: "data/koty-meta.json", pick: "IANA_NO_CAT_EN", keys: "js", layout: "inline" },
-  KCAT: { images: true, keys: "json", layout: "inline" },
-  APIMAP: { file: "data/apimap.json", keys: "json", layout: "lines", indent: "" },
+  KCAT: { images: true, keys: "json", layout: "inline", tag: true },
+  APIMAP: { file: "data/apimap.json", keys: "json", layout: "lines", indent: "", tag: true },
   CATMAP: { file: "data/categories.json", keys: "json", layout: "inline" },
   NOTES: { file: "data/notes.json", keys: "json", layout: "inline" },
   APIOV: { file: "data/apioverview.json", keys: "json", layout: "inline" }
@@ -61,6 +63,13 @@ export function ser(v, keys) {
 
 export function emitBlock(name, value) {
   const b = BLOCKS[name];
+  if (b.tag) {
+    const body =
+      b.layout === "inline"
+        ? ser(value, b.keys)
+        : "[\n" + value.map(x => b.indent + ser(x, b.keys)).join(",\n") + "\n]";
+    return '<script type="application/json" id="d-' + name + '">' + body + "</script>";
+  }
   if (b.layout === "inline") return "const " + name + " = " + ser(value, b.keys) + ";";
   return "const " + name + " = [\n" + value.map(x => b.indent + ser(x, b.keys)).join(",\n") + "\n];";
 }

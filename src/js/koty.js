@@ -1,7 +1,8 @@
 /* HTTP Koty, mounted on demand into the shadow root of #koty. */
-/*@data KCAT*/
 function bootKoty(root, onNav) {
   "use strict";
+  /* The images (most of the page's weight) sit in a JSON tag, parsed only when Koty mounts. */
+  const KCAT = JSON.parse(document.getElementById("d-KCAT").textContent);
   /* c: code, n: name as on http.cat, pl: meaning, fun: memory hook, x: origin if unofficial, v: VTEX note, t: top tier */
   /*@data CODES*/
 

@@ -44,7 +44,7 @@ src/data/categories.json per category: `api` = [apiKey, tags?] for its embedded 
 src/img/cats/<code>.jpg http.cat images, inlined as KCAT at build time
 scripts/                lib (block formats), build, extract, validate, stats, format. Node >= 18; Prettier is the one devDependency.
 ```
-Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs` (`BLOCKS`). To add a new data block: add it there, add a `/*@data NAME*/` line in the right script, and create the JSON file.
+Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs` (`BLOCKS`). To add a new data block: add it there, add a `/*@data NAME*/` line in the right script, and create the JSON file. A block with `tag: true` (KCAT, APIMAP) is emitted as a `<script type="application/json" id="d-NAME">` from an HTML `<!--@data NAME-->` marker in `src/index.html`, and its module parses it on first use (`apimapData()`, the `KCAT` const in `bootKoty`), so the 3 MB of images and the API Map are not parsed at startup.
 
 ## Content schema
 **Q** (`questions.json`), an exam-style multiple-choice question:
