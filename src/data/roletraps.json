@@ -1,0 +1,11 @@
+[
+{"t":"Brak zasobu z tabeli endpointu kończy się kodem **403**.","l":["appkeys"]},
+{"t":"Wystarczy **jeden** z zasobów wymienionych przy endpoincie.","l":["appkeys"]},
+{"t":"**Owner (Admin Super)** ma wszystkie zasoby License Manager oprócz `Save user`.","l":["predroles","ownerrole"]},
+{"t":"Gdy endpoint nie ma roli predefiniowanej, tworzysz **rolę custom** z jednym z jego zasobów.","l":["lmrolelist"]},
+{"t":"Rola predefiniowana zwykle daje wiele zasobów naraz. Gdy część jest zbędna, lepsza rola custom.","l":["appkeys"]},
+{"t":"Rolę utworzysz tylko z zasobem `Save access profile`.","l":["lmroles"]},
+{"t":"Użytkowników z rolą **Owner (Admin Super)** ma być jak najmniej.","l":["lmroles"]},
+{"t":"Zasób `Renew API Token` leży w License Manager, a endpoint rotacji tokenu w VTEX ID API.","l":["renew"]},
+{"t":"Nie łącz zasobów call center z innymi zasobami w jednej roli.","l":["predroles"]}
+]

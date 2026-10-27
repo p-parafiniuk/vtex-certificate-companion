@@ -48,9 +48,11 @@ function bootApiMap(root, onNav, embed) {
   ];
   const LIMIT = 150;
   const KEY = "apimap.v1";
-  /* "overview" is the bird's-eye page (APIOV, per category in DOMS order); only the API Map tab has it. */
+  /* "overview" is the bird's-eye page (APIOV, per category in DOMS order); only the API Map tab has it.
+     "roles" is its second page: the License Manager resources and predefined roles behind each endpoint (ep.pm). */
   const OV = embed ? [] : DOMS.filter(d => APIOV[d[0]]).map(d => [d, APIOV[d[0]]]);
-  const KEYS = ["all", ...(embed ? [] : ["overview"]), ...APIMAP.map(a => a.key)];
+  const KEYS = ["all", ...(embed ? [] : ["overview", "roles"]), ...APIMAP.map(a => a.key)];
+  const isOv = k => k === "overview" || k === "roles";
   let LIST = APIMAP;
 
   const $ = id => root.getElementById(id);
@@ -85,7 +87,12 @@ function bootApiMap(root, onNav, embed) {
     view: "tree",
     filters: false,
     shown: LIMIT,
-    open: new Map()
+    open: new Map(),
+    lens: "tree",
+    pf: "all",
+    rq: "",
+    ropen: new Map(),
+    rmore: new Set()
   };
   const stored = () => {
     try {
@@ -100,6 +107,8 @@ function bootApiMap(root, onNav, embed) {
     if (["tree", "list"].includes(p.view)) state.view = p.view;
     if (!embed && KEYS.includes(p.api)) state.api = p.api;
     if (!embed && [0, 1, 2, 3, 99].includes(p.depth)) state.depth = p.depth;
+    if (["tree", "roles"].includes(p.lens)) state.lens = p.lens;
+    if (["all", "c", "r", "n", "x"].includes(p.pf)) state.pf = p.pf;
   }
   /* Both copies share the tree/list choice; the API and depth belong to the API Map tab alone. */
   function save() {
@@ -108,6 +117,8 @@ function bootApiMap(root, onNav, embed) {
     if (!embed) {
       p.api = state.api;
       p.depth = state.depth;
+      p.lens = state.lens;
+      p.pf = state.pf;
     }
     try {
       localStorage.setItem(KEY, JSON.stringify(p));
@@ -265,10 +276,17 @@ function bootApiMap(root, onNav, embed) {
       apisEl.scrollLeft += apisEl.clientWidth * 0.7;
     };
     $("ov").onclick = e => {
+      if (rolesClick(e)) return;
       const b = e.target.closest("button[data-k]");
       if (!b) return;
       show(b.dataset.k);
       if (onNav) onNav(state.api);
+      if (b.dataset.ep) {
+        $("q").value = b.dataset.ep;
+        state.q = b.dataset.ep.toLowerCase();
+        state.qAll = false;
+        render();
+      }
       /* The cards are gone after the switch, so focus moves to the chip of the API just opened. */
       const c = root.querySelector('#apis [aria-pressed="true"]');
       if (c) c.focus({ preventScroll: true });
@@ -323,14 +341,21 @@ function bootApiMap(root, onNav, embed) {
   /* "/" jumps to search, as on GitHub and MDN, but only in the copy that is on screen. */
   document.addEventListener("keydown", e => {
     if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || !root.host.getClientRects().length) return;
-    if (state.api === "overview") return;
+    if (isOv(state.api)) return;
     const t = e.composedPath()[0];
     if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
     e.preventDefault();
     $("q").focus();
   });
   function syncControls() {
-    root.querySelectorAll("#apis .chip").forEach(b => b.setAttribute("aria-pressed", b.dataset.k === state.api));
+    root
+      .querySelectorAll("#apis .chip")
+      .forEach(b =>
+        b.setAttribute(
+          "aria-pressed",
+          b.dataset.k === state.api || (b.dataset.k === "overview" && state.api === "roles")
+        )
+      );
     const allM = state.methods.size === METHODS.length;
     root
       .querySelectorAll("#methods button")
@@ -496,10 +521,10 @@ function bootApiMap(root, onNav, embed) {
   function render(more) {
     if (!more) state.shown = LIMIT;
     syncControls();
-    const ov = state.api === "overview";
+    const ov = isOv(state.api);
     root.querySelector(".wrap").classList.toggle("ovmode", ov);
     if (ov) {
-      $("ov").innerHTML = ovHtml();
+      $("ov").innerHTML = ovTabs() + (state.api === "roles" ? rolesHtml() : ovHtml());
       $("tree").innerHTML = "";
       chipCounts();
       return;
@@ -673,6 +698,292 @@ function bootApiMap(root, onNav, embed) {
     );
   }
 
+  /* ---------- bird's-eye view: roles and permissions ---------- */
+  function ovTabs() {
+    const t = (k, label) =>
+      `<button type="button" role="tab" data-ov="${k}" aria-selected="${state.api === k}" tabindex="${state.api === k ? 0 : -1}">${label}</button>`;
+    return `<div class="ovtabs" role="tablist" aria-label="${L("Widok z lotu ptaka", "Bird's-eye view")}">${t("overview", L("API w trzech linijkach", "APIs in three lines"))}${t("roles", L("Role i uprawnienia", "Roles and permissions"))}</div>`;
+  }
+  /* pm.k: n = needs no resource, c = no predefined role in the docs (custom role only), r = predefined roles listed. x = no Permissions section. */
+  let RIDX = null;
+  function roleIndex() {
+    if (RIDX) return RIDX;
+    const prods = new Map(),
+      roles = new Map(),
+      kinds = { all: 0, c: 0, r: 0, n: 0, x: 0 },
+      plain = [];
+    const get = (m, k, mk) => m.get(k) || m.set(k, mk()).get(k);
+    for (const a of APIMAP)
+      for (const ep0 of a.eps) {
+        const ep = { ...ep0, api: a },
+          k = ep.pm ? ep.pm.k : "x";
+        kinds.all++;
+        kinds[k]++;
+        if (k === "n" || k === "x") {
+          plain.push(ep);
+          continue;
+        }
+        const has = new Map();
+        for (const [r, res] of ep.pm.o || []) get(has, res, () => new Set()).add(r);
+        for (const [p, c, res] of ep.pm.s) {
+          const node = get(
+            get(
+              get(prods, p, () => new Map()),
+              c,
+              () => new Map()
+            ),
+            res,
+            () => ({
+              eps: [],
+              roles: new Set()
+            })
+          );
+          if (!node.eps.includes(ep)) node.eps.push(ep);
+          for (const r of has.get(res) || []) {
+            node.roles.add(r);
+            const ro = get(roles, r, () => ({ res: new Set(), eps: new Set(), apis: new Set() }));
+            ro.res.add(res);
+            ro.eps.add(ep);
+            ro.apis.add(a.key);
+          }
+        }
+      }
+    return (RIDX = { prods, roles, kinds, plain });
+  }
+  const trapsFor = name => ROLETRAPS.filter(x => x.t.includes("`" + name + "`"));
+  const docLink = k =>
+    DOCS[k] ? `<a class="ref" href="${esc(DOCS[k][0])}" target="_blank" rel="noopener">${esc(DOCS[k][1])} ↗</a>` : "";
+  const trapLine = x =>
+    `<li>${fmt(x.t)} <a class="rsrc" href="${esc(DOCS[x.l[0]][0])}" target="_blank" rel="noopener" aria-label="${L("Źródło", "Source")}: ${esc(DOCS[x.l[0]][1])}" title="${esc(DOCS[x.l[0]][1])}">↗</a></li>`;
+  function rolesHtml() {
+    const K = roleIndex().kinds;
+    const pf = (k, label) =>
+      `<button type="button" class="rchip${k === "c" ? " warn" : ""}" data-pf="${k}" aria-pressed="${state.pf === k}">${label} <span>${K[k]}</span></button>`;
+    const lens = (k, label) =>
+      `<button type="button" data-lens="${k}" aria-pressed="${state.lens === k}">${label}</button>`;
+    return (
+      `<div class="ovhead"><h2>${L("Role i uprawnienia", "Roles and permissions")}</h2>` +
+      `<p>${L("Każdy endpoint sprawdza zasób License Manager. Drzewo idzie od produktu, przez kategorię, do zasobu. Przy zasobie widzisz role predefiniowane, które go dają, i endpointy, które go wymagają.", "Every endpoint checks a License Manager resource. The tree goes from product, through category, to resource. Each resource shows the predefined roles that grant it and the endpoints that need it. The traps are in Polish.")}</p>` +
+      `<p class="rsrcs">${L("Źródło: sekcja", "Source: the")} <b>Permissions</b> ${L("każdego endpointu w", "section of each endpoint in")} <a href="https://github.com/vtex/openapi-schemas" target="_blank" rel="noopener">vtex/openapi-schemas</a> · ${docLink("lmres")} · ${docLink("predroles")}</p></div>` +
+      `<div class="rctl"><span class="rlens" role="group" aria-label="${L("Soczewka", "Lens")}">${lens("tree", L("Drzewo uprawnień", "Permission tree"))}${lens("roles", L("Role predefiniowane", "Predefined roles"))}</span>` +
+      `<label class="rq"><span class="vh">${L("Szukaj zasobu, roli lub ścieżki", "Search a resource, role or path")}</span><input id="rq" type="search" spellcheck="false" autocapitalize="off" autocomplete="off" value="${esc(state.rq)}" placeholder="${L("Szukaj: zasób, rola, ścieżka… np. Save user, cancel", "Search: resource, role, path… e.g. Save user, cancel")}"></label></div>` +
+      `<div class="rpf" role="group" aria-label="${L("Pokaż endpointy", "Show endpoints")}"${state.lens === "roles" ? " hidden" : ""}><span class="lbl">${L("Pokaż", "Show")}</span>` +
+      pf("all", L("Wszystkie", "All")) +
+      pf("c", L("Tylko rola custom", "Custom role only")) +
+      pf("r", L("Jest rola predefiniowana", "Has a predefined role")) +
+      pf("n", L("Bez uprawnień", "No permissions")) +
+      pf("x", L("Brak sekcji w docs", "No section in the docs")) +
+      `</div><div class="rlay"><div class="rmain" id="rbody">${rolesBody()}</div>` +
+      `<details class="rtraps"${wide.matches ? " open" : ""}${state.lens === "roles" ? " hidden" : ""}><summary><h3>${L("Pułapki", "Traps")}</h3><span class="cnt">${ROLETRAPS.length}</span></summary><ul>${ROLETRAPS.map(trapLine).join("")}</ul></details></div>`
+    );
+  }
+  function rolesBody() {
+    const words = state.rq ? state.rq.toLowerCase().split(/\s+/) : [];
+    const hit = (...xs) => {
+      const hay = xs.join(" ").toLowerCase();
+      return words.every(w => hay.includes(w));
+    };
+    const mark = s => {
+      let h = esc(s);
+      for (const w of words)
+        if (w) h = h.replace(new RegExp(w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), m => `<mark>${m}</mark>`);
+      return h;
+    };
+    return state.lens === "roles" ? rolesCards(hit, mark) : rolesTree(hit, mark);
+  }
+  const epLink = ep =>
+    `<button type="button" class="rep" data-k="${esc(ep.api.key)}" data-ep="${esc(ep.p)}"><span class="m ${ep.m}">${ep.m}</span><span class="p">${esc(ep.p)}</span><span class="ra">${esc(ep.api.name)} ›</span></button>`;
+  const roleTag = r => `<span class="rrole">${esc(r)}</span>`;
+  const customTag = n => `<span class="rtag warn">${n ? n + " " : ""}${L("tylko custom", "custom only")}</span>`;
+  function epList(key, eps) {
+    const more = state.rmore.has(key),
+      show = more ? eps : eps.slice(0, 3);
+    return (
+      `<div class="reps">${show.map(epLink).join("")}` +
+      (eps.length > show.length
+        ? `<button type="button" class="rmore" data-more="${esc(key)}">+ ${plural(eps.length - show.length, L("kolejny endpoint", "more endpoint"), L("kolejne endpointy", "more endpoints"), L("kolejnych endpointów", "more endpoints"))}</button>`
+        : "") +
+      `</div>`
+    );
+  }
+  function rolesTree(hit, mark) {
+    const R = roleIndex(),
+      pf = state.pf,
+      q = !!state.rq;
+    if (pf === "n" || pf === "x") {
+      const eps = R.plain.filter(ep => (ep.pm ? ep.pm.k : "x") === pf && hit(ep.p, ep.s, ep.api.name));
+      const note =
+        pf === "n"
+          ? L("Te endpointy nie wymagają zasobu License Manager.", "These endpoints need no License Manager resource.")
+          : L(
+              "Schemat nie ma przy nich tabeli zasobów. Sprawdź opis endpointu w API Reference.",
+              "The schema has no resource table for them. Check the endpoint description in the API Reference."
+            );
+      return `<div class="rtree"><p class="rnote">${note}</p>${eps.length ? `<div class="reps flat">${eps.map(epLink).join("")}</div>` : empty()}</div>`;
+    }
+    const keep = ep => pf === "all" || ep.pm.k === pf;
+    const open = (key, def) => (q ? true : (state.ropen.get(key) ?? def));
+    /* License Manager starts open: its users, roles and API keys are what the Auth category asks about. */
+    const START = "License Manager";
+    let h = "";
+    const all = new Set();
+    for (const [p, cats] of [...R.prods].sort(
+      (a, b) => (b[0] === START) - (a[0] === START) || a[0].localeCompare(b[0])
+    )) {
+      let ph = "";
+      const pEps = new Set(),
+        pCustom = new Set();
+      for (const [c, rs] of [...cats].sort((a, b) => a[0].localeCompare(b[0]))) {
+        let ch = "";
+        const cEps = new Set();
+        for (const [r, node] of [...rs].sort((a, b) => a[0].localeCompare(b[0]))) {
+          const eps = node.eps.filter(
+            ep => keep(ep) && hit(p, c, r, [...node.roles].join(" "), ep.p, ep.s, ep.api.name)
+          );
+          if (!eps.length) continue;
+          eps.forEach(ep => {
+            all.add(ep);
+            cEps.add(ep);
+            pEps.add(ep);
+            if (ep.pm.k === "c") pCustom.add(ep);
+          });
+          const key = p + "|" + c + "|" + r,
+            roles = [...node.roles].sort();
+          /* A resource with a trap starts open, so the trap is seen without a click. */
+          const traps = trapsFor(r);
+          ch +=
+            `<details class="rres" data-rk="${esc(key)}"${open(key, traps.length > 0) ? " open" : ""}><summary><span class="caret" aria-hidden="true">▸</span><code>${mark(r)}</code>` +
+            `<span class="rtags">${roles.length ? (roles.length > 2 ? roleTag(plural(roles.length, L("rola", "role"), L("role", "roles"), L("ról", "roles"))) : roles.map(x => roleTag(x)).join("")) : customTag()}</span><span class="cnt">${eps.length}</span></summary>` +
+            `<div class="rbox">` +
+            traps
+              .map(x => `<p class="redge"><b class="ovt edge">${L("UWAGA", "TRAP")}</b><span>${fmt(x.t)}</span></p>`)
+              .join("") +
+            (roles.length
+              ? `<p class="rlbl">${L("Role predefiniowane", "Predefined roles")}</p><div class="rroles">${roles.map(x => `<span class="rrole">${mark(x)}</span>`).join("")}</div>`
+              : `<p class="rnote">${L("Docs nie podają roli predefiniowanej. Utwórz rolę custom z tym zasobem.", "The docs list no predefined role. Create a custom role with this resource.")}</p>`) +
+            `<p class="rlbl">${L("Endpointy", "Endpoints")}</p>${epList(key, eps)}</div></details>`;
+        }
+        if (!ch) continue;
+        const key = p + "|" + c;
+        ph += `<details class="rcat" data-rk="${esc(key)}"${open(key, p === START) ? " open" : ""}><summary><span class="caret" aria-hidden="true">▸</span><span class="rn">${mark(c)}</span><span class="cnt">${cEps.size}</span></summary><div class="rkids">${ch}</div></details>`;
+      }
+      if (!ph) continue;
+      h += `<details class="rprod" data-rk="${esc(p)}"${open(p, p === START) ? " open" : ""}><summary><span class="caret" aria-hidden="true">▸</span><span class="rn">${mark(p)}</span>${pCustom.size ? (pf !== "c" ? customTag(pCustom.size === pEps.size ? "" : pCustom.size) : "") : roleTag(L("role predefiniowane", "predefined roles"))}<span class="cnt">${pEps.size} ep.</span></summary><div class="rkids">${ph}</div></details>`;
+    }
+    return (
+      (q
+        ? `<p class="rhits" role="status">${L("Pasuje", "Matches")}: ${plural(all.size, "endpoint", L("endpointy", "endpoints"), L("endpointów", "endpoints"))}</p>`
+        : "") +
+      `<div class="rtree" role="group" aria-label="${L("Drzewo uprawnień", "Permission tree")}"><div class="rth" aria-hidden="true"><span>${L("PRODUKT › KATEGORIA › ZASÓB", "PRODUCT › CATEGORY › RESOURCE")}</span><span>${L("ROLE", "ROLES")}</span><span>EP.</span></div>` +
+      (h || empty()) +
+      (pf === "all"
+        ? `<button type="button" class="rfree" data-pf="n"><b class="rtag">${L("BEZ UPRAWNIEŃ", "NO PERMISSIONS")}</b><span>${plural(R.kinds.n, L("endpoint nie wymaga", "endpoint needs"), L("endpointy nie wymagają", "endpoints need"), L("endpointów nie wymaga", "endpoints need"))} ${L("zasobu, np. Session Manager i Intelligent Search", "no resource, e.g. Session Manager and Intelligent Search")} ›</span></button>`
+        : "") +
+      `</div>`
+    );
+  }
+  const empty = () =>
+    `<p class="rnote">${L("Nic nie pasuje. Zmień szukaną frazę albo filtr.", "Nothing matches. Change the search or the filter.")}</p>`;
+  function rolesCards(hit, mark) {
+    const R = roleIndex();
+    const owner = ROLETRAPS.filter(x => x.t.includes("Owner (Admin Super)"));
+    const api = k => APIMAP.find(a => a.key === k);
+    const cards = [...R.roles]
+      .filter(([r, o]) => hit(r, [...o.res].join(" "), [...o.apis].map(k => api(k).name).join(" ")))
+      .sort((a, b) => b[1].eps.size - a[1].eps.size || a[0].localeCompare(b[0]))
+      .map(
+        ([r, o]) =>
+          `<article class="rcard"><div class="ovh"><h3 class="ovn">${mark(r)}</h3><span class="ovc-n">${o.eps.size} ep.</span></div>` +
+          `<div class="rapis">${[...o.apis].map(k => `<button type="button" class="rapi" data-k="${esc(k)}">${esc(api(k).name)}</button>`).join("")}</div>` +
+          `<p class="rlbl">${L("Daje zasoby", "Grants resources")}</p><div class="rres-l">${[...o.res]
+            .sort()
+            .map(x => `<code>${mark(x)}</code>`)
+            .join("")}</div>` +
+          ROLETRAPS.filter(x => x.t.toLowerCase().includes(r.toLowerCase().split(" ").slice(0, 2).join(" ")))
+            .map(x => `<p class="redge"><b class="ovt edge">${L("UWAGA", "TRAP")}</b><span>${fmt(x.t)}</span></p>`)
+            .join("") +
+          `</article>`
+      );
+    return (
+      (hit("Owner (Admin Super)")
+        ? `<article class="rcard rowner"><div class="ovh"><h3 class="ovn">Owner (Admin Super)</h3><b class="ovt edge">${L("UWAGA", "TRAP")}</b>${docLink("predroles")}</div><ul>${owner.map(trapLine).join("")}</ul></article>`
+        : "") +
+      (cards.length ? `<div class="rgrid">${cards.join("")}</div>` : empty()) +
+      `<article class="rcard rcustom"><div class="ovh"><h3 class="ovn">${L("Rola custom", "Custom role")}</h3><span class="ovc-n">${R.kinds.c} ep.</span></div>` +
+      `<p>${L("Przy tych endpointach docs nie podają roli predefiniowanej. Tworzysz własną rolę z jednym z zasobów z tabeli endpointu.", "For these endpoints the docs list no predefined role. You create your own role with one of the resources in the endpoint's table.")}</p>` +
+      `<div class="ovh"><button type="button" class="rchip" data-pf="c" data-lens="tree">${L("Pokaż w drzewie", "Show in the tree")} <span>${R.kinds.c}</span></button>${docLink("lmroles")}</div></article>`
+    );
+  }
+  function rolesRefresh() {
+    $("rbody").innerHTML = rolesBody();
+  }
+  /* Clicks inside the roles page; returns true when handled. Lens and filter changes keep the search box, so only the body redraws. */
+  function rolesClick(e) {
+    const tab = e.target.closest("[data-ov]");
+    if (tab) {
+      if (tab.dataset.ov !== state.api) {
+        show(tab.dataset.ov);
+        if (onNav) onNav(state.api);
+        const t = root.querySelector(`[data-ov="${state.api}"]`);
+        if (t) t.focus();
+      }
+      return true;
+    }
+    if (state.api !== "roles") return false;
+    const b = e.target.closest("[data-lens], [data-pf], [data-more]");
+    if (!b) return false;
+    if (b.dataset.more) {
+      state.rmore.add(b.dataset.more);
+      const box = b.parentElement,
+        n = box.querySelectorAll(".rep").length;
+      rolesRefresh();
+      const d = root.querySelector(`details[data-rk="${CSS.escape(b.dataset.more)}"] .rep:nth-of-type(${n + 1})`);
+      if (d) d.focus();
+      return true;
+    }
+    if (b.dataset.lens) state.lens = b.dataset.lens;
+    if (b.dataset.pf) state.pf = b.dataset.pf;
+    save();
+    root.querySelectorAll("[data-lens]").forEach(x => {
+      if (x.closest(".rlens")) x.setAttribute("aria-pressed", x.dataset.lens === state.lens);
+    });
+    root.querySelectorAll(".rpf [data-pf]").forEach(x => x.setAttribute("aria-pressed", x.dataset.pf === state.pf));
+    root.querySelector(".rpf").hidden = state.lens === "roles";
+    root.querySelector(".rtraps").hidden = state.lens === "roles";
+    rolesRefresh();
+    if (!b.isConnected) {
+      const t = root.querySelector(".rlens [aria-pressed='true']");
+      if (t) t.focus();
+    }
+    return true;
+  }
+  if (!embed) {
+    $("ov").addEventListener("input", e => {
+      if (e.target.id !== "rq") return;
+      state.rq = e.target.value.trim();
+      rolesRefresh();
+    });
+    $("ov").addEventListener(
+      "toggle",
+      e => {
+        const d = e.target;
+        if (d.tagName === "DETAILS" && d.dataset.rk && !state.rq) state.ropen.set(d.dataset.rk, d.open);
+      },
+      true
+    );
+    /* Arrow keys move between the two tabs, as in the WAI-ARIA tabs pattern. */
+    $("ov").addEventListener("keydown", e => {
+      const t = e.target.closest("[data-ov]");
+      if (!t || (e.key !== "ArrowLeft" && e.key !== "ArrowRight")) return;
+      e.preventDefault();
+      const next = t.dataset.ov === "roles" ? "overview" : "roles";
+      show(next);
+      if (onNav) onNav(state.api);
+      const n = root.querySelector(`[data-ov="${next}"]`);
+      if (n) n.focus();
+    });
+  }
+
   /* ---------- endpoint detail ---------- */
   if (embed)
     root.addEventListener("click", e => {
@@ -844,7 +1155,7 @@ function bootApiMap(root, onNav, embed) {
   }
 
   function show(api) {
-    if (!KEYS.includes(api) || !(api === "all" || api === "overview" || LIST.some(a => a.key === api))) return;
+    if (!KEYS.includes(api) || !(api === "all" || isOv(api) || LIST.some(a => a.key === api))) return;
     if (api === state.api && ($("tree").childElementCount || $("ov").childElementCount)) return;
     /* Picking an API while searching means "search here". */
     state.api = api;

@@ -160,5 +160,9 @@
   "md1scroll": ["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/scroll","Master Data API v1: Scroll documents"],
   "is_ps": ["https://developers.vtex.com/docs/api-reference/intelligent-search-api#get-/product_search/-facets-","Intelligent Search API (Legacy): Get list of products for a query"],
   "is_v1mig": ["https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1","Guide: Migrating to Intelligent Search API v1"],
-  "sessget": ["https://developers.vtex.com/docs/api-reference/session-manager-api#get-/api/sessions","Session Manager API: Get session"]
+  "sessget": ["https://developers.vtex.com/docs/api-reference/session-manager-api#get-/api/sessions","Session Manager API: Get session"],
+  "predroles": ["https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy","Help Center: Predefined roles"],
+  "lmroles": ["https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc","Help Center: Roles"],
+  "lmres": ["https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3","Help Center: License Manager resources"],
+  "lmrolelist": ["https://developers.vtex.com/docs/api-reference/license-manager-api#get-/api/license-manager/site/pvt/roles/list/paged","License Manager API: Get list of roles"]
 }

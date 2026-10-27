@@ -30,7 +30,8 @@ export const BLOCKS = {
   APIMAP: { file: "data/apimap.json", keys: "json", layout: "lines", indent: "", tag: true },
   CATMAP: { file: "data/categories.json", keys: "json", layout: "inline" },
   NOTES: { file: "data/notes.json", keys: "json", layout: "inline" },
-  APIOV: { file: "data/apioverview.json", keys: "json", layout: "inline" }
+  APIOV: { file: "data/apioverview.json", keys: "json", layout: "inline" },
+  ROLETRAPS: { file: "data/roletraps.json", keys: "json", layout: "inline" }
 };
 
 export const MARKER = /^\s*(?:<!--|\/\*)\s*@(include|data)\s+(\S+)\s*(?:-->|\*\/)\s*$/;

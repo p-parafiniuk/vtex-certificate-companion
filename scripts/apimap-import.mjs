@@ -96,6 +96,44 @@ const authNames = () => {
   return out;
 };
 
+/* The "## Permissions" section of each description: a Product | Category | Resource table and, when VTEX
+   names one, a Role | Resource table of predefined roles. k: "n" needs none, "c" custom role only, "r" has roles.
+   The schemas spell a few names two ways; FIX folds them so the roles tree does not split. */
+const FIX = {
+  "OMS Access": "OMS access",
+  "Seller administration": "Seller Administration",
+  "Seller adminstration": "Seller Administration",
+  "Save seller": "Save Seller",
+  "Seller manager": "Seller Manager"
+};
+const fix = s => FIX[s] || s;
+const cells = line =>
+  line
+    .trim()
+    .replace(/^\||\|$/g, "")
+    .split("|")
+    .map(c => c.replace(/\*\*/g, "").trim());
+const perms = desc => {
+  const i = (desc || "").indexOf("## Permissions");
+  if (i < 0) return undefined;
+  let sec = desc.slice(i + 14);
+  const j = sec.search(/\n#{1,2} /);
+  if (j >= 0) sec = sec.slice(0, j);
+  if (/does not require/i.test(sec)) return { k: "n" };
+  const s = [],
+    o = [];
+  const split = c => (/<p>/.test(c) ? [...c.matchAll(/<p>(.*?)<\/p>/g)].map(m => m[1].trim()) : [c]);
+  for (const line of sec.split("\n")) {
+    if (!line.trim().startsWith("|")) continue;
+    const c = cells(line);
+    if (!c[0] || /^[-: ]+$/.test(c[0]) || c[0] == "Product" || c[0] == "Role") continue;
+    if (c.length == 3) for (const r of split(c[2])) s.push([fix(c[0]), fix(c[1]), fix(r)]);
+    else if (c.length == 2) for (const r of split(c[1])) o.push([fix(c[0]), fix(r)]);
+  }
+  if (!s.length) return undefined;
+  return o.length ? { k: "r", s, o } : { k: "c", s };
+};
+
 const eps = [];
 for (const [p, item] of Object.entries(spec.paths || {})) {
   const shared = (item.parameters || []).map(x => deref(x));
@@ -112,6 +150,8 @@ for (const [p, item] of Object.entries(spec.paths || {})) {
       q: [...new Set(params.filter(x => x.in == "query").map(x => x.name + (x.required ? "*" : "")))],
       a: security(op, p)
     };
+    const pm = perms(op.description);
+    if (pm) ep.pm = pm;
     const rb = deref(op.requestBody);
     if (rb && rb.content) {
       const ct = Object.keys(rb.content)[0];
