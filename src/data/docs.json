@@ -157,5 +157,8 @@
   "o_gifthub": ["https://developers.vtex.com/docs/api-reference/giftcard-hub-api","GiftCard Hub API: overview"],
   "o_search": ["https://developers.vtex.com/docs/api-reference/search-api","Legacy Search API: overview"],
   "o_mktapi": ["https://developers.vtex.com/docs/api-reference/marketplace-apis","Marketplace API: overview"],
-  "md1scroll": ["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/scroll","Master Data API v1: Scroll documents"]
+  "md1scroll": ["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/scroll","Master Data API v1: Scroll documents"],
+  "is_ps": ["https://developers.vtex.com/docs/api-reference/intelligent-search-api#get-/product_search/-facets-","Intelligent Search API (Legacy): Get list of products for a query"],
+  "is_v1mig": ["https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1","Guide: Migrating to Intelligent Search API v1"],
+  "sessget": ["https://developers.vtex.com/docs/api-reference/session-manager-api#get-/api/sessions","Session Manager API: Get session"]
 }
