@@ -2681,18 +2681,21 @@ body[data-view="pytania"] .wrap {
   text-align: right;
 }
 .weak {
-  margin: 0;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border-radius: 8px;
   background: var(--bg);
   font-size: 0.92rem;
+  display: grid;
+  gap: 8px;
+}
+.weak p {
+  margin: 0;
+}
+.weak-act {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px 8px;
-}
-.weak .linkbtn {
-  margin-left: auto;
+  gap: 8px 16px;
 }
 .dayrow {
   display: flex;
