@@ -1230,3 +1230,529 @@ mark {
     display: inline-block;
   }
 }
+
+/* Bird's-eye view, second page: License Manager resources and predefined roles behind the endpoints. */
+.ovpanel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.ovtabs {
+  display: inline-flex;
+  justify-self: start;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.ovtabs button {
+  font: 500 13px/1 var(--f-body);
+  color: var(--muted);
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 14px;
+  min-height: 38px;
+  cursor: pointer;
+}
+.ovtabs button:hover {
+  background: var(--hover);
+}
+.ovtabs button[aria-selected="true"] {
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.ovhead .rsrcs {
+  font-size: 12.5px;
+  max-width: none;
+}
+.ovhead .rsrcs a {
+  color: var(--accent);
+}
+.rctl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.rlens {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel);
+}
+.rlens button {
+  font: 500 13px/1 var(--f-body);
+  color: var(--fg);
+  background: none;
+  border: 0;
+  padding: 0 14px;
+  min-height: 38px;
+  cursor: pointer;
+}
+.rlens button + button {
+  border-left: 1px solid var(--line);
+}
+.rlens button:hover {
+  background: var(--hover);
+}
+.rlens button[aria-pressed="true"] {
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--fg);
+}
+.rq {
+  flex: 1 1 260px;
+  display: flex;
+}
+.rq input {
+  width: 100%;
+  min-height: 38px;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  font: 14px var(--f-body);
+  color: var(--fg);
+  background: var(--panel);
+}
+.rq input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.rpf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.rpf .lbl {
+  margin-right: 4px;
+}
+.rchip {
+  font: 500 13px/1 var(--f-body);
+  color: var(--fg);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 12px;
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.rchip span {
+  font: 500 11px/1 var(--f-mono);
+  color: var(--muted);
+}
+.rchip:hover {
+  background: var(--hover);
+}
+.rchip[aria-pressed="true"] {
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--fg);
+  border-color: var(--fg);
+}
+.rchip[aria-pressed="true"] span {
+  color: inherit;
+  opacity: 0.75;
+}
+.rchip.warn[aria-pressed="true"] {
+  color: var(--warn);
+  background: var(--warn-soft);
+  border-color: var(--warn);
+}
+.rlay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+}
+.rmain {
+  flex: 999 1 480px;
+  min-width: 0;
+}
+.rtraps {
+  flex: 1 1 280px;
+  min-width: 0;
+  background: var(--warn-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px 12px;
+}
+.rtraps summary {
+  min-height: 36px;
+}
+.rtraps h3 {
+  margin: 0;
+  font: 700 15px var(--f-display);
+  color: var(--warn);
+}
+.rtraps .cnt {
+  color: var(--warn);
+}
+.rtraps ul,
+.rowner ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: normal;
+}
+.rsrc {
+  color: var(--accent);
+  text-decoration: none;
+  padding: 0 2px;
+}
+.rsrc:hover {
+  text-decoration: underline;
+}
+.rtree {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.rth {
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  font: 500 11px var(--f-mono);
+  color: var(--muted);
+}
+.rth span:first-child {
+  flex: 1;
+}
+.rtree summary {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 0;
+  white-space: normal;
+}
+.rprod + .rprod {
+  border-top: 1px solid var(--line);
+}
+.rprod > summary .rn {
+  font-weight: 600;
+}
+.rcat > summary .rn {
+  color: var(--muted);
+}
+.rkids {
+  padding-left: 20px;
+}
+.rtree .rn,
+.rres > summary code {
+  flex: 1;
+  min-width: 0;
+}
+.rres > summary code {
+  font: 13px var(--f-mono);
+  overflow-wrap: anywhere;
+}
+.rres[open] > summary {
+  background: var(--accent-soft);
+  border-radius: 6px;
+}
+.rres[open] > summary code {
+  font-weight: 600;
+}
+.rtree .cnt {
+  font: 500 11.5px var(--f-mono);
+  color: var(--muted);
+  white-space: nowrap;
+  min-width: 28px;
+  text-align: right;
+}
+.rtags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.rrole {
+  font: 500 12px/1.4 var(--f-body);
+  color: var(--role);
+  background: var(--role-soft);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+.rtag {
+  font: 600 10.5px/1.6 var(--f-mono);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.rtag.warn {
+  color: var(--warn);
+  background: var(--warn-soft);
+}
+.rbox {
+  margin: 4px 0 10px 18px;
+  padding: 6px 0 6px 14px;
+  border-left: 2px solid var(--line);
+  display: grid;
+  gap: 8px;
+}
+.rlbl {
+  margin: 0;
+  font: 600 10.5px var(--f-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rroles,
+.rapis,
+.rres-l {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+}
+.redge {
+  margin: 0;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 13px;
+}
+.redge code,
+.rtraps code,
+.rowner code,
+.rcustom code {
+  font: 12px var(--f-mono);
+  background: var(--hover);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.rnote {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.rbox .rnote {
+  padding: 0;
+}
+.reps {
+  display: grid;
+  gap: 2px;
+}
+.reps.flat {
+  padding: 0 12px 8px;
+}
+.rep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 0 6px;
+  border: 0;
+  border-radius: 4px;
+  background: none;
+  color: var(--fg);
+  font: 12.5px var(--f-mono);
+  text-align: left;
+  cursor: pointer;
+}
+.rep:hover {
+  background: var(--hover);
+}
+.rep .p {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.rep .ra {
+  font: 12px var(--f-body);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.rmore {
+  justify-self: start;
+  font: 500 12.5px var(--f-body);
+  color: var(--accent);
+  background: none;
+  border: 0;
+  padding: 0 6px;
+  min-height: 36px;
+  cursor: pointer;
+}
+.rgrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-block: 10px;
+}
+.rcard {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.rcard h3 {
+  margin: 0;
+  cursor: default;
+}
+.rcard h3:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rcard > p:not(.rlbl) {
+  margin: 0;
+  font-size: 13.5px;
+}
+.rcard .ref {
+  color: var(--accent);
+  margin-left: auto;
+  font-size: 12px;
+}
+.rowner {
+  background: var(--warn-soft);
+}
+.rcustom {
+  border-style: dashed;
+}
+.rapi {
+  font: 500 12px/1.4 var(--f-body);
+  color: var(--fg);
+  background: var(--hover);
+  border: 0;
+  border-radius: 4px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+.rapi:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.rres-l code {
+  display: inline-block;
+  font: 12px var(--f-mono);
+  color: var(--role);
+  background: var(--role-soft);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+@media (max-width: 760px) {
+  .ovtabs,
+  .rlens {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-self: stretch;
+    flex-basis: 100%;
+  }
+  .ovtabs button,
+  .rlens button {
+    min-height: 44px;
+  }
+  .rsrc {
+    display: inline-block;
+    padding: 8px 10px;
+    margin: -8px -6px;
+  }
+  .ovhead .rsrcs a {
+    display: inline-block;
+    padding-block: 12px;
+    margin-block: -12px;
+  }
+  /* On a phone the folded traps sit right under the lead, before the lens switch, as in the mockup. */
+  .rlay {
+    display: contents;
+  }
+  .ovpanel > .ovhead {
+    order: -2;
+  }
+  .rtraps {
+    order: -1;
+  }
+  .rq {
+    flex-basis: 100%;
+  }
+  .rq input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .rpf {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+  .rpf .rchip {
+    flex: none;
+    min-height: 44px;
+  }
+  .rpf .lbl {
+    display: none;
+  }
+  .rtraps {
+    flex-basis: 100%;
+  }
+  .rtraps summary {
+    min-height: 44px;
+  }
+  .rkids {
+    padding-left: 12px;
+  }
+  .rbox {
+    margin-left: 8px;
+  }
+  .rep {
+    min-height: 44px;
+  }
+  .rep .ra {
+    display: none;
+  }
+  .rgrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .rapi,
+  .rmore {
+    min-height: 44px;
+  }
+}
+.rhits {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.rfree {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: var(--ok-soft);
+  color: var(--ok);
+  font: 13px var(--f-body);
+  text-align: left;
+  cursor: pointer;
+}
+.rfree:hover span {
+  text-decoration: underline;
+}
+.rfree .rtag {
+  color: var(--ok);
+  background: var(--panel);
+}

@@ -87,6 +87,9 @@ const used = new Set(
     .flatMap(x => x.l || [])
     .concat(Object.values(D.NOTES).flatMap(n => (n.s || []).flatMap(s => s[2] || [])))
     .concat(Object.values(D.APIOV).flatMap(cs => (Array.isArray(cs) ? cs : []).flatMap(c => c.l || [])))
+    .concat((Array.isArray(D.ROLETRAPS) ? D.ROLETRAPS : []).flatMap(x => x.l || []))
+    /* linked from the header of the API Map roles view */
+    .concat(["lmres", "predroles"])
 );
 for (const [k, v] of Object.entries(D.DOCS)) {
   if (!Array.isArray(v) || v.length !== 2 || !isStr(v[1])) E("DOCS." + k, "must be [url, label]");
@@ -212,6 +215,32 @@ for (const [k, n] of Object.entries(D.NOTES)) {
   }
   for (const a of apis.keys()) if (!seen.has(a)) W("APIOV", "no card for API `" + a + "`");
 }
+
+/* API Map roles view: pm = the Permissions section of an endpoint, imported by apimap-import; traps follow the notes fact rule. */
+D.APIMAP.forEach(a =>
+  a.eps.forEach(ep => {
+    const pm = ep.pm,
+      w = "APIMAP." + a.key + " " + ep.m + " " + ep.p;
+    if (pm === undefined) return;
+    if (!["n", "c", "r"].includes(pm.k)) return E(w, "pm.k must be n, c or r");
+    if (pm.k === "n") return;
+    if (!Array.isArray(pm.s) || !pm.s.length || !pm.s.every(r => Array.isArray(r) && r.length === 3 && r.every(isStr)))
+      E(w, "pm.s must be [product, category, resource] rows");
+    if (pm.k === "r" && !(Array.isArray(pm.o) && pm.o.length && pm.o.every(r => Array.isArray(r) && r.length === 2)))
+      E(w, "pm.o must be [role, resource] rows");
+  })
+);
+if (!Array.isArray(D.ROLETRAPS) || !D.ROLETRAPS.length) E("ROLETRAPS", "needs at least one trap");
+else
+  D.ROLETRAPS.forEach((x, i) => {
+    const w = "ROLETRAPS[" + i + "]";
+    if (!isStr(x.t)) return E(w, "empty text t");
+    markup(w, x.t);
+    if (/\[UNVERIFIED|https?:|</i.test(x.t)) E(w, "no [UNVERIFIED], URLs or raw < : sources go in DOCS keys");
+    if (x.t.split(/\s+/).length > 25) W(w, "over 25 words");
+    if (!Array.isArray(x.l) || !x.l.length) E(w, "needs DOCS keys in l");
+    else x.l.forEach(d => D.DOCS[d] || E(w, "DOCS key `" + d + "` not in DOCS"));
+  });
 
 /* HTTP Koty */
 const codes = new Set();

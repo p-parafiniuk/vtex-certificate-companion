@@ -18,6 +18,7 @@
   --k3: #96600d;
   --k3-soft: #fbf3e6;
   --k5: #7238bd;
+  --k5-soft: #efe7fa;
   --kshadow: rgb(28 22 34 / 0.22);
   --nav-bg: #1c1622;
   --nav-ink: #f2edf5;
@@ -47,6 +48,7 @@
     --k3: #e3ae52;
     --k3-soft: #3a2a12;
     --k5: #c0a0ff;
+    --k5-soft: #2a1f40;
     --kshadow: rgb(0 0 0 / 0.55);
     --nav-bg: #0f0b12;
     --nav-ink: #f2edf5;
@@ -74,6 +76,7 @@
   --k3: #e3ae52;
   --k3-soft: #3a2a12;
   --k5: #c0a0ff;
+  --k5-soft: #2a1f40;
   --kshadow: rgb(0 0 0 / 0.55);
   --nav-bg: #0f0b12;
   --nav-ink: #f2edf5;
@@ -2335,6 +2338,8 @@ body[data-view="api"] .wrap {
   --delete: var(--bad);
   --warn: var(--k3);
   --warn-soft: var(--k3-soft);
+  --role: var(--k5);
+  --role-soft: var(--k5-soft);
 }
 .hchip {
   font: 500 0.82rem var(--f-mono);
