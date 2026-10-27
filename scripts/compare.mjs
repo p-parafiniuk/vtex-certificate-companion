@@ -4,7 +4,8 @@
    (Artifact read of artifact-type/dc-runtime.js), and compare.json:
    [{ "board": "Main", "hash": "pytania-pricing-api", "w": 1280, "h": 1040, "theme": "light",
       "click": ["#catapi #view [data-v=\"list\"]"], "top": "#catapi #stats", "dy": -330 }]
-   click: selectors clicked in order (they pierce shadow roots); top: scrolled to the top of the viewport, then by dy.
+   click: selectors clicked in order (they pierce shadow roots); type: [selector, text] filled after the clicks;
+   top: scrolled to the top of the viewport, then by dy.
    Writes shots/design-<board>.png, shots/app-<board>.png and shots/compare-<topic>-<board>.png.
    Exits 1 on a missing board or a console error on either side. */
 import { execSync } from "node:child_process";
@@ -79,6 +80,10 @@ for (const s of specs) {
   for (const c of s.click || []) {
     await a.locator(c).first().click();
     await a.waitForTimeout(150);
+  }
+  if (s.type) {
+    await a.locator(s.type[0]).first().fill(s.type[1]);
+    await a.waitForTimeout(250);
   }
   if (s.top)
     await a

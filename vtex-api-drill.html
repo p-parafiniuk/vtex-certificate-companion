@@ -192,13 +192,8 @@ a {
 .brand:hover .brand-mark rect {
   fill: var(--nav-ink);
 }
-/* The exam button shares the top row on a phone: the name shrinks, and on the narrowest screens only the mark shows. */
-@media (max-width: 400px) {
-  .bar h1 {
-    font-size: 1.12rem;
-  }
-}
-@media (max-width: 340px) {
+/* The exam button and three icons share the top row on a phone, so below 430 px only the mark shows. */
+@media (max-width: 430px) {
   .brand-name {
     position: absolute;
     width: 1px;
@@ -239,6 +234,34 @@ a {
 }
 .theme-btn:hover {
   color: var(--nav-ink);
+}
+/* Search sits right after the theme switch, as one icon group. */
+.bar .srch-btn {
+  margin-left: -20px;
+  width: auto;
+  height: 36px;
+  gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 10px 0 12px;
+  background: var(--nav-ink);
+  color: var(--nav-bg);
+  font: 500 0.9rem var(--f-body);
+}
+.bar .srch-btn:hover {
+  background: var(--nav-accent);
+  color: var(--nav-bg);
+}
+.srch-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.srch-btn kbd {
+  font: 500 0.75rem var(--f-mono);
+  padding: 0 5px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  opacity: 0.6;
 }
 /* The one primary action in the bar. Desktop: far right, after the icon buttons. Phone: top row, left of Settings. */
 .sim-cta {
@@ -318,7 +341,7 @@ a {
   .tab-set {
     position: absolute;
     top: 6px;
-    right: 60px;
+    right: 108px;
   }
   .bar .tabs {
     order: 3;
@@ -330,6 +353,28 @@ a {
   }
   .bar .tabs + .sim-cta + .theme-btn {
     margin-left: 0;
+  }
+  /* Two rows: an icon like its neighbours, and the label stays in aria-label. */
+  .bar .srch-btn {
+    margin-left: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+    background: none;
+    color: var(--nav-muted);
+  }
+  .bar .srch-btn:hover {
+    background: none;
+    color: var(--nav-ink);
+  }
+  .srch-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+  .srch-l,
+  .srch-btn kbd {
+    display: none;
   }
   /* A 36 px pill inside a 44 px hit area, like the tabs. */
   .sim-cta {
@@ -1510,6 +1555,177 @@ h3 {
 }
 body:has(.info-dlg[open]) {
   overflow: hidden;
+}
+
+.gs-dlg {
+  width: min(640px, calc(100vw - 16px));
+  max-height: calc(100vh - 112px);
+  margin: 72px auto auto;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 18px 48px var(--kshadow);
+  overflow: hidden;
+}
+.gs-dlg[open] {
+  display: flex;
+  flex-direction: column;
+}
+.gs-dlg::backdrop {
+  background: rgb(12 8 16 / 0.55);
+}
+body:has(.gs-dlg[open]) {
+  overflow: hidden;
+}
+.gs-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 14px 0 16px;
+}
+.gs-field {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 12px;
+  border: 2px solid var(--accent);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--muted);
+}
+.gs-field svg {
+  flex: none;
+}
+.gs-field input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 400 1rem var(--f-body);
+  outline: none;
+}
+.gs-field input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+.gs-x {
+  flex: none;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: 600 0.95rem var(--f-body);
+  cursor: pointer;
+}
+.gs-sum {
+  margin: 0;
+  padding: 10px 18px 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+.gs-res {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  gap: 14px;
+  padding: 10px 10px 14px;
+}
+.gs-res:empty {
+  display: none;
+}
+.gs-g {
+  display: grid;
+  gap: 2px;
+}
+.gs-g h3 {
+  margin: 0 8px 4px;
+  font: 600 0.74rem var(--f-mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.gs-it {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.gs-it:hover,
+.gs-it:focus-visible {
+  background: var(--accent-soft);
+}
+.gs-it:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.gs-m {
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gs-t {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.gs-api .gs-t {
+  font: 500 0.84rem var(--f-mono);
+  overflow-wrap: anywhere;
+}
+.gs-mth {
+  font-weight: 600;
+  color: var(--k1);
+}
+.gs-t mark {
+  background: var(--accent-soft);
+  color: inherit;
+  border-radius: 3px;
+}
+.gs-it:hover mark,
+.gs-it:focus-visible mark {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.gs-more {
+  justify-self: start;
+  margin: 2px 10px 0;
+  font-size: 0.88rem;
+}
+.gs-keys {
+  margin: 0;
+  padding: 10px 18px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+@media (pointer: coarse) {
+  .gs-keys {
+    display: none;
+  }
+}
+@media (max-width: 520px) {
+  .gs-dlg {
+    margin-top: 8px;
+    max-height: calc(100dvh - 16px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .meter i {
@@ -3268,6 +3484,7 @@ div.setrow {
     <!-- Not a tab: starting the exam is an action, so it sits apart as the one primary button. app.js fills it. -->
     <a class="sim-cta" id="sim-cta" href="#symulacja"></a>
     <button type="button" class="theme-btn" id="theme-btn" aria-label="Motyw"></button>
+    <button type="button" class="theme-btn srch-btn" id="gs-open" aria-haspopup="dialog" aria-controls="gs-dlg" aria-label="Szukaj (/)" title="Szukaj (/)" data-en-aria="Search (/)" data-en-title="Search (/)"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span class="srch-l" aria-hidden="true" data-en="Search">Szukaj</span><kbd aria-hidden="true">/</kbd></button>
     <button type="button" class="btn small" id="back-q" hidden></button>
   </div>
 </header>
@@ -3437,6 +3654,16 @@ div.setrow {
   <section class="panel" id="p-api" role="tabpanel" aria-labelledby="t-api" hidden>
     <div id="apimap"></div>
   </section>
+
+  <dialog class="gs-dlg" id="gs-dlg" aria-label="Szukaj" data-en-aria="Search">
+    <div class="gs-head">
+      <label class="gs-field"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input type="search" id="gs-q" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-controls="gs-res" aria-label="Szukaj w pytaniach, fiszkach, notatkach i API Map" data-en-aria="Search questions, flashcards, notes and the API Map" placeholder="Pytania, fiszki, notatki, endpointy" data-en-ph="Questions, flashcards, notes, endpoints"></label>
+      <button type="button" class="gs-x" id="gs-close" data-en="Close">Zamknij</button>
+    </div>
+    <p class="gs-sum" id="gs-sum" aria-live="polite"></p>
+    <div class="gs-res" id="gs-res"></div>
+    <p class="gs-keys" data-en-html="&lt;kbd&gt;↑&lt;/kbd&gt; &lt;kbd&gt;↓&lt;/kbd&gt; choose · &lt;kbd&gt;Enter&lt;/kbd&gt; open · &lt;kbd&gt;Esc&lt;/kbd&gt; close · &lt;kbd&gt;/&lt;/kbd&gt; or &lt;kbd&gt;Ctrl&lt;/kbd&gt; &lt;kbd&gt;K&lt;/kbd&gt; anywhere opens search"><kbd>↑</kbd> <kbd>↓</kbd> wybór · <kbd>Enter</kbd> otwórz · <kbd>Esc</kbd> zamknij · <kbd>/</kbd> lub <kbd>Ctrl</kbd> <kbd>K</kbd> otwiera wyszukiwarkę z każdego miejsca</p>
+  </dialog>
 
   <footer class="src">
     <div class="src-row">
@@ -7762,9 +7989,8 @@ const IANA_NO_CAT_EN = {104:"Upload Resumption Supported (provisional registrati
 /* VTEX API Map, mounted on demand into the shadow root of #apimap. Data: vtex/openapi-schemas, one API per item.
    embed: a second copy inside a category view, { onDoc(url, label) }. It shows only the APIs given to scope(), stores only
    the shared tree/list choice, and opens API Reference links through onDoc (the category's docs frame) instead of a new tab. */
-function bootApiMap(root, onNav, embed) {
-  "use strict";
-  /* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated (dt date), lg legacy, dr replacement, q query (* = required), a auth, b body, r responses}] */
+/* key, name, file, server, auth, eps: [{p path, m method, s summary, t tag, d deprecated (dt date), lg legacy, dr replacement, q query (* = required), a auth, b body, r responses}]
+   Top level, so the main app's search can read it without booting the map. */
 const APIMAP = [
 {"key":"vtex-id","name":"VTEX ID","file":"VTEX - VTEX ID API.json","ref":"vtex-id-api","server":"https://{accountName}.vtexcommercestable.com.br","auth":["X-VTEX-API-AppKey","X-VTEX-API-AppToken","VtexIdclientAutCookie"],"eps":[{"p":"/api/vtexid/pvt/user/info","m":"GET","s":"Get storefront user by identifier","t":"Storefront users","d":0,"q":["user*"],"a":1,"r":[{"c":"200","d":"OK\n\nUser found.","ex":"{\n  \"userId\": \"a1b2c3d4-e5f6-7890-abcd-ef1234567890\",\n  \"user\": \"john.doe@example.com\",\n  \"name\": \"John Doe\",\n  \"accountId\": \"12345\",\n  \"accountName\": \"mystore\"\n}","src":"schema"},{"c":"401","d":"Unauthorized\n\nNot authenticated.","ex":null,"src":null}]},{"p":"/api/vtexid/apptoken/login","m":"POST","s":"Generate authentication token","t":"Authentication","d":0,"q":["an"],"a":1,"b":{"ct":"application/json","ex":"{\n  \"appkey\": \"vtexappkey-example-YSWQFZ\",\n  \"apptoken\": \"eyJhbGciOiJFUzI1NiIsImtpZCI6IjA1MTZFN0IwMDNFODMxRTg0QkFDOTg2NzBCNUM2QTRERTlBN0RFNkUiLCJ0eXAiOiJqd3QifQ.eyJzdWIiOiJwZWRyby5jb3N0YUB2dGV4LmNvbS5iciIsImFjY291bnQiOiJhcHBsaWFuY2V0aGVtZSIsImF1ZGllbmNlIjoiYWRtaW4iLCJzZXNzIjoiZjU3YjMyMGItMWE3YS00YzlkLWJkNDMtZTE4NDdhYmE1MTE1IiwiZXhwIjoxNjE2NzY3Mjc4LCJ1c2VySWQiOiJmYjU0MmU1MS01NDg4LTRjMzQtOGQxNy1lZDhmY2Y1OTdhOTQiLCJpYXQiOjE2MwerY2ODA4NzgsImlzcyI6InRva2VuLWVtaXR0ZXIiLCJqdGkiOiJmYTI0YWJiOC03Y2E5LTQ3NjUtYmYzNC1kMmvU5YTgzYjYxZmUifQ.23rn-2dEdAAYXJX2exrxDEdbieyKWsVKABeSUNeFWyhz7xRd7d5EcxwiMLjM3bRaBOKrAA9Op7ocn89c45qQ\"\n}","src":"schema","req":["appkey","apptoken"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"authStatus\": \"Success\",\n  \"token\": \"eyJhbGciOiJFUzI1NiIsImtpZCI6IjFBRjI5MUUwRDY0MERENTlEQTkzRTg0REMxNjQyNjA3ODZEQjY3ODAiLCJ0eXAiOiJqd3QifQ.eyJzdWIiOiJ2dGV4YXBwa2V5LXZ0ZXhoZWxwLVdWQ0FCVCIsImFjY291bnQiOiJwerV4aGVscCIsImF1ZGllbmNlIjoiYWRtaW4iLCJleHAiOjE2Njk3NzA3MzcsInVzZXJJZCI6IjM5MjNhMmUy5khmMTctNGNiYy04YzU3LWQ3OGFkNmUxYTU2NiIsImlhdCI6MTY2OTc0OTEzNywiaXNzIjoidG9rZW4tZW1HgoRlciIsImp0aSI6IjNiNjAxODA2LTExMzEtNDcwYS05MWJjLTVhM2JhOThiYWQyNiJ9.Q7N8MFa1FMJsQUpxBY29oije4aa-Jf29wgLFLl6LUY3Wei3MRUVUMRQWkey6Kug8iFPonZ1L-PaFmwfzSz3TCQ\",\n  \"expires\": 1669770737\n}","src":"schema"}]},{"p":"/api/vtexid/audience/webstore/provider/oauth/exchange","m":"POST","s":"Exchange OAuth access token for VTEX credential","t":"Authentication","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"providerId\": \"custom-oauth-provider\",\n  \"accessToken\": \"dsfDShdgfhDFI1NiIsIrtyZCI6IjFBRjI5MUUwRDY0MERENTlEQTkzRTg0REMxNjQyNjA3ODZEQjY3ODAiLCJ0eXAiOiJqd3QifQ.eyJzdWIiOiJ2dGV4YXBwa2V5LXZ0ZXhoZWxwLVdWQ0FCVCIsImFjY291bdg465DATU4GVscCIsImF1MBllbmNlIjoiYWRtaW4iLCJleHAiOjE2Njk3NzA3MzcsInVzZXJJZCI6IjM5MjNhMmUy5khmMTctNGNiYy04YzU3LWQ3OGFkNmUxYTU2NiIsImlhdCI6MTY2OTc0OTEzNywiaXNzIjoidG9rZW4tZW1HgoRlciIsImp0aSI6IjNiNjAxODA2LTExMzEtNDcwYS05MWJjLTVhM2JhOThiYWQyNiJ9.Q7N8MFa1FMJsQUpxBY29oije4aa-654fgjLFLl6LUY3Wei3MRUVUMRQWkey6Kug8iFPonZ1L-PaFmwfzSz3TCQ\",\n  \"duration\": 90\n}","src":"schema","req":["providerId","accessToken"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"authToken\": \"eyJhbGciOiJFUzI1NiIsIrtyZCI6IjFBRjI5MUUwRDY0MERENTlEQTkzRTg0REMxNjQyNjA3ODZEQjY3ODAiLCJ0eXAiOiJqd3QifQ.eyJzdWIiOiJ2dGV4YXBwa2V5LXZ0ZXhoZWxwLVdWQ0FCVCIsImFjY291bnQiOiJwerV4aGVscCIsImF1MBllbmNlIjoiYWRtaW4iLCJleHAiOjE2Njk3NzA3MzcsInVzZXJJZCI6IjM5MjNhMmUy5khmMTctNGNiYy04YzU3LWQ3OGFkNmUxYTU2NiIsImlhdCI6MTY2OTc0OTEzNywiaXNzIjoidG9rZW4tZW1HgoRlciIsImp0aSI6IjNiNjAxODA2LTExMzEtNDcwYS05MWJjLTVhM2JhOThiYWQyNiJ9.Q7N8MFa1FMJsQUpxBY29oije4aa-Jf463lwgLFLl6LUY3Wei3MRUVUMRQWkey6Kug8iFPonZ1L-PaFmwfzSz3TCQ\"\n}","src":"schema"}]},{"p":"/api/vtexid/credential/validate","m":"POST","s":"Check authenticated user","t":"Authentication","d":0,"q":["an"],"a":1,"b":{"ct":"application/json","ex":"{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n}","src":"schema","req":["token"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"authStatus\": \"Success\",\n  \"id\": \"1f6c17e5-06f9-44a9-a459-b3686e03fa9d\",\n  \"user\": \"john@mail.com\",\n  \"account\": \"apiexamples\",\n  \"audience\": \"admin\",\n  \"tokenType\": \"user\"\n}","src":"schema"},{"c":"401","d":"Unauthorized","ex":"{\n  \"authStatus\": \"WrongCredentials\"\n}","src":"schema"}]},{"p":"/api/vtexid/pub/providers/setup/password/webstore/password","m":"POST","s":"Enable or disable repeated passwords","t":"Authentication","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"isActive\": true,\n  \"allowRepeated\": false\n}","src":"schema","req":[]},"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/api/vtexid/password/expire","m":"POST","s":"Expire user password","t":"Authentication","d":0,"q":["email*"],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/api/vtexid/apikey/{apiKey}/apitoken/renew","m":"PATCH","s":"Initiate token renewal","t":"Token renewal","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"{\n  \"id\": \"1f6c17e5-06f9-44a9-a459-b3686e03fa9d\",\n  \"keyName\": \"my-api-key\",\n  \"creationDateToken\": \"2025-02-18T12:00:00Z\",\n  \"creationDateNewToken\": \"2025-02-25T12:00:00Z\",\n  \"expirationPeriod\": 30,\n  \"newToken\": \"abc123xyz789\"\n}","src":"schema"},{"c":"400","d":"Bad Request\n\nInvalid API key or API key not owned by tenant.","ex":null,"src":null},{"c":"409","d":"Conflict\n\nAlready has a renewed token pending.","ex":null,"src":null},{"c":"500","d":"Internal Server Error\n\nUnknown server error.","ex":null,"src":null}]},{"p":"/api/vtexid/apikey/{apiKey}/apitoken/finish-renewal","m":"PATCH","s":"Complete token renewal","t":"Token renewal","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"{\n  \"id\": \"1f6c17e5-06f9-44a9-a459-b3686e03fa9d\",\n  \"creationDateToken\": \"2025-02-18T15:30:00Z\",\n  \"creationDateNewToken\": null\n}","src":"schema"},{"c":"400","d":"Bad Request\n\nInvalid API key or API key not owned by tenant.","ex":null,"src":null},{"c":"404","d":"Not Found\n\nNo renewed API token was found.","ex":null,"src":null},{"c":"500","d":"Internal Server Error\n\nUnknown server error.","ex":null,"src":null}]},{"p":"/api/vtexid/pvt/user/id","m":"GET","s":"Get user ID by email","t":"Authentication","d":0,"q":["usuario*"],"a":1,"r":[{"c":"200","d":"OK","ex":"1f6c17e5-06f9-44a9-a459-b3686e03fa9d","src":"schema"},{"c":"401","d":"Unauthorized\n\nInvalid or missing VtexIdclientAutCookie.","ex":null,"src":null}]},{"p":"/api/vtexid/pub/authentication/start","m":"GET","s":"Start authentication","t":"Refresh token headless","d":0,"q":["scope*","fingerprint"],"a":1,"r":[{"c":"200","d":"OK","ex":"{\n  \"authenticationToken\": \"C17BCD635B637E66BF2BBE07CEED0B1B7425387FB8D6E42FE68EBCE7A49193F2\",\n  \"oauthProviders\": [\n    {\n      \"providerName\": \"Google\",\n      \"className\": \"google-plus\",\n      \"expectedContext\": []\n    },\n    {\n      \"providerName\": \"Facebook\",\n      \"className\": \"facebook\",\n      \"expectedContext\": []\n    }\n  ],\n  \"showClassicAuthentication\": true,\n  \"showAccessKeyAuthentication\": true,\n  \"showPasskeyAuthentication\": false,\n  \"authCookie\": null,\n  \"isAuthenticated\": false,\n  \"selectedProvider\": null,\n  \"samlProviders\": []\n}","src":"schema"}]},{"p":"/api/vtexid/pub/authentication/accesskey/send","m":"POST","s":"Send access key","t":"Refresh token headless","d":0,"q":["email*"],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null},{"c":"400","d":"Bad Request","ex":"{\n  \"authStatus\": \"InvalidEmail\"\n}","src":"schema"}]},{"p":"/api/vtexid/pub/authentication/accesskey/validate","m":"POST","s":"Validate session","t":"Refresh token headless","d":0,"q":[],"a":1,"b":{"ct":"multipart/form-data","ex":"{\n  \"accessKey\": \"123456\",\n  \"login\": \"user@example.com\"\n}","src":"schema","req":[]},"r":[{"c":"200","d":"OK","ex":"{\n  \"authStatus\": \"Success\",\n  \"promptMFA\": false,\n  \"lastAttemptAvailable\": null,\n  \"clientToken\": null,\n  \"authCookie\": {\n    \"Name\": \"VtexIdclientAutCookie_apiexamples\",\n    \"Value\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n  },\n  \"accountAuthCookie\": {\n    \"Name\": \"VtexIdclientAutCookie_a8b27fb4-6516-4cc0-82b6-a5f2b011e6e2\",\n    \"Value\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n  },\n  \"expiresIn\": 86399,\n  \"userId\": \"1f6c17e5-06f9-44a9-a459-b3686e03fa9d\",\n  \"phoneNumber\": null,\n  \"scope\": null\n}","src":"schema"},{"c":"400","d":"Bad Request","ex":"{\n  \"authStatus\": \"InvalidEmail\",\n  \"promptMFA\": false,\n  \"lastAttemptAvailable\": null,\n  \"clientToken\": null,\n  \"authCookie\": null,\n  \"accountAuthCookie\": null,\n  \"expiresIn\": 0,\n  \"userId\": null,\n  \"phoneNumber\": null,\n  \"scope\": null\n}","src":"schema"}]},{"p":"/api/vtexid/refreshtoken/webstore","m":"POST","s":"Refresh token","t":"Refresh token headless","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"fingerprint\": \"12345\"\n}","src":"schema","req":[]},"r":[{"c":"200","d":"OK","ex":"{\n  \"status\": \"Success\",\n  \"userId\": \"1f6c17e5-06f9-44a9-a459-b3686e03fa9d\",\n  \"refreshAfter\": \"2025-03-27T02:36:30+00:00\"\n}","src":"schema"}]},{"p":"/api/vtexid/organization-units/{unitId}/settings","m":"GET","s":"Get organization unit authentication settings","t":"Organization account authentication","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK\n\nAuthentication settings were returned successfully.","ex":"{\n  \"authenticationMethods\": [\n    {\n      \"type\": \"Password\",\n      \"name\": \"Password\",\n      \"status\": \"Enabled\"\n    },\n    {\n      \"type\": \"OAuth\",\n      \"name\": \"PingFederate\",\n      \"status\": \"Enabled\"\n    }\n  ]\n}","src":"schema"},{"c":"401","d":"Unauthorized\n\nThe current user could not be resolved.","ex":"{\n  \"message\": \"The current user could not be resolved.\"\n}","src":"schema"},{"c":"403","d":"Forbidden\n\nAccess denied.","ex":"{\n  \"message\": \"Access denied.\"\n}","src":"schema"},{"c":"404","d":"Not Found\n\nInvalid organization unit ID or the organization unit was not found.","ex":"{\n  \"message\": \"Organization unit not found.\"\n}","src":"schema"},{"c":"500","d":"Internal Server Error\n\nUnknown server error.","ex":"{\n  \"message\": \"An unexpected error occurred.\"\n}","src":"schema"}]},{"p":"/api/vtexid/organization-units/{unitId}/settings","m":"POST","s":"Set organization unit authentication settings","t":"Organization account authentication","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"settings\": [\n    {\n      \"type\": \"OAuth\",\n      \"name\": \"PingFederate\",\n      \"status\": \"Disabled\"\n    }\n  ]\n}","src":"schema","req":["settings"]},"r":[{"c":"200","d":"OK\n\nSettings were updated successfully.","ex":"{\n  \"success\": true\n}","src":"schema"},{"c":"400","d":"Bad Request\n\nInvalid authentication configuration.","ex":"{\n  \"message\": \"Invalid authentication configuration.\"\n}","src":"schema"},{"c":"401","d":"Unauthorized\n\nThe current user could not be resolved.","ex":"{\n  \"message\": \"The current user could not be resolved.\"\n}","src":"schema"},{"c":"403","d":"Forbidden\n\nAccess denied.","ex":"{\n  \"message\": \"Access denied.\"\n}","src":"schema"},{"c":"404","d":"Not Found\n\nInvalid organization unit ID or the organization unit was not found.","ex":"{\n  \"message\": \"Organization unit not found.\"\n}","src":"schema"},{"c":"409","d":"Conflict\n\nAuthentication settings already exist for one or more methods.","ex":"{\n  \"message\": \"Authentication settings already exist for one or more methods.\"\n}","src":"schema"},{"c":"500","d":"Internal Server Error\n\nUnknown server error.","ex":"{\n  \"message\": \"An unexpected error occurred.\"\n}","src":"schema"}]},{"p":"/api/vtexid/organization-units/{unitId}/settings","m":"PATCH","s":"Update organization unit authentication settings","t":"Organization account authentication","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"settings\": [\n    {\n      \"type\": \"OAuth\",\n      \"status\": \"Disabled\"\n    }\n  ]\n}","src":"schema","req":["settings"]},"r":[{"c":"200","d":"OK\n\nUpdated authentication settings were returned successfully.","ex":"{\n  \"authenticationMethods\": [\n    {\n      \"type\": \"Password\",\n      \"name\": \"Password\",\n      \"status\": \"Enabled\"\n    },\n    {\n      \"type\": \"OAuth\",\n      \"name\": \"PingFederate\",\n      \"status\": \"Enabled\"\n    }\n  ]\n}","src":"schema"},{"c":"400","d":"Bad Request\n\nInvalid authentication configuration or authentication settings were not found for update.","ex":"{\n  \"message\": \"Authentication settings were not found for update.\"\n}","src":"schema"},{"c":"401","d":"Unauthorized\n\nThe current user could not be resolved.","ex":"{\n  \"message\": \"The current user could not be resolved.\"\n}","src":"schema"},{"c":"403","d":"Forbidden\n\nAccess denied.","ex":"{\n  \"message\": \"Access denied.\"\n}","src":"schema"},{"c":"404","d":"Not Found\n\nInvalid organization unit ID or the organization unit was not found.","ex":"{\n  \"message\": \"Organization unit not found.\"\n}","src":"schema"},{"c":"500","d":"Internal Server Error\n\nUnknown server error.","ex":"{\n  \"message\": \"An unexpected error occurred.\"\n}","src":"schema"}]},{"p":"/api/vtexid/organization-units/{unitId}/settings","m":"DELETE","s":"Delete organization unit authentication setting","t":"Organization account authentication","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"settings\": [\n    {\n      \"type\": \"OAuth\"\n    }\n  ]\n}","src":"schema","req":["settings"]},"r":[{"c":"204","d":"No Content\n\nThe listed authentication configuration entries were deleted successfully.","ex":null,"src":null},{"c":"400","d":"Bad Request\n\nInvalid authentication configuration or authentication settings were not found for delete.","ex":"{\n  \"message\": \"Authentication settings were not found for delete.\"\n}","src":"schema"},{"c":"401","d":"Unauthorized\n\nThe current user could not be resolved.","ex":"{\n  \"message\": \"The current user could not be resolved.\"\n}","src":"schema"},{"c":"403","d":"Forbidden\n\nAccess denied.","ex":"{\n  \"message\": \"Access denied.\"\n}","src":"schema"},{"c":"404","d":"Not Found\n\nInvalid organization unit ID or the organization unit was not found.","ex":"{\n  \"message\": \"Organization unit not found.\"\n}","src":"schema"},{"c":"500","d":"Internal Server Error\n\nUnknown server error.","ex":"{\n  \"message\": \"An unexpected error occurred.\"\n}","src":"schema"}]}]},
 {"key":"license","name":"License Manager","file":"VTEX - License Manager API.json","ref":"license-manager-api","server":"https://{accountName}.vtexcommercestable.com.br","auth":["X-VTEX-API-AppKey","X-VTEX-API-AppToken","VtexIdclientAutCookie"],"eps":[{"p":"/api/license-manager/users/{userId}","m":"GET","s":"Get admin user information by user ID","t":"Users","d":0,"q":[],"a":1,"r":[{"c":"200","d":"Success","ex":"{\n  \"id\": \"e845b52a40e24654a2c70766adb5762b\",\n  \"name\": \"Jane\",\n  \"email\": \"jane@mail.com\"\n}","src":"schema"},{"c":"400","d":"Bad Request","ex":"{\n  \"Message\": \"Invalid UserId\"\n}","src":"schema"},{"c":"405","d":"Method Not Allowed - A null `userId` sends the request to a path that is not allowed.","ex":null,"src":null}]},{"p":"/api/license-manager/users/{userId}","m":"DELETE","s":"Delete admin user","t":"Users","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null},{"c":"400","d":"Bad Request","ex":"{\n  \"Message\": \"Invalid UserId\"\n}","src":"schema"}]},{"p":"/api/license-manager/users","m":"POST","s":"Create admin user","t":"Users","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"name\": \"Jane\",\n  \"email\": \"jane@mail.com\"\n}","src":"schema","req":["email"]},"r":[{"c":"200","d":"Success","ex":"{\n  \"id\": \"a404870467d24533a085a6b3c6a5a320\",\n  \"email\": \"jane@mail.com\",\n  \"name\": \"Jane\"\n}","src":"schema"},{"c":"400","d":"Bad Request","ex":"{\n  \"Message\": \"Invalid email\"\n}","src":"schema"}]},{"p":"/api/license-manager/site/pvt/logins/list/paged","m":"GET","s":"Get list of admin users","t":"Users","d":0,"q":["numItems","pageNumber","sort","sortType"],"a":1,"r":[{"c":"200","d":"Success","ex":"{\n  \"items\": [\n    {\n      \"id\": \"a404870467d24533a085a6b3c6a5a320\",\n      \"email\": \"mynewuser@mydomain.com\",\n      \"isAdmin\": false,\n      \"isReliable\": false,\n      \"isBlocked\": false,\n      \"roles\": [],\n      \"accountNames\": [],\n      \"name\": \"testuser\"\n    }\n  ],\n  \"paging\": {\n    \"page\": 1,\n    \"perPage\": 1,\n    \"total\": 1,\n    \"pages\": 1\n  }\n}","src":"schema"}]},{"p":"/api/license-manager/users/{userId}/roles","m":"PUT","s":"Add roles to admin user or API Key","t":"Roles","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"[\n  9000,\n  9111,\n  9333,\n  9444\n]","src":"schema","req":[]},"r":[{"c":"204","d":"Success - A no-content response, but the roles were added successfully.","ex":null,"src":null},{"c":"400","d":"Bad Request - A userId or role list with invalid format. The message on the body of the response will contain further information.","ex":"{\n  \"Message\": \"Roles list contains roles that do not exist in this account\"\n}","src":"schema"},{"c":"500","d":"Unexpected error - One possible reason is that the userId is not present on the database.","ex":"{\n  \"Message\": \"Unexpected error\"\n}","src":"schema"}]},{"p":"/api/license-manager/users/{userId}/roles","m":"GET","s":"Get roles by admin user ID or API Key","t":"Roles","d":0,"q":[],"a":1,"r":[{"c":"200","d":"Success","ex":"[\n  {\n    \"id\": 957,\n    \"name\": \"Call center operator\"\n  },\n  {\n    \"id\": 1,\n    \"name\": \"Owner (Admin Super)\"\n  }\n]","src":"schema"}]},{"p":"/api/license-manager/users/{userId}/roles/{roleId}","m":"DELETE","s":"Remove role from admin user or API Key","t":"Roles","d":0,"q":[],"a":1,"r":[{"c":"204","d":"Success - A no-content response, but the role deletion was performed successfully.","ex":null,"src":null},{"c":"400","d":"Bad Request - A userId or role list with invalid format. The message on the body of the response will contain further information.","ex":"{\n  \"Message\": \"Invalid UserId\"\n}","src":"schema"},{"c":"405","d":"Method Not Allowed","ex":null,"src":null}]},{"p":"/api/license-manager/site/pvt/roles/list/paged","m":"GET","s":"Get list of roles","t":"Roles","d":0,"q":["numItems","pageNumber","sort","sortType"],"a":1,"r":[{"c":"200","d":"Success","ex":"{\n  \"items\": [\n    {\n      \"id\": 957,\n      \"isAdmin\": false,\n      \"roleType\": 0,\n      \"products\": [\n        {\n          \"id\": null,\n          \"categoryId\": null,\n          \"categoryName\": null,\n          \"description\": null,\n          \"consoleUrlMask\": null,\n          \"urlConfiguration\": null,\n          \"webApiUrlMask\": null,\n          \"url\": null,\n          \"productResources\": null,\n          \"name\": \"Catalog\"\n        },\n        {\n          \"id\": null,\n          \"categoryId\": null,\n          \"categoryName\": null,\n          \"description\": null,\n          \"consoleUrlMask\": null,\n          \"urlConfiguration\": null,\n          \"webApiUrlMask\": null,\n          \"url\": null,\n          \"productResources\": null,\n          \"name\": \"OMS\"\n        }\n      ],\n      \"resources\": null,\n      \"logins\": null,\n      \"name\": \"Call center operator\"\n    }\n  ],\n  \"paging\": {\n    \"page\": 1,\n    \"perPage\": 1,\n    \"total\": 1,\n    \"pages\": 1\n  }\n}","src":"schema"}]},{"p":"/api/vlm/appkeys","m":"POST","s":"Create new API Key","t":"API keys","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"label\": \"my new API Key\"\n}","src":"schema","req":["label"]},"r":[{"c":"200","d":"Success","ex":"{\n  \"id\": \"a2555e95-9db8-48be-94f8-2a28577c0b4a\",\n  \"appKey\": \"vtexappkey-myaccount-ORYNWX\",\n  \"appToken\": \"WNVUJKYFKJFLTPXHQGAZDHPBHSDQVJJWSFZUBOGCKPEXAIFHTPANKJTOXUKRIIJAAJSOPCFBAXOODRABMUXFJVLJLKWGEOUCFDXRPRRQKYNNUFLGTIEOKERFXJCFFYXL\",\n  \"label\": \"my new API Key\",\n  \"createdIn\": \"2018-07-04T14:09:08.2718405Z\",\n  \"isActive\": true\n}","src":"schema"}]},{"p":"/api/vlm/appkeys","m":"GET","s":"Get API keys from account","t":"API keys","d":0,"q":[],"a":1,"r":[{"c":"200","d":"Success","ex":"[\n  {\n    \"id\": \"a2555e95-9db8-48be-94f8-2a28577c0b4a\",\n    \"appKey\": \"vtexappkey-myaccount-ORYNWX\",\n    \"label\": \"my new API Key\",\n    \"createdIn\": \"2018-07-04T14:09:08.2718405Z\",\n    \"isActive\": true\n  },\n  {\n    \"id\": \"a2555e95-9db8-48be-94f8-2a28577c0b4a\",\n    \"appKey\": \"vtexappkey-myaccount-ORKPDC\",\n    \"label\": \"my other API Key\",\n    \"createdIn\": \"2018-07-04T14:09:08.2718405Z\",\n    \"isActive\": true\n  }\n]","src":"schema"}]},{"p":"/api/vlm/appkeys/{id}","m":"PUT","s":"Update API Key","t":"API keys","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"isActive\": false\n}","src":"schema","req":["isActive"]},"r":[{"c":"200","d":"Success","ex":null,"src":null},{"c":"400","d":"Bad Request","ex":"{\n  \"Details\": null,\n  \"HttpStatusCode\": 400,\n  \"VLMErrorCode\": 17,\n  \"Message\": \"Token not exists for this account\"\n}","src":"schema"}]},{"p":"/api/vlm/account/stores","m":"GET","s":"Get stores","t":"Stores","d":0,"q":[],"a":1,"r":[{"c":"200","d":"Success","ex":"[\n  {\n    \"id\": 1213,\n    \"name\": \"ambientecrm\",\n    \"hosts\": [\n      \"loja.ambientecrm.com.br\",\n      \"www.ambientecrm.com.br\"\n    ]\n  },\n  {\n    \"id\": 213,\n    \"name\": \"ambienteqa\",\n    \"hosts\": [\n      \"loja.blackbox.com.br\",\n      \"www.blackbox.com.br\"\n    ]\n  }\n]","src":"schema"}]},{"p":"/api/vlm/account","m":"GET","s":"Get information about account","t":"Account","d":0,"q":[],"a":1,"r":[{"c":"200","d":"Success","ex":"{\n  \"isActive\": true,\n  \"id\": \"71fe5fdabc4940ad81c226d43b754ba8\",\n  \"name\": \"UNISUPER, SOCIEDAD ANONIMA\",\n  \"accountName\": \"apiexamples\",\n  \"lv\": null,\n  \"isOperating\": false,\n  \"defaultUrl\": null,\n  \"district\": null,\n  \"country\": null,\n  \"complement\": null,\n  \"companyName\": \"UNISUPER, SOCIEDAD ANONIMA\",\n  \"cnpj\": null,\n  \"haveParentAccount\": false,\n  \"parentAccountId\": null,\n  \"parentAccountName\": null,\n  \"city\": null,\n  \"address\": null,\n  \"logo\": null,\n  \"hasLogo\": false,\n  \"number\": null,\n  \"postalCode\": null,\n  \"state\": null,\n  \"telephone\": \"+219999999\",\n  \"tradingName\": \"UNISUPER, SOCIEDAD ANONIMA\",\n  \"licenses\": [\n    {\n      \"expiration\": null,\n      \"id\": 24,\n      \"isPurchased\": false,\n      \"products\": [\n        {\n          \"id\": 1,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"License Manager\"\n        },\n        {\n          \"id\": 9,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Logistics\"\n        },\n        {\n          \"id\": 14,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Log\"\n        },\n        {\n          \"id\": 23,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Message Center\"\n        },\n        {\n          \"id\": 43,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Billing\"\n        },\n        {\n          \"id\": 55,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Audit\"\n        },\n        {\n          \"id\": 64,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Vtex ID\"\n        },\n        {\n          \"id\": 66,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"VTEX IO\"\n        },\n        {\n          \"id\": 73,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Seller Register\"\n        },\n        {\n          \"id\": 75,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Time Series\"\n        },\n        {\n          \"id\": 91,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Releases\"\n        }\n      ],\n      \"name\": \"Carrier\"\n    },\n    {\n      \"expiration\": null,\n      \"id\": 10,\n      \"isPurchased\": false,\n      \"products\": [\n        {\n          \"id\": 1,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"License Manager\"\n        },\n        {\n          \"id\": 3,\n          \"domains\": [],\n          \"endpoints\": {\n            \"webApiUrl\": null,\n            \"consoleUrl\": null\n          },\n          \"name\": \"Master Data\"\n        },\n        {\n          \"id\": 14,\n          \"domains\": [],\n          \"endpoints\": {\n       \n… (ucięte, pełna wersja w schemacie)","src":"schema"}]}]},
@@ -7788,6 +8014,8 @@ const APIMAP = [
 {"key":"marketplace","name":"Marketplace","file":"VTEX - Marketplace APIs.json","ref":"marketplace-apis","server":"https://{accountName}.vtexcommercestable.com.br/api","auth":["X-VTEX-API-AppKey","X-VTEX-API-AppToken","VtexIdclientAutCookie"],"eps":[{"p":"/notificator/{sellerId}/changenotification/{skuId}/price","m":"POST","s":"Notify marketplace of price update","t":"Notification","d":0,"q":[],"a":1,"r":[{"c":"202","d":"Accepted","ex":null,"src":null}]},{"p":"/notificator/{sellerId}/changenotification/{skuId}/inventory","m":"POST","s":"Notify marketplace of inventory update","t":"Notification","d":0,"q":[],"a":1,"r":[{"c":"202","d":"Accepted","ex":null,"src":null}]},{"p":"/offer-manager/pvt/offers","m":"GET","s":"Get matched offers list","t":"Matched Offers","d":0,"q":["sort","rows","start","fq"],"a":1,"r":[{"c":"200","d":"OK","ex":"[\n  {\n    \"LastModified\": \"2021-05-06T21:37:24.262529\",\n    \"ProductId\": \"941947\",\n    \"CategoryId\": 1563,\n    \"BrandId\": 2004291,\n    \"ProductName\": \"Product Test 04 - Black - 40\",\n    \"Skus\": [\n      {\n        \"SkuId\": \"1070268\",\n        \"EanId\": \"768655\",\n        \"RefId\": \"1234\",\n        \"NameComplete\": \"Product Test 04 - Black - 40 Color:Black\",\n        \"Name\": \"Color:Black\",\n        \"IsActive\": true,\n        \"MainImage\": {\n          \"ImageId\": \"53878805\",\n          \"ImageLabel\": null,\n          \"ImageTag\": \"\u003cimg src=\\\"~/arquivos/ids/53878805-#width#-#height#/image-8b4364782e664d76a6ebc8702008e478.jpg\\\" width=\\\"#width#\\\" height=\\\"#height#\\\" alt=\\\"image-8b4364782e664d76a6ebc8702008e478\\\" id=\\\"\\\" />\",\n          \"ImagePath\": \"~/arquivos/ids/53878805-#width#-#height#/image-8b4364782e664d76a6ebc8702008e478.jpg\",\n          \"IsMain\": true,\n          \"IsZoomSize\": true,\n          \"ImageText\": \"image-8b4364782e664d76a6ebc8702008e478\",\n          \"LastModified\": \"2021-04-06T03:01:30.747\"\n        },\n        \"Offers\": [\n          {\n            \"SellerId\": \"1\",\n            \"SellerSkuId\": \"1070268\",\n            \"OffersPerSalesChannel\": [\n              {\n                \"SaleChannel\": 1,\n                \"Price\": 0,\n                \"ListPrice\": 0,\n                \"PriceWithoutDiscount\": 0,\n                \"AvailableQuantity\": 0\n              }\n            ],\n            \"AvailableSalesChannels\": null\n          },\n          {\n            \"SellerId\": \"madesacms\",\n            \"SellerSkuId\": \"3298\",\n            \"OffersPerSalesChannel\": [\n              {\n                \"SaleChannel\": 0,\n                \"Price\": 1200,\n                \"ListPrice\": 1200,\n                \"PriceWithoutDiscount\": 1200,\n                \"AvailableQuantity\": 10000000\n              }\n            ],\n            \"AvailableSalesChannels\": null\n          }\n        ]\n      }\n    ]\n  }\n]","src":"schema"}]},{"p":"/offer-manager/pvt/product/{productId}/sku/{skuId}","m":"GET","s":"Get matched offers' data by SKU ID","t":"Matched Offers","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"[\n  {\n    \"productId\": \"1561208\",\n    \"skuId\": \"1559161\",\n    \"nameComplete\": \"Long sleeve cardigan - Women - Grey - L\",\n    \"mainImage\": {\n      \"imagePath\": \"~/arquivos/ids/8567753-#width#-#height#/image-05b40d3167b5b7ed42285124f6862f12.jpg\"\n    },\n    \"sellersOffers\": [\n      {\n        \"sellerId\": \"1\",\n        \"sellerSkuId\": \"1559161\",\n        \"salesChannelOffer\": [\n          {\n            \"salesChannelId\": \"1\",\n            \"salesChannelName\": \"Principal\",\n            \"price\": 49.99,\n            \"listPrice\": 59.99,\n            \"priceWithoutDiscount\": 49.99,\n            \"availableQuantity\": 8\n          },\n          {\n            \"salesChannelId\": \"2\",\n            \"salesChannelName\": \"Online Store\",\n            \"price\": 47.99,\n            \"listPrice\": 59.99,\n            \"priceWithoutDiscount\": 47.99,\n            \"availableQuantity\": 12\n          }\n        ]\n      }\n    ]\n  }\n]","src":"schema"}]},{"p":"/offer-manager/pvt/product/{productId}","m":"GET","s":"Get matched offers' data by product ID","t":"Matched Offers","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"[\n  {\n    \"productId\": \"1561208\",\n    \"skuId\": \"1559161\",\n    \"nameComplete\": \"Long sleeve cardigan - Women - Grey - L\",\n    \"mainImage\": {\n      \"imagePath\": \"~/arquivos/ids/8567753-#width#-#height#/image-05b40d3167b5b7ed42285124f6862f12.jpg\"\n    },\n    \"sellersOffers\": [\n      {\n        \"sellerId\": \"1\",\n        \"sellerSkuId\": \"1559161\",\n        \"salesChannelOffer\": {\n          \"salesChannelId\": \"1\",\n          \"salesChannelName\": \"Principal\",\n          \"price\": 0,\n          \"listPrice\": 0,\n          \"priceWithoutDiscount\": 0,\n          \"availableQuantity\": 0\n        }\n      }\n    ]\n  },\n  {\n    \"productId\": \"1561208\",\n    \"skuId\": \"1559163\",\n    \"nameComplete\": \"Long sleeve cardigan - Women - Grey - XS\",\n    \"mainImage\": {\n      \"imagePath\": \"~/arquivos/ids/8567753-#width#-#height#/image-05b40d3167b5b7ed42285124f6862f12.jpg\"\n    },\n    \"sellersOffers\": [\n      {\n        \"sellerId\": \"1\",\n        \"sellerSkuId\": \"1559161\",\n        \"salesChannelOffer\": {\n          \"salesChannelId\": \"1\",\n          \"salesChannelName\": \"Principal\",\n          \"price\": 0,\n          \"listPrice\": 0,\n          \"priceWithoutDiscount\": 0,\n          \"availableQuantity\": 0\n        }\n      }\n    ]\n  }\n]","src":"schema"}]},{"p":"/seller-register/pvt/seller-leads","m":"POST","s":"Invite seller lead","t":"Seller Invite","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"sellerEmail\": \"selleremail@email.com\",\n  \"sellerName\": \"Seller Name\",\n  \"sellerAccountName\": \"seller123\",\n  \"salesChannel\": \"1\",\n  \"email\": \"email@email.com\",\n  \"sellerType\": 1,\n  \"accountId\": \"5fb38ace-d95e-45ad-970d-ee97cce9fbcd\",\n  \"document\": \"12345671000\",\n  \"hasAcceptedLegalTerms\": true,\n  \"address\": {\n    \"postalcode\": \"12345678\",\n    \"complement\": \"Appartment 1234\",\n    \"street\": \"VTEX street\",\n    \"number\": \"25\",\n    \"neighborhood\": \"VTEX quarter\",\n    \"state\": \"RJ\",\n    \"city\": \"Rio de Janeiro\"\n  },\n  \"accountable\": {\n    \"name\": \"Jane Smith\",\n    \"email\": \"email@email.com\",\n    \"phone\": \"1234567890\"\n  }\n}","src":"schema","req":["sellerEmail","sellerName","sellerAccountName","salesChannel","email","sellerType","accountId","accountable","hasAcceptedLegalTerms","address","document"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"sellerId\": \"7890123456\",\n  \"createdAt\": \"2023-01-01T12:34:56Z\",\n  \"updatedAt\": \"2023-01-01T12:34:56Z\"\n}","src":"schema"}]},{"p":"/seller-register/pvt/seller-leads","m":"GET","s":"List seller leads","t":"Seller Invite","d":0,"q":["offset*","limit*","isConnected*","search*","status*","orderBy*"],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/seller-leads/{sellerLeadId}","m":"PUT","s":"Accept seller lead","t":"Seller Invite","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"sellerEmail\": \"selleremail@email.com\",\n  \"sellerName\": \"Seller Name\",\n  \"sellerAccountName\": \"seller123\",\n  \"salesChannel\": \"1\",\n  \"email\": \"seller@email.com\",\n  \"sellerType\": 1,\n  \"accountId\": \"5fb38ace-d95e-45ad-970d-ee97cce9fbcd\",\n  \"document\": \"12345671000\",\n  \"hasAcceptedLegalTerms\": true,\n  \"address\": {\n    \"postalcode\": \"12345678\",\n    \"complement\": \"Appartment 1234\",\n    \"street\": \"Park Avenue\",\n    \"number\": \"25\",\n    \"neighborhood\": \"Manhattan\",\n    \"state\": \"RJ\",\n    \"city\": \"Rio de Janeiro\"\n  },\n  \"accountable\": {\n    \"name\": \"Jane Smith\",\n    \"email\": \"email@email.com\",\n    \"phone\": \"1234567890\"\n  }\n}","src":"gen","req":["sellerEmail","sellerName","sellerAccountName","salesChannel","email","sellerType","accountId","document","hasAcceptedLegalTerms","address","accountable"]},"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/seller-leads/{sellerLeadId}","m":"GET","s":"Get seller lead's data by ID","t":"Seller Invite","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/seller-leads/{sellerLeadId}","m":"DELETE","s":"Delete seller lead","t":"Seller Invite","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/seller-leads/{sellerLeadId}/seller","m":"PUT","s":"Create seller from lead","t":"Seller Invite","d":0,"q":["isActive"],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/seller-leads/{sellerLeadId}/status","m":"PUT","s":"Resend seller lead invite","t":"Seller Invite","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"status\": \"accepted\"\n}","src":"gen","req":["status"]},"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/sellers/{sellerId}/commissions","m":"GET","s":"List seller commissions by seller ID","t":"Seller Commissions","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"[\n  {\n    \"categoryId\": \"51\",\n    \"categoryName\": \"Clothes\",\n    \"categoryFullPath\": [\n      \"2.0\",\n      \"Boys\",\n      \"Clothes\"\n    ],\n    \"productCommissionPercentage\": 7.75,\n    \"freightCommissionPercentage\": 2.33\n  }\n]","src":"schema"}]},{"p":"/seller-register/pvt/sellers/{sellerId}/commissions","m":"PUT","s":"Upsert seller commissions in bulk","t":"Seller Commissions","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"[\n  {\n    \"categoryId\": \"6\",\n    \"categoryFullPath\": null,\n    \"productCommissionPercentage\": 9.85,\n    \"freightCommissionPercentage\": 2.43\n  }\n]","src":"gen","req":["categoryId","categoryFullPath","productCommissionPercentage","freightCommissionPercentage"]},"r":[{"c":"204","d":"No Content","ex":null,"src":null}]},{"p":"/seller-register/pvt/sellers/{sellerId}/commissions/{categoryId}","m":"DELETE","s":"Remove seller commissions by category ID","t":"Seller Commissions","d":0,"q":[],"a":1,"r":[{"c":"204","d":"No Content","ex":null,"src":null}]},{"p":"/seller-register/pvt/sellers/{sellerId}/commissions/{categoryId}","m":"GET","s":"Get seller commissions by category ID","t":"Seller Commissions","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"{\n  \"categoryId\": \"51\",\n  \"categoryName\": \"Clothes\",\n  \"categoryFullPath\": [\n    \"2.0\",\n    \"Boys\",\n    \"Clothes\"\n  ],\n  \"productCommissionPercentage\": 7.75,\n  \"freightCommissionPercentage\": 2.33\n}","src":"schema"}]},{"p":"/seller-register/pvt/sellers","m":"POST","s":"Configure seller account","t":"Sellers","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"id\": \"seller123\",\n  \"name\": \"Seller Name\",\n  \"isActive\": true,\n  \"fulfillmentEndpoint\": \"http://{SellerName}.vtexcommercestable.com.br/api/fulfillment?&sc={TradePolicyID}\",\n  \"allowHybridPayments\": false,\n  \"taxCode\": \"34444\",\n  \"email\": \"seller@email.com\",\n  \"description\": \"Seller A, from the B industry.\",\n  \"sellerCommissionConfiguration\": {\n    \"productCommissionPercentage\": 3,\n    \"freightCommissionPercentage\": 4,\n    \"categoriesCommissionConfiguration\": []\n  },\n  \"isBetterScope\": true,\n  \"sellerType\": 1,\n  \"availableSalesChannels\": [\n    {\n      \"isSelected\": true,\n      \"id\": 1,\n      \"name\": \"Principal store\"\n    },\n    {\n      \"isSelected\": true,\n      \"id\": 2,\n      \"name\": \"Third\"\n    },\n    {\n      \"isSelected\": true,\n      \"id\": 3,\n      \"name\": \"Marketplaces\"\n    }\n  ],\n  \"CSCIdentification\": \"cscidentification 123\",\n  \"account\": \"partner01\",\n  \"channel\": \"channel name\",\n  \"salesChannel\": \"1\",\n  \"isVtex\": true,\n  \"exchangeReturnPolicy\": \"Describe exchange and returns policy\",\n  \"deliveryPolicy\": \"Describe delivery policy\",\n  \"securityPrivacyPolicy\": \"Our marketplace ensures that all transactions are encrypted with SSL technology, and we adhere to strict privacy standards to protect both sellers and buyers. Personal data is only shared with authorized parties to facilitate order processing and delivery, and we do not sell or disclose personal information to third parties without consent.\",\n  \"fulfillmentSellerId\": \"seller1\",\n  \"groups\": [\n    {\n      \"groups\": [\n        {\n          \"id\": \"8d845239bf1448dc8bc3ed3121837511\",\n          \"name\": \"long tail\"\n        },\n        {\n          \"id\": \"b9bcd348ab9c4cec8285ff9485c27a72\",\n          \"name\": \"franchise accounts\"\n        }\n      ]\n    }\n  ],\n  \"user\": \"integrationHubUserName\",\n  \"password\": \"integrationHubPassword\",\n  \"catalogSystemEndpoint\": \"https://apiexamples.vtexcommercestable.com.br/api/catalog_system/\",\n  \"trustPolicy\": \"AllowEmailSharing\",\n  \"score\": 0\n}","src":"gen","req":["id","name","isActive","fulfillmentEndpoint","allowHybridPayments","taxCode","email","description","sellerCommissionConfiguration","isBetterScope","sellerType","availableSalesChannels","CSCIdentification","account","channel","salesChannel","isVtex","score","exchangeReturnPolicy","deliveryPolicy","securityPrivacyPolicy","fulfillmentSellerId","user","password","catalogSystemEndpoint","trustPolicy"]},"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/sellers","m":"GET","s":"List sellers","t":"Sellers","d":0,"q":["from","to","keyword","integration","group ","isActive","isBetterScope","isVtex","sc","sellerType","sort"],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/sellers/{sellerId}","m":"PATCH","s":"Update seller by seller ID","t":"Sellers","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"[\n  {\n    \"operation\": \"replace\",\n    \"path\": \"/field\",\n    \"value\": false\n  }\n]","src":"gen","req":["operation","path","value"]},"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/sellers/{sellerId}","m":"GET","s":"Get seller data by ID","t":"Sellers","d":0,"q":["sc"],"a":1,"r":[{"c":"200","d":"OK","ex":null,"src":null}]},{"p":"/seller-register/pvt/sellers/{sellerId}/sales-channel/mapping","m":"PUT","s":"Upsert sales channel mapping","t":"Sales Channel Mapping","d":0,"q":["an*"],"a":1,"b":{"ct":"application/json","ex":"[\n  {\n    \"marketplaceSalesChannel\": 1,\n    \"sellerChannel\": \"GCB\"\n  },\n  {\n    \"marketplaceSalesChannel\": 2,\n    \"sellerChannel\": \"DFT\"\n  }\n]","src":"schema","req":["marketplaceSalesChannel","sellerChannel"]},"r":[{"c":"200","d":"OK","ex":"[\n  {\n    \"marketplaceSalesChannel\": \"1\",\n    \"sellerChannel\": \"GCC\"\n  }\n]","src":"schema"}]},{"p":"/seller-register/pvt/sellers/{sellerId}/sales-channel/mapping","m":"GET","s":"Get sales channel mapping data","t":"Sales Channel Mapping","d":0,"q":["an*"],"a":1,"r":[{"c":"200","d":"OK","ex":"[\n  {\n    \"marketplaceSalesChannel\": \"1\",\n    \"sellerChannel\": \"GCC\"\n  }\n]","src":"schema"}]},{"p":"/fulfillment/pvt/affiliates","m":"GET","s":"List affiliates","t":"Affiliates","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"[\n  {\n    \"id\": \"LNG\",\n    \"followUpEmail\": \"your@email.com\",\n    \"useSellerPaymentMethod\": false,\n    \"name\": \"Lengow\",\n    \"salesChannel\": \"1\",\n    \"searchURIEndpoint\": null,\n    \"searchURIEndpointVersion\": \"1.x.x\",\n    \"searchURIEndpointAvailableVersions\": [\n      \"1.x.x\"\n    ],\n    \"minimumValueAccumulated\": 5000\n  },\n  {\n    \"id\": \"CNT\",\n    \"followUpEmail\": \"email@email.com\",\n    \"useSellerPaymentMethod\": false,\n    \"name\": \"Centauro - lojadobreno\",\n    \"salesChannel\": \"2\",\n    \"searchURIEndpoint\": \"http://centaurointegration.vtexinternal.com.br/api/centaurointegration/indexedstockkeepingunit?an=lojadobreno\",\n    \"searchURIEndpointVersion\": \"1.x.x\",\n    \"searchURIEndpointAvailableVersions\": [\n      \"1.x.x\"\n    ],\n    \"minimumValueAccumulated\": 1000\n  },\n  {\n    \"id\": \"MLC\",\n    \"followUpEmail\": \"null\",\n    \"useSellerPaymentMethod\": false,\n    \"name\": \"Mercado Livre - lojadobreno - gold_special\",\n    \"salesChannel\": \"2\",\n    \"searchURIEndpoint\": \"http://meliintegration.vtexinternal.com/api/meliintegration/commercialcondition?an=lojadobreno&lt=gold_special\",\n    \"searchURIEndpointVersion\": \"1.x.x\",\n    \"searchURIEndpointAvailableVersions\": [\n      \"1.x.x\"\n    ],\n    \"minimumValueAccumulated\": 2000\n  }\n]","src":"schema"}]},{"p":"/fulfillment/pvt/affiliates/{affiliateId}","m":"GET","s":"Get affiliate by ID","t":"Affiliates","d":0,"q":[],"a":1,"r":[{"c":"200","d":"OK","ex":"{\n  \"id\": \"LNG\",\n  \"followUpEmail\": \"your@email.com\",\n  \"useSellerPaymentMethod\": false,\n  \"name\": \"Lengow\",\n  \"salesChannel\": \"1\",\n  \"searchURIEndpoint\": null,\n  \"searchURIEndpointVersion\": \"1.x.x\",\n  \"searchURIEndpointAvailableVersions\": [\n    \"1.x.x\"\n  ],\n  \"minimumValueAccumulated\": 5000\n}","src":"schema"}]},{"p":"/fulfillment/pvt/affiliates/{affiliateId}","m":"PUT","s":"Update affiliate by ID","t":"Affiliates","d":0,"q":[],"a":1,"b":{"ct":"application/json","ex":"{\n  \"followUpEmail\": \"example@email.com\",\n  \"name\": \"Affiliate name\",\n  \"salesChannel\": \"1\",\n  \"searchURIEndpoint\": \"\",\n  \"searchURIEndpointVersion\": \"1.x.x\",\n  \"searchURIEndpointAvailableVersions\": [\n    \"1.x.x\"\n  ],\n  \"minimumValueAccumulated\": 5000\n}","src":"schema","req":[]},"r":[{"c":"204","d":"No Content","ex":null,"src":null}]},{"p":"/fulfillment/pvt/affiliates/{affiliateId}","m":"DELETE","s":"Delete affiliate by ID","t":"Affiliates","d":0,"q":[],"a":1,"r":[{"c":"204","d":"No Content","ex":null,"src":null}]}]},
 {"key":"mkt-orders","name":"External Marketplace Orders","file":"VTEX - Marketplace Protocol - External Marketplace Orders.json","ref":"marketplace-protocol-external-marketplace-orders","server":"https://{accountName}.vtexcommercestable.com.br","auth":["X-VTEX-API-AppKey","X-VTEX-API-AppToken"],"eps":[{"p":"/api/fulfillment/pvt/orders","m":"POST","s":"Place fulfillment order","t":"External Marketplace","d":0,"q":["sc","affiliateId*"],"a":1,"b":{"ct":"application/json","ex":"{\n  \"marketplaceOrderId\": \"123456789\",\n  \"marketplaceServicesEndpoint\": \"https://exampleseller.marketplaceservices.com\",\n  \"marketplacePaymentValue\": 100,\n  \"isCreatedAsync\": false,\n  \"items\": [\n    {\n      \"id\": \"123456789\",\n      \"quantity\": 1,\n      \"seller\": \"1\"\n    }\n  ],\n  \"clientProfileData\": {\n    \"email\": \"customer@examplemail.com\",\n    \"firstName\": \"first-name\",\n    \"lastName\": \"last-name\",\n    \"documentType\": \"cpf\",\n    \"document\": \"123456789\",\n    \"phone\": \"+55110988887777\",\n    \"corporateName\": \"company-name\",\n    \"tradeName\": \"trade-name\",\n    \"corporateDocument\": \"12345678000100\",\n    \"stateInscription\": \"12345678\",\n    \"corporatePhone\": \"+551100988887777\",\n    \"isCorporate\": false\n  },\n  \"shippingData\": {\n    \"address\": {\n      \"addressType\": \"Residential\",\n      \"receiverName\": \"receiver-name\",\n      \"addressId\": \"Home\",\n      \"postalCode\": \"12345000\",\n      \"city\": \"Rio de Janeiro\",\n      \"state\": \"Rio de Janeiro\",\n      \"country\": \"BRA\",\n      \"street\": \"Praia de Botafogo\",\n      \"number\": \"300\",\n      \"neighborhood\": \"Botafogo\",\n      \"complement\": \"3rd floor\",\n      \"reference\": \"Grey building\",\n      \"geoCoordinates\": [\n        \"00.00000\"\n      ]\n    },\n    \"logisticsInfo\": [\n      {\n        \"itemIndex\": 0,\n        \"selectedSla\": \"Express\",\n        \"lockTTL\": \"8d\",\n        \"shippingEstimate\": \"7d\",\n        \"price\": 1099\n      }\n    ]\n  },\n  \"marketingData\": {\n    \"utmSource\": \"Facebook\",\n    \"utmMedium\": \"CPC\",\n    \"utmCampaign\": \"Black friday\",\n    \"utmiPage\": \"utmi_page-example\",\n    \"utmiPart\": \"utmi_part-exmaple\",\n    \"utmiCampaign\": \"utmi_campaign-exmaple\"\n  },\n  \"openTextField\": \"open-text-example\"\n}","src":"gen","req":["marketplaceOrderId","marketplaceServicesEndpoint","marketplacePaymentValue","items","clientProfileData","shippingData"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"orderId\": \"1234567890\",\n  \"status\": \"success\",\n  \"message\": \"Order placed successfully\",\n  \"orderData\": {\n    \"marketplaceOrderId\": \"123456789\",\n    \"marketplaceServicesEndpoint\": \"https://exampleseller.marketplaceservices.com\",\n    \"marketplacePaymentValue\": 100,\n    \"isCreatedAsync\": false,\n    \"items\": [\n      {\n        \"id\": \"123456789\",\n        \"quantity\": 1,\n        \"seller\": \"1\",\n        \"commission\": 10,\n        \"freightCommission\": 10,\n        \"price\": 2499,\n        \"bundleItems\": [],\n        \"itemAttachment\": {\n          \"name\": \"name-example\",\n          \"content\": \"content-example\"\n        },\n        \"attachments\": [],\n        \"priceTags\": [],\n        \"measurementUnit\": \"g\",\n        \"unitMultiplier\": 1,\n        \"isGift\": false\n      }\n    ],\n    \"clientProfileData\": {\n      \"email\": \"customer@examplemail.com\",\n      \"firstName\": \"first-name\",\n      \"lastName\": \"last-name\",\n      \"documentType\": \"cpf\",\n      \"document\": \"123456789\",\n      \"phone\": \"+55110988887777\",\n      \"corporateName\": \"company-name\",\n      \"tradeName\": \"trade-name\",\n      \"corporateDocument\": \"12345678000100\",\n      \"stateInscription\": \"12345678\",\n      \"corporatePhone\": \"+551100988887777\",\n      \"isCorporate\": false\n    },\n    \"shippingData\": {\n      \"address\": {\n        \"addressType\": \"residential\",\n        \"receiverName\": \"receiver-name\",\n        \"addressId\": \"Home\",\n        \"postalCode\": \"12345000\",\n        \"city\": \"Rio de Janeiro\",\n        \"state\": \"Rio de Janeiro\",\n        \"country\": \"BRA\",\n        \"street\": \"Praia de Botafogo\",\n        \"number\": \"300\",\n        \"neighborhood\": \"Botafogo\",\n        \"complement\": \"3rd floor\",\n        \"reference\": \"Grey building\",\n        \"geoCoordinates\": [\n          \"00.00000\",\n          \"00.00000\"\n        ]\n      },\n      \"logisticsInfo\": [\n        {\n          \"itemIndex\": 0,\n          \"selectedSla\": \"Express\",\n          \"lockTTL\": \"8d\",\n          \"shippingEstimate\": \"7d\",\n          \"price\": 1099,\n          \"deliveryWindow\": {\n            \"startDateUtc\": \"2023-01-01 00:00:00\",\n            \"endDateUtc\": \"2023-01-02 00:00:00\",\n            \"price\": 0,\n            \"lisPrice\": 0,\n            \"tax\": 0\n          }\n        }\n      ],\n      \"updateStatus\": \"updated\"\n    },\n    \"paymentData\": \"credit card\",\n    \"marketingData\": {\n      \"utmSource\": \"Facebook\",\n      \"utmMedium\": \"CPC\",\n      \"utmCampaign\": \"Black friday\",\n      \"utmiPage\": \"utmi_page-example\",\n      \"utmiPart\": \"utmi_part-example\",\n      \"utmiCampaign\": \"utmi_campaign-example\"\n    },\n    \"openTextField\": \"open-text-example\"\n  }\n}","src":"schema"}]},{"p":"/api/fulfillment/pvt/orders/{orderId}/fulfill","m":"POST","s":"Authorize dispatch for fulfillment order","t":"External Marketplace","d":0,"q":["sc","affiliateId*"],"a":1,"b":{"ct":"application/json","ex":"{\n  \"marketplaceOrderId\": \"123\"\n}","src":"gen","req":[]},"r":[{"c":"201","d":"Created","ex":"{\n  \"status\": \"success\",\n  \"message\": \"Order created successfully\",\n  \"orderId\": \"123\",\n  \"details\": {\n    \"createdAt\": \"2024-07-04T12:34:56Z\",\n    \"marketplaceOrderId\": \"123\",\n    \"status\": \"pending\"\n  }\n}","src":"schema"}]},{"p":"/api/order-integration/orders","m":"POST","s":"New Order Integration","t":"External Marketplace","d":0,"q":["an","affiliateId*"],"a":1,"b":{"ct":"application/json","ex":"{\n  \"marketplaceOrderId\": \"123\",\n  \"connectorName\": \"SkyHub\",\n  \"connectorEndpoint\": \"https://connector-endpoint.com/api/vtex\",\n  \"marketplaceOrderStatus\": \"new\",\n  \"marketplacePaymentValue\": 3025,\n  \"marketplaceInterestValue\": 0,\n  \"priceDivergenceAllowanceRate\": 0.05,\n  \"allowFranchises\": false,\n  \"pickupAccountName\": \"testAccount\",\n  \"items\": [\n    {\n      \"id\": \"1\",\n      \"price\": 975,\n      \"quantity\": 1\n    }\n  ],\n  \"clientProfileData\": {\n    \"email\": \"email@email.com.br\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"phone\": \"99999999999\",\n    \"document\": \"99999999999\",\n    \"corporateDocument\": null,\n    \"corporatePhone\": null,\n    \"corporateName\": null,\n    \"tradeName\": null,\n    \"stateInscription\": null\n  },\n  \"shippingData\": {\n    \"logisticsInfo\": [\n      {\n        \"price\": 2050,\n        \"selectedDeliveryChannel\": \"delivery\",\n        \"selectedSla\": \"Express\",\n        \"lockTTL\": \"1d\",\n        \"shippingEstimate\": \"2d\",\n        \"deliveryIds\": [\n          {\n            \"warehouseId\": \"AR1\"\n          }\n        ]\n      }\n    ],\n    \"selectedAddresses\": [\n      {\n        \"addressType\": \"Residential\",\n        \"addressId\": \"1\",\n        \"receiverName\": \"John Doe\",\n        \"postalCode\": \"81020-235\",\n        \"city\": \"Curitiba\",\n        \"state\": \"PR\",\n        \"country\": \"BRA\",\n        \"street\": \"Rua Eduardo Carlos Pereira\",\n        \"number\": \"4125\",\n        \"neighborhood\": \"Portão\",\n        \"complement\": \"101\",\n        \"geoCoordinates\": {\n          \"latitude\": -29.5,\n          \"longitude\": -45.8\n        }\n      }\n    ],\n    \"isFob\": true,\n    \"isMarketplaceFulfillment\": true,\n    \"trackingHints\": [\n      {\n        \"trackingId\": \"BR123456789\",\n        \"courierName\": \"Correios\",\n        \"trackingUrl\": \"https://tracking.example.com/BR123456789\",\n        \"trackingLabel\": \"Correios Express\"\n      }\n    ]\n  },\n  \"invoiceData\": {\n    \"userPaymentInfo\": {\n      \"paymentMethods\": [\n        \"creditCardPaymentGroup\"\n      ]\n    }\n  },\n  \"customData\": {\n    \"customApps\": [\n      {\n        \"id\": \"marketplace-integration\",\n        \"major\": 1,\n        \"fields\": {\n          \"marketplacePaymentMethod\": \"credit card\"\n        }\n      }\n    ]\n  },\n  \"taxData\": [\n    {\n      \"skuId\": \"1\",\n      \"value\": 150\n    }\n  ],\n  \"openTextField\": \"Additional order information.\"\n}","src":"schema","req":["marketplaceOrderId","marketplaceOrderStatus","marketplacePaymentValue","allowFranchises","items","clientProfileData","shippingData","invoiceData"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"marketplaceOrderId\": null,\n  \"accountName\": \"grocery1\",\n  \"code\": \"SOI003\",\n  \"flow\": \"PlaceOrder\",\n  \"success\": true,\n  \"operationId\": null,\n  \"errors\": null,\n  \"fields\": null,\n  \"message\": \"Order successfully enqueued\"\n}","src":"schema"},{"c":"default","d":"Default response for successful order enqueue operation.","ex":"{\n  \"marketplaceOrderId\": null,\n  \"accountName\": \"grocery1\",\n  \"code\": \"SOI003\",\n  \"flow\": \"PlaceOrder\",\n  \"success\": true,\n  \"operationId\": null,\n  \"errors\": null,\n  \"fields\": null,\n  \"message\": \"Order successfully enqueued\"\n}","src":"schema"}]},{"p":"/api/order-integration/orders/status","m":"PUT","s":"Update Order Status","t":"External Marketplace","d":0,"q":["an"],"a":1,"b":{"ct":"application/json","ex":"{\n  \"marketplaceOrderId\": \"{{$guid}}\",\n  \"marketplaceOrderStatus\": \"approved\",\n  \"connectorName\": \"Skyhub\",\n  \"connectorEndpoint\": \"https://connector-endpoint.com/api/vtex\"\n}","src":"schema","req":["marketplaceOrderId","marketplaceOrderStatus","connectorName","connectorEndpoint"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"marketplaceOrderId\": \"7e62fcd3-827b-400d-be8a-f050a79c4976\",\n  \"accountName\": null,\n  \"code\": \"SOI003\",\n  \"flow\": \"ApproveOrder\",\n  \"success\": true,\n  \"operationId\": null,\n  \"errors\": null,\n  \"fields\": null,\n  \"message\": \"Order successfully enqueued\"\n}","src":"schema"}]},{"p":"/api/checkout/pub/orderForms/simulation","m":"POST","s":"Fulfillment simulation - external marketplace","t":"External Marketplace","d":0,"q":["affiliateId","sc"],"a":1,"b":{"ct":"application/json","ex":"{\n  \"items\": [\n    {\n      \"id\": \"1\",\n      \"quantity\": 1,\n      \"seller\": \"1\"\n    }\n  ],\n  \"marketingData\": {\n    \"coupon\": \"free-shipping\",\n    \"utmSource\": \"Facebook\",\n    \"utmMedium\": \"CPC\",\n    \"utmCampaign\": \"Black friday\",\n    \"utmiPage\": \"utmi_page-example\",\n    \"utmiPart\": \"utmi_part-example\",\n    \"utmiCampaign\": \"utmi_campaign-example\"\n  },\n  \"postalCode\": \"12345-000\",\n  \"country\": \"BRA\",\n  \"selectedSla\": \"Normal\",\n  \"clientProfileData\": {\n    \"email\": \"clark.kent@example.com\",\n    \"firstName\": \"Clark\",\n    \"lastName\": \"Kent\",\n    \"documentType\": \"cpf\",\n    \"document\": \"12345678900\",\n    \"phone\": \"+552199999999\",\n    \"corporateName\": \"companyName\",\n    \"tradeName\": \"tradeName\",\n    \"corporateDocument\": \"corporateDocument\",\n    \"stateInscription\": \"stateInscription\",\n    \"corporatePhone\": \"corporatePhone\",\n    \"isCorporate\": true,\n    \"profileCompleteOnLoading\": false,\n    \"profileErrorOnLoading\": false,\n    \"customerClass\": \"customerClass\"\n  },\n  \"geoCoordinates\": [\n    -47.924747467041016,\n    -15.832582473754883\n  ]\n}","src":"gen","req":["id","quantity","seller"]},"r":[{"c":"200","d":"OK","ex":"{\n  \"items\": [\n    {\n      \"id\": \"1\",\n      \"requestIndex\": 0,\n      \"quantity\": 1,\n      \"seller\": \"1\",\n      \"sellerChain\": [\n        \"1\"\n      ],\n      \"tax\": 0,\n      \"priceValidUntil\": \"2023-07-12T11:49:01Z\",\n      \"price\": 9999,\n      \"listPrice\": 9999,\n      \"rewardValue\": 0,\n      \"sellingPrice\": 2999700,\n      \"offerings\": [\n        {\n          \"id\": \"14\",\n          \"name\": \"offeringExample\",\n          \"price\": 15099,\n          \"availability\": \"available\"\n        }\n      ],\n      \"priceTags\": [\n        {\n          \"name\": \"DISCOUNT@MANUALPRICE\",\n          \"value\": -5000,\n          \"rawValue\": -50,\n          \"isPercentual\": false,\n          \"identifier\": \"1234abc-5678b-1234c\",\n          \"owner\": \"ownerExample\"\n        }\n      ],\n      \"measurementUnit\": \"un\",\n      \"unitMultiplier\": 300,\n      \"parentItemIndex\": null,\n      \"parentAssemblyBinding\": null,\n      \"availability\": \"available\",\n      \"priceDefinition\": {\n        \"calculatedSellingPrice\": 2999700,\n        \"total\": 2999700,\n        \"sellingPrices\": [\n          {\n            \"value\": 2999700,\n            \"quantity\": 1\n          }\n        ]\n      }\n    }\n  ],\n  \"ratesAndBenefitsData\": {\n    \"rateAndBenefitsIdentifiers\": [\n      {\n        \"id\": \"245\",\n        \"name\": \"giftcard\"\n      }\n    ],\n    \"teaser\": [\n      {\n        \"name\": \"teaserName\",\n        \"description\": \"descriptionTeaser\"\n      }\n    ]\n  },\n  \"paymentData\": {\n    \"installmentOptions\": [\n      [\n        {\n          \"paymentSystem\": 123,\n          \"bin\": \"123456\",\n          \"paymentName\": \"Credit Card\",\n          \"paymentGroupName\": \"Credit Cards\",\n          \"value\": 100000,\n          \"installments\": [\n            {\n              \"count\": 1,\n              \"hasInterestRate\": false,\n              \"interestRate\": 0,\n              \"value\": 100000,\n              \"total\": 100000,\n              \"sellerMerchantInstallments\": [\n                {\n                  \"id\": 1,\n                  \"count\": 1,\n                  \"value\": 100000\n                }\n              ]\n            },\n            {\n              \"count\": 3,\n              \"hasInterestRate\": true,\n              \"interestRate\": 5,\n              \"value\": 34000,\n              \"total\": 102000,\n              \"sellerMerchantInstallments\": [\n                {\n                  \"id\": 1,\n                  \"count\": 3,\n                  \"value\": 34000\n                }\n              ]\n            }\n          ]\n        }\n      ],\n      [\n        {\n          \"paymentSystem\": 456,\n          \"bin\": null,\n          \"paymentName\": \"PayPal\",\n          \"paymentGroupName\": \"Digital Wallets\",\n          \"value\": 100000,\n          \"installments\": [\n            {\n              \"count\": 1,\n              \"hasInterestRate\": false,\n              \"interestRate\": 0,\n              \"value\": 100000,\n              \"total\": 100000,\n              \"sellerMerchantInstallments\": [\n                {\n                  \"id\": 2,\n                  \"count\": 1,\n                  \"value\": 100000\n                }\n              ]\n            }\n          ]\n        }\n      ]\n    ]\n  },\n  \"selectableGifts\": [],\n  \"marketingData\": {\n    \"utmSource\": \"app\",\n    \"utmMedium\": \"CPC\",\n    \"utmCampaign\": \"Black friday\",\n    \"utmipage\": \"true\",\n    \"utmiPart\": \"true\",\n    \"utmiCampaign\": \"true\",\n    \"coupon\": null,\n    \"marketingTags\": [\n      \"tag1\",\n      \"tag2\"\n    ]\n  },\n  \"country\": \"BRA\",\n  \"postalCode\": \"12345-000\",\n  \"geoCoordinates\": [\n    -47.924747467041016,\n    -15.832582473754883\n  ],\n  \"logisticsInf\n… (ucięte, pełna wersja w schemacie)","src":"schema"}]}]}
 ];
+function bootApiMap(root, onNav, embed) {
+  "use strict";
   const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
   /* UI language comes from <html lang>, which the main app sets; relang() redraws after a switch. */
   const L = (pl, en) => (document.documentElement.lang === "en" ? en : pl);
@@ -8656,6 +8884,13 @@ const APIMAP = [
   return {
     show: api => show(api),
     api: () => state.api,
+    /* The main app's search lands here with an endpoint path: search for it inside the API just shown. */
+    query: q => {
+      $("q").value = q;
+      state.q = q.trim().toLowerCase();
+      state.qAll = state.api === "all";
+      render();
+    },
     scope,
     relang: () => {
       buildLabels();
@@ -13432,6 +13667,245 @@ const APIMAP = [
     if (b && b.dataset.tab !== CUR)
       go(b.dataset.tab === "pytania" && S.dom !== "all" ? { tab: "pytania", cat: S.dom } : { tab: b.dataset.tab });
     else if (b) window.scrollTo(0, 0);
+  });
+
+  /* ---------- Szukaj: one box over questions, flashcards, notes and API Map endpoints ---------- */
+  var GS = { idx: null, more: {}, t: 0 },
+    gsDlg = $("#gs-dlg"),
+    gsQ = $("#gs-q"),
+    GS_MAX = 5,
+    GS_GROUPS = [
+      ["q", ["Pytania", "Questions"]],
+      ["f", ["Fiszki", "Flashcards"]],
+      ["n", ["Notatki", "Notes"]],
+      ["a", ["API", "API"]]
+    ];
+  function gsPlain(s) {
+    return String(s)
+      .replace(/\*\*|`/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  /* One output character per input character, so match positions map straight back onto the shown text. */
+  function gsNorm(s) {
+    var o = "";
+    for (var i = 0; i < s.length; i++) o += s.charAt(i).toLowerCase().normalize("NFD").charAt(0);
+    return o;
+  }
+  function gsIndex() {
+    var x = [];
+    function add(g, text, more, o) {
+      o.g = g;
+      o.text = text;
+      o.nt = gsNorm(text);
+      o.hay = gsNorm(text + " " + gsPlain(more));
+      x.push(o);
+    }
+    Q.forEach(function (q, i) {
+      add("q", gsPlain(q.q), q.o.join(" ") + " " + q.e, { id: "q" + (i + 1), d: q.d, n: "#" + (i + 1) });
+    });
+    F.forEach(function (f, i) {
+      add("f", gsPlain(f.q), f.a, { id: "f" + (i + 1), d: f.d, n: "F" + (i + 1) });
+    });
+    Object.keys(NOTES).forEach(function (d) {
+      var n = NOTES[d];
+      (n.t || []).forEach(function (b) {
+        add("n", gsPlain(b), "", { d: d, h: "TL;DR" });
+      });
+      (n.s || []).forEach(function (s) {
+        s[1].forEach(function (b) {
+          add("n", gsPlain(b), s[0], { d: d, h: s[0] });
+        });
+      });
+    });
+    if (typeof APIMAP !== "undefined")
+      APIMAP.forEach(function (a) {
+        a.eps.forEach(function (e) {
+          add("a", e.m + " " + e.p, (e.s || "") + " " + a.name, {
+            k: a.key,
+            api: a.name,
+            m: e.m,
+            p: e.p,
+            s: e.s || ""
+          });
+        });
+      });
+    return x;
+  }
+  function gsMark(text, nt, words) {
+    var on = [],
+      out = "",
+      i;
+    words.forEach(function (w) {
+      for (var at = nt.indexOf(w); at > -1; at = nt.indexOf(w, at + 1)) for (i = at; i < at + w.length; i++) on[i] = 1;
+    });
+    for (i = 0; i < text.length;) {
+      var j = i;
+      while (j < text.length && !!on[j] === !!on[i]) j++;
+      out += on[i] ? "<mark>" + esc(text.slice(i, j)) + "</mark>" : esc(text.slice(i, j));
+      i = j;
+    }
+    return out;
+  }
+  function gsMeta(x) {
+    if (x.g === "a") return esc(x.api + (x.s ? " · " + x.s : ""));
+    var dom = x.d === "all" ? L("Podstawy API", "API basics") : dn(x.d);
+    return esc(x.g === "n" ? dom + " · " + x.h : x.n + " · " + dom);
+  }
+  function gsRender() {
+    if (!GS.idx) return;
+    var raw = gsQ.value.trim(),
+      words = gsNorm(raw).split(/\s+/).filter(Boolean);
+    if (raw.length < 2) {
+      $("#gs-sum").textContent = L(
+        "Wpisz co najmniej 2 znaki. Szuka w pytaniach, fiszkach, notatkach i endpointach API Map.",
+        "Type at least 2 characters. Searches questions, flashcards, notes and API Map endpoints."
+      );
+      $("#gs-res").innerHTML = "";
+      return;
+    }
+    var hits = { q: [], f: [], n: [], a: [] },
+      total = 0;
+    GS.idx.forEach(function (x, k) {
+      if (
+        words.every(function (w) {
+          return x.hay.indexOf(w) > -1;
+        })
+      ) {
+        hits[x.g].push(k);
+        total++;
+      }
+    });
+    var html = "";
+    GS_GROUPS.forEach(function (gr) {
+      var g = gr[0],
+        list = hits[g];
+      if (!list.length) return;
+      /* Items whose shown text holds every word come first; the rest matched in options, answers or summaries. */
+      list.sort(function (a, b) {
+        function shown(k) {
+          return words.every(function (w) {
+            return GS.idx[k].nt.indexOf(w) > -1;
+          })
+            ? 0
+            : 1;
+        }
+        return shown(a) - shown(b) || a - b;
+      });
+      var cut = GS.more[g] ? list.length : Math.min(list.length, GS_MAX);
+      html +=
+        '<section class="gs-g" aria-label="' +
+        L(gr[1][0], gr[1][1]) +
+        '"><h3>' +
+        L(gr[1][0], gr[1][1]) +
+        " · " +
+        list.length +
+        "</h3>";
+      list.slice(0, cut).forEach(function (k) {
+        var x = GS.idx[k];
+        html +=
+          '<button type="button" class="gs-it' +
+          (g === "a" ? " gs-api" : "") +
+          '" data-gs="' +
+          k +
+          '"><span class="gs-m">' +
+          gsMeta(x) +
+          '</span><span class="gs-t">' +
+          (g === "a"
+            ? '<span class="gs-mth">' + esc(x.m) + "</span> " + gsMark(x.p, gsNorm(x.p), words)
+            : gsMark(x.text, x.nt, words)) +
+          "</span></button>";
+      });
+      if (cut < list.length)
+        html +=
+          '<button type="button" class="linkbtn gs-more" data-gs-more="' +
+          g +
+          '">' +
+          L("+" + (list.length - cut) + " więcej", "+" + (list.length - cut) + " more") +
+          "</button>";
+      html += "</section>";
+    });
+    $("#gs-sum").textContent = total
+      ? L(plural(total, "wynik", "wyniki", "wyników"), plural(total, "result", "results", "results"))
+      : L("Brak wyników dla „" + raw + "”.", "No results for “" + raw + "”.");
+    $("#gs-res").innerHTML = html;
+  }
+  function gsOpen() {
+    if (gsDlg.open) return gsQ.select();
+    if (!GS.idx) GS.idx = gsIndex();
+    gsDlg.showModal();
+    gsQ.select();
+    gsRender();
+  }
+  function gsGo(x) {
+    gsDlg.close();
+    if (x.g === "q" || x.g === "f") {
+      var c = BY_ID[x.id];
+      /* The deck must hold the card: its own category, every card type, and its round. */
+      S.fo.dom = c.d;
+      S.fo.deck = "all";
+      if (!inSet(c)) S.set = "all";
+      save();
+      go({ tab: "focus", id: c.id });
+    } else if (x.g === "n") go(x.d === "all" ? { tab: "pytania" } : { tab: "pytania", cat: x.d, sec: "info" });
+    else {
+      go({ tab: "api", sub: x.k });
+      if (APIM) APIM.query(x.p);
+    }
+  }
+  $("#gs-open").addEventListener("click", gsOpen);
+  $("#gs-close").addEventListener("click", function () {
+    gsDlg.close();
+  });
+  gsQ.addEventListener("input", function () {
+    GS.more = {};
+    clearTimeout(GS.t);
+    GS.t = setTimeout(gsRender, 80);
+  });
+  gsDlg.addEventListener("click", function (ev) {
+    if (ev.target === gsDlg) return gsDlg.close();
+    var b = ev.target.closest("[data-gs]");
+    if (b) return gsGo(GS.idx[+b.dataset.gs]);
+    b = ev.target.closest("[data-gs-more]");
+    if (b) {
+      var g = b.dataset.gsMore,
+        n = b.parentNode.querySelectorAll(".gs-it").length;
+      GS.more[g] = 1;
+      gsRender();
+      /* The button vanishes on redraw, so focus moves to the first item it revealed. */
+      var its = Array.prototype.filter.call(document.querySelectorAll("#gs-res .gs-it"), function (el) {
+        return GS.idx[+el.dataset.gs].g === g;
+      });
+      if (its[n]) its[n].focus();
+    }
+  });
+  /* Arrows walk the input and the results as one list; Enter on a result is a native button press. */
+  gsDlg.addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter" && ev.target === gsQ) {
+      clearTimeout(GS.t);
+      gsRender();
+      var top = $("#gs-res .gs-it");
+      if (top) gsGo(GS.idx[+top.dataset.gs]);
+      return ev.preventDefault();
+    }
+    if (ev.key !== "ArrowDown" && ev.key !== "ArrowUp") return;
+    var its = [gsQ].concat(Array.prototype.slice.call(document.querySelectorAll("#gs-res .gs-it"))),
+      at = its.indexOf(document.activeElement);
+    if (at < 0) return;
+    ev.preventDefault();
+    var to = its[Math.max(0, Math.min(its.length - 1, at + (ev.key === "ArrowDown" ? 1 : -1)))];
+    to.focus();
+  });
+  document.addEventListener("keydown", function (ev) {
+    var t = ev.composedPath ? ev.composedPath()[0] : ev.target,
+      k = ev.key,
+      typing = t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+    var hot =
+      (k === "/" && !typing && !ev.ctrlKey && !ev.metaKey && !ev.altKey) ||
+      ((ev.ctrlKey || ev.metaKey) && (k === "k" || k === "K"));
+    if (!hot || ev.defaultPrevented || (document.querySelector("dialog[open]") && !gsDlg.open)) return;
+    ev.preventDefault();
+    gsOpen();
   });
 
   var infoDlg = $("#info-dlg");
