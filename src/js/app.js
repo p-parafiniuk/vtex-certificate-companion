@@ -61,7 +61,8 @@
       [0, 0],
       [0, 0]
     ],
-    conf: true
+    conf: true,
+    lc: []
   };
   /* Note blocks are not keyed by index (they may be reordered), so "Umiem" is stored by category and heading. */
   var NKEY = Object.create(null),
@@ -323,6 +324,11 @@
           S.cal[k] = [Math.min(x && x[0] >>> 0, n) || 0, n];
         });
       if (raw.conf === false) S.conf = false;
+      /* lc: confidence levels of the last answer to show, 0 = answered without one; empty = no filter */
+      if (Array.isArray(raw.lc))
+        [0, 1, 2, 3].forEach(function (k) {
+          if (raw.lc.indexOf(k) > -1) S.lc.push(k);
+        });
       var rf = raw.fo;
       if (rf && typeof rf === "object") {
         if (["all", "q", "f", "p"].indexOf(rf.deck) > -1) S.fo.deck = rf.deck;
@@ -817,7 +823,8 @@
           esc(dn(q.d)) +
           '</span><span class="rnd">R' +
           q.r +
-          "</span>";
+          "</span>" +
+          (mode === "learn" ? lcBadge(i) : "");
     var how = reveal
       ? ""
       : '<p class="how">' +
@@ -1016,29 +1023,55 @@
       "</p>";
   }
   function renderQ() {
-    var html = "";
+    var html = "",
+      ids = [],
+      shown = 0;
     ORDER.forEach(function (i) {
       var q = Q[i];
       if (!inSet(q)) return;
       if (S.dom !== "all" && q.d !== S.dom) return;
       if (S.hide && S.known[i]) return;
+      ids.push("q" + (i + 1));
+      if (!lcPass("q" + (i + 1))) return;
+      shown++;
       html += qCard(i, "learn", learnSel(i));
     });
-    $("#qlist").innerHTML =
-      html ||
-      (S.hide
-        ? '<p class="empty">' +
+    $("#lcf").innerHTML =
+      '<p class="lch" id="lc-h">' +
+      L("Pewność przy ostatniej odpowiedzi", "Confidence at the last answer") +
+      "</p>" +
+      lcChips(ids, "lc-h") +
+      (S.lc.length
+        ? '<p class="how">' +
+          plural(shown, L("pytanie", "question"), L("pytania", "questions"), L("pytań", "questions")) +
           L(
-            "Wszystko w tym filtrze masz opanowane. Odznacz „Ukryj opanowane”, aby zobaczyć pytania.",
-            "You have mastered everything in this filter. Untick “Hide mastered” to see the questions."
+            ". Możesz wybrać kilka poziomów. Pytania bez odpowiedzi są ukryte.",
+            ". You can pick several levels. Unanswered questions are hidden."
           ) +
           "</p>"
-        : '<p class="empty">' +
+        : "");
+    $("#qlist").innerHTML =
+      html ||
+      (S.lc.length
+        ? '<p class="empty">' +
           L(
-            "W tej rundzie nie ma pytań z tej kategorii. Wybierz „Obie rundy” albo inną kategorię.",
-            "This round has no questions in this category. Pick “Both rounds” or another category."
+            "Brak pytań z ostatnią odpowiedzią na tym poziomie pewności. Wybierz inny poziom albo „Wszystkie”.",
+            "No questions whose last answer had this confidence. Pick another level or “All”."
           ) +
-          "</p>");
+          "</p>"
+        : S.hide
+          ? '<p class="empty">' +
+            L(
+              "Wszystko w tym filtrze masz opanowane. Odznacz „Ukryj opanowane”, aby zobaczyć pytania.",
+              "You have mastered everything in this filter. Untick “Hide mastered” to see the questions."
+            ) +
+            "</p>"
+          : '<p class="empty">' +
+            L(
+              "W tej rundzie nie ma pytań z tej kategorii. Wybierz „Obie rundy” albo inną kategorię.",
+              "This round has no questions in this category. Pick “Both rounds” or another category."
+            ) +
+            "</p>");
     $("#q-lead").hidden = S.dom !== "all";
     $("#hide-known").checked = S.hide;
     $("#hint-on").checked = S.hint;
@@ -1433,6 +1466,13 @@
     S.set = b.dataset.set;
     save();
     renderQ();
+  });
+  $("#lcf").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-lc]");
+    if (!b) return;
+    lcPick(b.dataset.lc);
+    renderQ();
+    lcFocus("#lcf", b.dataset.lc);
   });
   $("#hide-known").addEventListener("change", function (ev) {
     S.hide = ev.target.checked;
@@ -2399,6 +2439,96 @@
   }
   function sureMiss() {
     return Object.keys(S.rv).filter(isSureMiss);
+  }
+  /* Confidence of the last answer: -1 never answered, 0 answered without a level (flashcards, answers older than review). */
+  function lcOf(id) {
+    var e = S.rv[id],
+      i = id.slice(1) - 1;
+    if (e) return e[3];
+    return (id.charAt(0) === "q" ? S.ans[i] : S.fans[i]) === undefined ? -1 : 0;
+  }
+  function lcPass(id) {
+    return !S.lc.length || S.lc.indexOf(lcOf(id)) > -1;
+  }
+  function lcBadge(i) {
+    var e = S.rv["q" + (i + 1)],
+      ok,
+      cf;
+    if (e) {
+      ok = e[4];
+      cf = e[3];
+    } else if (S.ans[i] !== undefined) {
+      ok = isRight(i, S.ans[i]);
+      cf = 0;
+    } else return "";
+    var word = cf ? T(CONFS[cf - 1]) : L("bez oceny", "not rated"),
+      bars = "";
+    for (var k = 1; k <= 3; k++) bars += "<i" + (k <= cf ? ' class="on"' : "") + "></i>";
+    var said = (ok ? L("Ostatnio dobrze", "Last answer right") : L("Ostatnio źle", "Last answer wrong")) + ", ";
+    return (
+      '<span class="lcb ' +
+      (ok ? "ok" : "no") +
+      '" title="' +
+      said +
+      L("pewność: ", "confidence: ") +
+      word +
+      '"><span aria-hidden="true">' +
+      (ok ? "✓" : "✗") +
+      '</span><span class="vh">' +
+      said +
+      L("pewność: ", "confidence: ") +
+      "</span>" +
+      word +
+      '<span class="lcm" aria-hidden="true">' +
+      bars +
+      "</span></span>"
+    );
+  }
+  /* One chip group for the list and for Focus: several levels can be on at once, none means all. */
+  function lcChips(ids, hid) {
+    var n = [0, 0, 0, 0];
+    ids.forEach(function (id) {
+      var k = lcOf(id);
+      if (k > -1) n[k]++;
+    });
+    function chip(v, label, c) {
+      return (
+        '<button type="button" class="chip" data-lc="' +
+        v +
+        '" aria-pressed="' +
+        (v === "" ? !S.lc.length : S.lc.indexOf(+v) > -1) +
+        '">' +
+        label +
+        (c === null ? "" : " <small>" + c + "</small>") +
+        "</button>"
+      );
+    }
+    return (
+      '<div class="chips" role="group" aria-labelledby="' +
+      hid +
+      '">' +
+      chip("", L("Wszystkie", "All"), null) +
+      chip("1", T(CONFS[0]), n[1]) +
+      chip("2", T(CONFS[1]), n[2]) +
+      chip("3", T(CONFS[2]), n[3]) +
+      chip("0", L("Bez oceny", "Not rated"), n[0]) +
+      "</div>"
+    );
+  }
+  function lcPick(v) {
+    if (v === "") S.lc = [];
+    else {
+      var k = S.lc.indexOf(+v);
+      if (k > -1) S.lc.splice(k, 1);
+      else S.lc.push(+v);
+      S.lc.sort();
+    }
+    save();
+  }
+  /* The chips are re-rendered on every toggle; keep keyboard focus on the one just pressed. */
+  function lcFocus(root, v) {
+    var b = $(root).querySelector('[data-lc="' + v + '"]');
+    if (b) b.focus();
   }
   function rvWhen(day) {
     var n = Math.round((new Date(day + "T12:00:00") - daysAgo(0)) / 864e5);
@@ -3625,7 +3755,7 @@
   /* The card on screen stays in the deck even after it stops matching the filter, so it does not vanish mid-answer. */
   function fDeck(cur) {
     var list = fBase().filter(function (c) {
-      return c.id === cur || fPass(c);
+      return c.id === cur || (fPass(c) && lcPass(c.id));
     });
     if (S.fo.shuf)
       list.sort(function (a, b) {
@@ -3802,6 +3932,21 @@
       L(
         "„Do nauki” pomija karty z dobrą odpowiedzią i oznaczone Umiem. „Słabe” to „Do nauki” plus pewne pomyłki. „Do powtórki” to karty, których termin minął.",
         "“To learn” skips cards answered right and cards marked Known. “Weak” is “To learn” plus confident misses. “Due today” holds cards whose review day has come."
+      ) +
+      "</p></div>" +
+      '<div class="fs"><h3 id="fo-h-lc">' +
+      L("Pewność przy ostatniej odpowiedzi", "Confidence at the last answer") +
+      "</h3>" +
+      lcChips(
+        base.map(function (c) {
+          return c.id;
+        }),
+        "fo-h-lc"
+      ) +
+      '<p class="how">' +
+      L(
+        "Możesz wybrać kilka poziomów. Karty bez odpowiedzi są ukryte. Fiszki trafiają do „Bez oceny”.",
+        "You can pick several levels. Unanswered cards are hidden. Flashcards count as “Not rated”."
       ) +
       "</p></div>" +
       '<div class="fs"><h3 id="fo-h-set">' +
@@ -4231,6 +4376,7 @@
     if (b) return fGrade(b.dataset.g === "1");
     if (t.closest("#fo-reset")) {
       S.fo.flt = "all";
+      S.lc = [];
       return refocus();
     }
     b = t.closest("[data-fdom]");
@@ -4242,6 +4388,12 @@
     if (b) {
       S.fo.flt = b.dataset.flt;
       return refocus();
+    }
+    b = t.closest("[data-lc]");
+    if (b) {
+      lcPick(b.dataset.lc);
+      refocus();
+      return lcFocus("#fo-set", b.dataset.lc);
     }
     b = t.closest("[data-set]");
     if (b) {
