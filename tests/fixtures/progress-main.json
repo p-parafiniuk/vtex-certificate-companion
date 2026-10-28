@@ -1,0 +1,48 @@
+{
+  "_about": "Saved progress (localStorage vtex-drill-v1) recorded on main at 171 Q / 38 F. right = what each saved answer meant then; scripts/e2e.mjs checks it still means the same.",
+  "right": {
+    "0": true,
+    "1": false,
+    "2": true,
+    "3": false,
+    "4": true,
+    "5": false,
+    "6": true,
+    "7": false,
+    "8": true,
+    "9": false,
+    "10": true,
+    "11": false
+  },
+  "state": {
+    "v": 2,
+    "ans": {
+      "0": [0, 1],
+      "1": [1],
+      "2": [0],
+      "3": [2],
+      "4": [0, 1],
+      "5": [1],
+      "6": [0],
+      "7": [3],
+      "8": [0],
+      "9": [1],
+      "10": [0, 1],
+      "11": [1]
+    },
+    "known": {
+      "0": true,
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": true
+    },
+    "fknown": {
+      "0": true,
+      "1": true
+    },
+    "nknown": {
+      "auth|Kody odpowiedzi": true
+    }
+  }
+}
