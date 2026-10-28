@@ -869,6 +869,45 @@ h3 {
   letter-spacing: 0.04em;
   color: var(--muted);
 }
+/* Confidence chips: red guess, amber fairly sure, green sure. A dot when off, a tint when on, so the ink chip does not hide the colour. */
+.chip.lc1,
+.chip.lc2,
+.chip.lc3 {
+  --lc: var(--bad);
+  --lc-soft: var(--bad-soft);
+  align-items: center;
+}
+.chip.lc2 {
+  --lc: var(--k3);
+  --lc-soft: var(--k3-soft);
+}
+.chip.lc3 {
+  --lc: var(--ok);
+  --lc-soft: var(--ok-soft);
+}
+.chip.lc1::before,
+.chip.lc2::before,
+.chip.lc3::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--lc);
+  flex: none;
+}
+.chip.lc1[aria-pressed="true"],
+.chip.lc2[aria-pressed="true"],
+.chip.lc3[aria-pressed="true"] {
+  background: var(--lc-soft);
+  border-color: var(--lc);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--lc);
+}
+.chip.lc1[aria-pressed="true"] small,
+.chip.lc2[aria-pressed="true"] small,
+.chip.lc3[aria-pressed="true"] small {
+  color: var(--ink);
+}
 .lcf .how {
   margin: 0;
 }
@@ -12333,7 +12372,9 @@ function bootApiMap(root, onNav, embed) {
     });
     function chip(v, label, c) {
       return (
-        '<button type="button" class="chip" data-lc="' +
+        '<button type="button" class="chip' +
+        (v === "1" || v === "2" || v === "3" ? " lc" + v : "") +
+        '" data-lc="' +
         v +
         '" aria-pressed="' +
         (v === "" ? !S.lc.length : S.lc.indexOf(+v) > -1) +

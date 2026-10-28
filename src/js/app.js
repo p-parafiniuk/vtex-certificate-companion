@@ -2493,7 +2493,9 @@
     });
     function chip(v, label, c) {
       return (
-        '<button type="button" class="chip" data-lc="' +
+        '<button type="button" class="chip' +
+        (v === "1" || v === "2" || v === "3" ? " lc" + v : "") +
+        '" data-lc="' +
         v +
         '" aria-pressed="' +
         (v === "" ? !S.lc.length : S.lc.indexOf(+v) > -1) +
