@@ -795,6 +795,69 @@ h3 {
   border-radius: 99px;
   padding: 1px 8px;
 }
+/* Result and confidence of the last answer; the bars repeat the level so it reads without the word. */
+.lcb {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 99px;
+  padding: 1px 9px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.lcb.ok {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+.lcb.no {
+  color: var(--bad);
+  background: var(--bad-soft);
+}
+.lcm {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+.lcm i {
+  width: 3px;
+  height: 6px;
+  border-radius: 1px;
+  background: currentColor;
+  opacity: 0.3;
+}
+.lcm i:nth-child(2) {
+  height: 9px;
+}
+.lcm i:nth-child(3) {
+  height: 12px;
+}
+.lcm i.on {
+  opacity: 1;
+}
+.vh {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.lcf {
+  display: grid;
+  gap: 6px;
+}
+.lch {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.lcf .how {
+  margin: 0;
+}
 .q-head {
   display: flex;
   align-items: center;
