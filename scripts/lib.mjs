@@ -45,6 +45,14 @@ export const readSrc = p => readFileSync(join(SRC, p), "utf8");
 export const readJSON = p => JSON.parse(readSrc(p));
 export const hash = s => createHash("sha1").update(s).digest("hex").slice(0, 12);
 
+/* Length of the longest right option against the longest distractor. A right answer that is
+   always the longest can be guessed without knowing it. */
+export const optLens = x => {
+  const n = x.n || 1,
+    L = x.o.map(o => o.length);
+  return { right: Math.max(...L.slice(0, n)), wrong: Math.max(...L.slice(n)) };
+};
+
 /* Value serializer matching the hand-written HTML: JSON everywhere, except bare keys in "js" blocks.
    "<" is written as \u003c so no string can close the surrounding <script>. */
 const js = v => JSON.stringify(v).replace(/</g, "\\u003c");

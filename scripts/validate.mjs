@@ -2,7 +2,7 @@
    Usage: node scripts/validate.mjs [--update-lock]
    The lock (tests/ids.lock.json) guards stable ids: saved progress is keyed by array index of Q and F. */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { LOCK, CATS, loadData, hash } from "./lib.mjs";
+import { LOCK, CATS, loadData, hash, optLens } from "./lib.mjs";
 
 const D = loadData();
 const err = [],
@@ -286,20 +286,68 @@ D.QUESTIONS.forEach((q, i) => {
     E(w, "en.o must match o in length");
 });
 
-/* append-only lock */
-const now = { Q: D.Q.map(x => hash(x.q)), F: D.F.map(x => hash(x.q)) };
-if (process.argv.includes("--update-lock") || !existsSync(LOCK)) {
-  if (existsSync(LOCK)) {
-    const old = JSON.parse(readFileSync(LOCK, "utf8"));
+/* append-only lock. A saved answer is the sorted option indexes as written in questions.json, and an index
+   below n means right, so a Q entry also pins its option count, n and the right options' text:
+   "hash|options|n|right hash". Older locks hold
+   the bare hash; those entries are checked on the text only until the next `npm run lock`. */
+const now = {
+  Q: D.Q.map(x => [hash(x.q), (x.o || []).length, x.n || 1, rightHash(x)].join("|")),
+  F: D.F.map(x => hash(x.q))
+};
+function rightHash(x) {
+  return hash((x.o || []).slice(0, x.n || 1).join("\n"));
+}
+function shape(old) {
+  old.Q.forEach((e, i) => {
+    const [, len, n, rh] = e.split("|"),
+      x = D.Q[i];
+    if (!x || len === undefined) return;
+    if (+len !== x.o.length || +n !== (x.n || 1))
+      E(
+        "Q[" + i + "]",
+        "options or n changed since lock (" +
+          len +
+          "|" +
+          n +
+          " -> " +
+          x.o.length +
+          "|" +
+          (x.n || 1) +
+          "). Saved answers point at option indexes: keep the count, n and the right ones first, or append a new question."
+      );
+    else if (rh && rh !== rightHash(x))
+      W(
+        "Q[" + i + "]",
+        "right options changed since lock. Rewording is fine; if a different option is now right, saved answers flip meaning."
+      );
+  });
+}
+/* Exam-style quality, warned for items appended after the lock only, so old items never nag. */
+function quality(base) {
+  const fresh = D.Q.slice(base);
+  fresh.forEach((x, k) => {
+    if (!Array.isArray(x.o) || x.o.length < 2) return;
+    const L = optLens(x);
+    if (L.right > L.wrong * 1.5)
+      W("Q[" + (base + k) + "]", "right option is much longer than every distractor; even out the lengths");
+  });
+  const multi = fresh.filter(x => (x.n || 1) > 1).length;
+  if (fresh.length >= 5 && multi / fresh.length > 0.3)
+    W("Q", multi + " of " + fresh.length + " new questions are multi-answer; the exam has mostly single-answer ones");
+}
+const oldLock = existsSync(LOCK) ? JSON.parse(readFileSync(LOCK, "utf8")) : null;
+quality(oldLock ? oldLock.Q.length : D.Q.length);
+if (oldLock) shape(oldLock);
+if (process.argv.includes("--update-lock") || !oldLock) {
+  if (oldLock)
     for (const k of ["Q", "F"])
-      if (now[k].length < old[k].length) E("lock", k + " shrank; refusing to update the lock");
-  }
+      if (now[k].length < oldLock[k].length) E("lock", k + " shrank; refusing to update the lock");
   if (!err.length) {
     writeFileSync(LOCK, JSON.stringify(now, null, 0).replace(/\],/g, "],\n") + "\n");
     console.log("lock written: Q=" + now.Q.length + " F=" + now.F.length);
   }
 } else {
-  const old = JSON.parse(readFileSync(LOCK, "utf8"));
+  const old = oldLock;
   for (const k of ["Q", "F"]) {
     if (now[k].length < old[k].length)
       E(
@@ -312,7 +360,7 @@ if (process.argv.includes("--update-lock") || !existsSync(LOCK)) {
           ". Never delete: saved progress is keyed by index."
       );
     old[k].forEach((h, i) => {
-      if (now[k][i] !== undefined && now[k][i] !== h)
+      if (now[k][i] !== undefined && now[k][i].split("|")[0] !== h.split("|")[0])
         W(
           k + "[" + i + "]",
           "q text changed since lock. Typo fix is fine; moved or replaced items break saved progress."

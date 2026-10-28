@@ -20,7 +20,8 @@
     "review-scope": "node scripts/review-scope.mjs",
     "shots": "node scripts/shots.mjs",
     "compare": "node scripts/compare.mjs",
-    "prune": "node scripts/prune.mjs"
+    "prune": "node scripts/prune.mjs",
+    "e2e": "node scripts/e2e.mjs"
   },
   "engines": {
     "node": ">=18"
