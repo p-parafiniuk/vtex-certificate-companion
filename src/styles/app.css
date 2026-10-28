@@ -1353,6 +1353,141 @@ h3 {
 .result p {
   margin: 0;
 }
+/* simulation: question mix per area (setup) and score per area (result) */
+.mixbox[open] {
+  display: grid;
+  gap: 8px;
+}
+.mixbox summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 32px;
+  display: list-item;
+}
+.mix {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mix li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 10px;
+  background: var(--surface);
+  font-size: 0.88rem;
+}
+.mix b {
+  font: 500 0.84rem var(--f-mono);
+  font-variant-numeric: tabular-nums;
+}
+.hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  max-width: 65ch;
+}
+.doms {
+  display: grid;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+}
+.doms p {
+  margin: 0;
+}
+.dl {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+}
+.dl li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.dl li:last-child {
+  border-bottom: 0;
+}
+.dl .n {
+  text-align: right;
+  font: 500 0.86rem var(--f-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+@media (min-width: 600px) {
+  .dl li {
+    grid-template-columns: minmax(0, 1fr) 7rem 4rem 7.5rem;
+    padding: 8px 0;
+  }
+  .dl .n {
+    order: 3;
+  }
+  .dl .st {
+    order: 4;
+  }
+}
+.sq {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.sq i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+.sq .y {
+  background: var(--ok);
+}
+.sq .x {
+  border: 2px solid var(--bad);
+}
+.hint .sq {
+  vertical-align: -1px;
+}
+.st {
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 99px;
+  padding: 2px 9px;
+  white-space: nowrap;
+  justify-self: end;
+}
+.st.bad {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+.st.mid {
+  background: var(--k3-soft);
+  color: var(--k3);
+}
+.st.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+.okl {
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 0.92rem;
+}
+.dl:empty + .okl,
+.hint + .okl {
+  border-top: 0;
+  padding-top: 0;
+}
 
 /* progress */
 .stats {

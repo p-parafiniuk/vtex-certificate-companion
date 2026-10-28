@@ -6,6 +6,8 @@
       "click": ["#catapi #view [data-v=\"list\"]"], "top": "#catapi #stats", "dy": -330 }]
    click: selectors clicked in order (they pierce shadow roots); type: [selector, text] filled after the clicks;
    top: scrolled to the top of the viewport, then by dy.
+   storage: an object put into localStorage before the app boots, { "<key>": <JSON value> }, for states no
+   click reaches (a finished simulation, saved progress).
    Writes shots/design-<board>.png, shots/app-<board>.png and shots/compare-<topic>-<board>.png.
    Exits 1 on a missing board or a console error on either side. */
 import { execSync } from "node:child_process";
@@ -41,7 +43,7 @@ mkdirSync(shots, { recursive: true });
 const { chromium } = await playwright();
 const browser = await chromium.launch();
 let errors = 0;
-async function open(url, s, label) {
+async function open(url, s, label, storage) {
   const page = await browser.newPage({ viewport: { width: s.w, height: s.h }, colorScheme: s.theme || "light" });
   page.on("console", m => {
     /* The canvas runtime refetches its own file, which file:// refuses; the board still renders. */
@@ -59,6 +61,10 @@ async function open(url, s, label) {
   });
   /* Fonts need the network; block it on both sides so they fall back the same way. */
   await page.route(/^https?:/, r => r.abort());
+  if (storage)
+    await page.addInitScript(st => {
+      for (const k of Object.keys(st)) localStorage.setItem(k, JSON.stringify(st[k]));
+    }, storage);
   await page.goto(url);
   await page.waitForTimeout(800);
   return page;
@@ -76,7 +82,7 @@ for (const s of specs) {
   await d.screenshot({ path: df });
   await d.close();
 
-  const a = await open(pathToFileURL(OUT).href + "#" + s.hash, s, "app " + s.board);
+  const a = await open(pathToFileURL(OUT).href + "#" + s.hash, s, "app " + s.board, s.storage);
   for (const c of s.click || []) {
     await a.locator(c).first().click();
     await a.waitForTimeout(150);

@@ -3,7 +3,8 @@
 
   var KEY = "vtex-drill-v1";
   var SIM_Q = 36,
-    SIM_P = 4;
+    SIM_P = 4,
+    SIM_MIN = 3;
   var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
   var VIEWS = TABS.concat(["focus"]);
   var LET = "ABCDEFG";
@@ -1574,7 +1575,78 @@
     }
   }
 
+  /* VTEX publishes no weights per area, so every area gets SIM_MIN questions and the rest follow the
+     pool size (largest remainder). Without this a draw mirrors how many questions each area happens to have. */
+  function simMix() {
+    var pool = {},
+      out = {},
+      tot = 0,
+      used = 0;
+    Q.forEach(function (q) {
+      pool[q.d] = (pool[q.d] || 0) + 1;
+      tot++;
+    });
+    var ks = DOMS.map(function (d) {
+      return d[0];
+    }).filter(function (k) {
+      return pool[k];
+    });
+    ks.forEach(function (k) {
+      out[k] = Math.min(SIM_MIN, pool[k]);
+      used += out[k];
+    });
+    var spare = Math.max(0, SIM_Q - used),
+      frac = [];
+    ks.forEach(function (k) {
+      var share = (spare * pool[k]) / tot,
+        add = Math.min(Math.floor(share), pool[k] - out[k]);
+      out[k] += add;
+      used += add;
+      frac.push([k, share - Math.floor(share)]);
+    });
+    frac.sort(function (a, b) {
+      return b[1] - a[1] || pool[b[0]] - pool[a[0]];
+    });
+    for (var g = 0; used < Math.min(SIM_Q, tot) && g < frac.length * SIM_Q; g++) {
+      var k = frac[g % frac.length][0];
+      if (out[k] < pool[k]) {
+        out[k]++;
+        used++;
+      }
+    }
+    return out;
+  }
+  function simDraw() {
+    var mix = simMix(),
+      by = {};
+    Q.forEach(function (q, i) {
+      (by[q.d] = by[q.d] || []).push(i);
+    });
+    var ids = [];
+    Object.keys(mix).forEach(function (k) {
+      ids = ids.concat(shuffle(by[k]).slice(0, mix[k]));
+    });
+    return shuffle(ids);
+  }
   function simSetup() {
+    var mix = simMix(),
+      ks = DOMS.filter(function (d) {
+        return mix[d[0]];
+      }).sort(function (a, b) {
+        return mix[b[0]] - mix[a[0]];
+      }),
+      lo = Math.min.apply(
+        null,
+        ks.map(function (d) {
+          return mix[d[0]];
+        })
+      ),
+      hi = Math.max.apply(
+        null,
+        ks.map(function (d) {
+          return mix[d[0]];
+        })
+      );
     var presets = [
       [120, L("2 h, jak na egzaminie", "2 h, like the exam")],
       [60, "60 min"],
@@ -1587,20 +1659,46 @@
           SIM_Q +
           " pytań z " +
           Q.length +
-          "</strong> i <strong>" +
+          "</strong>, z <strong>każdego obszaru co najmniej " +
+          SIM_MIN +
+          "</strong>, i <strong>" +
           SIM_P +
           " zadania praktyczne</strong> z fiszek „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
-          "Wynik i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.",
+          "Wynik, także per obszar, i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.",
         "I draw <strong>" +
           SIM_Q +
           " questions out of " +
           Q.length +
-          "</strong> and <strong>" +
+          "</strong>, <strong>at least " +
+          SIM_MIN +
+          " from every area</strong>, and <strong>" +
           SIM_P +
           " practical tasks</strong> from the “Practical” flashcards. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
-          "You get the score and explanations at the end. The pass mark is <strong>80%</strong>."
+          "You get the score, also per area, and the explanations at the end. The pass mark is <strong>80%</strong>."
       ) +
       "</p>" +
+      '<details class="mixbox"><summary>' +
+      L("Rozkład pytań: ", "Question mix: ") +
+      ks.length +
+      L(" obszarów, po ", " areas, ") +
+      (lo === hi ? lo : lo + "–" + hi) +
+      L("", " each") +
+      '</summary><ul class="mix">' +
+      ks
+        .map(function (d) {
+          return "<li>" + esc(dn(d[0])) + " <b>" + mix[d[0]] + "</b></li>";
+        })
+        .join("") +
+      '</ul><p class="hint">' +
+      L(
+        "VTEX nie podaje wag obszarów na egzaminie, więc każdy dostaje po " +
+          SIM_MIN +
+          " pytania, a pozostałe trafiają do obszarów z największą liczbą pytań w bazie.",
+        "VTEX does not publish area weights for the exam, so every area gets " +
+          SIM_MIN +
+          " questions and the rest go to the areas with the most questions in the bank."
+      ) +
+      "</p></details>" +
       '<div class="setup">' +
       '<div class="fs"><h3 id="sim-time-h">' +
       L("Czas", "Time") +
@@ -1809,26 +1907,96 @@
       "</b></p>"
     );
   }
+  /* Per area, weakest first, like the "needs improvement" section of a vendor score report. 3–4 questions per
+     area is a small sample, which the hint says, so the label counts mistakes instead of grading. */
+  function simDoms(m) {
+    var per = {};
+    m.ids.forEach(function (i) {
+      var p = (per[Q[i].d] = per[Q[i].d] || { ok: 0, t: 0 });
+      p.t++;
+      if (isRight(i, m.ans[i])) p.ok++;
+    });
+    var ks = DOMS.filter(function (d) {
+      return per[d[0]];
+    }).map(function (d) {
+      return d[0];
+    });
+    var bad = ks
+        .filter(function (k) {
+          return per[k].ok < per[k].t;
+        })
+        .sort(function (a, b) {
+          return per[b].t - per[b].ok - (per[a].t - per[a].ok) || per[a].ok / per[a].t - per[b].ok / per[b].t;
+        }),
+      good = ks.filter(function (k) {
+        return per[k].ok === per[k].t;
+      });
+    function sq(p) {
+      var h = "";
+      for (var j = 0; j < p.t; j++) h += j < p.ok ? '<i class="y"></i>' : '<i class="x"></i>';
+      return '<span class="sq" aria-hidden="true">' + h + "</span>";
+    }
+    return (
+      '<section class="doms" aria-labelledby="sim-dh"><h3 id="sim-dh">' +
+      L("Wynik per obszar", "Score per area") +
+      '</h3><p class="hint">' +
+      L(
+        "Od najsłabszego. To kilka pytań na obszar, więc traktuj wynik jako wskazówkę. ",
+        "Weakest first. It is a few questions per area, so take it as a pointer. "
+      ) +
+      '<span class="sq" aria-hidden="true"><i class="y"></i></span> ' +
+      L("dobrze", "right") +
+      ', <span class="sq" aria-hidden="true"><i class="x"></i></span> ' +
+      L("źle. Nazwa obszaru otwiera jego pytania.", "wrong. An area name opens its questions.") +
+      "</p>" +
+      (bad.length
+        ? '<ul class="dl">' +
+          bad
+            .map(function (k) {
+              var p = per[k],
+                e = p.t - p.ok;
+              return (
+                '<li><a href="#pytania-' +
+                k +
+                '">' +
+                esc(dn(k)) +
+                '</a><span class="n">' +
+                p.ok +
+                " / " +
+                p.t +
+                "</span>" +
+                sq(p) +
+                '<span class="st ' +
+                (e > 1 ? "bad" : "mid") +
+                '">' +
+                L(plural(e, "błąd", "błędy", "błędów"), e + (e > 1 ? " mistakes" : " mistake")) +
+                "</span></li>"
+              );
+            })
+            .join("") +
+          "</ul>"
+        : "") +
+      (good.length
+        ? '<p class="okl"><span class="st ok">' +
+          L("Bez błędów", "No mistakes") +
+          "</span> " +
+          good
+            .map(function (k) {
+              return '<a href="#pytania-' + k + '">' + esc(dn(k)) + "</a>";
+            })
+            .join(", ") +
+          "</p>"
+        : "") +
+      "</section>"
+    );
+  }
   function simResult() {
     var m = S.sim,
       nq = m.ids.length,
       score = simScore(),
       pass = Math.ceil(nq * 0.8),
       ok = score >= pass;
-    var miss = {};
-    m.ids.forEach(function (i) {
-      if (!isRight(i, m.ans[i])) miss[Q[i].d] = (miss[Q[i].d] || 0) + 1;
-    });
-    var weak = DOMS.filter(function (d) {
-      return miss[d[0]];
-    })
-      .sort(function (a, b) {
-        return miss[b[0]] - miss[a[0]];
-      })
-      .map(function (d) {
-        return esc(dn(d[0])) + " (" + miss[d[0]] + ")";
-      })
-      .join(" · ");
+    var doms = simDoms(m);
     var pOk = 0,
       pSet = 0;
     m.pr.forEach(function (fi) {
@@ -1898,12 +2066,10 @@
           )
         : "") +
       ".</p>" +
-      (weak
-        ? "<p><strong>" + L("Do powtórki:", "To review:") + "</strong> " + weak + "</p>"
-        : "<p>" + L("Bez błędów w części testowej.", "No mistakes in the test part.") + "</p>") +
       '<div class="row"><button type="button" class="btn primary" id="sim-new">' +
       L("Nowa symulacja", "New simulation") +
       "</button></div></div>" +
+      doms +
       simConfStats(m);
 
     if (m.pr.length) {
@@ -2086,11 +2252,7 @@
     S.hint = $("#sim-hint").checked;
     var now = Date.now();
     S.sim = {
-      ids: shuffle(
-        Q.map(function (_, i) {
-          return i;
-        })
-      ).slice(0, SIM_Q),
+      ids: simDraw(),
       pr: S.simPrac ? shuffle(PRACTICAL.slice()).slice(0, SIM_P) : [],
       ans: {},
       txt: {},

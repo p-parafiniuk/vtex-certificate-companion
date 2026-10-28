@@ -87,6 +87,74 @@ async function open(hash, { w = 1280, theme = "light", state, lang } = {}) {
   await page.close();
 }
 
+/* Simulation draws: SIM_MIN from every area, the same mix every time, no repeats. */
+let lastDraw;
+{
+  const { page, errs } = await open("symulacja", { state: { v: 2 } });
+  const mixes = new Set();
+  let short = 0,
+    dup = 0;
+  for (let r = 0; r < 30; r++) {
+    /* A fresh page per draw: a running exam saves itself again on unload. */
+    const run = await open("symulacja", { state: { v: 2 } });
+    await run.page.click("#sim-start");
+    const ids = await run.page.evaluate(k => JSON.parse(localStorage.getItem(k)).sim.ids, KEY);
+    errs.push(...run.errs);
+    await run.page.close();
+    const per = {};
+    ids.forEach(i => (per[D.Q[i].d] = (per[D.Q[i].d] || 0) + 1));
+    if (ids.length !== 36 || D.DOMS.some(d => (per[d[0]] || 0) < 3)) short++;
+    if (new Set(ids).size !== ids.length) dup++;
+    mixes.add(JSON.stringify(D.DOMS.map(d => per[d[0]] || 0)));
+    lastDraw = ids;
+  }
+  ok(!short, "every draw has 36 questions and at least 3 per area", short + " of 30 draws broke it");
+  ok(!dup, "no question twice in a draw", dup + " draws had a repeat");
+  ok(mixes.size === 1, "the mix per area is the same every draw", [...mixes].join(" vs "));
+  const listed = await page.$$eval(".mix b", bs => bs.reduce((a, b) => a + +b.textContent, 0));
+  ok(listed === 36, "setup lists a mix that adds up to 36", String(listed));
+  ok(!errs.length, "no console errors while drawing", errs.join(" | "));
+  await page.close();
+}
+
+/* Score per area: every orders answer wrong, everything else right. */
+{
+  const ans = {};
+  lastDraw.forEach(i => {
+    const n = D.Q[i].n || 1;
+    ans[i] = D.Q[i].d === "orders" ? [n] : [...Array(n).keys()];
+  });
+  const nOrders = lastDraw.filter(i => D.Q[i].d === "orders").length;
+  const now = Date.now();
+  const sim = { ids: lastDraw, pr: [], ans, done: true, dur: 120, used: 600000, start: now - 600000, endAt: now };
+  for (const [w, theme] of [
+    [375, "dark"],
+    [1280, "light"]
+  ]) {
+    const { page, errs } = await open("symulacja", { w, theme, state: { v: 2, sim } });
+    const rows = await page.$$eval(".doms .dl li", ls => ls.map(l => l.textContent));
+    ok(
+      rows.length === 1 && rows[0].includes("0 / " + nOrders),
+      "result lists only the weak area, with its score (" + w + ")",
+      JSON.stringify(rows)
+    );
+    const okLinks = await page.$$eval(".doms .okl a", as => as.map(a => a.getAttribute("href")));
+    ok(
+      okLinks.length === D.DOMS.length - 1,
+      "the other areas sit on the no-mistakes line (" + w + ")",
+      okLinks.join(",")
+    );
+    const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    ok(!errs.length && over <= 0, "result renders cleanly (" + w + " " + theme + ")", errs.join(" | ") || over + "px");
+    if (w === 1280) {
+      await page.click('.doms .dl a[href="#pytania-orders"]');
+      await page.waitForTimeout(200);
+      ok((await page.evaluate(() => location.hash)) === "#pytania-orders", "an area name opens its questions");
+    }
+    await page.close();
+  }
+}
+
 /* Every tab, phone and desktop, light and dark, plus English on the phone. */
 const tabs = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
 for (const h of tabs)
