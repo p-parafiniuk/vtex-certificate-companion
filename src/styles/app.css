@@ -1931,6 +1931,37 @@ body:has(.gs-dlg[open]) {
   background: var(--accent);
   color: var(--accent-ink);
 }
+/* Where a search result lands (gsLight in app.js): tinted on arrival, then it fades and the class goes. */
+.gs-spot {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+li.gs-spot {
+  background: var(--accent-soft);
+}
+mark.gs-hit {
+  background: var(--accent-soft);
+  color: inherit;
+  border-radius: 3px;
+}
+li.gs-spot mark.gs-hit {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gs-spot,
+  mark.gs-hit {
+    animation: gs-out 0.8s ease-in 2.6s forwards;
+  }
+}
+@keyframes gs-out {
+  to {
+    outline-color: transparent;
+    background-color: transparent;
+    color: inherit;
+  }
+}
 .gs-more {
   justify-self: start;
   margin: 2px 10px 0;

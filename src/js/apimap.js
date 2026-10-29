@@ -1203,6 +1203,12 @@ function bootApiMap(root, onNav, embed) {
       state.qAll = state.api === "all";
       render();
     },
+    /* Opens one endpoint of the current list, so a search hit lands on its details, and returns its row. */
+    reveal: (m, p) => {
+      const b = [...root.querySelectorAll("#tree .ep")].find(x => x.dataset.id === `ep-${state.api}-${m}-${p}`);
+      if (b && b.getAttribute("aria-expanded") !== "true") b.click();
+      return b || null;
+    },
     scope,
     relang: () => {
       buildLabels();
