@@ -5,7 +5,11 @@
   var SIM_Q = 36,
     SIM_P = 4,
     SIM_MIN = 3;
-  var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
+  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "ustawienia"];
+  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql). */
+  var REFS = ["http", "api", "graphql"];
+  /* Sections of a category; "all" shows only the first two. */
+  var CSECS = ["pytania", "katas", "info", "api", "docs"];
   /* Sections of Postęp; the first one has no hash suffix. */
   var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
@@ -45,6 +49,7 @@
     fans: {},
     ptxt: {},
     fo: { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" },
+    ref: "http",
     theme: "auto",
     days: {},
     tday: { d: "", ids: {} },
@@ -374,6 +379,7 @@
       if (raw.simPrac === false) S.simPrac = false;
       if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
       if (raw.lang === "en") S.lang = "en";
+      if (REFS.indexOf(raw.ref) > -1) S.ref = raw.ref;
       if (raw.days && typeof raw.days === "object" && !Array.isArray(raw.days)) {
         Object.keys(raw.days).forEach(function (k) {
           var n = raw.days[k] >>> 0;
@@ -1190,13 +1196,14 @@
     CATAPI_D = null;
   function renderCat() {
     var all = S.dom === "all",
-      sec = all ? "pytania" : NAV.cur.sec || "pytania";
-    $("#ctabs").hidden = all;
-    ["pytania", "info", "api", "docs"].forEach(function (k) {
+      sec = NAV.cur.sec || "pytania";
+    CSECS.forEach(function (k, i) {
       $("#cs-" + k).hidden = k !== sec;
+      $("#ct-" + k).hidden = all && i > 1;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
+    paintKataTab();
     $("#ct-docs").innerHTML =
       '<span class="ctab-l">' +
       L("Dokumentacja", "Docs") +
@@ -1212,6 +1219,7 @@
     if (sec === "api") renderCatApi(S.dom);
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
     if (sec === "info") renderInfo(S.dom);
+    if (sec === "katas") renderF();
   }
   /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
   /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.
@@ -1474,7 +1482,11 @@
   $("#ctabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".ctab");
     if (!b || b.getAttribute("aria-selected") === "true") return;
-    go({ tab: "pytania", cat: S.dom, sec: b.dataset.sec === "pytania" ? undefined : b.dataset.sec });
+    go({
+      tab: "pytania",
+      cat: S.dom === "all" ? undefined : S.dom,
+      sec: b.dataset.sec === "pytania" ? undefined : b.dataset.sec
+    });
   });
   $("#ptabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".ctab");
@@ -1483,9 +1495,14 @@
   });
   /* Tabs pattern: arrows move between sections, only the selected tab is in the Tab order. */
   $("#ptabs").addEventListener("keydown", tabKeys);
+  $("#rtabs").addEventListener("keydown", tabKeys);
+  $("#rtabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".ctab");
+    if (b && b.getAttribute("aria-selected") !== "true") go({ tab: b.dataset.rtab });
+  });
   $("#ctabs").addEventListener("keydown", tabKeys);
   function tabKeys(ev) {
-    var tabs = [].slice.call(ev.currentTarget.querySelectorAll(".ctab")),
+    var tabs = [].slice.call(ev.currentTarget.querySelectorAll(".ctab:not([hidden])")),
       at = tabs.indexOf(ev.target);
     var k = ev.key,
       to =
@@ -2561,9 +2578,11 @@
 
   /* ---------- Fiszki ---------- */
   function renderF() {
-    $("#flist").innerHTML = F.map(function (f, i) {
+    var html = "";
+    F.forEach(function (f, i) {
+      if (S.dom !== "all" && f.d !== S.dom) return;
       var n = i + 1;
-      return (
+      html +=
         '<article class="fc' +
         (S.fknown[i] ? " is-known" : "") +
         '" id="f-' +
@@ -2601,16 +2620,28 @@
         fmt(f.a) +
         docLinks(f) +
         httpChips(f) +
-        "</div></article>"
-      );
-    }).join("");
+        "</div></article>";
+    });
+    $("#flist").innerHTML =
+      html || '<p class="empty">' + L("Ta kategoria nie ma jeszcze katas.", "This category has no katas yet.") + "</p>";
     fSync();
   }
   function fSync() {
-    var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length;
-    $("#f-show-all").disabled = n === F.length;
+    var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length,
+      all = document.querySelectorAll("#flist .rev").length;
+    $("#f-show-all").disabled = n === all;
     $("#f-hide-all").disabled = !n;
-    $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + F.length;
+    $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + all;
+  }
+  function paintKataTab() {
+    var k = 0,
+      t = 0;
+    F.forEach(function (f, i) {
+      if (S.dom !== "all" && f.d !== S.dom) return;
+      t++;
+      if (S.fknown[i]) k++;
+    });
+    $("#ct-katas").innerHTML = "Katas" + (t ? ' <span class="num">' + k + "/" + t + "</span>" : "");
   }
   function setAll(open) {
     document.querySelectorAll("#flist .rev").forEach(function (b) {
@@ -2638,6 +2669,7 @@
     else delete S.fknown[i];
     save();
     card.classList.toggle("is-known", !!S.fknown[i]);
+    paintKataTab();
     header();
   });
   /* The pressed button disables itself, so focus moves to its twin instead of falling to <body>. */
@@ -4671,14 +4703,14 @@
     if (el) el.focus({ preventScroll: true });
   }
   function enterFocus(from) {
-    var flash = from === "fiszki";
-    /* From a category the deck holds only that category; from the flashcard list it spans all of them. */
-    S.fo.dom = flash ? "all" : S.dom;
+    var flash = from === "pytania" && NAV.cur.sec === "katas";
+    /* The deck holds what the list showed: the open category, questions or katas. */
+    S.fo.dom = S.dom;
     if (S.fo.deck !== "all" && (S.fo.deck === "q") === flash) S.fo.deck = flash ? "f" : "q";
     var strict = fDeck(null),
       c = BY_ID[S.fo.id];
     function fits(x) {
-      return (x.t === "q") !== flash && (flash || S.dom === "all" || x.d === S.dom);
+      return (x.t === "q") !== flash && (S.dom === "all" || x.d === S.dom);
     }
     if (!(c && strict.indexOf(c) > -1 && fits(c))) c = strict.filter(fits)[0] || strict[0];
     go({ tab: "focus", id: c ? c.id : "" });
@@ -4707,7 +4739,7 @@
   function exitFocus() {
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
-    go(flash ? { tab: "fiszki" } : { tab: "pytania", cat: S.fo.dom === "all" ? undefined : S.fo.dom });
+    go({ tab: "pytania", cat: S.fo.dom === "all" ? undefined : S.fo.dom, sec: flash ? "katas" : undefined });
     var el = c && document.getElementById((flash ? "f-" : "q-") + (c.i + 1));
     if (el && !el.hidden) {
       el.scrollIntoView({ block: "center" });
@@ -5020,6 +5052,70 @@
     }
     kotyTop();
   }
+  /* ---------- Ściągi › GraphQL: static cards from GQL, redrawn only when the language changes ---------- */
+  function renderGql() {
+    var el = $("#p-graphql");
+    if (el.dataset.k === S.lang) return;
+    el.dataset.k = S.lang;
+    el.innerHTML =
+      "<div><h2>" +
+      L("GraphQL w VTEX IO", "GraphQL in VTEX IO") +
+      '</h2><p class="lead">' +
+      fmt(GQL.t) +
+      " " +
+      L("Endpointy REST są w ", "REST endpoints are in ") +
+      '<a data-nav href="#api">API Map</a>.</p></div><div class="gql-grid">' +
+      GQL.s
+        .map(function (x) {
+          return (
+            '<section class="card gql-b' +
+            (x.h === "Pułapki" ? " trap" : "") +
+            '"><h3>' +
+            esc(x.h) +
+            "</h3>" +
+            (x.ol
+              ? "<ol>" +
+                x.ol
+                  .map(function (y) {
+                    return "<li>" + fmt(y) + "</li>";
+                  })
+                  .join("") +
+                "</ol>"
+              : "") +
+            (x.b ? noteList(x.b) : "") +
+            (x.tree
+              ? '<dl class="gql-tree">' +
+                x.tree
+                  .map(function (y) {
+                    return "<dt><code>" + esc(y[0]) + "</code></dt><dd>" + fmt(y[1]) + "</dd>";
+                  })
+                  .join("") +
+                "</dl>"
+              : "") +
+            (x.cmp
+              ? '<div class="tblwrap"><table class="gql-cmp"><thead><tr><td></td><th scope="col">REST</th><th scope="col">GraphQL</th></tr></thead><tbody>' +
+                x.cmp
+                  .map(function (y) {
+                    return (
+                      '<tr><th scope="row">' +
+                      fmt(y[0]) +
+                      "</th><td>" +
+                      fmt(y[1]) +
+                      "</td><td>" +
+                      fmt(y[2]) +
+                      "</td></tr>"
+                    );
+                  })
+                  .join("") +
+                "</tbody></table></div>"
+              : "") +
+            docLinks(x) +
+            "</section>"
+          );
+        })
+        .join("") +
+      "</div>";
+  }
   /* ---------- VTEX API Map view ---------- */
   var APIM = null;
   function openApiMap() {
@@ -5071,7 +5167,7 @@
   /* ---------- navigation ----------
      Each tab, HTTP Koty module, jumped-to status code, simulator card and Focus card is a history entry, so the
      browser's Back and Forward move between them and return to the same scroll position. The hash stays a bare
-     token (#fiszki, #http-kody, #symulacja-12, #focus-q12, #pytania-catalog-docs-skus); everything else rides in history.state. */
+     token (#pytania-katas, #http-kody, #symulacja-12, #focus-q12, #pytania-catalog-docs-skus); everything else rides in history.state. */
   var NAV = { cur: { tab: "pytania", i: 0 }, prev: null, ok: true, mute: false, t: null };
   try {
     history.scrollRestoration = "manual";
@@ -5085,10 +5181,13 @@
     if (r.tab === "postep" && r.sub && r.sub !== PSECS[0]) return "postep-" + r.sub;
     if (r.tab === "pytania" && r.cat)
       return "pytania-" + r.cat + (r.sec ? "-" + r.sec + (r.sec === "docs" && r.doc ? "-" + r.doc : "") : "");
+    if (r.tab === "pytania" && r.sec === "katas") return "pytania-katas";
     return r.tab;
   }
   function parseHash(h) {
     var m = /^#?([a-z]+)(?:-([a-z0-9_-]+))?$/.exec(h || "");
+    /* Katas used to be a tab of their own: old links open them inside Pytania. */
+    if (m && m[1] === "fiszki") return { tab: "pytania", sec: "katas" };
     if (!m || VIEWS.indexOf(m[1]) < 0) return { tab: "pytania" };
     var r = { tab: m[1] };
     if (m[2] && (r.tab === "http" || r.tab === "api")) r.sub = m[2];
@@ -5097,9 +5196,10 @@
     if (m[2] && r.tab === "postep" && PSECS.indexOf(m[2]) > 0) r.sub = m[2];
     if (m[2] && r.tab === "pytania") {
       var p = m[2].split("-");
+      if (p[0] === "katas") r.sec = "katas";
       if (DOM_NAME[p[0]]) {
         r.cat = p[0];
-        if (p[1] === "api" || p[1] === "docs" || p[1] === "info") r.sec = p[1];
+        if (CSECS.indexOf(p[1]) > 0) r.sec = p[1];
         if (r.sec === "docs" && p[2]) r.doc = p.slice(2).join("-");
       }
     }
@@ -5142,13 +5242,33 @@
     NAV.ok = writeState(r, !replace);
   }
   function apply(r, restore) {
-    var tab = VIEWS.indexOf(r.tab) < 0 ? "pytania" : r.tab;
+    if (r.tab === "fiszki") {
+      r.tab = "pytania";
+      r.sec = "katas";
+      delete r.cat;
+    }
+    var tab = VIEWS.indexOf(r.tab) < 0 ? "pytania" : r.tab,
+      ref = REFS.indexOf(tab) > -1;
     r.tab = tab;
     TABS.forEach(function (t) {
       $("#p-" + t).hidden = t !== tab;
       var tb = $("#t-" + t);
       if (tb) tb.setAttribute("aria-selected", t === tab);
     });
+    $("#t-ref").setAttribute("aria-selected", ref);
+    $("#t-pytania .num").textContent = Q.length;
+    $("#rtabs").hidden = !ref;
+    if (ref) {
+      REFS.forEach(function (k) {
+        $("#rt-" + k).setAttribute("aria-selected", k === tab);
+        $("#rt-" + k).tabIndex = k === tab ? 0 : -1;
+      });
+      $("#t-ref").setAttribute("aria-controls", "p-" + tab);
+      if (S.ref !== tab) {
+        S.ref = tab;
+        save();
+      }
+    }
     $("#p-focus").hidden = tab !== "focus";
     /* Focus reuses the list's card markup and ids, so only one of the two is ever in the document. */
     if (tab !== "focus") $("#focusroot").innerHTML = "";
@@ -5160,9 +5280,8 @@
       /* history.state is stored data: keep only a known category and section. */
       if (!DOM_NAME[r.cat]) {
         delete r.cat;
-        delete r.sec;
       }
-      if (r.sec !== "api" && r.sec !== "docs" && r.sec !== "info") delete r.sec;
+      if (r.cat ? CSECS.indexOf(r.sec) < 1 : r.sec !== "katas") delete r.sec;
       if (r.sec !== "docs" || !/^[a-z0-9_-]+$/.test(r.doc || "")) delete r.doc;
       if (r.doc !== "ep" || !EP_URL.test(r.url || "")) {
         delete r.url;
@@ -5189,8 +5308,7 @@
       }
       ARM = null;
       renderSim();
-    } else if (tab === "fiszki") renderF();
-    else if (tab === "focus") {
+    } else if (tab === "focus") {
       $("#qlist").innerHTML = "";
       $("#flist").innerHTML = "";
       if (!BY_ID[r.id]) r.id = fResume();
@@ -5218,7 +5336,8 @@
       openApiMap();
       if (r.sub) APIM.show(r.sub);
       r.sub = APIM.api();
-    } else if (tab === "ustawienia") renderSettings();
+    } else if (tab === "graphql") renderGql();
+    else if (tab === "ustawienia") renderSettings();
     else {
       if (PSECS.indexOf(r.sub) < 1) delete r.sub;
       var ps = r.sub || PSECS[0];
@@ -5328,9 +5447,10 @@
   });
 
   document.querySelector(".tabs").addEventListener("click", function (ev) {
-    var b = ev.target.closest(".tab");
-    if (b && b.dataset.tab !== CUR)
-      go(b.dataset.tab === "pytania" && S.dom !== "all" ? { tab: "pytania", cat: S.dom } : { tab: b.dataset.tab });
+    var b = ev.target.closest(".tab"),
+      t = b && (b.dataset.tab === "ref" ? S.ref : b.dataset.tab);
+    if (b && t !== CUR && !(b.dataset.tab === "ref" && REFS.indexOf(CUR) > -1))
+      go(t === "pytania" && S.dom !== "all" ? { tab: "pytania", cat: S.dom } : { tab: t });
     else if (b) window.scrollTo(0, 0);
   });
 

@@ -88,6 +88,7 @@ const used = new Set(
     .concat(Object.values(D.NOTES).flatMap(n => (n.s || []).flatMap(s => s[2] || [])))
     .concat(Object.values(D.APIOV).flatMap(cs => (Array.isArray(cs) ? cs : []).flatMap(c => c.l || [])))
     .concat((Array.isArray(D.ROLETRAPS) ? D.ROLETRAPS : []).flatMap(x => x.l || []))
+    .concat((D.GQL && Array.isArray(D.GQL.s) ? D.GQL.s : []).flatMap(x => x.l || []))
     /* linked from the header of the API Map roles view */
     .concat(["lmres", "predroles"])
 );
@@ -241,6 +242,45 @@ else
     if (!Array.isArray(x.l) || !x.l.length) E(w, "needs DOCS keys in l");
     else x.l.forEach(d => D.DOCS[d] || E(w, "DOCS key `" + d + "` not in DOCS"));
   });
+
+/* Ściągi › GraphQL: same fact rule as notes. A block holds bullets (b), steps (ol), a file tree ([path, note]) or a
+   REST vs GraphQL table ([row, REST, GraphQL]); a heading of exactly "Pułapki" gets the trap tint. */
+{
+  const g = D.GQL || {},
+    txt = (w, x) => {
+      if (!isStr(x)) return E(w, "empty text");
+      markup(w, x);
+      if (/\[UNVERIFIED|https?:|</i.test(x)) E(w, "no [UNVERIFIED], URLs or raw < : sources go in DOCS keys");
+      if (x.split(/\s+/).length > 30) W(w, "over 30 words");
+    };
+  for (const f of Object.keys(g)) if (f !== "t" && f !== "s") E("GQL", "unknown field `" + f + "`");
+  txt("GQL.t", g.t);
+  if (!Array.isArray(g.s) || !g.s.length) E("GQL", "s needs at least one block");
+  else
+    g.s.forEach((x, i) => {
+      const w = "GQL.s[" + i + "]";
+      for (const f of Object.keys(x))
+        if (!["h", "b", "ol", "tree", "cmp", "l"].includes(f)) E(w, "unknown field `" + f + "`");
+      if (!isStr(x.h)) E(w, "needs a heading h");
+      if (!x.b && !x.ol && !x.tree && !x.cmp) E(w, "needs b, ol, tree or cmp");
+      [x.b, x.ol].forEach(
+        xs =>
+          xs !== undefined &&
+          (Array.isArray(xs) ? xs.forEach((y, j) => txt(w + "." + j, y)) : E(w, "b and ol are lists"))
+      );
+      [x.tree, x.cmp].forEach((rows, k) => {
+        if (rows === undefined) return;
+        if (!Array.isArray(rows)) return E(w, "tree and cmp are lists of rows");
+        rows.forEach((r, j) => {
+          if (!Array.isArray(r) || r.length !== (k ? 3 : 2))
+            E(w, (k ? "cmp" : "tree") + " row " + j + " needs " + (k ? 3 : 2) + " cells");
+          else r.forEach(c => txt(w + "." + j, c));
+        });
+      });
+      if (!Array.isArray(x.l) || !x.l.length) E(w, "needs DOCS keys in l");
+      else x.l.forEach(d => D.DOCS[d] || E(w, "DOCS key `" + d + "` not in DOCS"));
+    });
+}
 
 /* HTTP Koty */
 const codes = new Set();

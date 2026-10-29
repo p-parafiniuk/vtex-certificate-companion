@@ -2620,8 +2620,93 @@ kbd {
   --font-mono: var(--f-mono);
 }
 body[data-view="http"] .pcard,
-body[data-view="api"] .pcard {
+body[data-view="api"] .pcard,
+body[data-view="graphql"] .pcard {
   display: none;
+}
+/* Ściągi: the sub-tab strip sits above HTTP Koty, API Map and GraphQL, which start right under the bar. */
+.rtabs {
+  margin-top: 16px;
+}
+@media (max-width: 520px) {
+  .rtabs .ctab {
+    flex: 1 0 auto;
+  }
+}
+.rtabs .ctab-l {
+  font-weight: 400;
+  color: var(--muted);
+}
+body[data-view="graphql"] .wrap {
+  max-width: 1040px;
+}
+.gql-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.gql-b.trap {
+  grid-column: 1 / -1;
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.gql-b.trap h3 {
+  color: var(--accent);
+}
+.gql-b ul,
+.gql-b ol {
+  margin: 0;
+  padding-left: 1.15em;
+  display: grid;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+.gql-b .doc {
+  margin: 0;
+}
+.gql-tree {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--code);
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  font-size: 0.9rem;
+}
+.gql-tree dt code {
+  background: none;
+  padding: 0;
+}
+.gql-tree dd {
+  margin: 0;
+  color: var(--muted);
+}
+@media (max-width: 520px) {
+  .gql-tree {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .gql-tree dd {
+    margin-bottom: 8px;
+  }
+}
+.gql-cmp {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.gql-cmp th,
+.gql-cmp td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.gql-cmp tbody th {
+  font-weight: 500;
+  color: var(--muted);
 }
 body[data-view="http"] .wrap,
 body[data-view="api"] .wrap {
@@ -3912,6 +3997,9 @@ div.setrow {
   font-family: var(--f-mono);
   font-weight: 700;
 }
+.gql-b .tblwrap {
+  overflow-x: auto;
+}
 </style>
 
 <header class="bar">
@@ -3919,10 +4007,8 @@ div.setrow {
     <h1><a class="brand" href="#pytania" title="Wszystkie pytania" data-en-title="All questions"><svg class="brand-mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M16 18l14 30h4l14-30"/></svg><span class="brand-name">VTEX API Drill</span></a></h1>
     <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
       <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
-      <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki" title="Kata to krótkie ćwiczenie do powtarzania: pytanie otwarte albo zadanie praktyczne. Najpierw odpowiadasz sam, potem porównujesz z wzorcem i sam się oceniasz." data-en-title="A kata is a short drill you repeat: an open question or a practical task. You answer on your own first, then compare with the model answer and grade yourself."><span data-en="Katas">Katas</span> <span class="num">35</span></button>
       <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
-      <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
-      <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
+      <button class="tab tab-x" role="tab" id="t-ref" data-tab="ref" aria-controls="p-http" title="Ściągi: kody HTTP, mapa API i GraphQL" data-en-title="Reference: HTTP codes, API Map and GraphQL"><span data-en="Reference">Ściągi</span></button>
       <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button>
     </nav>
     <!-- Not a tab: starting the exam is an action, so it sits apart as the one primary button. app.js fills it. -->
@@ -3967,6 +4053,7 @@ div.setrow {
         <div id="cat-tldr"></div>
         <div class="ctabs" id="ctabs" role="tablist" aria-label="Sekcje kategorii" data-en-aria="Category sections">
           <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania" data-en="Questions">Pytania</button>
+          <button type="button" class="ctab" role="tab" id="ct-katas" data-sec="katas" aria-controls="cs-katas" title="Kata to krótkie ćwiczenie do powtarzania: pytanie otwarte albo zadanie praktyczne. Najpierw odpowiadasz sam, potem porównujesz z wzorcem i sam się oceniasz." data-en-title="A kata is a short drill you repeat: an open question or a practical task. You answer on your own first, then compare with the model answer and grade yourself.">Katas</button>
           <button type="button" class="ctab" role="tab" id="ct-info" data-sec="info" aria-controls="cs-info" data-en="Notes">Notatki</button>
           <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api"><span class="ctab-l" data-en="API paths">Ścieżki API</span><span class="ctab-s">API</span></button>
           <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
@@ -3981,6 +4068,12 @@ div.setrow {
             <label class="check" for="hint-on"><input type="checkbox" id="hint-on"> <span data-en="Show how many answers are right">Pokazuj, ile odpowiedzi jest poprawnych</span></label></div>
           </div>
           <div class="list" id="qlist"></div>
+        </div>
+        <div class="csec" id="cs-katas" role="tabpanel" aria-labelledby="ct-katas" hidden>
+          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one kata at a time, with deck progress. Only the katas you see in this list."><strong>Focus:</strong> jedna kata naraz, z postępem talii. Tylko katas z tej listy.</span></div>
+          <p class="lead" data-en-html="<strong>A kata</strong> is a short drill: an open question or a practical task. <strong>Answer out loud or write the request on paper first</strong>, then reveal the model answer and grade yourself. The &ldquo;Practical&rdquo; katas train the 4 practical tasks: method, path, body."><strong>Kata</strong> to krótkie ćwiczenie: pytanie otwarte albo zadanie praktyczne. <strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce</strong>, potem odsłoń wzorzec i oceń się. Katas „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body.</p>
+          <div class="row"><button type="button" class="btn small" id="f-show-all" data-en="Show all answers">Pokaż wszystkie odpowiedzi</button><button type="button" class="btn small" id="f-hide-all" data-en="Hide all answers">Ukryj wszystkie odpowiedzi</button><span class="how" id="f-open-n"></span></div>
+          <div class="list" id="flist"></div>
         </div>
         <div class="csec" id="cs-info" role="tabpanel" aria-labelledby="ct-info" hidden></div>
         <div class="csec" id="cs-api" role="tabpanel" aria-labelledby="ct-api" hidden>
@@ -3998,13 +4091,6 @@ div.setrow {
       <li data-en="36 multiple-choice questions">36 pytań wielokrotnego wyboru</li><li data-en="4 practical tasks">4 zadania praktyczne</li><li data-en="2 h in total">2 h na całość</li><li data-en="80% pass mark">próg 80%</li>
     </ul>
     <div id="simroot" class="simroot"></div>
-  </section>
-
-  <section class="panel" id="p-fiszki" role="tabpanel" aria-labelledby="t-fiszki" hidden>
-    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, katas and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, katas i zadania praktyczne w jednym ciągu.</span></div>
-    <p class="lead" data-en-html="<strong>A kata</strong> is a short drill you repeat until it sticks: an open question or a practical task. You grade yourself against the model answer.<br><strong>Answer out loud or write the request on paper first.</strong> Only then reveal the answer. The &ldquo;Practical&rdquo; katas train the 4 practical tasks: method, path, body. Under each answer there is a link to the VTEX docs. F1–20 are round 1, F21–35 are round 2."><strong>Kata</strong> to krótkie ćwiczenie powtarzane do skutku: pytanie otwarte albo zadanie praktyczne. Sam oceniasz się względem wzorcowej odpowiedzi.<br><strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce.</strong> Dopiero potem odsłoń odpowiedź. Katas „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body. Pod każdą odpowiedzią jest link do dokumentacji VTEX. F1–20 to runda 1, F21–35 to runda 2.</p>
-    <div class="row"><button type="button" class="btn small" id="f-show-all" data-en="Show all answers">Pokaż wszystkie odpowiedzi</button><button type="button" class="btn small" id="f-hide-all" data-en="Hide all answers">Ukryj wszystkie odpowiedzi</button><span class="how" id="f-open-n"></span></div>
-    <div class="list" id="flist"></div>
   </section>
 
   <section class="panel" id="p-postep" role="tabpanel" aria-labelledby="t-postep" hidden>
@@ -4110,13 +4196,21 @@ div.setrow {
     <div id="focusroot" class="simroot focus"></div>
   </section>
 
-  <section class="panel" id="p-http" role="tabpanel" aria-labelledby="t-http" hidden>
+  <div class="ctabs rtabs" id="rtabs" role="tablist" aria-label="Ściągi" data-en-aria="Reference" hidden>
+    <button type="button" class="ctab" role="tab" id="rt-http" data-rtab="http" aria-controls="p-http">HTTP<span class="ctab-l" data-en=" · status codes"> · kody statusu</span></button>
+    <button type="button" class="ctab" role="tab" id="rt-api" data-rtab="api" aria-controls="p-api">API Map<span class="ctab-l" data-en=" · REST endpoints"> · endpointy REST</span></button>
+    <button type="button" class="ctab" role="tab" id="rt-graphql" data-rtab="graphql" aria-controls="p-graphql">GraphQL<span class="ctab-l"> · VTEX IO</span></button>
+  </div>
+
+  <section class="panel" id="p-http" role="tabpanel" aria-labelledby="rt-http" hidden>
     <div id="koty"></div>
   </section>
 
-  <section class="panel" id="p-api" role="tabpanel" aria-labelledby="t-api" hidden>
+  <section class="panel" id="p-api" role="tabpanel" aria-labelledby="rt-api" hidden>
     <div id="apimap"></div>
   </section>
+
+  <section class="panel gql" id="p-graphql" role="tabpanel" aria-labelledby="rt-graphql" hidden></section>
 
   <dialog class="gs-dlg" id="gs-dlg" aria-label="Szukaj" data-en-aria="Search">
     <div class="gs-head">
@@ -7794,7 +7888,7 @@ const DOMS = [["auth","Auth, kody, SSO","🔐","Auth, codes, SSO"],["catalog","C
 /* Stable ids: questions 0-99 = round 1, 100-160 = round 2; flashcards 0-19 and 20-34. Saved progress is keyed by index, so only ever append.
    Multi-select: the first n options of a question are correct (n defaults to 1); options shuffle on load. */
 /* Documentation targets: key -> [url, label]. Every item carries l: [keys]. Each URL was fetched twice and matched to its items on 2026-10-09. */
-const DOCS = {"keys":["https://developers.vtex.com/docs/guides/api-authentication-using-api-keys","Guide: API authentication using API keys"],"user":["https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens","Guide: API authentication using user tokens"],"auth":["https://developers.vtex.com/docs/guides/authentication-overview","Guide: Authentication (overview)"],"bestkeys":["https://help.vtex.com/en/tutorial/best-practices-api-keys--7b6nD1VMHa49aI5brlOvJm","Help Center: Best practices for API keys"],"learn":["https://learn.vtex.com/docs/course-calling-commerce-apis-step02references-lang-en","VTEX Learning: Discovering VTEX Commerce APIs"],"codes":["https://developers.vtex.com/docs/guides/api-response-codes","Guide: API response status codes"],"catint":["https://developers.vtex.com/docs/guides/catalog-integration","Guide: Catalog (integration order)"],"catov":["https://developers.vtex.com/docs/guides/catalog-overview","Guide: Catalog (onboarding)"],"skus":["https://developers.vtex.com/docs/guides/skus","Guide: SKUs"],"erpcat":["https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog","ERP guide: Set up catalog"],"erpprod":["https://developers.vtex.com/docs/guides/erp-integration-import-products","ERP guide: Import products"],"erpprice":["https://developers.vtex.com/docs/guides/erp-integration-import-prices","ERP guide: Import prices"],"inv":["https://developers.vtex.com/docs/guides/erp-integration-import-inventory","ERP guide: Import inventory"],"order":["https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api","Guide: Creating a regular order with the Checkout API"],"ofields":["https://developers.vtex.com/docs/guides/orderform-fields","Guide: orderForm fields reference"],"feed":["https://developers.vtex.com/docs/guides/orders-feed","Guide: Feed v3 (Feed and Hook)"],"ordint":["https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration","ERP guide: Set up order integration"],"ordproc":["https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing","ERP guide: Set up order processing"],"hflow":["https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196","Help Center: Order flow and status"],"change":["https://developers.vtex.com/docs/guides/change-order","Guide: Order modifications"],"ppp":["https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider","Guide: Implementing a payment provider"],"flows":["https://developers.vtex.com/docs/guides/payments-integration-purchase-flows","Guide: Purchase flows"],"proxy":["https://developers.vtex.com/docs/guides/payments-integration-secure-proxy","Guide: Secure Proxy"],"fraud":["https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works","Guide: Anti-fraud integration protocol"],"sso":["https://developers.vtex.com/docs/guides/login-integration-guide","Guide: Login (SSO)"],"sess":["https://developers.vtex.com/docs/guides/sessions-system-overview","Guide: Sessions System overview"],"trig":["https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2","Guide: Setting up triggers on Master Data v2"],"mdpag":["https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api","Guide: Pagination in the Master Data API"],"mdschema":["https://developers.vtex.com/docs/guides/master-data-schema-lifecycle","Guide: Master Data schema lifecycle"],"mdcomp":["https://developers.vtex.com/docs/guides/master-data-components","Guide: Master Data components"],"seller":["https://developers.vtex.com/docs/guides/external-seller-integration-connector","Guide: External seller connector"],"gift":["https://developers.vtex.com/docs/guides/gift-card-integration-guide","Guide: Gift Cards"],"lead":["https://help.vtex.com/en/tutorial/lead-time-shipping-time-at-sku-level--16yv5Mkj6bTyWR1hCN2f4B","Help Center: Lead time (shipping time at SKU level)"],"o_pricing":["https://developers.vtex.com/docs/api-reference/pricing-api","Pricing API: overview and rate limits"],"o_catalog":["https://developers.vtex.com/docs/api-reference/catalog-api","Catalog API: overview (rate limit, URL parameters)"],"o_checkout":["https://developers.vtex.com/docs/api-reference/checkout-api","Checkout API: overview and endpoint list"],"o_ppp":["https://developers.vtex.com/docs/api-reference/payment-provider-protocol","Payment Provider Protocol: overview and requirements"],"o_is":["https://developers.vtex.com/docs/api-reference/intelligent-search-api","Intelligent Search API (Legacy): overview"],"o_mkt":["https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders","Marketplace Protocol: external marketplace endpoints"],"login":["https://developers.vtex.com/docs/api-reference/vtex-id-api#post-/api/vtexid/apptoken/login","VTEX ID API: Generate authentication token"],"renew":["https://developers.vtex.com/docs/api-reference/vtex-id-api#patch-/api/vtexid/apikey/-apiKey-/apitoken/renew","VTEX ID API: Initiate token renewal"],"product":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/product","Catalog API: Create product with category and brand"],"skufile":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/stockkeepingunit/-skuId-/file","Catalog API: Create SKU file"],"salespol":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/product/-productId-/salespolicy/-tradepolicyId-","Catalog API: Associate product with sales channel"],"specfld":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog_system/pvt/specification/field","Catalog API: Create specification field"],"ids":["https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pvt/products/GetProductAndSkuIds","Catalog API: Get product and SKU IDs"],"refid":["https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pvt/sku/stockkeepingunitidbyrefid/-refId-","Catalog API: Get SKU ID by reference ID"],"search":["https://developers.vtex.com/docs/api-reference/search-api#get-/api/catalog_system/pub/products/search","Legacy Search API: Search for products with filter, order and pagination"],"session":["https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions","Session Manager API: Create new session"],"price":["https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/prices/-itemId-","Pricing API: Create or update base price or fixed price"],"computed":["https://developers.vtex.com/docs/api-reference/pricing-api#get-/pricing/prices/-itemId-/computed/-priceTableId-","Pricing API: Get computed price by price table or trade policy"],"pipeline":["https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/pipeline/catalog/-priceTableId-","Pricing API: Update rules for a price table"],"coupon":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api#post-/api/rnb/pvt/coupon","Promotions & Taxes API: Create or update coupon"],"promo":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api#post-/api/rnb/pvt/calculatorconfiguration","Promotions & Taxes API: Create or update promotion or tax"],"invput":["https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-","Logistics API: Update inventory by SKU and warehouse"],"invqty":["https://developers.vtex.com/docs/api-reference/logistics-api#patch-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-/quantity","Logistics API: Update inventory quantity by SKU and warehouse"],"wh":["https://developers.vtex.com/docs/api-reference/logistics-api#post-/api/logistics/pvt/configuration/warehouses","Logistics API: Create or update warehouse"],"pickup":["https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/configuration/pickuppoints/-pickupPointId-","Logistics API: Create or update pickup point"],"sim":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForms/simulation","Checkout API: Cart simulation"],"cart":["https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm","Checkout API: Get current or create a new cart"],"items":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items","Checkout API: Add cart items"],"shipping":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/attachments/shippingData","Checkout API: Add shipping address and select delivery option"],"manprice":["https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orderForm/-orderFormId-/items/-itemIndex-/price","Checkout API: Change price of an SKU in a cart"],"ofconf":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm","Checkout API: Create order form configuration"],"custom":["https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orderForm/-orderFormId-/customData/-appId-/-appFieldName-","Checkout API: Set single custom field value"],"trans":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/transaction","Checkout API: Place order from an existing cart"],"list":["https://developers.vtex.com/docs/api-reference/orders-api#get-/api/oms/pvt/orders","Orders API: List orders"],"start":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/start-handling","Orders API: Start handling order"],"invoice":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/invoice","Orders API: Order invoice notification"],"invpatch":["https://developers.vtex.com/docs/api-reference/orders-api#patch-/api/oms/pvt/orders/-orderId-/invoice/-invoiceNumber-","Orders API: Update order's partial invoice (send tracking number)"],"tracking":["https://developers.vtex.com/docs/api-reference/orders-api#put-/api/oms/pvt/orders/-orderId-/invoice/-invoiceNumber-/tracking","Orders API: Update order tracking status"],"pay":["https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments","Payment Provider Protocol: Create payment"],"settle":["https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments/-paymentId-/settlements","Payment Provider Protocol: Settle payment"],"giftcard":["https://developers.vtex.com/docs/api-reference/giftcard-api#post-/giftcards","Giftcard API: Create a gift card"],"afraud":["https://developers.vtex.com/docs/api-reference/antifraud-provider-protocol#post-/transactions","Anti-fraud Provider API: Send anti-fraud data"],"scroll":["https://developers.vtex.com/docs/api-reference/master-data-api-v2#get-/api/dataentities/-dataEntityName-/scroll","Master Data API v2: Scroll documents"],"mdput":["https://developers.vtex.com/docs/api-reference/master-data-api-v2#put-/api/dataentities/-dataEntityName-/documents/-id-","Master Data API v2: Create document with custom ID or update entire document"],"md2search":["https://developers.vtex.com/docs/api-reference/master-data-api-v2#get-/api/dataentities/-dataEntityName-/search","Master Data API v2: Search documents"],"md1search":["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/search","Master Data API v1: Search documents"],"cl":["https://developers.vtex.com/docs/api-reference/masterdata-api#post-/api/dataentities/CL/documents","Master Data API v1: Create new customer profile"],"mkorder":["https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders#post-/api/fulfillment/pvt/orders","Marketplace Protocol: Place fulfillment order"],"mkfulfil":["https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders#post-/api/fulfillment/pvt/orders/-orderId-/fulfill","Marketplace Protocol: Authorize dispatch for fulfillment order"],"notif":["https://developers.vtex.com/docs/api-reference/marketplace-apis#post-/notificator/-sellerId-/changenotification/-skuId-/price","Marketplace API: Notify marketplace of price update"],"authuse":["https://developers.vtex.com/docs/guides/authentication","Guide: Authentication (which credential to use)"],"iotoken":["https://developers.vtex.com/docs/guides/app-authentication-using-auth-tokens","Guide: App authentication using auth tokens"],"rotate":["https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens","Guide: Rotating VTEX API tokens"],"appkeys":["https://developers.vtex.com/docs/api-reference/license-manager-api#post-/api/vlm/appkeys","License Manager API: Create new API key"],"keymgmt":["https://help.vtex.com/en/announcements/2021-08-19-improvements-in-application-key-management","Help Center: Improvements in application key management"],"extkeys":["https://help.vtex.com/en/docs/tutorials/external-keys","Help Center: External keys"],"ownerrole":["https://help.vtex.com/en/announcements/2023-02-03-the-owner-admin-super-user-role-no-longer-has-permission-to-create-users","Help Center: Owner (Admin Super) no longer creates users"],"roles":["https://help.vtex.com/en/docs/tutorials/creating-roles","Help Center: Creating roles"],"feedcfg":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/orders/feed/config","Orders API: Create or update feed configuration"],"oauthx":["https://developers.vtex.com/docs/api-reference/vtex-id-api#post-/api/vtexid/audience/webstore/provider/oauth/exchange","VTEX ID API: Exchange OAuth access token for VTEX credential"],"tls":["https://help.vtex.com/en/announcements/2020-07-10-transitioning-api-integrations-to-https-tls-1-2","Help Center: Transitioning API integrations to HTTPS + TLS 1.2"],"audit":["https://help.vtex.com/en/docs/tutorials/audit","Help Center: Audit"],"tpwork":["https://help.vtex.com/en/docs/tutorials/how-trade-policies-work","Help Center: Sales channels (how trade policies work)"],"tpsite":["https://help.vtex.com/en/docs/tutorials/how-the-relationship-between-websites-and-business-policies-works","Help Center: Websites and sales channels (binding, priority)"],"tpcreate":["https://help.vtex.com/en/docs/tutorials/creating-a-trade-policy","Help Center: Creating a sales channel"],"tpadmin":["https://help.vtex.com/en/announcements/2026-04-06-creating-sales-channels-via-vtex-admin","Help Center: Creating sales channels via VTEX Admin"],"tpaff":["https://help.vtex.com/en/docs/tutorials/what-is-the-difference-between-sales-policy-affiliate-and-seller","Help Center: Sales policy vs seller vs affiliate"],"mskus":["https://developers.vtex.com/docs/guides/managing-skus","Guide: Managing SKUs"],"mprod":["https://developers.vtex.com/docs/guides/managing-products","Guide: Managing products"],"specs":["https://developers.vtex.com/docs/guides/specifications","Guide: Specifications"],"cati18n":["https://developers.vtex.com/docs/guides/catalog-internationalization","Guide: Translating Catalog content"],"searchpag":["https://help.vtex.com/en/announcements/2018-01-24-requests-with-pagination-will-change-in-the-search-api","Help Center: Requests with pagination will change in the search API"],"pricov":["https://developers.vtex.com/docs/guides/pricing-overview","Guide: Pricing overview"],"bulkprice":["https://developers.vtex.com/docs/guides/bulk-pricing-import-integration","Guide: Bulk pricing import"],"fixedprice":["https://help.vtex.com/en/docs/tracks/fixed-price-concept-definition","Help Center: Fixed price concept definition"],"pricetbl":["https://help.vtex.com/en/docs/tutorials/setting-up-price-tables-for-specific-users","Help Center: Configuring price tables for specific users"],"pricerule":["https://help.vtex.com/en/docs/tracks/regra-de-preco-definicao-de-conceito","Help Center: Price rule concept definition"],"taxov":["https://developers.vtex.com/docs/guides/tax-services-overview","Guide: Tax services overview"],"taxspec":["https://developers.vtex.com/docs/guides/tax-services-specification","Guide: Tax services specification"],"fulfil":["https://developers.vtex.com/docs/guides/fulfillment","Guide: Fulfillment (shipping strategy and inventory)"],"reserv":["https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92","Help Center: How the reservation works"],"invsku":["https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/inventory/skus/-skuId-","Logistics API: List inventory by SKU"],"invlead":["https://developers.vtex.com/docs/api-reference/logistics-api#patch-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-/lead-time","Logistics API: Update inventory lead time by SKU and warehouse"],"invbatch":["https://developers.vtex.com/docs/api-reference/logistics-api#post-/availability/v1/inventory/batch","Logistics API: Create batch inventory job"],"cartorder":["https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart","Guide: Creating a regular order from an existing cart"],"headless":["https://developers.vtex.com/docs/guides/headless-cart-and-checkout","Guide: Headless cart and checkout"],"placeord":["https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders","Checkout API: Place order"],"gwcb":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/gatewayCallback/-orderGroup-","Checkout API: Process order"],"clientprof":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/attachments/clientProfileData","Checkout API: Add client profile"],"removeall":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items/removeAll","Checkout API: Remove all items from shopping cart"],"ofpatch":["https://developers.vtex.com/docs/api-reference/checkout-api#patch-/api/checkout/pvt/configuration/orderForm","Checkout API: Update order form configuration"],"cancel":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/cancel","Orders API: Cancel order"],"ordmod":["https://developers.vtex.com/docs/guides/order-modifications","Guide: Order modifications (errors and restrictions)"],"filters":["https://developers.vtex.com/docs/guides/using-orders-management-filters-in-api","Guide: Using VTEX Admin filters on orders via API"],"hppp":["https://help.vtex.com/en/docs/tutorials/payment-provider-protocol","Help Center: Payment Provider Protocol"],"pci":["https://developers.vtex.com/docs/guides/payments-integration-pci-dss-compliance","Guide: PCI DSS compliance"],"autosettle":["https://developers.vtex.com/docs/guides/custom-auto-capture-feature","Guide: Custom automatic capture feature"],"pgwrefund":["https://developers.vtex.com/docs/api-reference/payments-gateway-api#post-/api/pvt/transactions/-transactionId-/refunding-request","Payments Gateway API: Refund the transaction"],"recaptcha":["https://help.vtex.com/en/docs/tutorials/using-recaptcha-at-checkout","Help Center: Using reCAPTCHA at checkout"],"recapann":["https://help.vtex.com/en/announcements/2023-07-04-recaptcha-validation-will-now-follow-orderform-configuration-for-all-requests","Help Center: reCAPTCHA validation follows orderForm configuration for all requests"],"mdhelp":["https://help.vtex.com/en/docs/tutorials/master-data","Help Center: Master Data"],"md1create":["https://developers.vtex.com/docs/api-reference/masterdata-api#post-/api/dataentities/-acronym-/documents","Master Data API v1: Create new document"],"mdfields":["https://help.vtex.com/en/docs/tutorials/restrict-public-access-to-master-data-fields","Help Center: Restrict public access to Master Data fields"],"mdextract":["https://developers.vtex.com/docs/guides/extracting-data-from-master-data-with-search-and-scroll","Guide: Extracting data from Master Data with search and scroll"],"mdquery1":["https://developers.vtex.com/docs/guides/querying-documents-in-master-data-v1","Guide: Querying documents in Master Data v1"],"wsdep":["https://developers.vtex.com/updates/release-notes/2025-05-23-legacy-webservice-api-deprecation","Release note: Legacy Webservice API deprecation"],"firstreq":["https://developers.vtex.com/docs/guides/making-your-first-request","Guide: Making your first request"],"postman":["https://developers.vtex.com/docs/guides/using-postman","Guide: Using Postman"],"gqlide":["https://developers.vtex.com/docs/guides/graphql-ide","Guide: Admin GraphQL IDE"],"gqlsvc":["https://developers.vtex.com/docs/guides/developing-a-graphql-api-in-service-apps","Guide: Developing a GraphQL API in service apps"],"gqlbuild":["https://developers.vtex.com/docs/guides/vtex-io-documentation-graphql-builder","Guide: GraphQL builder"],"gqlauth":["https://developers.vtex.com/docs/guides/graphql-authorization-in-io-apps","Guide: GraphQL authorization in IO apps"],"gql2x":["https://developers.vtex.com/updates/release-notes/2025-09-30-graphql-builder-update-2x","Release note: GraphQL builder 2.x"],"gqlcache":["https://developers.vtex.com/docs/guides/implementing-cache-in-graphql-apis-for-io-apps","Guide: Implementing cache in GraphQL APIs for IO apps"],"loadtest":["https://developers.vtex.com/docs/guides/how-to-load-test-a-store","Guide: How to load test a store"],"ratebp":["https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors","Guide: Best practices for avoiding rate limit errors"],"errors":["https://developers.vtex.com/docs/guides/handling-errors-and-exceptions","Guide: Handling errors and exceptions"],"adsrl":["https://developers.vtex.com/updates/release-notes/2026-08-04-vtex-ads-api-reports-rate-limit","Release note: VTEX Ads API Reports rate limit"],"keysint":["https://help.vtex.com/en/docs/tracks/api-keys-for-integrations","Help Center: API keys for integrations"],"o_promo":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api","Promotions & Taxes API: overview"],"o_promo2":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api-v2","Promotions & Taxes API v2: overview (coupons)"],"o_gift":["https://developers.vtex.com/docs/api-reference/giftcard-api","Giftcard API: overview"],"o_gifthub":["https://developers.vtex.com/docs/api-reference/giftcard-hub-api","GiftCard Hub API: overview"],"o_search":["https://developers.vtex.com/docs/api-reference/search-api","Legacy Search API: overview"],"o_mktapi":["https://developers.vtex.com/docs/api-reference/marketplace-apis","Marketplace API: overview"],"md1scroll":["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/scroll","Master Data API v1: Scroll documents"],"is_ps":["https://developers.vtex.com/docs/api-reference/intelligent-search-api#get-/product_search/-facets-","Intelligent Search API (Legacy): Get list of products for a query"],"is_v1mig":["https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1","Guide: Migrating to Intelligent Search API v1"],"sessget":["https://developers.vtex.com/docs/api-reference/session-manager-api#get-/api/sessions","Session Manager API: Get session"],"predroles":["https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy","Help Center: Predefined roles"],"lmroles":["https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc","Help Center: Roles"],"lmres":["https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3","Help Center: License Manager resources"],"lmrolelist":["https://developers.vtex.com/docs/api-reference/license-manager-api#get-/api/license-manager/site/pvt/roles/list/paged","License Manager API: Get list of roles"]};
+const DOCS = {"keys":["https://developers.vtex.com/docs/guides/api-authentication-using-api-keys","Guide: API authentication using API keys"],"user":["https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens","Guide: API authentication using user tokens"],"auth":["https://developers.vtex.com/docs/guides/authentication-overview","Guide: Authentication (overview)"],"bestkeys":["https://help.vtex.com/en/tutorial/best-practices-api-keys--7b6nD1VMHa49aI5brlOvJm","Help Center: Best practices for API keys"],"learn":["https://learn.vtex.com/docs/course-calling-commerce-apis-step02references-lang-en","VTEX Learning: Discovering VTEX Commerce APIs"],"codes":["https://developers.vtex.com/docs/guides/api-response-codes","Guide: API response status codes"],"catint":["https://developers.vtex.com/docs/guides/catalog-integration","Guide: Catalog (integration order)"],"catov":["https://developers.vtex.com/docs/guides/catalog-overview","Guide: Catalog (onboarding)"],"skus":["https://developers.vtex.com/docs/guides/skus","Guide: SKUs"],"erpcat":["https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog","ERP guide: Set up catalog"],"erpprod":["https://developers.vtex.com/docs/guides/erp-integration-import-products","ERP guide: Import products"],"erpprice":["https://developers.vtex.com/docs/guides/erp-integration-import-prices","ERP guide: Import prices"],"inv":["https://developers.vtex.com/docs/guides/erp-integration-import-inventory","ERP guide: Import inventory"],"order":["https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api","Guide: Creating a regular order with the Checkout API"],"ofields":["https://developers.vtex.com/docs/guides/orderform-fields","Guide: orderForm fields reference"],"feed":["https://developers.vtex.com/docs/guides/orders-feed","Guide: Feed v3 (Feed and Hook)"],"ordint":["https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration","ERP guide: Set up order integration"],"ordproc":["https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing","ERP guide: Set up order processing"],"hflow":["https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196","Help Center: Order flow and status"],"change":["https://developers.vtex.com/docs/guides/change-order","Guide: Order modifications"],"ppp":["https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider","Guide: Implementing a payment provider"],"flows":["https://developers.vtex.com/docs/guides/payments-integration-purchase-flows","Guide: Purchase flows"],"proxy":["https://developers.vtex.com/docs/guides/payments-integration-secure-proxy","Guide: Secure Proxy"],"fraud":["https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works","Guide: Anti-fraud integration protocol"],"sso":["https://developers.vtex.com/docs/guides/login-integration-guide","Guide: Login (SSO)"],"sess":["https://developers.vtex.com/docs/guides/sessions-system-overview","Guide: Sessions System overview"],"trig":["https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2","Guide: Setting up triggers on Master Data v2"],"mdpag":["https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api","Guide: Pagination in the Master Data API"],"mdschema":["https://developers.vtex.com/docs/guides/master-data-schema-lifecycle","Guide: Master Data schema lifecycle"],"mdcomp":["https://developers.vtex.com/docs/guides/master-data-components","Guide: Master Data components"],"seller":["https://developers.vtex.com/docs/guides/external-seller-integration-connector","Guide: External seller connector"],"gift":["https://developers.vtex.com/docs/guides/gift-card-integration-guide","Guide: Gift Cards"],"lead":["https://help.vtex.com/en/tutorial/lead-time-shipping-time-at-sku-level--16yv5Mkj6bTyWR1hCN2f4B","Help Center: Lead time (shipping time at SKU level)"],"o_pricing":["https://developers.vtex.com/docs/api-reference/pricing-api","Pricing API: overview and rate limits"],"o_catalog":["https://developers.vtex.com/docs/api-reference/catalog-api","Catalog API: overview (rate limit, URL parameters)"],"o_checkout":["https://developers.vtex.com/docs/api-reference/checkout-api","Checkout API: overview and endpoint list"],"o_ppp":["https://developers.vtex.com/docs/api-reference/payment-provider-protocol","Payment Provider Protocol: overview and requirements"],"o_is":["https://developers.vtex.com/docs/api-reference/intelligent-search-api","Intelligent Search API (Legacy): overview"],"o_mkt":["https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders","Marketplace Protocol: external marketplace endpoints"],"login":["https://developers.vtex.com/docs/api-reference/vtex-id-api#post-/api/vtexid/apptoken/login","VTEX ID API: Generate authentication token"],"renew":["https://developers.vtex.com/docs/api-reference/vtex-id-api#patch-/api/vtexid/apikey/-apiKey-/apitoken/renew","VTEX ID API: Initiate token renewal"],"product":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/product","Catalog API: Create product with category and brand"],"skufile":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/stockkeepingunit/-skuId-/file","Catalog API: Create SKU file"],"salespol":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/product/-productId-/salespolicy/-tradepolicyId-","Catalog API: Associate product with sales channel"],"specfld":["https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog_system/pvt/specification/field","Catalog API: Create specification field"],"ids":["https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pvt/products/GetProductAndSkuIds","Catalog API: Get product and SKU IDs"],"refid":["https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pvt/sku/stockkeepingunitidbyrefid/-refId-","Catalog API: Get SKU ID by reference ID"],"search":["https://developers.vtex.com/docs/api-reference/search-api#get-/api/catalog_system/pub/products/search","Legacy Search API: Search for products with filter, order and pagination"],"session":["https://developers.vtex.com/docs/api-reference/session-manager-api#post-/api/sessions","Session Manager API: Create new session"],"price":["https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/prices/-itemId-","Pricing API: Create or update base price or fixed price"],"computed":["https://developers.vtex.com/docs/api-reference/pricing-api#get-/pricing/prices/-itemId-/computed/-priceTableId-","Pricing API: Get computed price by price table or trade policy"],"pipeline":["https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/pipeline/catalog/-priceTableId-","Pricing API: Update rules for a price table"],"coupon":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api#post-/api/rnb/pvt/coupon","Promotions & Taxes API: Create or update coupon"],"promo":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api#post-/api/rnb/pvt/calculatorconfiguration","Promotions & Taxes API: Create or update promotion or tax"],"invput":["https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-","Logistics API: Update inventory by SKU and warehouse"],"invqty":["https://developers.vtex.com/docs/api-reference/logistics-api#patch-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-/quantity","Logistics API: Update inventory quantity by SKU and warehouse"],"wh":["https://developers.vtex.com/docs/api-reference/logistics-api#post-/api/logistics/pvt/configuration/warehouses","Logistics API: Create or update warehouse"],"pickup":["https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/configuration/pickuppoints/-pickupPointId-","Logistics API: Create or update pickup point"],"sim":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForms/simulation","Checkout API: Cart simulation"],"cart":["https://developers.vtex.com/docs/api-reference/checkout-api#get-/api/checkout/pub/orderForm","Checkout API: Get current or create a new cart"],"items":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items","Checkout API: Add cart items"],"shipping":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/attachments/shippingData","Checkout API: Add shipping address and select delivery option"],"manprice":["https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orderForm/-orderFormId-/items/-itemIndex-/price","Checkout API: Change price of an SKU in a cart"],"ofconf":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pvt/configuration/orderForm","Checkout API: Create order form configuration"],"custom":["https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orderForm/-orderFormId-/customData/-appId-/-appFieldName-","Checkout API: Set single custom field value"],"trans":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/transaction","Checkout API: Place order from an existing cart"],"list":["https://developers.vtex.com/docs/api-reference/orders-api#get-/api/oms/pvt/orders","Orders API: List orders"],"start":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/start-handling","Orders API: Start handling order"],"invoice":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/invoice","Orders API: Order invoice notification"],"invpatch":["https://developers.vtex.com/docs/api-reference/orders-api#patch-/api/oms/pvt/orders/-orderId-/invoice/-invoiceNumber-","Orders API: Update order's partial invoice (send tracking number)"],"tracking":["https://developers.vtex.com/docs/api-reference/orders-api#put-/api/oms/pvt/orders/-orderId-/invoice/-invoiceNumber-/tracking","Orders API: Update order tracking status"],"pay":["https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments","Payment Provider Protocol: Create payment"],"settle":["https://developers.vtex.com/docs/api-reference/payment-provider-protocol#post-/payments/-paymentId-/settlements","Payment Provider Protocol: Settle payment"],"giftcard":["https://developers.vtex.com/docs/api-reference/giftcard-api#post-/giftcards","Giftcard API: Create a gift card"],"afraud":["https://developers.vtex.com/docs/api-reference/antifraud-provider-protocol#post-/transactions","Anti-fraud Provider API: Send anti-fraud data"],"scroll":["https://developers.vtex.com/docs/api-reference/master-data-api-v2#get-/api/dataentities/-dataEntityName-/scroll","Master Data API v2: Scroll documents"],"mdput":["https://developers.vtex.com/docs/api-reference/master-data-api-v2#put-/api/dataentities/-dataEntityName-/documents/-id-","Master Data API v2: Create document with custom ID or update entire document"],"md2search":["https://developers.vtex.com/docs/api-reference/master-data-api-v2#get-/api/dataentities/-dataEntityName-/search","Master Data API v2: Search documents"],"md1search":["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/search","Master Data API v1: Search documents"],"cl":["https://developers.vtex.com/docs/api-reference/masterdata-api#post-/api/dataentities/CL/documents","Master Data API v1: Create new customer profile"],"mkorder":["https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders#post-/api/fulfillment/pvt/orders","Marketplace Protocol: Place fulfillment order"],"mkfulfil":["https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders#post-/api/fulfillment/pvt/orders/-orderId-/fulfill","Marketplace Protocol: Authorize dispatch for fulfillment order"],"notif":["https://developers.vtex.com/docs/api-reference/marketplace-apis#post-/notificator/-sellerId-/changenotification/-skuId-/price","Marketplace API: Notify marketplace of price update"],"authuse":["https://developers.vtex.com/docs/guides/authentication","Guide: Authentication (which credential to use)"],"iotoken":["https://developers.vtex.com/docs/guides/app-authentication-using-auth-tokens","Guide: App authentication using auth tokens"],"rotate":["https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens","Guide: Rotating VTEX API tokens"],"appkeys":["https://developers.vtex.com/docs/api-reference/license-manager-api#post-/api/vlm/appkeys","License Manager API: Create new API key"],"keymgmt":["https://help.vtex.com/en/announcements/2021-08-19-improvements-in-application-key-management","Help Center: Improvements in application key management"],"extkeys":["https://help.vtex.com/en/docs/tutorials/external-keys","Help Center: External keys"],"ownerrole":["https://help.vtex.com/en/announcements/2023-02-03-the-owner-admin-super-user-role-no-longer-has-permission-to-create-users","Help Center: Owner (Admin Super) no longer creates users"],"roles":["https://help.vtex.com/en/docs/tutorials/creating-roles","Help Center: Creating roles"],"feedcfg":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/orders/feed/config","Orders API: Create or update feed configuration"],"oauthx":["https://developers.vtex.com/docs/api-reference/vtex-id-api#post-/api/vtexid/audience/webstore/provider/oauth/exchange","VTEX ID API: Exchange OAuth access token for VTEX credential"],"tls":["https://help.vtex.com/en/announcements/2020-07-10-transitioning-api-integrations-to-https-tls-1-2","Help Center: Transitioning API integrations to HTTPS + TLS 1.2"],"audit":["https://help.vtex.com/en/docs/tutorials/audit","Help Center: Audit"],"tpwork":["https://help.vtex.com/en/docs/tutorials/how-trade-policies-work","Help Center: Sales channels (how trade policies work)"],"tpsite":["https://help.vtex.com/en/docs/tutorials/how-the-relationship-between-websites-and-business-policies-works","Help Center: Websites and sales channels (binding, priority)"],"tpcreate":["https://help.vtex.com/en/docs/tutorials/creating-a-trade-policy","Help Center: Creating a sales channel"],"tpadmin":["https://help.vtex.com/en/announcements/2026-04-06-creating-sales-channels-via-vtex-admin","Help Center: Creating sales channels via VTEX Admin"],"tpaff":["https://help.vtex.com/en/docs/tutorials/what-is-the-difference-between-sales-policy-affiliate-and-seller","Help Center: Sales policy vs seller vs affiliate"],"mskus":["https://developers.vtex.com/docs/guides/managing-skus","Guide: Managing SKUs"],"mprod":["https://developers.vtex.com/docs/guides/managing-products","Guide: Managing products"],"specs":["https://developers.vtex.com/docs/guides/specifications","Guide: Specifications"],"cati18n":["https://developers.vtex.com/docs/guides/catalog-internationalization","Guide: Translating Catalog content"],"searchpag":["https://help.vtex.com/en/announcements/2018-01-24-requests-with-pagination-will-change-in-the-search-api","Help Center: Requests with pagination will change in the search API"],"pricov":["https://developers.vtex.com/docs/guides/pricing-overview","Guide: Pricing overview"],"bulkprice":["https://developers.vtex.com/docs/guides/bulk-pricing-import-integration","Guide: Bulk pricing import"],"fixedprice":["https://help.vtex.com/en/docs/tracks/fixed-price-concept-definition","Help Center: Fixed price concept definition"],"pricetbl":["https://help.vtex.com/en/docs/tutorials/setting-up-price-tables-for-specific-users","Help Center: Configuring price tables for specific users"],"pricerule":["https://help.vtex.com/en/docs/tracks/regra-de-preco-definicao-de-conceito","Help Center: Price rule concept definition"],"taxov":["https://developers.vtex.com/docs/guides/tax-services-overview","Guide: Tax services overview"],"taxspec":["https://developers.vtex.com/docs/guides/tax-services-specification","Guide: Tax services specification"],"fulfil":["https://developers.vtex.com/docs/guides/fulfillment","Guide: Fulfillment (shipping strategy and inventory)"],"reserv":["https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92","Help Center: How the reservation works"],"invsku":["https://developers.vtex.com/docs/api-reference/logistics-api#get-/api/logistics/pvt/inventory/skus/-skuId-","Logistics API: List inventory by SKU"],"invlead":["https://developers.vtex.com/docs/api-reference/logistics-api#patch-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-/lead-time","Logistics API: Update inventory lead time by SKU and warehouse"],"invbatch":["https://developers.vtex.com/docs/api-reference/logistics-api#post-/availability/v1/inventory/batch","Logistics API: Create batch inventory job"],"cartorder":["https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart","Guide: Creating a regular order from an existing cart"],"headless":["https://developers.vtex.com/docs/guides/headless-cart-and-checkout","Guide: Headless cart and checkout"],"placeord":["https://developers.vtex.com/docs/api-reference/checkout-api#put-/api/checkout/pub/orders","Checkout API: Place order"],"gwcb":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/gatewayCallback/-orderGroup-","Checkout API: Process order"],"clientprof":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/attachments/clientProfileData","Checkout API: Add client profile"],"removeall":["https://developers.vtex.com/docs/api-reference/checkout-api#post-/api/checkout/pub/orderForm/-orderFormId-/items/removeAll","Checkout API: Remove all items from shopping cart"],"ofpatch":["https://developers.vtex.com/docs/api-reference/checkout-api#patch-/api/checkout/pvt/configuration/orderForm","Checkout API: Update order form configuration"],"cancel":["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/cancel","Orders API: Cancel order"],"ordmod":["https://developers.vtex.com/docs/guides/order-modifications","Guide: Order modifications (errors and restrictions)"],"filters":["https://developers.vtex.com/docs/guides/using-orders-management-filters-in-api","Guide: Using VTEX Admin filters on orders via API"],"hppp":["https://help.vtex.com/en/docs/tutorials/payment-provider-protocol","Help Center: Payment Provider Protocol"],"pci":["https://developers.vtex.com/docs/guides/payments-integration-pci-dss-compliance","Guide: PCI DSS compliance"],"autosettle":["https://developers.vtex.com/docs/guides/custom-auto-capture-feature","Guide: Custom automatic capture feature"],"pgwrefund":["https://developers.vtex.com/docs/api-reference/payments-gateway-api#post-/api/pvt/transactions/-transactionId-/refunding-request","Payments Gateway API: Refund the transaction"],"recaptcha":["https://help.vtex.com/en/docs/tutorials/using-recaptcha-at-checkout","Help Center: Using reCAPTCHA at checkout"],"recapann":["https://help.vtex.com/en/announcements/2023-07-04-recaptcha-validation-will-now-follow-orderform-configuration-for-all-requests","Help Center: reCAPTCHA validation follows orderForm configuration for all requests"],"mdhelp":["https://help.vtex.com/en/docs/tutorials/master-data","Help Center: Master Data"],"md1create":["https://developers.vtex.com/docs/api-reference/masterdata-api#post-/api/dataentities/-acronym-/documents","Master Data API v1: Create new document"],"mdfields":["https://help.vtex.com/en/docs/tutorials/restrict-public-access-to-master-data-fields","Help Center: Restrict public access to Master Data fields"],"mdextract":["https://developers.vtex.com/docs/guides/extracting-data-from-master-data-with-search-and-scroll","Guide: Extracting data from Master Data with search and scroll"],"mdquery1":["https://developers.vtex.com/docs/guides/querying-documents-in-master-data-v1","Guide: Querying documents in Master Data v1"],"wsdep":["https://developers.vtex.com/updates/release-notes/2025-05-23-legacy-webservice-api-deprecation","Release note: Legacy Webservice API deprecation"],"firstreq":["https://developers.vtex.com/docs/guides/making-your-first-request","Guide: Making your first request"],"postman":["https://developers.vtex.com/docs/guides/using-postman","Guide: Using Postman"],"gqlide":["https://developers.vtex.com/docs/guides/graphql-ide","Guide: GraphQL IDE"],"gqlsvc":["https://developers.vtex.com/docs/guides/developing-a-graphql-api-in-service-apps","Guide: Developing a GraphQL API in service apps"],"gqlbuild":["https://developers.vtex.com/docs/guides/vtex-io-documentation-graphql-builder","VTEX IO: GraphQL builder"],"gqlauth":["https://developers.vtex.com/docs/guides/graphql-authorization-in-io-apps","Guide: GraphQL authorization in IO apps"],"gql2x":["https://developers.vtex.com/updates/release-notes/2025-09-30-graphql-builder-update-2x","Release note: GraphQL builder 2.x"],"gqlcache":["https://developers.vtex.com/docs/guides/implementing-cache-in-graphql-apis-for-io-apps","Guide: Implementing cache in GraphQL APIs for IO apps"],"loadtest":["https://developers.vtex.com/docs/guides/how-to-load-test-a-store","Guide: How to load test a store"],"ratebp":["https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors","Guide: Best practices for avoiding rate limit errors"],"errors":["https://developers.vtex.com/docs/guides/handling-errors-and-exceptions","Guide: Handling errors and exceptions"],"adsrl":["https://developers.vtex.com/updates/release-notes/2026-08-04-vtex-ads-api-reports-rate-limit","Release note: VTEX Ads API Reports rate limit"],"keysint":["https://help.vtex.com/en/docs/tracks/api-keys-for-integrations","Help Center: API keys for integrations"],"o_promo":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api","Promotions & Taxes API: overview"],"o_promo2":["https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api-v2","Promotions & Taxes API v2: overview (coupons)"],"o_gift":["https://developers.vtex.com/docs/api-reference/giftcard-api","Giftcard API: overview"],"o_gifthub":["https://developers.vtex.com/docs/api-reference/giftcard-hub-api","GiftCard Hub API: overview"],"o_search":["https://developers.vtex.com/docs/api-reference/search-api","Legacy Search API: overview"],"o_mktapi":["https://developers.vtex.com/docs/api-reference/marketplace-apis","Marketplace API: overview"],"md1scroll":["https://developers.vtex.com/docs/api-reference/masterdata-api#get-/api/dataentities/-acronym-/scroll","Master Data API v1: Scroll documents"],"is_ps":["https://developers.vtex.com/docs/api-reference/intelligent-search-api#get-/product_search/-facets-","Intelligent Search API (Legacy): Get list of products for a query"],"is_v1mig":["https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1","Guide: Migrating to Intelligent Search API v1"],"sessget":["https://developers.vtex.com/docs/api-reference/session-manager-api#get-/api/sessions","Session Manager API: Get session"],"predroles":["https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy","Help Center: Predefined roles"],"lmroles":["https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc","Help Center: Roles"],"lmres":["https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3","Help Center: License Manager resources"],"lmrolelist":["https://developers.vtex.com/docs/api-reference/license-manager-api#get-/api/license-manager/site/pvt/roles/list/paged","License Manager API: Get list of roles"],"gqlio":["https://developers.vtex.com/docs/guides/graphql-in-vtex-io","Guide: GraphQL in VTEX IO"],"gqlv2":["https://developers.vtex.com/updates/release-notes/2025-09-30-graphql-builder-update-2x","Release note: GraphQL builder 2.x"],"gqldev":["https://developers.vtex.com/docs/guides/developing-a-graphql-api-in-service-apps","Guide: Developing a GraphQL API in service apps"]};
 
 const HN = {"200":"OK","201":"Created","202":"Accepted","204":"No Content","400":"Bad Request","401":"Unauthorized","403":"Forbidden","404":"Not Found","405":"Method Not Allowed","409":"Conflict","429":"Too Many Requests","500":"Internal Server Error"};
 
@@ -7809,6 +7903,9 @@ const APIOV = {"auth":[{"k":"vtex-id","do":"Logowanie użytkowników. Po logowan
 
 /* API Map roles view: exam traps about roles and License Manager resources, t = text, l = DOCS keys. Polish only. */
 const ROLETRAPS = [{"t":"Brak zasobu z tabeli endpointu kończy się kodem **403**.","l":["appkeys"]},{"t":"Wystarczy **jeden** z zasobów wymienionych przy endpoincie.","l":["appkeys"]},{"t":"**Owner (Admin Super)** ma wszystkie zasoby License Manager oprócz `Save user`.","l":["predroles","ownerrole"]},{"t":"Gdy endpoint nie ma roli predefiniowanej, tworzysz **rolę custom** z jednym z jego zasobów.","l":["lmrolelist"]},{"t":"Rola predefiniowana zwykle daje wiele zasobów naraz. Gdy część jest zbędna, lepsza rola custom.","l":["appkeys"]},{"t":"Rolę utworzysz tylko z zasobem `Save access profile`.","l":["lmroles"]},{"t":"Użytkowników z rolą **Owner (Admin Super)** ma być jak najmniej.","l":["lmroles"]},{"t":"Zasób `Renew API Token` leży w License Manager, a endpoint rotacji tokenu w VTEX ID API.","l":["renew"]},{"t":"Nie łącz zasobów call center z innymi zasobami w jednej roli.","l":["predroles"]}];
+
+/* Ściągi › GraphQL: t = lead, s = blocks {h, b?, ol?, tree?, cmp?, l}. Polish only, same fact rule as notes. */
+const GQL = {"t":"GraphQL to język zapytań do API: klient prosi tylko o dane, których potrzebuje. REST zwraca stałą strukturę danych.","s":[{"h":"Pułapki","b":["Builder `graphql` jest potrzebny tylko, gdy aplikacja **tworzy** własne API GraphQL. Do korzystania z gotowego API go nie dodajesz.","Builder `2.x`: każde query i mutation wymaga dyrektywy `@auth` z argumentem `scope`.","`scope` przyjmuje `PUBLIC` albo `PRIVATE`. `PRIVATE` wymaga też `productCode` i `resourceCode`.","Builder `1.x` jest wycofany od 7 stycznia 2026."],"l":["gqlbuild","gqlv2"]},{"h":"Gdzie co leży","tree":[["graphql/","folder w katalogu głównym aplikacji"],["graphql/schema.graphql","tylko endpointy: query, mutation, subscription"],["graphql/directives.graphql","dyrektywy"],["graphql/types/","pozostałe typy, każdy w osobnym pliku"],["node/resolvers/","resolvery"]],"l":["gqlbuild","gqldev"]},{"h":"GraphQL IDE w Adminie","ol":["`vtex install vtex.admin-graphql-ide@3.x`","Admin › **Store Settings** › **Storefront** › **GraphQL IDE**","Z listy **Choose an app** wybierz aplikację, której API chcesz odpytać."],"b":["Ma autouzupełnianie, podświetlanie składni, błędy na bieżąco i eksplorator dokumentacji."],"l":["gqlide"]},{"h":"REST czy GraphQL","cmp":[["Odpowiedź","stała struktura danych","tylko pola, o które prosi klient"],["Gdzie w VTEX","API Reference, zakładka API Map","API aplikacji VTEX IO, test w GraphQL IDE"]],"l":["gqlio","gqlide"]}]};
 
 const Q = [
  {"d":"auth","r":1,"q":"Which HTTP headers authenticate a request to a VTEX API with an application key?","o":["`X-VTEX-API-AppKey`","`X-VTEX-API-AppToken`","`Authorization: Bearer {appToken}`","`X-VTEX-AppSecret`","`X-VTEX-Account`"],"e":"Para **appKey + appToken** idzie w dwóch nagłówkach: `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`.","l":["keys"],"n":2},
@@ -10260,7 +10357,11 @@ function bootApiMap(root, onNav, embed) {
   var SIM_Q = 36,
     SIM_P = 4,
     SIM_MIN = 3;
-  var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
+  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "ustawienia"];
+  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql). */
+  var REFS = ["http", "api", "graphql"];
+  /* Sections of a category; "all" shows only the first two. */
+  var CSECS = ["pytania", "katas", "info", "api", "docs"];
   /* Sections of Postęp; the first one has no hash suffix. */
   var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
@@ -10300,6 +10401,7 @@ function bootApiMap(root, onNav, embed) {
     fans: {},
     ptxt: {},
     fo: { deck: "all", flt: "all", shuf: 0, id: "", dom: "all" },
+    ref: "http",
     theme: "auto",
     days: {},
     tday: { d: "", ids: {} },
@@ -10629,6 +10731,7 @@ function bootApiMap(root, onNav, embed) {
       if (raw.simPrac === false) S.simPrac = false;
       if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
       if (raw.lang === "en") S.lang = "en";
+      if (REFS.indexOf(raw.ref) > -1) S.ref = raw.ref;
       if (raw.days && typeof raw.days === "object" && !Array.isArray(raw.days)) {
         Object.keys(raw.days).forEach(function (k) {
           var n = raw.days[k] >>> 0;
@@ -11445,13 +11548,14 @@ function bootApiMap(root, onNav, embed) {
     CATAPI_D = null;
   function renderCat() {
     var all = S.dom === "all",
-      sec = all ? "pytania" : NAV.cur.sec || "pytania";
-    $("#ctabs").hidden = all;
-    ["pytania", "info", "api", "docs"].forEach(function (k) {
+      sec = NAV.cur.sec || "pytania";
+    CSECS.forEach(function (k, i) {
       $("#cs-" + k).hidden = k !== sec;
+      $("#ct-" + k).hidden = all && i > 1;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
+    paintKataTab();
     $("#ct-docs").innerHTML =
       '<span class="ctab-l">' +
       L("Dokumentacja", "Docs") +
@@ -11467,6 +11571,7 @@ function bootApiMap(root, onNav, embed) {
     if (sec === "api") renderCatApi(S.dom);
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
     if (sec === "info") renderInfo(S.dom);
+    if (sec === "katas") renderF();
   }
   /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
   /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.
@@ -11729,7 +11834,11 @@ function bootApiMap(root, onNav, embed) {
   $("#ctabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".ctab");
     if (!b || b.getAttribute("aria-selected") === "true") return;
-    go({ tab: "pytania", cat: S.dom, sec: b.dataset.sec === "pytania" ? undefined : b.dataset.sec });
+    go({
+      tab: "pytania",
+      cat: S.dom === "all" ? undefined : S.dom,
+      sec: b.dataset.sec === "pytania" ? undefined : b.dataset.sec
+    });
   });
   $("#ptabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".ctab");
@@ -11738,9 +11847,14 @@ function bootApiMap(root, onNav, embed) {
   });
   /* Tabs pattern: arrows move between sections, only the selected tab is in the Tab order. */
   $("#ptabs").addEventListener("keydown", tabKeys);
+  $("#rtabs").addEventListener("keydown", tabKeys);
+  $("#rtabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".ctab");
+    if (b && b.getAttribute("aria-selected") !== "true") go({ tab: b.dataset.rtab });
+  });
   $("#ctabs").addEventListener("keydown", tabKeys);
   function tabKeys(ev) {
-    var tabs = [].slice.call(ev.currentTarget.querySelectorAll(".ctab")),
+    var tabs = [].slice.call(ev.currentTarget.querySelectorAll(".ctab:not([hidden])")),
       at = tabs.indexOf(ev.target);
     var k = ev.key,
       to =
@@ -12816,9 +12930,11 @@ function bootApiMap(root, onNav, embed) {
 
   /* ---------- Fiszki ---------- */
   function renderF() {
-    $("#flist").innerHTML = F.map(function (f, i) {
+    var html = "";
+    F.forEach(function (f, i) {
+      if (S.dom !== "all" && f.d !== S.dom) return;
       var n = i + 1;
-      return (
+      html +=
         '<article class="fc' +
         (S.fknown[i] ? " is-known" : "") +
         '" id="f-' +
@@ -12856,16 +12972,28 @@ function bootApiMap(root, onNav, embed) {
         fmt(f.a) +
         docLinks(f) +
         httpChips(f) +
-        "</div></article>"
-      );
-    }).join("");
+        "</div></article>";
+    });
+    $("#flist").innerHTML =
+      html || '<p class="empty">' + L("Ta kategoria nie ma jeszcze katas.", "This category has no katas yet.") + "</p>";
     fSync();
   }
   function fSync() {
-    var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length;
-    $("#f-show-all").disabled = n === F.length;
+    var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length,
+      all = document.querySelectorAll("#flist .rev").length;
+    $("#f-show-all").disabled = n === all;
     $("#f-hide-all").disabled = !n;
-    $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + F.length;
+    $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + all;
+  }
+  function paintKataTab() {
+    var k = 0,
+      t = 0;
+    F.forEach(function (f, i) {
+      if (S.dom !== "all" && f.d !== S.dom) return;
+      t++;
+      if (S.fknown[i]) k++;
+    });
+    $("#ct-katas").innerHTML = "Katas" + (t ? ' <span class="num">' + k + "/" + t + "</span>" : "");
   }
   function setAll(open) {
     document.querySelectorAll("#flist .rev").forEach(function (b) {
@@ -12893,6 +13021,7 @@ function bootApiMap(root, onNav, embed) {
     else delete S.fknown[i];
     save();
     card.classList.toggle("is-known", !!S.fknown[i]);
+    paintKataTab();
     header();
   });
   /* The pressed button disables itself, so focus moves to its twin instead of falling to <body>. */
@@ -14926,14 +15055,14 @@ function bootApiMap(root, onNav, embed) {
     if (el) el.focus({ preventScroll: true });
   }
   function enterFocus(from) {
-    var flash = from === "fiszki";
-    /* From a category the deck holds only that category; from the flashcard list it spans all of them. */
-    S.fo.dom = flash ? "all" : S.dom;
+    var flash = from === "pytania" && NAV.cur.sec === "katas";
+    /* The deck holds what the list showed: the open category, questions or katas. */
+    S.fo.dom = S.dom;
     if (S.fo.deck !== "all" && (S.fo.deck === "q") === flash) S.fo.deck = flash ? "f" : "q";
     var strict = fDeck(null),
       c = BY_ID[S.fo.id];
     function fits(x) {
-      return (x.t === "q") !== flash && (flash || S.dom === "all" || x.d === S.dom);
+      return (x.t === "q") !== flash && (S.dom === "all" || x.d === S.dom);
     }
     if (!(c && strict.indexOf(c) > -1 && fits(c))) c = strict.filter(fits)[0] || strict[0];
     go({ tab: "focus", id: c ? c.id : "" });
@@ -14962,7 +15091,7 @@ function bootApiMap(root, onNav, embed) {
   function exitFocus() {
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
-    go(flash ? { tab: "fiszki" } : { tab: "pytania", cat: S.fo.dom === "all" ? undefined : S.fo.dom });
+    go({ tab: "pytania", cat: S.fo.dom === "all" ? undefined : S.fo.dom, sec: flash ? "katas" : undefined });
     var el = c && document.getElementById((flash ? "f-" : "q-") + (c.i + 1));
     if (el && !el.hidden) {
       el.scrollIntoView({ block: "center" });
@@ -15275,6 +15404,70 @@ function bootApiMap(root, onNav, embed) {
     }
     kotyTop();
   }
+  /* ---------- Ściągi › GraphQL: static cards from GQL, redrawn only when the language changes ---------- */
+  function renderGql() {
+    var el = $("#p-graphql");
+    if (el.dataset.k === S.lang) return;
+    el.dataset.k = S.lang;
+    el.innerHTML =
+      "<div><h2>" +
+      L("GraphQL w VTEX IO", "GraphQL in VTEX IO") +
+      '</h2><p class="lead">' +
+      fmt(GQL.t) +
+      " " +
+      L("Endpointy REST są w ", "REST endpoints are in ") +
+      '<a data-nav href="#api">API Map</a>.</p></div><div class="gql-grid">' +
+      GQL.s
+        .map(function (x) {
+          return (
+            '<section class="card gql-b' +
+            (x.h === "Pułapki" ? " trap" : "") +
+            '"><h3>' +
+            esc(x.h) +
+            "</h3>" +
+            (x.ol
+              ? "<ol>" +
+                x.ol
+                  .map(function (y) {
+                    return "<li>" + fmt(y) + "</li>";
+                  })
+                  .join("") +
+                "</ol>"
+              : "") +
+            (x.b ? noteList(x.b) : "") +
+            (x.tree
+              ? '<dl class="gql-tree">' +
+                x.tree
+                  .map(function (y) {
+                    return "<dt><code>" + esc(y[0]) + "</code></dt><dd>" + fmt(y[1]) + "</dd>";
+                  })
+                  .join("") +
+                "</dl>"
+              : "") +
+            (x.cmp
+              ? '<div class="tblwrap"><table class="gql-cmp"><thead><tr><td></td><th scope="col">REST</th><th scope="col">GraphQL</th></tr></thead><tbody>' +
+                x.cmp
+                  .map(function (y) {
+                    return (
+                      '<tr><th scope="row">' +
+                      fmt(y[0]) +
+                      "</th><td>" +
+                      fmt(y[1]) +
+                      "</td><td>" +
+                      fmt(y[2]) +
+                      "</td></tr>"
+                    );
+                  })
+                  .join("") +
+                "</tbody></table></div>"
+              : "") +
+            docLinks(x) +
+            "</section>"
+          );
+        })
+        .join("") +
+      "</div>";
+  }
   /* ---------- VTEX API Map view ---------- */
   var APIM = null;
   function openApiMap() {
@@ -15326,7 +15519,7 @@ function bootApiMap(root, onNav, embed) {
   /* ---------- navigation ----------
      Each tab, HTTP Koty module, jumped-to status code, simulator card and Focus card is a history entry, so the
      browser's Back and Forward move between them and return to the same scroll position. The hash stays a bare
-     token (#fiszki, #http-kody, #symulacja-12, #focus-q12, #pytania-catalog-docs-skus); everything else rides in history.state. */
+     token (#pytania-katas, #http-kody, #symulacja-12, #focus-q12, #pytania-catalog-docs-skus); everything else rides in history.state. */
   var NAV = { cur: { tab: "pytania", i: 0 }, prev: null, ok: true, mute: false, t: null };
   try {
     history.scrollRestoration = "manual";
@@ -15340,10 +15533,13 @@ function bootApiMap(root, onNav, embed) {
     if (r.tab === "postep" && r.sub && r.sub !== PSECS[0]) return "postep-" + r.sub;
     if (r.tab === "pytania" && r.cat)
       return "pytania-" + r.cat + (r.sec ? "-" + r.sec + (r.sec === "docs" && r.doc ? "-" + r.doc : "") : "");
+    if (r.tab === "pytania" && r.sec === "katas") return "pytania-katas";
     return r.tab;
   }
   function parseHash(h) {
     var m = /^#?([a-z]+)(?:-([a-z0-9_-]+))?$/.exec(h || "");
+    /* Katas used to be a tab of their own: old links open them inside Pytania. */
+    if (m && m[1] === "fiszki") return { tab: "pytania", sec: "katas" };
     if (!m || VIEWS.indexOf(m[1]) < 0) return { tab: "pytania" };
     var r = { tab: m[1] };
     if (m[2] && (r.tab === "http" || r.tab === "api")) r.sub = m[2];
@@ -15352,9 +15548,10 @@ function bootApiMap(root, onNav, embed) {
     if (m[2] && r.tab === "postep" && PSECS.indexOf(m[2]) > 0) r.sub = m[2];
     if (m[2] && r.tab === "pytania") {
       var p = m[2].split("-");
+      if (p[0] === "katas") r.sec = "katas";
       if (DOM_NAME[p[0]]) {
         r.cat = p[0];
-        if (p[1] === "api" || p[1] === "docs" || p[1] === "info") r.sec = p[1];
+        if (CSECS.indexOf(p[1]) > 0) r.sec = p[1];
         if (r.sec === "docs" && p[2]) r.doc = p.slice(2).join("-");
       }
     }
@@ -15397,13 +15594,33 @@ function bootApiMap(root, onNav, embed) {
     NAV.ok = writeState(r, !replace);
   }
   function apply(r, restore) {
-    var tab = VIEWS.indexOf(r.tab) < 0 ? "pytania" : r.tab;
+    if (r.tab === "fiszki") {
+      r.tab = "pytania";
+      r.sec = "katas";
+      delete r.cat;
+    }
+    var tab = VIEWS.indexOf(r.tab) < 0 ? "pytania" : r.tab,
+      ref = REFS.indexOf(tab) > -1;
     r.tab = tab;
     TABS.forEach(function (t) {
       $("#p-" + t).hidden = t !== tab;
       var tb = $("#t-" + t);
       if (tb) tb.setAttribute("aria-selected", t === tab);
     });
+    $("#t-ref").setAttribute("aria-selected", ref);
+    $("#t-pytania .num").textContent = Q.length;
+    $("#rtabs").hidden = !ref;
+    if (ref) {
+      REFS.forEach(function (k) {
+        $("#rt-" + k).setAttribute("aria-selected", k === tab);
+        $("#rt-" + k).tabIndex = k === tab ? 0 : -1;
+      });
+      $("#t-ref").setAttribute("aria-controls", "p-" + tab);
+      if (S.ref !== tab) {
+        S.ref = tab;
+        save();
+      }
+    }
     $("#p-focus").hidden = tab !== "focus";
     /* Focus reuses the list's card markup and ids, so only one of the two is ever in the document. */
     if (tab !== "focus") $("#focusroot").innerHTML = "";
@@ -15415,9 +15632,8 @@ function bootApiMap(root, onNav, embed) {
       /* history.state is stored data: keep only a known category and section. */
       if (!DOM_NAME[r.cat]) {
         delete r.cat;
-        delete r.sec;
       }
-      if (r.sec !== "api" && r.sec !== "docs" && r.sec !== "info") delete r.sec;
+      if (r.cat ? CSECS.indexOf(r.sec) < 1 : r.sec !== "katas") delete r.sec;
       if (r.sec !== "docs" || !/^[a-z0-9_-]+$/.test(r.doc || "")) delete r.doc;
       if (r.doc !== "ep" || !EP_URL.test(r.url || "")) {
         delete r.url;
@@ -15444,8 +15660,7 @@ function bootApiMap(root, onNav, embed) {
       }
       ARM = null;
       renderSim();
-    } else if (tab === "fiszki") renderF();
-    else if (tab === "focus") {
+    } else if (tab === "focus") {
       $("#qlist").innerHTML = "";
       $("#flist").innerHTML = "";
       if (!BY_ID[r.id]) r.id = fResume();
@@ -15473,7 +15688,8 @@ function bootApiMap(root, onNav, embed) {
       openApiMap();
       if (r.sub) APIM.show(r.sub);
       r.sub = APIM.api();
-    } else if (tab === "ustawienia") renderSettings();
+    } else if (tab === "graphql") renderGql();
+    else if (tab === "ustawienia") renderSettings();
     else {
       if (PSECS.indexOf(r.sub) < 1) delete r.sub;
       var ps = r.sub || PSECS[0];
@@ -15583,9 +15799,10 @@ function bootApiMap(root, onNav, embed) {
   });
 
   document.querySelector(".tabs").addEventListener("click", function (ev) {
-    var b = ev.target.closest(".tab");
-    if (b && b.dataset.tab !== CUR)
-      go(b.dataset.tab === "pytania" && S.dom !== "all" ? { tab: "pytania", cat: S.dom } : { tab: b.dataset.tab });
+    var b = ev.target.closest(".tab"),
+      t = b && (b.dataset.tab === "ref" ? S.ref : b.dataset.tab);
+    if (b && t !== CUR && !(b.dataset.tab === "ref" && REFS.indexOf(CUR) > -1))
+      go(t === "pytania" && S.dom !== "all" ? { tab: "pytania", cat: S.dom } : { tab: t });
     else if (b) window.scrollTo(0, 0);
   });
 
