@@ -5171,13 +5171,18 @@
       });
     return x;
   }
+  function gsMask(nt, words) {
+    var on = [];
+    words.forEach(function (w) {
+      for (var at = nt.indexOf(w); at > -1; at = nt.indexOf(w, at + 1))
+        for (var i = at; i < at + w.length; i++) on[i] = 1;
+    });
+    return on;
+  }
   function gsMark(text, nt, words) {
-    var on = [],
+    var on = gsMask(nt, words),
       out = "",
       i;
-    words.forEach(function (w) {
-      for (var at = nt.indexOf(w); at > -1; at = nt.indexOf(w, at + 1)) for (i = at; i < at + w.length; i++) on[i] = 1;
-    });
     for (i = 0; i < text.length;) {
       var j = i;
       while (j < text.length && !!on[j] === !!on[i]) j++;
@@ -5276,7 +5281,89 @@
     gsQ.select();
     gsRender();
   }
+  /* Like a header link into a long article: the jump lands on the hit, tints it and the query's words, then fades. */
+  var GS_LIT = { el: null, t: 0 },
+    CALM = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function gsUnlit() {
+    clearTimeout(GS_LIT.t);
+    var el = GS_LIT.el;
+    if (!el) return;
+    GS_LIT.el = null;
+    el.classList.remove("gs-spot");
+    Array.prototype.forEach.call(el.querySelectorAll("mark.gs-hit"), function (m) {
+      var p = m.parentNode;
+      p.replaceChild(document.createTextNode(m.textContent), m);
+      p.normalize();
+    });
+  }
+  /* Wraps matches in text nodes only, so markup and handlers inside the hit stay as they were. */
+  function gsHits(root, words) {
+    var tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT),
+      ts = [],
+      t;
+    while ((t = tw.nextNode())) ts.push(t);
+    ts.forEach(function (t) {
+      var s = t.data,
+        on = gsMask(gsNorm(s), words),
+        f = document.createDocumentFragment(),
+        any = false,
+        i,
+        j;
+      for (i = 0; i < s.length; i = j) {
+        for (j = i; j < s.length && !!on[j] === !!on[i]; j++);
+        var tx = document.createTextNode(s.slice(i, j));
+        if (on[i]) {
+          var m = document.createElement("mark");
+          m.className = "gs-hit";
+          m.appendChild(tx);
+          f.appendChild(m);
+          any = true;
+        } else f.appendChild(tx);
+      }
+      if (any) t.parentNode.replaceChild(f, t);
+    });
+  }
+  function gsLight(el, words, where) {
+    gsUnlit();
+    if (!el) return;
+    for (var p = el; p; p = p.parentElement) if (p.tagName === "DETAILS") p.open = true;
+    Array.prototype.forEach.call(where || [el], function (w) {
+      gsHits(w, words);
+    });
+    el.classList.add("gs-spot");
+    GS_LIT.el = el;
+    el.scrollIntoView({ block: "center", behavior: CALM.matches ? "auto" : "smooth" });
+    if (!el.matches("button, a[href], input, textarea, [tabindex]")) el.setAttribute("tabindex", "-1");
+    el.focus({ preventScroll: true });
+    GS_LIT.t = setTimeout(gsUnlit, 3500);
+  }
+  /* The bullet a note hit came from: the TL;DR above the tabs, or a block found by its heading. */
+  function gsNote(x) {
+    var box = x.d === "all" ? $("#cat-tldr .basics") : x.h === "TL;DR" ? $("#cat-tldr .tldr") : $("#cs-info");
+    if (!box) return null;
+    var blk =
+      x.h === "TL;DR"
+        ? box
+        : Array.prototype.filter.call(box.querySelectorAll(".note"), function (n) {
+            return n.querySelector("summary span").textContent === x.h;
+          })[0];
+    if (!blk) return null;
+    var lis = blk.querySelectorAll(x.d === "all" && x.h === "TL;DR" ? ":scope > ul > li" : "li");
+    return (
+      Array.prototype.filter.call(lis, function (li) {
+        return gsPlain(li.textContent) === x.text;
+      })[0] || blk
+    );
+  }
   function gsGo(x) {
+    var words = gsNorm(gsQ.value.trim()).split(/\s+/).filter(Boolean),
+      long = words.filter(function (w) {
+        return w.length > 3;
+      }),
+      el = null,
+      where;
+    /* "What is the orderForm" should tint orderForm, not every "is" on the card. */
+    if (long.length) words = long;
     gsDlg.close();
     if (x.g === "q" || x.g === "f") {
       var c = BY_ID[x.id];
@@ -5286,11 +5373,22 @@
       if (!inSet(c)) S.set = "all";
       save();
       go({ tab: "focus", id: c.id });
-    } else if (x.g === "n") go(x.d === "all" ? { tab: "pytania" } : { tab: "pytania", cat: x.d, sec: "info" });
-    else {
+      /* Only the question is tinted: a mark on an option would give the answer away. */
+      el = $("#focusroot article");
+      if (el) where = el.querySelectorAll(".qt, .fq");
+    } else if (x.g === "n") {
+      go(x.d === "all" ? { tab: "pytania" } : { tab: "pytania", cat: x.d, sec: "info" });
+      el = gsNote(x);
+    } else {
       go({ tab: "api", sub: x.k });
-      if (APIM) APIM.query(x.p);
+      if (APIM) {
+        APIM.query(x.p);
+        el = APIM.reveal(x.m, x.p);
+        /* The map already marks the query in its own results. */
+        where = [];
+      }
     }
+    gsLight(el, words, where);
   }
   $("#gs-open").addEventListener("click", gsOpen);
   $("#gs-close").addEventListener("click", function () {

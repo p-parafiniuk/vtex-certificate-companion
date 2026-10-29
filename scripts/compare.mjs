@@ -5,6 +5,7 @@
    [{ "board": "Main", "hash": "pytania-pricing-api", "w": 1280, "h": 1040, "theme": "light",
       "click": ["#catapi #view [data-v=\"list\"]"], "top": "#catapi #stats", "dy": -330 }]
    click: selectors clicked in order (they pierce shadow roots); type: [selector, text] filled after the clicks;
+   then: selectors clicked after the typing (a search result, say);
    top: scrolled to the top of the viewport, then by dy.
    storage: an object put into localStorage before the app boots, { "<key>": <JSON value> }, for states no
    click reaches (a finished simulation, saved progress).
@@ -90,6 +91,10 @@ for (const s of specs) {
   if (s.type) {
     await a.locator(s.type[0]).first().fill(s.type[1]);
     await a.waitForTimeout(250);
+  }
+  for (const c of s.then || []) {
+    await a.locator(c).first().click();
+    await a.waitForTimeout(700);
   }
   if (s.top)
     await a
