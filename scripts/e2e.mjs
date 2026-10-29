@@ -156,7 +156,17 @@ let lastDraw;
 }
 
 /* Every tab, phone and desktop, light and dark, plus English on the phone. */
-const tabs = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
+const tabs = [
+  "pytania",
+  "symulacja",
+  "pytania-katas",
+  "pytania-catalog-katas",
+  "postep",
+  "http",
+  "api",
+  "graphql",
+  "ustawienia"
+];
 for (const h of tabs)
   for (const [w, theme, lang] of [
     [375, "dark"],

@@ -2606,8 +2606,93 @@ kbd {
   --font-mono: var(--f-mono);
 }
 body[data-view="http"] .pcard,
-body[data-view="api"] .pcard {
+body[data-view="api"] .pcard,
+body[data-view="graphql"] .pcard {
   display: none;
+}
+/* Ściągi: the sub-tab strip sits above HTTP Koty, API Map and GraphQL, which start right under the bar. */
+.rtabs {
+  margin-top: 16px;
+}
+@media (max-width: 520px) {
+  .rtabs .ctab {
+    flex: 1 0 auto;
+  }
+}
+.rtabs .ctab-l {
+  font-weight: 400;
+  color: var(--muted);
+}
+body[data-view="graphql"] .wrap {
+  max-width: 1040px;
+}
+.gql-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+.gql-b.trap {
+  grid-column: 1 / -1;
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.gql-b.trap h3 {
+  color: var(--accent);
+}
+.gql-b ul,
+.gql-b ol {
+  margin: 0;
+  padding-left: 1.15em;
+  display: grid;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+.gql-b .doc {
+  margin: 0;
+}
+.gql-tree {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--code);
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  font-size: 0.9rem;
+}
+.gql-tree dt code {
+  background: none;
+  padding: 0;
+}
+.gql-tree dd {
+  margin: 0;
+  color: var(--muted);
+}
+@media (max-width: 520px) {
+  .gql-tree {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .gql-tree dd {
+    margin-bottom: 8px;
+  }
+}
+.gql-cmp {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.gql-cmp th,
+.gql-cmp td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 8px 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.gql-cmp tbody th {
+  font-weight: 500;
+  color: var(--muted);
 }
 body[data-view="http"] .wrap,
 body[data-view="api"] .wrap {
@@ -3897,4 +3982,12 @@ div.setrow {
 .rv-miss .linkbtn {
   font-family: var(--f-mono);
   font-weight: 700;
+}
+.gql-b .tblwrap {
+  overflow-x: auto;
+}
+/* Katas inside a category: the controls repeat on every card, so they keep a full touch target. */
+#cs-katas .f-all,
+#flist .rev {
+  min-height: 44px;
 }
