@@ -6,6 +6,8 @@
     SIM_P = 4,
     SIM_MIN = 3;
   var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
+  /* Sections of Postęp; the first one has no hash suffix. */
+  var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
   var LET = "ABCDEFG";
   /* No prototype: keys come from the URL and storage, and "constructor" must not count as a category. */
@@ -1474,9 +1476,16 @@
     if (!b || b.getAttribute("aria-selected") === "true") return;
     go({ tab: "pytania", cat: S.dom, sec: b.dataset.sec === "pytania" ? undefined : b.dataset.sec });
   });
+  $("#ptabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".ctab");
+    if (!b || b.getAttribute("aria-selected") === "true") return;
+    go({ tab: "postep", sub: b.dataset.psec === PSECS[0] ? undefined : b.dataset.psec });
+  });
   /* Tabs pattern: arrows move between sections, only the selected tab is in the Tab order. */
-  $("#ctabs").addEventListener("keydown", function (ev) {
-    var tabs = [].slice.call(document.querySelectorAll("#ctabs .ctab")),
+  $("#ptabs").addEventListener("keydown", tabKeys);
+  $("#ctabs").addEventListener("keydown", tabKeys);
+  function tabKeys(ev) {
+    var tabs = [].slice.call(ev.currentTarget.querySelectorAll(".ctab")),
       at = tabs.indexOf(ev.target);
     var k = ev.key,
       to =
@@ -1494,7 +1503,7 @@
     var t = tabs[(to + tabs.length) % tabs.length];
     t.click();
     t.focus();
-  });
+  }
   /* In-app links (side panel, docs list) are real hrefs, so a new tab or a copied link opens the same view. */
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest ? ev.target.closest("a[data-nav]") : null;
@@ -2974,7 +2983,7 @@
           ? T(b.d) + L(" (i " + (fresh.length - 1) + " więcej)", " (and " + (fresh.length - 1) + " more)")
           : T(b.d)
       ) +
-      '</span></span><button type="button" class="linkbtn" data-go="postep">' +
+      '</span></span><button type="button" class="linkbtn" data-go="postep" data-go-sub="odznaki">' +
       L("Zobacz", "View") +
       "</button>" +
       '<button type="button" class="toast-x" aria-label="' +
@@ -3263,8 +3272,8 @@
       S.comboBest +
       "</small></summary><p>" +
       L(
-        "Combo liczy <strong>dobre odpowiedzi z rzędu</strong> w nauce: na liście pytań i w Focus, także ocenę katas. Symulacja się nie liczy. Jedna zła odpowiedź zeruje licznik. Karta liczy się raz dziennie, więc powtórka tej samej karty ani nie podbija, ani nie zrywa combo. Od 3 z rzędu Focus pokazuje <strong>Combo ×N</strong>. Odznaki liczą Twój rekord.",
-        "Combo counts <strong>right answers in a row</strong> while you study: in the question list and in Focus, katas you grade included. The simulation does not count. One wrong answer resets it. A card counts once a day, so repeating the same card neither raises nor breaks the combo. From 3 in a row Focus shows <strong>Combo ×N</strong>. The badges use your best run."
+        "<strong>Dobre odpowiedzi z rzędu</strong> na liście pytań i w Focus (z oceną katas, bez symulacji). Zła odpowiedź zeruje licznik. Karta liczy się raz dziennie. Od 3 z rzędu Focus pokazuje <strong>Combo ×N</strong>. Odznaki liczą rekord.",
+        "<strong>Right answers in a row</strong> in the question list and in Focus (graded katas too, not the simulation). A wrong answer resets it. A card counts once a day. From 3 in a row Focus shows <strong>Combo ×N</strong>. Badges use your best run."
       ) +
       "</p></details>"
     );
@@ -3428,7 +3437,7 @@
     var b = ev.target.closest ? ev.target.closest("[data-go], [data-go-dom]") : null;
     if (!b) return;
     if (b.dataset.goDom && DOM_NAME[b.dataset.goDom]) go({ tab: "pytania", cat: b.dataset.goDom });
-    else if (TABS.indexOf(b.dataset.go) > -1) go({ tab: b.dataset.go });
+    else if (TABS.indexOf(b.dataset.go) > -1) go({ tab: b.dataset.go, sub: b.dataset.goSub });
     if (b.closest("#gx-toast")) $("#gx-toast").hidden = true;
   });
 
@@ -3636,11 +3645,34 @@
         );
       }).join("");
     paintTotal(c);
+    paintPtabs(c);
+    $("#pk-q").textContent = L("Pytania 1–", "Questions 1–") + Q.length;
+    $("#pk-f").textContent = "Katas 1–" + F.length;
     $("#hist").innerHTML = S.sims.length
       ? S.sims.map(simLine).join("")
       : "<li>" +
         L("Jeszcze żadnej. Uruchom ją w zakładce Symulacja.", "None yet. Start one in the Simulation tab.") +
         "</li>";
+  }
+  function paintPtabs(c) {
+    var o = overall(c),
+      best = null;
+    S.sims.forEach(function (x) {
+      var v = x.s / (x.n || SIM_Q);
+      if (best === null || v > best) best = v;
+    });
+    [
+      ["przeglad", gxCtx(c).ready || "", 80],
+      ["odznaki", badgesGot() + "/" + BADGES.length, badgesGot() === BADGES.length],
+      ["wynik", o.total ? Math.round((o.done / o.total) * 100) + "%" : "", o.total && o.done === o.total],
+      ["karty", c.kq + c.kf + "/" + (Q.length + F.length), c.kq + c.kf === Q.length + F.length],
+      ["symulacje", best === null ? "" : Math.round(best * 100) + "%", best !== null && best >= 0.8]
+    ].forEach(function (x) {
+      var el = $("#pp-" + x[0]),
+        ok = x[2] === 80 ? x[1] >= 80 : x[2];
+      el.textContent = x[1];
+      el.className = "pill" + (ok ? " ok" : "");
+    });
   }
   function paintTotal(c) {
     var o = overall(c),
@@ -5050,6 +5082,7 @@
     if ((r.tab === "http" || r.tab === "api") && r.sub) return r.tab + "-" + r.sub;
     if (r.tab === "symulacja" && r.pos !== undefined) return "symulacja-" + (r.pos + 1);
     if (r.tab === "focus" && r.id) return "focus-" + r.id;
+    if (r.tab === "postep" && r.sub && r.sub !== PSECS[0]) return "postep-" + r.sub;
     if (r.tab === "pytania" && r.cat)
       return "pytania-" + r.cat + (r.sec ? "-" + r.sec + (r.sec === "docs" && r.doc ? "-" + r.doc : "") : "");
     return r.tab;
@@ -5061,6 +5094,7 @@
     if (m[2] && (r.tab === "http" || r.tab === "api")) r.sub = m[2];
     if (m[2] && r.tab === "symulacja" && +m[2] > 0) r.pos = +m[2] - 1;
     if (m[2] && r.tab === "focus") r.id = m[2];
+    if (m[2] && r.tab === "postep" && PSECS.indexOf(m[2]) > 0) r.sub = m[2];
     if (m[2] && r.tab === "pytania") {
       var p = m[2].split("-");
       if (DOM_NAME[p[0]]) {
@@ -5186,8 +5220,19 @@
       r.sub = APIM.api();
     } else if (tab === "ustawienia") renderSettings();
     else {
+      if (PSECS.indexOf(r.sub) < 1) delete r.sub;
+      var ps = r.sub || PSECS[0];
+      PSECS.forEach(function (k) {
+        $("#ps-" + k).hidden = k !== ps;
+        $("#pt-" + k).setAttribute("aria-selected", k === ps);
+        $("#pt-" + k).tabIndex = k === ps ? 0 : -1;
+      });
       renderStats();
       renderGrids();
+      /* On a phone the strip scrolls sideways: keep the open section's tab in sight (after the pills widen it). */
+      var pst = $("#ptabs"),
+        pb = $("#pt-" + ps).getBoundingClientRect();
+      pst.scrollLeft += pb.left - pst.getBoundingClientRect().left - (pst.clientWidth - pb.width) / 2;
     }
     paintBack();
   }

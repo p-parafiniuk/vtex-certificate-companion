@@ -2758,6 +2758,18 @@ body[data-view="pytania"] .wrap {
 .ctab .num {
   margin-left: 2px;
 }
+/* Postęp sections: same tab strip as a category, each tab carries its completion state. */
+.psec {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.ptabs .pill {
+  margin-left: 4px;
+}
+.ptabs .pill:empty {
+  display: none;
+}
 .ctab-s {
   display: none;
 }
@@ -3289,9 +3301,19 @@ body[data-view="pytania"] .wrap {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
   gap: 8px;
 }
+/* Phone: one badge per row, so the tier, name and progress read without wrapping word by word. */
 @media (max-width: 480px) {
   .badges {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    text-align: center;
+  }
+  .tiers li {
+    flex-direction: column;
+    gap: 3px;
   }
 }
 .badge {
@@ -3328,6 +3350,9 @@ body[data-view="pytania"] .wrap {
   grid-column: 1 / -1;
   border: 1px dashed var(--tc);
 }
+.badge.plat .meter i {
+  background: var(--tc);
+}
 .badge.plat.on {
   border-style: solid;
   background: var(--tc-soft);
@@ -3351,6 +3376,7 @@ body[data-view="pytania"] .wrap {
   color: var(--tc);
 }
 .badge-t {
+  flex: 1;
   min-width: 0;
   display: grid;
 }

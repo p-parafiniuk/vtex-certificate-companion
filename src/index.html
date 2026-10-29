@@ -109,31 +109,48 @@
   </section>
 
   <section class="panel" id="p-postep" role="tabpanel" aria-labelledby="t-postep" hidden>
-    <div class="gx-cards">
-      <section class="card" id="gx-ready" aria-labelledby="gx-ready-h"></section>
-      <section class="card" id="gx-days" aria-labelledby="gx-days-h"></section>
+    <div class="ctabs ptabs" id="ptabs" role="tablist" aria-label="Sekcje postępu" data-en-aria="Progress sections">
+      <button type="button" class="ctab" role="tab" id="pt-przeglad" data-psec="przeglad" aria-controls="ps-przeglad"><span data-en="Overview">Przegląd</span> <span class="pill" id="pp-przeglad"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-odznaki" data-psec="odznaki" aria-controls="ps-odznaki"><span data-en="Badges">Odznaki</span> <span class="pill" id="pp-odznaki"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-wynik" data-psec="wynik" aria-controls="ps-wynik"><span class="ctab-l" data-en="Score and areas">Wynik i obszary</span><span class="ctab-s" data-en="Score">Wynik</span> <span class="pill" id="pp-wynik"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-karty" data-psec="karty" aria-controls="ps-karty"><span data-en="Cards">Karty</span> <span class="pill" id="pp-karty"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-symulacje" data-psec="symulacje" aria-controls="ps-symulacje"><span data-en="Simulations">Symulacje</span> <span class="pill" id="pp-symulacje"></span></button>
     </div>
-    <div class="gx-cards">
-      <section class="card" id="rv-box" aria-labelledby="rv-box-h"></section>
-      <section class="card" id="rv-cal" aria-labelledby="rv-cal-h"></section>
+    <div class="psec" id="ps-przeglad" role="tabpanel" aria-labelledby="pt-przeglad">
+      <div class="gx-cards">
+        <section class="card" id="gx-ready" aria-labelledby="gx-ready-h"></section>
+        <section class="card" id="gx-days" aria-labelledby="gx-days-h"></section>
+      </div>
+      <div class="gx-cards">
+        <section class="card" id="rv-box" aria-labelledby="rv-box-h"></section>
+        <section class="card" id="rv-cal" aria-labelledby="rv-cal-h"></section>
+      </div>
     </div>
-    <section class="card" id="gx-badges" aria-labelledby="gx-badges-h"></section>
-    <section class="card" id="gx-total" aria-labelledby="gx-total-h"></section>
-    <dl class="stats" id="stats"></dl>
-    <h3 data-en="Areas">Obszary</h3>
-    <div class="domrows" id="domrows"></div>
-    <h3 data-en="Questions 1–161">Pytania 1–161</h3>
-    <ul class="legend">
-      <li><span class="sw k"></span><span data-en="mastered">opanowane</span></li>
-      <li><span class="sw r"></span><span data-en="last answer right">ostatnio dobrze</span></li>
-      <li><span class="sw w"></span><span data-en="last answer wrong">ostatnio źle</span></li>
-      <li><span class="sw"></span><span data-en="untouched">nieruszone</span></li>
-    </ul>
-    <div class="grid" id="qgrid"></div>
-    <h3 data-en="Katas 1–35">Katas 1–35</h3>
-    <div class="grid" id="fgrid"></div>
-    <h3 data-en="Recent simulations">Ostatnie symulacje</h3>
-    <ul class="hist" id="hist"></ul>
+    <div class="psec" id="ps-odznaki" role="tabpanel" aria-labelledby="pt-odznaki">
+      <section class="card" id="gx-badges" aria-labelledby="gx-badges-h"></section>
+    </div>
+    <div class="psec" id="ps-wynik" role="tabpanel" aria-labelledby="pt-wynik">
+      <section class="card" id="gx-total" aria-labelledby="gx-total-h"></section>
+      <dl class="stats" id="stats"></dl>
+      <h3 data-en="Areas">Obszary</h3>
+      <div class="domrows" id="domrows"></div>
+    </div>
+    <div class="psec" id="ps-karty" role="tabpanel" aria-labelledby="pt-karty">
+      <h3 id="pk-q">Pytania</h3>
+      <ul class="legend">
+        <li><span class="sw k"></span><span data-en="mastered">opanowane</span></li>
+        <li><span class="sw r"></span><span data-en="last answer right">ostatnio dobrze</span></li>
+        <li><span class="sw w"></span><span data-en="last answer wrong">ostatnio źle</span></li>
+        <li><span class="sw"></span><span data-en="untouched">nieruszone</span></li>
+      </ul>
+      <div class="grid" id="qgrid"></div>
+      <h3 id="pk-f">Katas</h3>
+      <div class="grid" id="fgrid"></div>
+    </div>
+    <div class="psec" id="ps-symulacje" role="tabpanel" aria-labelledby="pt-symulacje">
+      <h3 data-en="Recent simulations">Ostatnie symulacje</h3>
+      <ul class="hist" id="hist"></ul>
+    </div>
     <p class="lead" data-en-html="Clearing answers and resetting progress are in &lt;button type=&quot;button&quot; class=&quot;linkbtn&quot; data-go=&quot;ustawienia&quot;&gt;Settings&lt;/button&gt;.">Czyszczenie odpowiedzi i reset postępu są w <button type="button" class="linkbtn" data-go="ustawienia">Ustawieniach</button>.</p>
   </section>
 
