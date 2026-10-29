@@ -85,7 +85,7 @@
         <div class="csec" id="cs-katas" role="tabpanel" aria-labelledby="ct-katas" hidden>
           <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Kata:</strong> answer on your own, reveal the model answer, grade yourself. Focus: one at a time, only the katas in this list."><strong>Kata:</strong> odpowiedz sam, odsłoń wzorzec, oceń się. Focus: jedna naraz, tylko katas z tej listy.</span></div>
           <div class="chips" id="flv" role="group" aria-label="Filtr poziomu" data-en-aria="Level filter"></div>
-          <p class="how lvl-how" data-en-html="<span class='lvd' aria-hidden='true'>●</span> <strong>Recall</strong>, a fact · <span class='lvd' aria-hidden='true'>●●</span> <strong>Request</strong>, one call · <span class='lvd' aria-hidden='true'>●●●</span> <strong>Flow</strong>, steps in order"><span class="lvd" aria-hidden="true">●</span> <strong>Przypomnij</strong>, fakt · <span class="lvd" aria-hidden="true">●●</span> <strong>Request</strong>, jedno wywołanie · <span class="lvd" aria-hidden="true">●●●</span> <strong>Flow</strong>, kroki w kolejności</p>
+          <p class="how lvl-how" data-en-html="<span class='lvd' aria-hidden='true'>●</span> <strong>Recall</strong>, a fact · <span class='lvd' aria-hidden='true'>●●</span> <strong>Request</strong>, one call · <span class='lvd' aria-hidden='true'>●●●</span> <strong>Flow</strong>, steps in order · <span class='lvd' aria-hidden='true'>●●●●</span> <strong>Lab</strong>, from scratch, step by step"><span class="lvd" aria-hidden="true">●</span> <strong>Przypomnij</strong>, fakt · <span class="lvd" aria-hidden="true">●●</span> <strong>Request</strong>, jedno wywołanie · <span class="lvd" aria-hidden="true">●●●</span> <strong>Flow</strong>, kroki w kolejności · <span class="lvd" aria-hidden="true">●●●●</span> <strong>Lab</strong>, od zera, krok po kroku</p>
           <div class="row"><button type="button" class="btn small f-all" id="f-all" aria-controls="flist"></button><span class="how" id="f-open-n"></span></div>
           <div class="list" id="flist"></div>
         </div>
@@ -288,6 +288,9 @@
 
 /* Ściągi › GraphQL: t = lead, s = blocks {h, b?, ol?, tree?, cmp?, l}. Polish only, same fact rule as notes. */
 /*@data GQL*/
+
+/* Labs: level-4 katas run step by step from a stated starting state. Keyed by id, not index: pre = [text, DOCS keys], s = steps {h, in?, do, ok?, keep?, warn?, l}, brk = break-it task, fix = what to check. Polish only. */
+/*@data LABS*/
 
 /*@data Q*/
 

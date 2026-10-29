@@ -32,7 +32,8 @@ export const BLOCKS = {
   NOTES: { file: "data/notes.json", keys: "json", layout: "inline" },
   APIOV: { file: "data/apioverview.json", keys: "json", layout: "inline" },
   ROLETRAPS: { file: "data/roletraps.json", keys: "json", layout: "inline" },
-  GQL: { file: "data/graphql.json", keys: "json", layout: "inline" }
+  GQL: { file: "data/graphql.json", keys: "json", layout: "inline" },
+  LABS: { file: "data/labs.json", keys: "json", layout: "lines", indent: " " }
 };
 
 export const MARKER = /^\s*(?:<!--|\/\*)\s*@(include|data)\s+(\S+)\s*(?:-->|\*\/)\s*$/;
