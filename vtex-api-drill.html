@@ -1393,6 +1393,44 @@ h3 {
 .result p {
   margin: 0;
 }
+/* simulation result: what the exam added to the daily goal, the streak and the badges */
+.sim-gx {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+.sim-gx .meter {
+  flex: none;
+}
+.sim-gx-h {
+  font-weight: 600;
+}
+.sim-gx-h .up {
+  color: var(--ok);
+  font-variant-numeric: tabular-nums;
+}
+.result .sim-gx-s {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.result .sim-gx-b {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.sim-tier {
+  font: 600 0.72rem var(--f-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tc);
+  background: var(--tc-soft);
+  border-radius: 99px;
+  padding: 2px 10px;
+}
 /* simulation: question mix per area (setup) and score per area (result) */
 .mixbox[open] {
   display: grid;
@@ -10544,6 +10582,17 @@ function bootApiMap(root, onNav, embed) {
       }
     },
     {
+      id: "sim1",
+      n: ["Pierwsza symulacja", "First simulation"],
+      d: ["Ukończona symulacja", "A simulation finished"],
+      ok: function (x) {
+        return x.sims > 0;
+      },
+      p: function () {
+        return L("Ukończ jedną symulację", "Finish one simulation");
+      }
+    },
+    {
       id: "sim",
       n: ["Zdana symulacja", "Simulation passed"],
       d: ["Co najmniej 80% w symulacji", "At least 80% in a simulation"],
@@ -10552,6 +10601,17 @@ function bootApiMap(root, onNav, embed) {
       },
       p: function (x) {
         return x.simBest;
+      }
+    },
+    {
+      id: "sim3",
+      n: ["Hat-trick", "Hat-trick"],
+      d: ["3 zdane symulacje", "3 simulations passed"],
+      ok: function (x) {
+        return x.simPassN >= 3;
+      },
+      p: function (x) {
+        return x.simPassN + L(" / 3 zdane", " / 3 passed");
       }
     },
     {
@@ -10662,7 +10722,9 @@ function bootApiMap(root, onNav, embed) {
     s14: 3,
     c10: 2,
     c25: 3,
+    sim1: 1,
     sim: 3,
+    sim3: 3,
     dom: 2,
     fall: 3,
     ready: 3,
@@ -10691,7 +10753,7 @@ function bootApiMap(root, onNav, embed) {
     ],
     [
       ["Egzamin", "Exam"],
-      ["sim", "ready"]
+      ["sim1", "sim", "sim3", "ready"]
     ]
   ];
   /* Share of the way to a locked badge, for its progress bar; null when the badge has no count. */
@@ -10708,6 +10770,7 @@ function bootApiMap(root, onNav, embed) {
       f80: [x.kf, kNeed(0.8)],
       nall: [x.kn, NTOTAL],
       ready: [x.ready, 80],
+      sim3: [x.simPassN, 3],
       goal: [x.today, x.goal],
       plat: [badgesGot(true), BADGES.length - 1]
     }[id];
@@ -10850,6 +10913,8 @@ function bootApiMap(root, onNav, embed) {
           timeUp: !!rs.timeUp,
           only: /^(wrong|flag|both)$/.test(rs.only) ? rs.only : "all"
         };
+        if (rs.gx && typeof rs.gx === "object")
+          S.sim.gx = { n: Math.max(0, Math.min(rs.gx.n | 0, 999)), w: Math.max(0, Math.min(rs.gx.w | 0, 999)) };
       }
     }
   } catch (e) {
@@ -12490,6 +12555,68 @@ function bootApiMap(root, onNav, embed) {
       "</section>"
     );
   }
+  /* What the exam added to today's goal, the streak and the badges. */
+  function simGx(m) {
+    if (!S.gx.head || !m.gx) return "";
+    var t = todayN(),
+      st = streak(),
+      got = BADGES.filter(function (b) {
+        return S.badges[b.id] >= m.start;
+      });
+    return (
+      '<div class="sim-gx"><p class="sim-gx-h">' +
+      L("Do celu dnia: ", "Toward today's goal: ") +
+      '<span class="up">+' +
+      m.gx.n +
+      "</span></p>" +
+      '<div class="meter" aria-hidden="true"><i class="' +
+      (t >= S.goal ? "ok" : "") +
+      '" style="width:' +
+      Math.min(t / S.goal, 1) * 100 +
+      '%"></i></div>' +
+      '<p class="sim-gx-s">' +
+      L("Dziś ", "Today ") +
+      t +
+      " / " +
+      S.goal +
+      " · " +
+      (t >= S.goal ? L("cel osiągnięty", "goal reached") : L("jeszcze " + (S.goal - t), S.goal - t + " to go")) +
+      " · " +
+      L("seria ", "streak ") +
+      st +
+      " " +
+      days(st) +
+      "</p>" +
+      (m.gx.w
+        ? '<p class="sim-gx-s">' +
+          L(
+            "Błędne (" + m.gx.w + ") trafiły do powtórek w Focus.",
+            "The wrong ones (" + m.gx.w + ") went to the Focus reviews."
+          ) +
+          "</p>"
+        : "") +
+      got
+        .map(function (b) {
+          return (
+            '<p class="sim-gx-b"><span class="sim-tier t' +
+            BTIER[b.id] +
+            '">' +
+            esc(T(TIERS[BTIER[b.id]])) +
+            "</span>" +
+            L("Nowa odznaka: ", "New badge: ") +
+            esc(T(b.n)) +
+            "</p>"
+          );
+        })
+        .join("") +
+      '<p class="sim-gx-s">' +
+      L(
+        "Każde pytanie liczy się raz dziennie, zadanie praktyczne po samoocenie.",
+        "Each question counts once a day, a practical task once you grade it."
+      ) +
+      "</p></div>"
+    );
+  }
   function simResult() {
     var m = S.sim,
       nq = m.ids.length,
@@ -12566,6 +12693,7 @@ function bootApiMap(root, onNav, embed) {
           )
         : "") +
       ".</p>" +
+      simGx(m) +
       '<div class="row"><button type="button" class="btn primary" id="sim-new">' +
       L("Nowa symulacja", "New simulation") +
       "</button></div></div>" +
@@ -12771,12 +12899,28 @@ function bootApiMap(root, onNav, embed) {
     save();
     go({ tab: "symulacja", pos: 0 }, true);
   }
+  /* Exam answers count toward today, the streak and the reviews like any other answer, each question once a day. */
+  function simCredit(m) {
+    var n = 0,
+      w = 0;
+    m.ids.forEach(function (i) {
+      var a = m.ans[i];
+      if (!a || !a.length) return;
+      var ok = isRight(i, a);
+      if (!ok) w++;
+      if (recordAnswer("q" + (i + 1), ok, m.cf[i] || 0, true)) n++;
+    });
+    m.gx = { n: n, w: w };
+    if (n && todayN() >= S.goal && todayN() - n < S.goal)
+      live(L("Cel dzienny osiągnięty: ", "Daily goal reached: ") + S.goal + L(" odpowiedzi", " answers"));
+  }
   function finishSim(timeUp) {
     var m = S.sim;
     if (!m || m.done) return;
     m.done = true;
     m.timeUp = !!timeUp;
     m.used = Math.min(Date.now(), m.endAt) - m.start;
+    simCredit(m);
     S.sims.unshift({ t: m.start, s: simScore(), n: m.ids.length, pn: m.pr.length });
     S.sims = S.sims.slice(0, 10);
     ARM = null;
@@ -12825,7 +12969,13 @@ function bootApiMap(root, onNav, embed) {
         var fi = +b.closest(".prac").dataset.f,
           v = b.dataset.v === "1";
         if (m.self[fi] === v) delete m.self[fi];
-        else m.self[fi] = v;
+        else {
+          m.self[fi] = v;
+          if (m.gx && recordAnswer("f" + (fi + 1), v, 0, true)) {
+            m.gx.n++;
+            if (!v) m.gx.w++;
+          }
+        }
         var h = S.sims.filter(function (x) {
           return x.t === m.start;
         })[0];
@@ -13243,7 +13393,8 @@ function bootApiMap(root, onNav, embed) {
       "</p>"
     );
   }
-  function recordAnswer(id, ok, cf) {
+  /* quiet: a whole simulation is credited at once, so it skips the combo (Focus only) and the per-answer announcements. */
+  function recordAnswer(id, ok, cf, quiet) {
     review(id, ok, cf);
     var t = dayKey(new Date());
     if (S.tday.d !== t) {
@@ -13253,16 +13404,18 @@ function bootApiMap(root, onNav, embed) {
         if (k < old) delete S.days[k];
       });
     }
-    if (S.tday.ids[id]) return;
+    if (S.tday.ids[id]) return false;
     S.tday.ids[id] = 1;
     S.days[t] = (S.days[t] || 0) + 1;
     S.total++;
+    if (quiet) return true;
     S.combo = ok ? S.combo + 1 : 0;
     if (S.combo > S.comboBest) S.comboBest = S.combo;
     if (S.gx.combo && [5, 10, 25, 50].indexOf(S.combo) > -1)
       live("Combo: " + S.combo + L(" dobrych odpowiedzi z rzędu", " right answers in a row"));
     if (S.days[t] === S.goal)
       live(L("Cel dzienny osiągnięty: ", "Daily goal reached: ") + S.goal + L(" odpowiedzi", " answers"));
+    return true;
   }
   /* Today does not count against the streak until it is over, and one missing day a week is forgiven. */
   function streak() {
@@ -13299,6 +13452,9 @@ function bootApiMap(root, onNav, embed) {
     });
     return { v: Math.round(50 * m + 30 * acc + 20 * sim), m: m, acc: acc, accOk: c.ans >= 20, sim: sim, weak: weak };
   }
+  function simPassed(x) {
+    return x.s >= Math.ceil((x.n || SIM_Q) * 0.8);
+  }
   function gxCtx(c) {
     var rd = readiness(c),
       st = streak(),
@@ -13327,10 +13483,10 @@ function bootApiMap(root, onNav, embed) {
       goalHit: Object.keys(S.days).some(function (k) {
         return S.days[k] >= S.goal;
       }),
-      simPass: S.sims.some(function (x) {
-        var n = x.n || SIM_Q;
-        return x.s >= Math.ceil(n * 0.8);
-      }),
+      simPass: S.sims.some(simPassed),
+      /* S.sims keeps the last 10 exams, so Hat-trick means 3 passes among them. */
+      simPassN: S.sims.filter(simPassed).length,
+      sims: S.sims.length,
       simBest: simBest
         ? L("Najlepiej ", "Best ") +
           simBest.s +

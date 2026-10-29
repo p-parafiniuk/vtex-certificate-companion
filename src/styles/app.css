@@ -1379,6 +1379,44 @@ h3 {
 .result p {
   margin: 0;
 }
+/* simulation result: what the exam added to the daily goal, the streak and the badges */
+.sim-gx {
+  border-top: 1px solid var(--line);
+  margin-top: 4px;
+  padding-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+.sim-gx .meter {
+  flex: none;
+}
+.sim-gx-h {
+  font-weight: 600;
+}
+.sim-gx-h .up {
+  color: var(--ok);
+  font-variant-numeric: tabular-nums;
+}
+.result .sim-gx-s {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.result .sim-gx-b {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.sim-tier {
+  font: 600 0.72rem var(--f-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tc);
+  background: var(--tc-soft);
+  border-radius: 99px;
+  padding: 2px 10px;
+}
 /* simulation: question mix per area (setup) and score per area (result) */
 .mixbox[open] {
   display: grid;
