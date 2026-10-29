@@ -63,7 +63,9 @@ D.Q.forEach((x, i) => {
 
 D.F.forEach((x, i) => {
   const w = "F[" + i + "]";
-  common(w, x, ["d", "r", "q", "a", "l", "h"]);
+  common(w, x, ["d", "r", "lv", "q", "a", "l", "h"]);
+  /* 1 recall, 2 one request, 3 a flow of steps, 4 a lab from a stated starting state */
+  if (![1, 2, 3, 4].includes(x.lv)) E(w, "lv must be 1, 2, 3 or 4");
   if (!isStr(x.a)) E(w, "empty answer a");
   else markup(w + ".a", x.a);
 });

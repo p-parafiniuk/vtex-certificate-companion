@@ -53,7 +53,7 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 - `n`, optional, at least 2: number of correct answers. **The first `n` options are the correct ones.** Options are shuffled at runtime, so always put the correct answers first.
 - `h`, optional: HTTP codes from `http-names.json`, shown as chips
 
-**F** (`flashcards.json`): `d, r, q, a, l, h?`. A `q` starting with `Practical:` makes a hands-on task. The user writes their answer and self-grades it against `a`.
+**F** (`flashcards.json`): `d, r, lv, q, a, l, h?`. `lv` is the difficulty, 1 to 4: 1 Przypomnij (a fact or definition), 2 Request (one call), 3 Flow (steps in order), 4 Lab (from scratch, with the starting state stated). A `q` starting with `Practical:` makes a hands-on task. The user writes their answer and self-grades it against `a`.
 
 **DOMS** (`domains.json`): `[key, name, emoji, enName?]`. The emoji labels the category in the side panel. `enName` replaces `name` when the UI language is English; leave it out when the name is already English.
 

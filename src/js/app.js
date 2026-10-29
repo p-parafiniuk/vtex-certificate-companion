@@ -42,6 +42,7 @@
     hide: false,
     dom: "all",
     set: "all",
+    flv: "all",
     hint: false,
     sim: null,
     simMin: 120,
@@ -400,6 +401,7 @@
       S.hint = !!raw.hint;
       if (raw.dom === "all" || DOM_NAME[raw.dom]) S.dom = raw.dom;
       if (raw.set === "1" || raw.set === "2") S.set = raw.set;
+      if (["1", "2", "3", "4"].indexOf(raw.flv) > -1) S.flv = raw.flv;
       if (raw.simMin > 0 && raw.simMin <= 600) S.simMin = Math.round(raw.simMin);
       if (raw.simPrac === false) S.simPrac = false;
       if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
@@ -657,6 +659,33 @@
   }
   function inSet(x) {
     return S.set === "all" || String(x.r) === S.set;
+  }
+  /* Kata difficulty: what the answer asks of you, from recalling a fact up to a lab run from a stated starting state. */
+  var LVL = [
+    null,
+    ["Przypomnij", "Recall", "fakt, definicja, liczba", "a fact, definition or number"],
+    ["Request", "Request", "jedno wywołanie", "one call"],
+    ["Flow", "Flow", "kroki we właściwej kolejności", "steps in the right order"],
+    ["Lab", "Lab", "od zera, z warunkami początkowymi", "from scratch, with a starting state"]
+  ];
+  function lvPass(c) {
+    return c.t === "q" || S.flv === "all" || String(F[c.i].lv) === S.flv;
+  }
+  function lvBadge(lv) {
+    var l = LVL[lv];
+    return (
+      '<span class="lvl lv' +
+      lv +
+      '" title="' +
+      esc(L("Poziom ", "Level ") + lv + L(" z 4: ", " of 4: ") + L(l[2], l[3])) +
+      '"><span class="lvd" aria-hidden="true">' +
+      "●●●●".slice(0, lv) +
+      "<i>" +
+      "○○○○".slice(lv) +
+      "</i></span>" +
+      L(l[0], l[1]) +
+      "</span>"
+    );
   }
   function httpChips(x) {
     var cs = x.h || [];
@@ -2690,9 +2719,51 @@
 
   /* ---------- Fiszki ---------- */
   function renderF() {
-    var html = "";
+    var html = "",
+      per = [
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0],
+        [0, 0]
+      ];
     F.forEach(function (f, i) {
       if (S.dom !== "all" && f.d !== S.dom) return;
+      per[0][1]++;
+      per[f.lv][1]++;
+      if (S.fknown[i]) {
+        per[0][0]++;
+        per[f.lv][0]++;
+      }
+    });
+    /* A level that the open category no longer has would leave an empty list behind a filter nobody can see. */
+    if (S.flv !== "all" && !per[+S.flv][1]) S.flv = "all";
+    $("#flv").innerHTML = per[0][1]
+      ? [0, 1, 2, 3, 4]
+          .filter(function (k) {
+            return !k || per[k][1];
+          })
+          .map(function (k) {
+            var v = k ? String(k) : "all";
+            return (
+              '<button type="button" class="chip" data-flv="' +
+              v +
+              '" aria-pressed="' +
+              (S.flv === v) +
+              '">' +
+              (k ? lvBadge(k) : L("Wszystkie poziomy", "All levels")) +
+              " <small>" +
+              per[k][0] +
+              "/" +
+              per[k][1] +
+              "</small></button>"
+            );
+          })
+          .join("")
+      : "";
+    F.forEach(function (f, i) {
+      if (S.dom !== "all" && f.d !== S.dom) return;
+      if (S.flv !== "all" && String(f.lv) !== S.flv) return;
       var n = i + 1;
       html +=
         '<article class="fc' +
@@ -2709,6 +2780,7 @@
         '</span><span class="rnd">R' +
         f.r +
         "</span>" +
+        lvBadge(f.lv) +
         '<label class="check" for="kf-' +
         n +
         '"><input type="checkbox" class="kn" id="kf-' +
@@ -2789,6 +2861,16 @@
   /* One button: it opens every answer until all are open, then closes them all. */
   $("#f-all").addEventListener("click", function () {
     setAll(!this.dataset.open);
+  });
+  $("#flv").addEventListener("click", function (ev) {
+    var b = ev.target.closest("[data-flv]");
+    if (!b) return;
+    S.flv = b.dataset.flv;
+    save();
+    renderF();
+    /* The row is rebuilt, so keyboard focus goes back to the chip just picked. */
+    var nb = $('#flv [data-flv="' + S.flv + '"]');
+    if (nb) nb.focus();
   });
 
   /* ---------- Grywalizacja: streak, daily goal, readiness, badges, combo ----------
@@ -4252,7 +4334,9 @@
   }
   function fBase() {
     return CARDS.filter(function (c) {
-      return (S.fo.deck === "all" || c.t === S.fo.deck) && (S.fo.dom === "all" || c.d === S.fo.dom) && inSet(c);
+      return (
+        (S.fo.deck === "all" || c.t === S.fo.deck) && (S.fo.dom === "all" || c.d === S.fo.dom) && inSet(c) && lvPass(c)
+      );
     });
   }
   function fPass(c) {
@@ -4311,6 +4395,7 @@
       '<span class="rnd">' +
       (prac ? L("zadanie praktyczne", "practical task") : "kata") +
       "</span>" +
+      lvBadge(f.lv) +
       (S.fknown[c.i] ? '<span class="kbadge">' + L("Umiem", "Known") + "</span>" : "") +
       "</div>";
     var grade =
@@ -4481,6 +4566,23 @@
       chip("set", "1", L("Runda 1", "Round 1"), null, S.set === "1") +
       chip("set", "2", L("Runda 2 (luki)", "Round 2 (gaps)"), null, S.set === "2") +
       "</div></div>" +
+      (S.fo.deck === "q"
+        ? ""
+        : '<div class="fs"><h3 id="fo-h-flv">' +
+          L("Poziom katas", "Kata level") +
+          '</h3><div class="chips" role="group" aria-labelledby="fo-h-flv">' +
+          chip("flv", "all", L("Wszystkie poziomy", "All levels"), null, S.flv === "all") +
+          [1, 2, 3, 4]
+            .filter(function (k) {
+              return F.some(function (f) {
+                return f.lv === k;
+              });
+            })
+            .map(function (k) {
+              return chip("flv", String(k), lvBadge(k), null, S.flv === String(k));
+            })
+            .join("") +
+          "</div></div>") +
       '<div class="fs"><h3 id="fo-h-ord">' +
       L("Kolejność", "Order") +
       '</h3><div class="chips" role="group" aria-labelledby="fo-h-ord">' +
@@ -4925,6 +5027,15 @@
       S.set = b.dataset.set;
       if (!fBase().length) S.fo.deck = "all";
       return refocus();
+    }
+    b = t.closest("[data-flv]");
+    if (b) {
+      S.flv = b.dataset.flv;
+      if (!fBase().length) S.fo.deck = "all";
+      refocus();
+      b = $('#fo-set [data-flv="' + S.flv + '"]');
+      if (b) b.focus();
+      return;
     }
     b = t.closest("[data-ord]");
     if (b) {
