@@ -436,24 +436,25 @@ a {
   gap: 14px;
   min-width: 0;
 }
-.ring {
+/* The header progress ring is an <svg>; Focus has its own div.ring, which must not inherit the rotation or size. */
+svg.ring {
   flex: none;
   width: 56px;
   height: 56px;
   transform: rotate(-90deg);
 }
-.ring circle {
+svg.ring circle {
   fill: none;
   stroke: var(--code);
-  stroke-width: 6;
+  stroke-width: 5;
 }
-.ring #pm-all {
+svg.ring #pm-all {
   stroke: var(--accent);
   stroke-linecap: round;
   transition: stroke-dasharray 0.3s ease;
 }
 /* A round cap would draw a dot at 0%. */
-.ring #pm-all[stroke-dasharray^="0 "] {
+svg.ring #pm-all[stroke-dasharray^="0 "] {
   stroke: none;
 }
 .pc-sum {
@@ -535,7 +536,7 @@ a {
   }
 }
 @media (max-width: 480px) {
-  .ring {
+  svg.ring {
     width: 44px;
     height: 44px;
   }
