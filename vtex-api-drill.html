@@ -2772,6 +2772,18 @@ body[data-view="pytania"] .wrap {
 .ctab .num {
   margin-left: 2px;
 }
+/* Postęp sections: same tab strip as a category, each tab carries its completion state. */
+.psec {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+.ptabs .pill {
+  margin-left: 4px;
+}
+.ptabs .pill:empty {
+  display: none;
+}
 .ctab-s {
   display: none;
 }
@@ -3303,9 +3315,19 @@ body[data-view="pytania"] .wrap {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
   gap: 8px;
 }
+/* Phone: one badge per row, so the tier, name and progress read without wrapping word by word. */
 @media (max-width: 480px) {
   .badges {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    text-align: center;
+  }
+  .tiers li {
+    flex-direction: column;
+    gap: 3px;
   }
 }
 .badge {
@@ -3342,6 +3364,9 @@ body[data-view="pytania"] .wrap {
   grid-column: 1 / -1;
   border: 1px dashed var(--tc);
 }
+.badge.plat .meter i {
+  background: var(--tc);
+}
 .badge.plat.on {
   border-style: solid;
   background: var(--tc-soft);
@@ -3365,6 +3390,7 @@ body[data-view="pytania"] .wrap {
   color: var(--tc);
 }
 .badge-t {
+  flex: 1;
   min-width: 0;
   display: grid;
 }
@@ -3982,31 +4008,48 @@ div.setrow {
   </section>
 
   <section class="panel" id="p-postep" role="tabpanel" aria-labelledby="t-postep" hidden>
-    <div class="gx-cards">
-      <section class="card" id="gx-ready" aria-labelledby="gx-ready-h"></section>
-      <section class="card" id="gx-days" aria-labelledby="gx-days-h"></section>
+    <div class="ctabs ptabs" id="ptabs" role="tablist" aria-label="Sekcje postępu" data-en-aria="Progress sections">
+      <button type="button" class="ctab" role="tab" id="pt-przeglad" data-psec="przeglad" aria-controls="ps-przeglad"><span data-en="Overview">Przegląd</span> <span class="pill" id="pp-przeglad"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-odznaki" data-psec="odznaki" aria-controls="ps-odznaki"><span data-en="Badges">Odznaki</span> <span class="pill" id="pp-odznaki"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-wynik" data-psec="wynik" aria-controls="ps-wynik"><span class="ctab-l" data-en="Score and areas">Wynik i obszary</span><span class="ctab-s" data-en="Score">Wynik</span> <span class="pill" id="pp-wynik"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-karty" data-psec="karty" aria-controls="ps-karty"><span data-en="Cards">Karty</span> <span class="pill" id="pp-karty"></span></button>
+      <button type="button" class="ctab" role="tab" id="pt-symulacje" data-psec="symulacje" aria-controls="ps-symulacje"><span data-en="Simulations">Symulacje</span> <span class="pill" id="pp-symulacje"></span></button>
     </div>
-    <div class="gx-cards">
-      <section class="card" id="rv-box" aria-labelledby="rv-box-h"></section>
-      <section class="card" id="rv-cal" aria-labelledby="rv-cal-h"></section>
+    <div class="psec" id="ps-przeglad" role="tabpanel" aria-labelledby="pt-przeglad">
+      <div class="gx-cards">
+        <section class="card" id="gx-ready" aria-labelledby="gx-ready-h"></section>
+        <section class="card" id="gx-days" aria-labelledby="gx-days-h"></section>
+      </div>
+      <div class="gx-cards">
+        <section class="card" id="rv-box" aria-labelledby="rv-box-h"></section>
+        <section class="card" id="rv-cal" aria-labelledby="rv-cal-h"></section>
+      </div>
     </div>
-    <section class="card" id="gx-badges" aria-labelledby="gx-badges-h"></section>
-    <section class="card" id="gx-total" aria-labelledby="gx-total-h"></section>
-    <dl class="stats" id="stats"></dl>
-    <h3 data-en="Areas">Obszary</h3>
-    <div class="domrows" id="domrows"></div>
-    <h3 data-en="Questions 1–161">Pytania 1–161</h3>
-    <ul class="legend">
-      <li><span class="sw k"></span><span data-en="mastered">opanowane</span></li>
-      <li><span class="sw r"></span><span data-en="last answer right">ostatnio dobrze</span></li>
-      <li><span class="sw w"></span><span data-en="last answer wrong">ostatnio źle</span></li>
-      <li><span class="sw"></span><span data-en="untouched">nieruszone</span></li>
-    </ul>
-    <div class="grid" id="qgrid"></div>
-    <h3 data-en="Katas 1–35">Katas 1–35</h3>
-    <div class="grid" id="fgrid"></div>
-    <h3 data-en="Recent simulations">Ostatnie symulacje</h3>
-    <ul class="hist" id="hist"></ul>
+    <div class="psec" id="ps-odznaki" role="tabpanel" aria-labelledby="pt-odznaki">
+      <section class="card" id="gx-badges" aria-labelledby="gx-badges-h"></section>
+    </div>
+    <div class="psec" id="ps-wynik" role="tabpanel" aria-labelledby="pt-wynik">
+      <section class="card" id="gx-total" aria-labelledby="gx-total-h"></section>
+      <dl class="stats" id="stats"></dl>
+      <h3 data-en="Areas">Obszary</h3>
+      <div class="domrows" id="domrows"></div>
+    </div>
+    <div class="psec" id="ps-karty" role="tabpanel" aria-labelledby="pt-karty">
+      <h3 id="pk-q">Pytania</h3>
+      <ul class="legend">
+        <li><span class="sw k"></span><span data-en="mastered">opanowane</span></li>
+        <li><span class="sw r"></span><span data-en="last answer right">ostatnio dobrze</span></li>
+        <li><span class="sw w"></span><span data-en="last answer wrong">ostatnio źle</span></li>
+        <li><span class="sw"></span><span data-en="untouched">nieruszone</span></li>
+      </ul>
+      <div class="grid" id="qgrid"></div>
+      <h3 id="pk-f">Katas</h3>
+      <div class="grid" id="fgrid"></div>
+    </div>
+    <div class="psec" id="ps-symulacje" role="tabpanel" aria-labelledby="pt-symulacje">
+      <h3 data-en="Recent simulations">Ostatnie symulacje</h3>
+      <ul class="hist" id="hist"></ul>
+    </div>
     <p class="lead" data-en-html="Clearing answers and resetting progress are in &lt;button type=&quot;button&quot; class=&quot;linkbtn&quot; data-go=&quot;ustawienia&quot;&gt;Settings&lt;/button&gt;.">Czyszczenie odpowiedzi i reset postępu są w <button type="button" class="linkbtn" data-go="ustawienia">Ustawieniach</button>.</p>
   </section>
 
@@ -10218,6 +10261,8 @@ function bootApiMap(root, onNav, embed) {
     SIM_P = 4,
     SIM_MIN = 3;
   var TABS = ["pytania", "symulacja", "fiszki", "postep", "http", "api", "ustawienia"];
+  /* Sections of Postęp; the first one has no hash suffix. */
+  var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
   var LET = "ABCDEFG";
   /* No prototype: keys come from the URL and storage, and "constructor" must not count as a category. */
@@ -11686,9 +11731,16 @@ function bootApiMap(root, onNav, embed) {
     if (!b || b.getAttribute("aria-selected") === "true") return;
     go({ tab: "pytania", cat: S.dom, sec: b.dataset.sec === "pytania" ? undefined : b.dataset.sec });
   });
+  $("#ptabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".ctab");
+    if (!b || b.getAttribute("aria-selected") === "true") return;
+    go({ tab: "postep", sub: b.dataset.psec === PSECS[0] ? undefined : b.dataset.psec });
+  });
   /* Tabs pattern: arrows move between sections, only the selected tab is in the Tab order. */
-  $("#ctabs").addEventListener("keydown", function (ev) {
-    var tabs = [].slice.call(document.querySelectorAll("#ctabs .ctab")),
+  $("#ptabs").addEventListener("keydown", tabKeys);
+  $("#ctabs").addEventListener("keydown", tabKeys);
+  function tabKeys(ev) {
+    var tabs = [].slice.call(ev.currentTarget.querySelectorAll(".ctab")),
       at = tabs.indexOf(ev.target);
     var k = ev.key,
       to =
@@ -11706,7 +11758,7 @@ function bootApiMap(root, onNav, embed) {
     var t = tabs[(to + tabs.length) % tabs.length];
     t.click();
     t.focus();
-  });
+  }
   /* In-app links (side panel, docs list) are real hrefs, so a new tab or a copied link opens the same view. */
   document.addEventListener("click", function (ev) {
     var a = ev.target.closest ? ev.target.closest("a[data-nav]") : null;
@@ -13186,7 +13238,7 @@ function bootApiMap(root, onNav, embed) {
           ? T(b.d) + L(" (i " + (fresh.length - 1) + " więcej)", " (and " + (fresh.length - 1) + " more)")
           : T(b.d)
       ) +
-      '</span></span><button type="button" class="linkbtn" data-go="postep">' +
+      '</span></span><button type="button" class="linkbtn" data-go="postep" data-go-sub="odznaki">' +
       L("Zobacz", "View") +
       "</button>" +
       '<button type="button" class="toast-x" aria-label="' +
@@ -13475,8 +13527,8 @@ function bootApiMap(root, onNav, embed) {
       S.comboBest +
       "</small></summary><p>" +
       L(
-        "Combo liczy <strong>dobre odpowiedzi z rzędu</strong> w nauce: na liście pytań i w Focus, także ocenę katas. Symulacja się nie liczy. Jedna zła odpowiedź zeruje licznik. Karta liczy się raz dziennie, więc powtórka tej samej karty ani nie podbija, ani nie zrywa combo. Od 3 z rzędu Focus pokazuje <strong>Combo ×N</strong>. Odznaki liczą Twój rekord.",
-        "Combo counts <strong>right answers in a row</strong> while you study: in the question list and in Focus, katas you grade included. The simulation does not count. One wrong answer resets it. A card counts once a day, so repeating the same card neither raises nor breaks the combo. From 3 in a row Focus shows <strong>Combo ×N</strong>. The badges use your best run."
+        "<strong>Dobre odpowiedzi z rzędu</strong> na liście pytań i w Focus (z oceną katas, bez symulacji). Zła odpowiedź zeruje licznik. Karta liczy się raz dziennie. Od 3 z rzędu Focus pokazuje <strong>Combo ×N</strong>. Odznaki liczą rekord.",
+        "<strong>Right answers in a row</strong> in the question list and in Focus (graded katas too, not the simulation). A wrong answer resets it. A card counts once a day. From 3 in a row Focus shows <strong>Combo ×N</strong>. Badges use your best run."
       ) +
       "</p></details>"
     );
@@ -13640,7 +13692,7 @@ function bootApiMap(root, onNav, embed) {
     var b = ev.target.closest ? ev.target.closest("[data-go], [data-go-dom]") : null;
     if (!b) return;
     if (b.dataset.goDom && DOM_NAME[b.dataset.goDom]) go({ tab: "pytania", cat: b.dataset.goDom });
-    else if (TABS.indexOf(b.dataset.go) > -1) go({ tab: b.dataset.go });
+    else if (TABS.indexOf(b.dataset.go) > -1) go({ tab: b.dataset.go, sub: b.dataset.goSub });
     if (b.closest("#gx-toast")) $("#gx-toast").hidden = true;
   });
 
@@ -13848,11 +13900,34 @@ function bootApiMap(root, onNav, embed) {
         );
       }).join("");
     paintTotal(c);
+    paintPtabs(c);
+    $("#pk-q").textContent = L("Pytania 1–", "Questions 1–") + Q.length;
+    $("#pk-f").textContent = "Katas 1–" + F.length;
     $("#hist").innerHTML = S.sims.length
       ? S.sims.map(simLine).join("")
       : "<li>" +
         L("Jeszcze żadnej. Uruchom ją w zakładce Symulacja.", "None yet. Start one in the Simulation tab.") +
         "</li>";
+  }
+  function paintPtabs(c) {
+    var o = overall(c),
+      best = null;
+    S.sims.forEach(function (x) {
+      var v = x.s / (x.n || SIM_Q);
+      if (best === null || v > best) best = v;
+    });
+    [
+      ["przeglad", gxCtx(c).ready || "", 80],
+      ["odznaki", badgesGot() + "/" + BADGES.length, badgesGot() === BADGES.length],
+      ["wynik", o.total ? Math.round((o.done / o.total) * 100) + "%" : "", o.total && o.done === o.total],
+      ["karty", c.kq + c.kf + "/" + (Q.length + F.length), c.kq + c.kf === Q.length + F.length],
+      ["symulacje", best === null ? "" : Math.round(best * 100) + "%", best !== null && best >= 0.8]
+    ].forEach(function (x) {
+      var el = $("#pp-" + x[0]),
+        ok = x[2] === 80 ? x[1] >= 80 : x[2];
+      el.textContent = x[1];
+      el.className = "pill" + (ok ? " ok" : "");
+    });
   }
   function paintTotal(c) {
     var o = overall(c),
@@ -15262,6 +15337,7 @@ function bootApiMap(root, onNav, embed) {
     if ((r.tab === "http" || r.tab === "api") && r.sub) return r.tab + "-" + r.sub;
     if (r.tab === "symulacja" && r.pos !== undefined) return "symulacja-" + (r.pos + 1);
     if (r.tab === "focus" && r.id) return "focus-" + r.id;
+    if (r.tab === "postep" && r.sub && r.sub !== PSECS[0]) return "postep-" + r.sub;
     if (r.tab === "pytania" && r.cat)
       return "pytania-" + r.cat + (r.sec ? "-" + r.sec + (r.sec === "docs" && r.doc ? "-" + r.doc : "") : "");
     return r.tab;
@@ -15273,6 +15349,7 @@ function bootApiMap(root, onNav, embed) {
     if (m[2] && (r.tab === "http" || r.tab === "api")) r.sub = m[2];
     if (m[2] && r.tab === "symulacja" && +m[2] > 0) r.pos = +m[2] - 1;
     if (m[2] && r.tab === "focus") r.id = m[2];
+    if (m[2] && r.tab === "postep" && PSECS.indexOf(m[2]) > 0) r.sub = m[2];
     if (m[2] && r.tab === "pytania") {
       var p = m[2].split("-");
       if (DOM_NAME[p[0]]) {
@@ -15398,8 +15475,19 @@ function bootApiMap(root, onNav, embed) {
       r.sub = APIM.api();
     } else if (tab === "ustawienia") renderSettings();
     else {
+      if (PSECS.indexOf(r.sub) < 1) delete r.sub;
+      var ps = r.sub || PSECS[0];
+      PSECS.forEach(function (k) {
+        $("#ps-" + k).hidden = k !== ps;
+        $("#pt-" + k).setAttribute("aria-selected", k === ps);
+        $("#pt-" + k).tabIndex = k === ps ? 0 : -1;
+      });
       renderStats();
       renderGrids();
+      /* On a phone the strip scrolls sideways: keep the open section's tab in sight (after the pills widen it). */
+      var pst = $("#ptabs"),
+        pb = $("#pt-" + ps).getBoundingClientRect();
+      pst.scrollLeft += pb.left - pst.getBoundingClientRect().left - (pst.clientWidth - pb.width) / 2;
     }
     paintBack();
   }
