@@ -381,6 +381,11 @@ td.num {
   color: var(--bg);
   border-color: var(--ink);
 }
+@media (pointer: coarse), (max-width: 560px) {
+  .chip {
+    min-height: 44px;
+  }
+}
 .tags {
   display: flex;
   flex-wrap: wrap;

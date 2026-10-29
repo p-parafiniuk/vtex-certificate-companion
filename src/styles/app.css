@@ -756,6 +756,14 @@ h3 {
   color: inherit;
   opacity: 0.75;
 }
+/* Filter chips are tapped often, so a finger gets the full 44px target, as in the API Map. */
+@media (pointer: coarse), (max-width: 560px) {
+  .chip {
+    min-height: 44px;
+    align-items: center;
+    padding-inline: 13px;
+  }
+}
 .check {
   display: inline-flex;
   align-items: center;
