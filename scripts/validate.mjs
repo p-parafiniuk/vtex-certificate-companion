@@ -91,6 +91,13 @@ const used = new Set(
     .concat(Object.values(D.APIOV).flatMap(cs => (Array.isArray(cs) ? cs : []).flatMap(c => c.l || [])))
     .concat((Array.isArray(D.ROLETRAPS) ? D.ROLETRAPS : []).flatMap(x => x.l || []))
     .concat((D.GQL && Array.isArray(D.GQL.s) ? D.GQL.s : []).flatMap(x => x.l || []))
+    .concat(
+      (Array.isArray(D.LABS) ? D.LABS : []).flatMap(x =>
+        [x.pre, x.fix, [x.brk]]
+          .flatMap(r => (Array.isArray(r) ? r : []).flatMap(p => (p && p[1]) || []))
+          .concat((x.s || []).flatMap(s => s.l || []))
+      )
+    )
     /* linked from the header of the API Map roles view */
     .concat(["lmres", "predroles"])
 );
@@ -233,6 +240,46 @@ D.APIMAP.forEach(a =>
       E(w, "pm.o must be [role, resource] rows");
   })
 );
+/* Labs: progress is saved by id, so ids stay stable once shipped. Same fact rule as notes: every line has DOCS keys. */
+{
+  const ids = new Set();
+  const keys = (w, l) => {
+    if (!Array.isArray(l) || !l.length) E(w, "needs DOCS keys");
+    else l.forEach(d => D.DOCS[d] || E(w, "DOCS key `" + d + "` not in DOCS"));
+  };
+  const line = (w, p) => {
+    if (!Array.isArray(p) || p.length !== 2 || !isStr(p[0])) return E(w, "must be [text, DOCS keys]");
+    markup(w, p[0]);
+    if (/\[UNVERIFIED|https?:/i.test(p[0])) E(w, "no [UNVERIFIED] or URLs in text");
+    keys(w, p[1]);
+  };
+  (Array.isArray(D.LABS) ? D.LABS : E("LABS", "must be an array") || []).forEach((x, i) => {
+    const w = "LABS[" + i + "]";
+    for (const k of Object.keys(x))
+      if (!["id", "d", "t", "min", "goal", "pre", "s", "brk", "fix"].includes(k)) E(w, "unknown field `" + k + "`");
+    if (!/^[a-z0-9-]{3,40}$/.test(x.id || "")) E(w, "id must be a kebab-case slug");
+    else if (ids.has(x.id)) E(w, "duplicate id " + x.id);
+    else ids.add(x.id);
+    if (!doms.has(x.d)) E(w, "d=" + JSON.stringify(x.d) + " not in DOMS");
+    if (!isStr(x.t) || !isStr(x.goal)) E(w, "needs t and goal");
+    if (!Number.isInteger(x.min) || x.min < 5 || x.min > 240) E(w, "min must be whole minutes, 5 to 240");
+    if (!Array.isArray(x.pre) || !x.pre.length) E(w, "needs preconditions in pre");
+    else x.pre.forEach((p, j) => line(w + ".pre[" + j + "]", p));
+    if (!Array.isArray(x.s) || x.s.length < 2) E(w, "needs at least 2 steps in s");
+    else
+      x.s.forEach((s, j) => {
+        const ws = w + ".s[" + j + "]";
+        for (const k of Object.keys(s))
+          if (!["h", "in", "do", "ok", "keep", "warn", "l"].includes(k)) E(ws, "unknown field `" + k + "`");
+        if (!isStr(s.h) || !isStr(s.do)) E(ws, "needs h and do");
+        ["h", "in", "do", "ok", "keep", "warn"].forEach(k => s[k] !== undefined && markup(ws + "." + k, s[k]));
+        keys(ws, s.l);
+      });
+    line(w + ".brk", x.brk);
+    if (!Array.isArray(x.fix) || !x.fix.length) E(w, "needs at least one fix line");
+    else x.fix.forEach((p, j) => line(w + ".fix[" + j + "]", p));
+  });
+}
 if (!Array.isArray(D.ROLETRAPS) || !D.ROLETRAPS.length) E("ROLETRAPS", "needs at least one trap");
 else
   D.ROLETRAPS.forEach((x, i) => {

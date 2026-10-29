@@ -55,6 +55,8 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 
 **F** (`flashcards.json`): `d, r, lv, q, a, l, h?`. `lv` is the difficulty, 1 to 4: 1 Przypomnij (a fact or definition), 2 Request (one call), 3 Flow (steps in order), 4 Lab (from scratch, with the starting state stated). A `q` starting with `Practical:` makes a hands-on task. The user writes their answer and self-grades it against `a`.
 
+**LABS** (`labs.json`): level-4 katas, run step by step in a category's Katas section. Keyed by a stable kebab-case `id` (progress is saved under `lab.<id>`), so never rename an id once shipped. `{id, d, t, min, goal, pre: [[text, DOCS keys]], s: [{h, in?, do, ok?, keep?, warn?, l}], brk: [text, DOCS keys], fix: [[text, DOCS keys]]}`. `pre` is the starting state: everything that must exist before step 1, or the lab will not work. Each step says what it takes from earlier steps (`in`) and what to keep for later ones (`keep`). `brk` is a deliberate failure to try after finishing. Polish only, same fact rule as notes.
+
 **DOMS** (`domains.json`): `[key, name, emoji, enName?]`. The emoji labels the category in the side panel. `enName` replaces `name` when the UI language is English; leave it out when the name is already English.
 
 **API Reference links** are built, not stored: `https://developers.vtex.com/docs/api-reference/<slug>` for an API, plus `#<method>-<path>` with `{param}` written as `-param-` for an endpoint (the same format as the endpoint links in `docs.json`).

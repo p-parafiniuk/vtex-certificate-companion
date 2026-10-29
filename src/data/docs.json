@@ -169,5 +169,7 @@
   "gqlbuild": ["https://developers.vtex.com/docs/guides/vtex-io-documentation-graphql-builder","VTEX IO: GraphQL builder"],
   "gqlv2": ["https://developers.vtex.com/updates/release-notes/2025-09-30-graphql-builder-update-2x","Release note: GraphQL builder 2.x"],
   "gqldev": ["https://developers.vtex.com/docs/guides/developing-a-graphql-api-in-service-apps","Guide: Developing a GraphQL API in service apps"],
-  "gqlide": ["https://developers.vtex.com/docs/guides/graphql-ide","Guide: GraphQL IDE"]
+  "gqlide": ["https://developers.vtex.com/docs/guides/graphql-ide","Guide: GraphQL IDE"],
+  "feedget": ["https://developers.vtex.com/docs/api-reference/orders-api#get-/api/orders/feed","Orders API: Retrieve feed items"],
+  "feedcommit": ["https://developers.vtex.com/docs/api-reference/orders-api#post-/api/orders/feed","Orders API: Commit feed items"]
 }

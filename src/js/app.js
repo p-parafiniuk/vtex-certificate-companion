@@ -63,6 +63,7 @@
     gx: { head: true, combo: true, toast: true },
     lang: "pl",
     nknown: {},
+    lab: {},
     cnt: { q: true, f: true, n: true },
     cntV: 1,
     rv: {},
@@ -402,6 +403,23 @@
       if (raw.dom === "all" || DOM_NAME[raw.dom]) S.dom = raw.dom;
       if (raw.set === "1" || raw.set === "2") S.set = raw.set;
       if (["1", "2", "3", "4"].indexOf(raw.flv) > -1) S.flv = raw.flv;
+      /* Labs are keyed by id: anything for a lab that no longer exists, or out of range, is dropped. */
+      if (raw.lab && typeof raw.lab === "object" && !Array.isArray(raw.lab))
+        LABS.forEach(function (x) {
+          var r = raw.lab[x.id],
+            o = {};
+          if (!r || typeof r !== "object") return;
+          o.st = Math.min(Math.max(r.st >>> 0, 0), x.s.length);
+          o.pre = {};
+          if (r.pre && typeof r.pre === "object")
+            x.pre.forEach(function (_, j) {
+              if (r.pre[j]) o.pre[j] = 1;
+            });
+          ["fail", "done"].forEach(function (k) {
+            if (typeof r[k] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r[k])) o[k] = r[k];
+          });
+          S.lab[x.id] = o;
+        });
       if (raw.simMin > 0 && raw.simMin <= 600) S.simMin = Math.round(raw.simMin);
       if (raw.simPrac === false) S.simPrac = false;
       if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
@@ -2718,15 +2736,15 @@
   });
 
   /* ---------- Fiszki ---------- */
-  function renderF() {
-    var html = "",
-      per = [
-        [0, 0],
-        [0, 0],
-        [0, 0],
-        [0, 0],
-        [0, 0]
-      ];
+  /* Known / total per level in the open category; [0] is all levels. Labs are level 4. */
+  function lvPer() {
+    var per = [
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [0, 0]
+    ];
     F.forEach(function (f, i) {
       if (S.dom !== "all" && f.d !== S.dom) return;
       per[0][1]++;
@@ -2736,6 +2754,25 @@
         per[f.lv][0]++;
       }
     });
+    domLabs().forEach(function (x) {
+      per[0][1]++;
+      per[4][1]++;
+      if (labDone(x)) {
+        per[0][0]++;
+        per[4][0]++;
+      }
+    });
+    return per;
+  }
+  function domLabs() {
+    return LABS.filter(function (x) {
+      return S.dom === "all" || x.d === S.dom;
+    });
+  }
+  function renderF() {
+    var html = "",
+      per = lvPer(),
+      labs = domLabs();
     /* A level that the open category no longer has would leave an empty list behind a filter nobody can see. */
     if (S.flv !== "all" && !per[+S.flv][1]) S.flv = "all";
     $("#flv").innerHTML = per[0][1]
@@ -2761,6 +2798,10 @@
           })
           .join("")
       : "";
+    if (S.flv === "all" || S.flv === "4")
+      labs.forEach(function (x) {
+        html += labHtml(x);
+      });
     F.forEach(function (f, i) {
       if (S.dom !== "all" && f.d !== S.dom) return;
       if (S.flv !== "all" && String(f.lv) !== S.flv) return;
@@ -2819,6 +2860,270 @@
     b.textContent = n === all ? L("Ukryj wszystkie", "Hide all") : L("Pokaż wszystkie", "Show all");
     $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + all;
   }
+  /* ---------- Labs: a level-4 kata walked step by step from a stated starting state ---------- */
+  var LABOPEN = {},
+    LABFIX = {};
+  function labSt(id) {
+    return S.lab[id] || { st: 0, pre: {} };
+  }
+  function labDone(x) {
+    return labSt(x.id).st >= x.s.length;
+  }
+  /* A failed run stays due until the lab is finished again on a later day. */
+  function labDue(x) {
+    var o = labSt(x.id);
+    return !!o.fail && !(o.done && o.done > o.fail && o.st >= x.s.length);
+  }
+  /* Lines of one section share a single source block, so the checklist stays readable on a phone. */
+  function labDocs(rows) {
+    var ks = [];
+    rows.forEach(function (p) {
+      p[1].forEach(function (k) {
+        if (ks.indexOf(k) < 0) ks.push(k);
+      });
+    });
+    return docLinks({ l: ks });
+  }
+  function labHtml(x) {
+    var o = labSt(x.id),
+      n = x.s.length,
+      id = esc(x.id),
+      open = !!LABOPEN[x.id],
+      done = o.st >= n,
+      preOk = x.pre.every(function (_, j) {
+        return o.pre[j];
+      }),
+      status = done
+        ? L("Ukończony", "Completed")
+        : o.st
+          ? L("Krok ", "Step ") + (o.st + 1) + L(" z ", " of ") + n
+          : L("Nie zaczęty", "Not started");
+    var h =
+      '<article class="lab' +
+      (done ? " is-known" : "") +
+      '" id="lab-' +
+      id +
+      '" data-lab="' +
+      id +
+      '"><div class="q-head">' +
+      lvBadge(4) +
+      '<span class="dom">' +
+      esc(dn(x.d)) +
+      '</span><span class="how lab-meta">' +
+      n +
+      L(" kroków · ~", " steps · ~") +
+      x.min +
+      " min</span>" +
+      (labDue(x) ? '<span class="lab-due">' + L("Do powtórki", "To redo") + "</span>" : "") +
+      '<span class="lab-st">' +
+      status +
+      "</span></div>" +
+      '<h3 class="lab-t">' +
+      fmt(x.t) +
+      '</h3><p class="lab-goal">' +
+      fmt(x.goal) +
+      "</p>" +
+      '<button type="button" class="btn lab-open" aria-expanded="' +
+      open +
+      '" aria-controls="lb-' +
+      id +
+      '">' +
+      (open
+        ? L("Zwiń lab", "Collapse lab")
+        : done
+          ? L("Otwórz ukończony lab", "Open the completed lab")
+          : o.st
+            ? L("Wznów od kroku ", "Resume at step ") + (o.st + 1)
+            : L("Zacznij lab", "Start the lab")) +
+      "</button>";
+    if (!open) return h + "</article>";
+    h +=
+      '<div class="lab-body" id="lb-' +
+      id +
+      '"><section class="lab-pre"><h4>' +
+      L("Zanim zaczniesz: warunki początkowe", "Before you start: starting state") +
+      "</h4><ul>" +
+      x.pre
+        .map(function (p, j) {
+          return (
+            '<li><label class="check"><input type="checkbox" class="lpre" data-j="' +
+            j +
+            '"' +
+            (o.pre[j] ? " checked" : "") +
+            "> <span>" +
+            fmt(p[0]) +
+            "</span></label></li>"
+          );
+        })
+        .join("") +
+      "</ul>" +
+      labDocs(x.pre) +
+      '</section><ol class="lab-steps">';
+    x.s.forEach(function (s, j) {
+      var cur = j === o.st,
+        cls = j < o.st ? "is-done" : cur ? "is-cur" : "";
+      h +=
+        '<li class="' +
+        cls +
+        '"' +
+        (cur ? ' aria-current="step"' : "") +
+        '><span class="lab-n" aria-hidden="true">' +
+        (j < o.st ? "✓" : j + 1) +
+        '</span><div class="lab-s"><p class="lab-h">' +
+        (j < o.st ? '<span class="sr">' + L("Zrobione: ", "Done: ") + "</span>" : "") +
+        fmt(s.h) +
+        "</p>";
+      if (cur) {
+        h +=
+          (s.in ? '<p class="lab-in"><strong>' + L("Masz: ", "You have: ") + "</strong>" + fmt(s.in) + "</p>" : "") +
+          '<p class="lab-do">' +
+          fmt(s.do) +
+          "</p>" +
+          (s.ok ? '<p class="lab-ok"><strong>' + L("Sukces: ", "Success: ") + "</strong>" + fmt(s.ok) + "</p>" : "") +
+          (s.keep
+            ? '<p class="lab-keep"><strong>' + L("Zapisz: ", "Keep: ") + "</strong>" + fmt(s.keep) + "</p>"
+            : "") +
+          (s.warn ? '<p class="lab-warn">' + fmt(s.warn) + "</p>" : "") +
+          docLinks(s) +
+          '<div class="row lab-acts"><button type="button" class="btn primary lab-next"' +
+          (!preOk && !j ? ' disabled aria-describedby="lh-' + id + '"' : "") +
+          ">" +
+          (j === n - 1 ? L("Zrobione, kończę lab", "Done, finish the lab") : L("Zrobione, dalej", "Done, next")) +
+          '</button><button type="button" class="btn lab-fail" aria-expanded="' +
+          !!LABFIX[x.id] +
+          '" aria-controls="lf-' +
+          id +
+          '">' +
+          L("Nie wyszło: co sprawdzić", "It failed: what to check") +
+          "</button>" +
+          (j ? '<button type="button" class="btn small lab-back">' + L("Krok wstecz", "Step back") + "</button>" : "") +
+          "</div>" +
+          (!preOk && !j
+            ? '<p class="how" id="lh-' +
+              id +
+              '">' +
+              L(
+                "Najpierw odhacz warunki początkowe. Bez nich ten lab nie zadziała.",
+                "Tick the starting state first. Without it this lab will not work."
+              ) +
+              "</p>"
+            : "") +
+          '<div class="lab-fix" id="lf-' +
+          id +
+          '"' +
+          (LABFIX[x.id] ? "" : " hidden") +
+          "><h4>" +
+          L("Sprawdź po kolei", "Check in this order") +
+          "</h4><ol>" +
+          x.fix
+            .map(function (p) {
+              return "<li>" + fmt(p[0]) + "</li>";
+            })
+            .join("") +
+          "</ol>" +
+          labDocs(x.fix) +
+          "</div>";
+      }
+      h += "</div></li>";
+    });
+    h +=
+      "</ol>" +
+      '<section class="lab-brk"><h4>' +
+      L("Zepsuj to", "Break it") +
+      "</h4>" +
+      /* The failure task shows only after a clean run: first get it working, then break it on purpose. */
+      (done
+        ? "<p>" + fmt(x.brk[0]) + "</p>" + labDocs([x.brk])
+        : '<p class="how">' +
+          L(
+            "Odblokuje się po ukończeniu labu: celowo go zepsujesz i zobaczysz, co się stanie.",
+            "Unlocks when you finish the lab: you break it on purpose and see what happens."
+          ) +
+          "</p>") +
+      "</section>" +
+      (done
+        ? '<div class="row lab-acts"><p class="lab-fin">' +
+          L(
+            "Lab ukończony. Powtórz go za kilka dni, bez zaglądania w kroki.",
+            "Lab completed. Run it again in a few days without looking at the steps."
+          ) +
+          '</p><button type="button" class="btn lab-reset">' +
+          L("Powtórz od zera", "Run it again") +
+          "</button></div>"
+        : "") +
+      "</div></article>";
+    return h;
+  }
+  function labRepaint(id, focusSel) {
+    var x = LABS.filter(function (l) {
+        return l.id === id;
+      })[0],
+      el = document.getElementById("lab-" + id);
+    if (!x || !el) return;
+    el.outerHTML = labHtml(x);
+    var nf = document.getElementById("lab-" + id).querySelector(focusSel);
+    if (nf) nf.focus();
+    renderLvChips();
+  }
+  function renderLvChips() {
+    var per = lvPer();
+    document.querySelectorAll("#flv [data-flv] small").forEach(function (sm) {
+      var v = sm.parentNode.dataset.flv,
+        k = v === "all" ? 0 : +v;
+      sm.textContent = per[k][0] + "/" + per[k][1];
+    });
+  }
+  $("#flist").addEventListener("click", function (ev) {
+    var card = ev.target.closest(".lab");
+    if (!card) return;
+    var id = card.dataset.lab,
+      x = LABS.filter(function (l) {
+        return l.id === id;
+      })[0];
+    if (!x) return;
+    var o = S.lab[id] || (S.lab[id] = { st: 0, pre: {} });
+    if (ev.target.closest(".lab-open")) {
+      LABOPEN[id] = !LABOPEN[id];
+      return labRepaint(id, ".lab-open");
+    }
+    if (ev.target.closest(".lab-fail")) {
+      LABFIX[id] = !LABFIX[id];
+      if (LABFIX[id]) {
+        o.fail = dayKey(new Date());
+        save();
+      }
+      return labRepaint(id, ".lab-fail");
+    }
+    if (ev.target.closest(".lab-next")) {
+      o.st = Math.min(o.st + 1, x.s.length);
+      if (o.st >= x.s.length) o.done = dayKey(new Date());
+      LABFIX[id] = false;
+      save();
+      return labRepaint(id, o.st >= x.s.length ? ".lab-reset" : ".lab-next");
+    }
+    if (ev.target.closest(".lab-back")) {
+      o.st = Math.max(o.st - 1, 0);
+      LABFIX[id] = false;
+      save();
+      return labRepaint(id, o.st ? ".lab-back" : ".lab-next");
+    }
+    if (ev.target.closest(".lab-reset")) {
+      o.st = 0;
+      o.pre = {};
+      LABFIX[id] = false;
+      save();
+      return labRepaint(id, ".lpre");
+    }
+  });
+  $("#flist").addEventListener("change", function (ev) {
+    if (!ev.target.classList.contains("lpre")) return;
+    var id = ev.target.closest(".lab").dataset.lab,
+      o = S.lab[id] || (S.lab[id] = { st: 0, pre: {} });
+    if (ev.target.checked) o.pre[ev.target.dataset.j] = 1;
+    else delete o.pre[ev.target.dataset.j];
+    save();
+    labRepaint(id, '.lpre[data-j="' + ev.target.dataset.j + '"]');
+  });
   function paintKataTab() {
     var k = 0,
       t = 0;
