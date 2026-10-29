@@ -12,7 +12,7 @@
 <script>(function () { var r = document.documentElement; r.setAttribute("data-boot", /^#focus/.test(location.hash) ? "focus" : ""); document.addEventListener("DOMContentLoaded", function () { r.removeAttribute("data-boot"); }); })();</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one 860px working column under a dark sticky navigation bar. A progress card opens the page: mastered overall, then questions, flashcards, accuracy and last simulation against the 80% pass line.
+/* Layout: one 860px working column under a dark sticky navigation bar. A progress card opens the page: mastered overall, then questions, katas, notes, accuracy and last simulation against the 80% pass line.
    Surfaces stay flat and quiet; colour is reserved for answer state and for what is mastered. */
 :root {
   --bg: #f5f2f6;
@@ -454,9 +454,11 @@ a {
   margin-top: 6px;
 }
 /* Columns never shrink below their content, so a long value or label cannot run into its neighbour. */
+/* Columns flow: a part the overall score leaves out is hidden and takes no column. */
 .prog {
   display: grid;
-  grid-template-columns: repeat(4, minmax(max-content, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(max-content, 1fr);
   gap: 10px 24px;
   border-left: 1px solid var(--line);
   padding-left: 28px;
@@ -3749,7 +3751,7 @@ div.setrow {
     <h1><a class="brand" href="#pytania" title="Wszystkie pytania" data-en-title="All questions"><svg class="brand-mark" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect width="64" height="64" rx="14"/><path d="M16 18l14 30h4l14-30"/></svg><span class="brand-name">VTEX API Drill</span></a></h1>
     <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
       <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
-      <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki"><span data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span> <span class="num">35</span></button>
+      <button class="tab" role="tab" id="t-fiszki" data-tab="fiszki" aria-controls="p-fiszki" title="Kata to krótkie ćwiczenie do powtarzania: pytanie otwarte albo zadanie praktyczne. Najpierw odpowiadasz sam, potem porównujesz z wzorcem i sam się oceniasz." data-en-title="A kata is a short drill you repeat: an open question or a practical task. You answer on your own first, then compare with the model answer and grade yourself."><span data-en="Katas">Katas</span> <span class="num">35</span></button>
       <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
       <button class="tab tab-x" role="tab" id="t-http" data-tab="http" aria-controls="p-http" title="Suplement: kody statusu HTTP" data-en-title="Extra: HTTP status codes">HTTP</button>
       <button class="tab" role="tab" id="t-api" data-tab="api" aria-controls="p-api" title="Suplement: mapa endpointów VTEX z vtex/openapi-schemas" data-en-title="Extra: map of VTEX endpoints from vtex/openapi-schemas">API<span class="tab-long"> Map</span></button>
@@ -3781,7 +3783,8 @@ div.setrow {
     </div>
     <div class="prog">
       <div class="pg" title="Pytania oznaczone jako Umiem" data-en-title="Questions marked as known"><span class="pg-k" data-en="Questions">Pytania</span><span class="pg-v" id="pg-q">0/161</span><div class="meter" aria-hidden="true"><i id="pm-q"></i></div></div>
-      <div class="pg" title="Fiszki oznaczone jako Umiem" data-en-title="Flashcards marked as known"><span class="pg-k" data-en-html='<span class="tab-long">Flashcards</span><span class="tab-short">Cards</span>'>Fiszki</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
+      <div class="pg" title="Katas oznaczone jako Umiem. Kata to krótkie ćwiczenie do powtarzania: pytanie otwarte albo zadanie praktyczne. Najpierw odpowiadasz sam, potem porównujesz z wzorcem i sam się oceniasz." data-en-title="Katas marked as known. A kata is a short drill you repeat: an open question or a practical task. You answer on your own first, then compare with the model answer and grade yourself."><span class="pg-k" data-en="Katas">Katas</span><span class="pg-v" id="pg-f">0/35</span><div class="meter" aria-hidden="true"><i id="pm-f"></i></div></div>
+      <div class="pg" title="Bloki notatek oznaczone jako Umiem" data-en-title="Note blocks marked as known"><span class="pg-k" data-en="Notes">Notatki</span><span class="pg-v" id="pg-n">0/80</span><div class="meter" aria-hidden="true"><i id="pm-n"></i></div></div>
       <div class="pg" title="Odsetek dobrych odpowiedzi w trybie nauki. Kreska = próg 80%" data-en-title="Share of right answers in study mode. Line = 80% pass mark"><span class="pg-k" data-en="Accuracy">Trafność</span><span class="pg-v" id="pg-a">–</span><div class="meter th" aria-hidden="true"><i id="pm-a"></i></div></div>
       <div class="pg" title="Wynik ostatniej symulacji. Kreska = próg 80%" data-en-title="Score of the last simulation. Line = 80% pass mark"><span class="pg-k" data-en-html='<span class="tab-long">Simulation</span><span class="tab-short">Exam</span>'><span class="tab-long">Symulacja</span><span class="tab-short">Test</span></span><span class="pg-v" id="pg-s">–</span><div class="meter th" aria-hidden="true"><i id="pm-s"></i></div></div>
     </div>
@@ -3801,7 +3804,7 @@ div.setrow {
           <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
         </div>
         <div class="csec" id="cs-pytania" role="tabpanel" aria-labelledby="ct-pytania">
-          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, flashcards and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
+          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, katas and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, katas i zadania praktyczne w jednym ciągu.</span></div>
           <p class="lead" id="q-lead" data-en-html="<strong>One bank for the APIs &amp;amp; Integrations Badge: 161 multiple-choice questions.</strong> Each question can have <strong>one right answer or several</strong>. Select all that apply and click <strong>Check answer</strong>. Only the full set counts. After a mistake you get a link to the VTEX docs. Tick <strong>Known</strong> once you have a question down. The categories narrow the bank to one area."><strong>Jedna baza do APIs &amp; Integrations Badge: 161 pytań wielokrotnego wyboru.</strong> W każdym pytaniu poprawna może być <strong>jedna odpowiedź albo kilka</strong>. Zaznacz wszystkie pasujące i kliknij <strong>Sprawdź odpowiedź</strong>. Liczy się tylko komplet. Po błędzie dostajesz link do dokumentacji VTEX. Zaznacz <strong>Umiem</strong>, gdy pytanie masz opanowane. Kategorie po lewej zawężają bazę do jednego obszaru.</p>
           <div class="toolbar">
             <div class="chips" id="sets" role="group" aria-label="Filtr rundy" data-en-aria="Round filter"></div>
@@ -3830,8 +3833,8 @@ div.setrow {
   </section>
 
   <section class="panel" id="p-fiszki" role="tabpanel" aria-labelledby="t-fiszki" hidden>
-    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, flashcards and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, fiszki i zadania praktyczne w jednym ciągu.</span></div>
-    <p class="lead" data-en-html="<strong>Answer out loud or write the request on paper first.</strong> Only then reveal the answer. The &ldquo;Practical&rdquo; flashcards train the 4 practical tasks: method, path, body. Under each answer there is a link to the VTEX docs. F1–20 are round 1, F21–35 are round 2."><strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce.</strong> Dopiero potem odsłoń odpowiedź. Fiszki „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body. Pod każdą odpowiedzią jest link do dokumentacji VTEX. F1–20 to runda 1, F21–35 to runda 2.</p>
+    <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one card at a time, with deck progress. Questions, katas and practical tasks in one run."><strong>Focus:</strong> jedna karta naraz, z postępem talii. Pytania, katas i zadania praktyczne w jednym ciągu.</span></div>
+    <p class="lead" data-en-html="<strong>A kata</strong> is a short drill you repeat until it sticks: an open question or a practical task. You grade yourself against the model answer.<br><strong>Answer out loud or write the request on paper first.</strong> Only then reveal the answer. The &ldquo;Practical&rdquo; katas train the 4 practical tasks: method, path, body. Under each answer there is a link to the VTEX docs. F1–20 are round 1, F21–35 are round 2."><strong>Kata</strong> to krótkie ćwiczenie powtarzane do skutku: pytanie otwarte albo zadanie praktyczne. Sam oceniasz się względem wzorcowej odpowiedzi.<br><strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce.</strong> Dopiero potem odsłoń odpowiedź. Katas „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body. Pod każdą odpowiedzią jest link do dokumentacji VTEX. F1–20 to runda 1, F21–35 to runda 2.</p>
     <div class="row"><button type="button" class="btn small" id="f-show-all" data-en="Show all answers">Pokaż wszystkie odpowiedzi</button><button type="button" class="btn small" id="f-hide-all" data-en="Hide all answers">Ukryj wszystkie odpowiedzi</button><span class="how" id="f-open-n"></span></div>
     <div class="list" id="flist"></div>
   </section>
@@ -3858,7 +3861,7 @@ div.setrow {
       <li><span class="sw"></span><span data-en="untouched">nieruszone</span></li>
     </ul>
     <div class="grid" id="qgrid"></div>
-    <h3 data-en="Flashcards 1–35">Fiszki 1–35</h3>
+    <h3 data-en="Katas 1–35">Katas 1–35</h3>
     <div class="grid" id="fgrid"></div>
     <h3 data-en="Recent simulations">Ostatnie symulacje</h3>
     <ul class="hist" id="hist"></ul>
@@ -3894,7 +3897,7 @@ div.setrow {
     <section class="card setg" aria-labelledby="set-h-look">
       <h3 id="set-h-look" data-en="Appearance">Wygląd</h3>
       <div class="setrow">
-        <span class="setl"><span class="setn" id="set-lang-l">Język · Language</span><span class="seth" data-en="Changes the interface text and HTTP Koty. Questions, explanations and flashcards stay as written.">Zmienia napisy interfejsu i HTTP Koty. Pytania, wyjaśnienia i fiszki zostają bez zmian.</span></span>
+        <span class="setl"><span class="setn" id="set-lang-l">Język · Language</span><span class="seth" data-en="Changes the interface text and HTTP Koty. Questions, explanations and katas stay as written.">Zmienia napisy interfejsu i HTTP Koty. Pytania, wyjaśnienia i katas zostają bez zmian.</span></span>
         <div class="seg" role="group" aria-labelledby="set-lang-l" id="set-lang"><button type="button" class="seg-b" data-lang-set="pl" lang="pl">Polski</button><button type="button" class="seg-b" data-lang-set="en" lang="en">English</button></div>
       </div>
       <div class="setrow">
@@ -3932,7 +3935,7 @@ div.setrow {
 
   <dialog class="gs-dlg" id="gs-dlg" aria-label="Szukaj" data-en-aria="Search">
     <div class="gs-head">
-      <label class="gs-field"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input type="search" id="gs-q" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-controls="gs-res" aria-label="Szukaj w pytaniach, fiszkach, notatkach i API Map" data-en-aria="Search questions, flashcards, notes and the API Map" placeholder="Pytania, fiszki, notatki, endpointy" data-en-ph="Questions, flashcards, notes, endpoints"></label>
+      <label class="gs-field"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input type="search" id="gs-q" autocomplete="off" spellcheck="false" enterkeyhint="search" aria-controls="gs-res" aria-label="Szukaj w pytaniach, katas, notatkach i API Map" data-en-aria="Search questions, katas, notes and the API Map" placeholder="Pytania, katas, notatki, endpointy" data-en-ph="Questions, katas, notes, endpoints"></label>
       <button type="button" class="gs-x" id="gs-close" data-en="Close">Zamknij</button>
     </div>
     <p class="gs-sum" id="gs-sum" aria-live="polite"></p>
@@ -3950,9 +3953,9 @@ div.setrow {
       <div class="info-body">
     <p data-en-html="<strong>Unofficial practice questions.</strong> They do not come from the real exam. Written from the public VTEX documentation and OpenAPI schemas, and checked against them on 7 and 8 October 2026. Banks merged on 9 October 2026."><strong>Nieoficjalne pytania treningowe.</strong> Nie pochodzą z prawdziwego egzaminu. Napisane na podstawie publicznej dokumentacji i schematów OpenAPI VTEX, sprawdzone z nimi 7 i 8 października 2026. Bazy połączone 9 października 2026.</p>
     <p data-en-html="<strong>Reviews and confidence:</strong> every answer puts the card in a box from 1 to 5. A right answer moves it up and pushes the next review further (1, 3, 7, 16, 35 days); a wrong one sends it back to box 1. Before you check, you can say how sure you are: a right guess does not move up, and a mistake made while sure comes back the same day. Confidence is optional; turn it off in &lt;button type=&quot;button&quot; class=&quot;linkbtn&quot; data-go=&quot;ustawienia&quot;&gt;Settings&lt;/button&gt;."><strong>Powtórki i pewność:</strong> każda odpowiedź trafia do pudełka 1–5. Dobra przesuwa kartę wyżej i odsuwa następną powtórkę (1, 3, 7, 16, 35 dni), zła wraca do pudełka 1. Przed sprawdzeniem możesz zaznaczyć pewność: zgadnięta dobra odpowiedź nie awansuje, a błąd „na pewno” wraca jeszcze tego samego dnia. Pewność jest opcjonalna, wyłączysz ją w <button type="button" class="linkbtn" data-go="ustawienia">Ustawieniach</button>.</p>
-    <p data-en-html="<strong>Focus mode:</strong> questions count as right when every right answer is selected; flashcards and practical tasks by your own grade."><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; fiszki i zadania praktyczne według Twojej własnej oceny.</p>
+    <p data-en-html="<strong>Focus mode:</strong> questions count as right when every right answer is selected; katas and practical tasks by your own grade."><strong>Tryb Focus:</strong> pytania liczą się jako dobre przy komplecie poprawnych odpowiedzi; katas i zadania praktyczne według Twojej własnej oceny.</p>
     <p data-en-html="<strong>Format:</strong> on 9 October 2026 the bank was rebuilt as multiple choice (one or several right answers). Every added right answer repeats a fact confirmed in the VTEX docs or API Reference."><strong>Format:</strong> 9 października 2026 baza została przebudowana na wielokrotny wybór (jedna lub kilka poprawnych). Każda dodana poprawna odpowiedź powtarza fakt potwierdzony w dokumentacji albo w API Reference VTEX.</p>
-    <p data-en-html="<strong>Links on questions and flashcards</strong> lead to the VTEX docs (Developer Portal, Help Center, VTEX Learning). Each address was opened twice and compared with the question on 9 October 2026."><strong>Linki przy pytaniach i fiszkach</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
+    <p data-en-html="<strong>Links on questions and katas</strong> lead to the VTEX docs (Developer Portal, Help Center, VTEX Learning). Each address was opened twice and compared with the question on 9 October 2026."><strong>Linki przy pytaniach i katas</strong> prowadzą do dokumentacji VTEX (Developer Portal, Help Center, VTEX Learning). Każdy adres został otwarty dwukrotnie i porównany z treścią pytania 9 października 2026.</p>
     <p><span data-en="Sources:">Źródła:</span> <a href="https://developers.vtex.com/docs/guides/api-authentication-using-api-keys">API keys</a> · <a href="https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens">User tokens</a> · <a href="https://developers.vtex.com/docs/guides/catalog-integration">Catalog</a> · <a href="https://developers.vtex.com/docs/guides/skus">SKUs</a> · <a href="https://developers.vtex.com/docs/api-reference/pricing-api">Pricing API</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-inventory">Inventory</a> · <a href="https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api">Checkout order</a> · <a href="https://developers.vtex.com/docs/guides/orders-feed">Feed v3 i Hook</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration">Order integration</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider">Payment provider</a> · <a href="https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api">Master Data pagination</a> · <a href="https://developers.vtex.com/docs/guides/external-seller-integration-connector">External seller</a> · <a href="https://developers.vtex.com/docs/guides/api-response-codes">Status codes</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog">ERP: catalog</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-import-products">ERP: products</a> · <a href="https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing">ERP: order processing</a> · <a href="https://developers.vtex.com/docs/guides/change-order">Change order</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-purchase-flows">Purchase flows</a> · <a href="https://developers.vtex.com/docs/guides/payments-integration-secure-proxy">Secure Proxy</a> · <a href="https://developers.vtex.com/docs/guides/how-the-integration-protocol-between-vtex-and-antifraud-companies-works">Anti-fraud</a> · <a href="https://developers.vtex.com/docs/guides/login-integration-guide">Login (SSO)</a> · <a href="https://developers.vtex.com/docs/guides/sessions-system-overview">Sessions</a> · <a href="https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2">MD triggers</a> · <a href="https://developers.vtex.com/docs/api-reference/search-api">Search API</a> · <a href="https://developers.vtex.com/docs/api-reference/checkout-api">Checkout API</a> · <a href="https://developers.vtex.com/docs/api-reference/orders-api">Orders API</a> · <a href="https://developers.vtex.com/docs/api-reference/logistics-api">Logistics API</a> · <a href="https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api">Promotions &amp; Taxes API</a> · <a href="https://developers.vtex.com/docs/api-reference/giftcard-api">Giftcard API</a> · <a href="https://developers.vtex.com/docs/api-reference/payment-provider-protocol">Payment Provider Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/marketplace-protocol">Marketplace Protocol</a> · <a href="https://developers.vtex.com/docs/api-reference/vtex-id-api">VTEX ID API</a> · <a href="https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196">Order flow and status</a> · <a href="https://github.com/vtex/openapi-schemas">vtex/openapi-schemas</a></p>
       </div>
     </dialog>
@@ -5593,8 +5596,8 @@ footer ul {
   <footer>
     <div class="row">
       <button class="btn ghost" id="reset" data-en="Clear progress">Wyczyść postęp</button>
-      <span data-en="HTTP Koty progress is saved in this browser, separately from questions and flashcards."
-        >Postęp HTTP Kotów zapisuje się w tej przeglądarce, osobno od pytań i fiszek.</span
+      <span data-en="HTTP Koty progress is saved in this browser, separately from questions and katas."
+        >Postęp HTTP Kotów zapisuje się w tej przeglądarce, osobno od pytań i katas.</span
       >
       <span id="resetask" hidden
         ><span data-en="Sure?">Na pewno?</span>
@@ -10123,6 +10126,7 @@ function bootApiMap(root, onNav, embed) {
     lang: "pl",
     nknown: {},
     cnt: { q: true, f: true, n: true },
+    cntV: 1,
     rv: {},
     cal: [
       [0, 0],
@@ -10257,13 +10261,13 @@ function bootApiMap(root, onNav, embed) {
     },
     {
       id: "fall",
-      n: ["Wszystkie fiszki", "All flashcards"],
-      d: ["Każda fiszka oznaczona Umiem", "Every flashcard marked Known"],
+      n: ["Wszystkie katas", "All katas"],
+      d: ["Każda kata oznaczona Umiem", "Every kata marked Known"],
       ok: function (x) {
         return x.kf >= F.length;
       },
       p: function (x) {
-        return x.kf + " / " + F.length + L(" fiszek", " flashcards");
+        return x.kf + " / " + F.length + L(" katas", " katas");
       }
     },
     {
@@ -10315,7 +10319,8 @@ function bootApiMap(root, onNav, embed) {
           if (NKEY[k] && raw.nknown[k]) S.nknown[k] = true;
         });
       }
-      if (raw.cnt && typeof raw.cnt === "object")
+      /* Choices saved before cntV were often an old default, not a decision: everything counts again once. */
+      if (raw.cnt && typeof raw.cnt === "object" && raw.cntV === 1)
         ["q", "f", "n"].forEach(function (k) {
           S.cnt[k] = raw.cnt[k] !== false;
         });
@@ -11070,7 +11075,7 @@ function bootApiMap(root, onNav, embed) {
       '<p class="cat-sub">' +
       plural(nq, L("pytanie", "question"), L("pytania", "questions"), L("pytań", "questions")) +
       " · " +
-      plural(nf, L("fiszka", "flashcard"), L("fiszki", "flashcards"), L("fiszek", "flashcards")) +
+      plural(nf, "kata", "katas", "katas") +
       (all
         ? ""
         : " · " +
@@ -11372,7 +11377,7 @@ function bootApiMap(root, onNav, embed) {
         url: DOCS[x[0]][0],
         label: DOCS[x[0]][1],
         n: x[1],
-        g: L("Z pytań i fiszek", "From questions and flashcards")
+        g: L("Z pytań i katas", "From questions and katas")
       });
     });
     return out;
@@ -11414,7 +11419,7 @@ function bootApiMap(root, onNav, embed) {
         "</span>" +
         (x.n
           ? '<small title="' +
-            L("Pytania i fiszki z tym linkiem", "Questions and flashcards with this link") +
+            L("Pytania i katas z tym linkiem", "Questions and katas with this link") +
             '">' +
             x.n +
             "</small>"
@@ -11730,7 +11735,7 @@ function bootApiMap(root, onNav, embed) {
           SIM_MIN +
           "</strong>, i <strong>" +
           SIM_P +
-          " zadania praktyczne</strong> z fiszek „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
+          " zadania praktyczne</strong> z katas „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
           "Wynik, także per obszar, i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.",
         "I draw <strong>" +
           SIM_Q +
@@ -11740,7 +11745,7 @@ function bootApiMap(root, onNav, embed) {
           SIM_MIN +
           " from every area</strong>, and <strong>" +
           SIM_P +
-          " practical tasks</strong> from the “Practical” flashcards. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
+          " practical tasks</strong> from the “Practical” katas. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
           "You get the score, also per area, and the explanations at the end. The pass mark is <strong>80%</strong>."
       ) +
       "</p>" +
@@ -13427,7 +13432,7 @@ function bootApiMap(root, onNav, embed) {
       Q.length +
       "</small></dd></div>" +
       "<div><dt>" +
-      L("Fiszki opanowane", "Flashcards mastered") +
+      L("Katas opanowane", "Katas mastered") +
       "</dt><dd>" +
       c.kf +
       " <small>/ " +
@@ -13554,7 +13559,7 @@ function bootApiMap(root, onNav, embed) {
       "</legend>" +
       [
         ["q", L("Pytania", "Questions"), c.kq, Q.length],
-        ["f", L("Fiszki", "Flashcards"), c.kf, F.length],
+        ["f", "Katas", c.kf, F.length],
         ["n", L("Notatki", "Notes"), c.kn, NTOTAL]
       ]
         .map(function (x) {
@@ -13575,7 +13580,10 @@ function bootApiMap(root, onNav, embed) {
         .join("") +
       "</fieldset>" +
       '<p class="seth">' +
-      L("Co najmniej jedno zostaje zaznaczone.", "At least one stays ticked.") +
+      L(
+        "Domyślnie liczy się wszystko. Odznaczona część znika też z paska u góry. Co najmniej jedna zostaje zaznaczona.",
+        "Everything counts by default. An unticked part also leaves the top bar. At least one stays ticked."
+      ) +
       "</p>";
   }
   function renderGrids() {
@@ -13618,7 +13626,7 @@ function bootApiMap(root, onNav, embed) {
         '"' +
         (S.fknown[i] ? " checked" : "") +
         ' aria-label="' +
-        L("Fiszka ", "Flashcard ") +
+        L("Kata ", "Kata ") +
         (i + 1) +
         L(" opanowana", " mastered") +
         '"><span>F' +
@@ -13818,7 +13826,7 @@ function bootApiMap(root, onNav, embed) {
           esc(when) +
           L(". Opanowane pytania: ", ". Questions mastered: ") +
           cnt(d.known) +
-          L(", fiszki: ", ", flashcards: ") +
+          ", katas: " +
           cnt(d.fknown) +
           L(", notatki: ", ", notes: ") +
           cnt(d.nknown) +
@@ -13911,7 +13919,7 @@ function bootApiMap(root, onNav, embed) {
   var DECKS = [
     ["all", ["Wszystko", "Everything"]],
     ["q", ["Pytania", "Questions"]],
-    ["f", ["Fiszki", "Flashcards"]],
+    ["f", ["Katas", "Katas"]],
     ["p", ["Praktyczne", "Practical"]]
   ];
   function svg(p) {
@@ -14015,7 +14023,7 @@ function bootApiMap(root, onNav, embed) {
       f.r +
       "</span>" +
       '<span class="rnd">' +
-      (prac ? L("zadanie praktyczne", "practical task") : L("fiszka", "flashcard")) +
+      (prac ? L("zadanie praktyczne", "practical task") : "kata") +
       "</span>" +
       (S.fknown[c.i] ? '<span class="kbadge">' + L("Umiem", "Known") + "</span>" : "") +
       "</div>";
@@ -14176,8 +14184,8 @@ function bootApiMap(root, onNav, embed) {
       ) +
       '<p class="how">' +
       L(
-        "Możesz wybrać kilka poziomów. Karty bez odpowiedzi są ukryte. Fiszki trafiają do „Bez oceny”.",
-        "You can pick several levels. Unanswered cards are hidden. Flashcards count as “Not rated”."
+        "Możesz wybrać kilka poziomów. Karty bez odpowiedzi są ukryte. Katas trafiają do „Bez oceny”.",
+        "You can pick several levels. Unanswered cards are hidden. Katas count as “Not rated”."
       ) +
       "</p></div>" +
       '<div class="fs"><h3 id="fo-h-set">' +
@@ -14431,7 +14439,7 @@ function bootApiMap(root, onNav, embed) {
               '"' +
               (x === c ? ' aria-current="true"' : "") +
               ' aria-label="' +
-              (x.t === "q" ? L("Pytanie ", "Question ") + (x.i + 1) : L("Fiszka ", "Flashcard ") + (x.i + 1)) +
+              (x.t === "q" ? L("Pytanie ", "Question ") + (x.i + 1) : L("Kata ", "Kata ") + (x.i + 1)) +
               (s === 1
                 ? L(", dobrze", ", right")
                 : s === 2
@@ -14825,6 +14833,12 @@ function bootApiMap(root, onNav, embed) {
     bar("#pm-q", (c.kq / Q.length) * 100);
     $("#pg-f").textContent = c.kf + "/" + F.length;
     bar("#pm-f", (c.kf / F.length) * 100);
+    $("#pg-n").textContent = c.kn + "/" + NTOTAL;
+    bar("#pm-n", NTOTAL ? (c.kn / NTOTAL) * 100 : 0);
+    /* The bar shows only the parts the overall score counts. */
+    ["q", "f", "n"].forEach(function (k) {
+      $("#pg-" + k).parentNode.hidden = !S.cnt[k];
+    });
     if (c.ans) {
       var acc = (c.right / c.ans) * 100;
       $("#pg-a").textContent = Math.round(acc) + "%";
@@ -14896,7 +14910,7 @@ function bootApiMap(root, onNav, embed) {
     if (card) {
       var num = card.querySelector(".num").textContent;
       from = /^F\d/.test(num)
-        ? L("fiszki ", "flashcard ") + num
+        ? L("kata ", "kata ") + num
         : /^#/.test(num)
           ? L("pytania ", "question ") + num
           : L("symulacji", "the simulation");
@@ -15175,7 +15189,7 @@ function bootApiMap(root, onNav, embed) {
     GS_MAX = 5,
     GS_GROUPS = [
       ["q", ["Pytania", "Questions"]],
-      ["f", ["Fiszki", "Flashcards"]],
+      ["f", ["Katas", "Katas"]],
       ["n", ["Notatki", "Notes"]],
       ["a", ["API", "API"]]
     ];
@@ -15269,8 +15283,8 @@ function bootApiMap(root, onNav, embed) {
       words = gsNorm(raw).split(/\s+/).filter(Boolean);
     if (raw.length < 2) {
       $("#gs-sum").textContent = L(
-        "Wpisz co najmniej 2 znaki. Szuka w pytaniach, fiszkach, notatkach i endpointach API Map.",
-        "Type at least 2 characters. Searches questions, flashcards, notes and API Map endpoints."
+        "Wpisz co najmniej 2 znaki. Szuka w pytaniach, katas, notatkach i endpointach API Map.",
+        "Type at least 2 characters. Searches questions, katas, notes and API Map endpoints."
       );
       $("#gs-res").innerHTML = "";
       return;

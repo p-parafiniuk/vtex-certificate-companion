@@ -56,6 +56,7 @@
     lang: "pl",
     nknown: {},
     cnt: { q: true, f: true, n: true },
+    cntV: 1,
     rv: {},
     cal: [
       [0, 0],
@@ -190,13 +191,13 @@
     },
     {
       id: "fall",
-      n: ["Wszystkie fiszki", "All flashcards"],
-      d: ["Każda fiszka oznaczona Umiem", "Every flashcard marked Known"],
+      n: ["Wszystkie katas", "All katas"],
+      d: ["Każda kata oznaczona Umiem", "Every kata marked Known"],
       ok: function (x) {
         return x.kf >= F.length;
       },
       p: function (x) {
-        return x.kf + " / " + F.length + L(" fiszek", " flashcards");
+        return x.kf + " / " + F.length + L(" katas", " katas");
       }
     },
     {
@@ -248,7 +249,8 @@
           if (NKEY[k] && raw.nknown[k]) S.nknown[k] = true;
         });
       }
-      if (raw.cnt && typeof raw.cnt === "object")
+      /* Choices saved before cntV were often an old default, not a decision: everything counts again once. */
+      if (raw.cnt && typeof raw.cnt === "object" && raw.cntV === 1)
         ["q", "f", "n"].forEach(function (k) {
           S.cnt[k] = raw.cnt[k] !== false;
         });
@@ -1003,7 +1005,7 @@
       '<p class="cat-sub">' +
       plural(nq, L("pytanie", "question"), L("pytania", "questions"), L("pytań", "questions")) +
       " · " +
-      plural(nf, L("fiszka", "flashcard"), L("fiszki", "flashcards"), L("fiszek", "flashcards")) +
+      plural(nf, "kata", "katas", "katas") +
       (all
         ? ""
         : " · " +
@@ -1305,7 +1307,7 @@
         url: DOCS[x[0]][0],
         label: DOCS[x[0]][1],
         n: x[1],
-        g: L("Z pytań i fiszek", "From questions and flashcards")
+        g: L("Z pytań i katas", "From questions and katas")
       });
     });
     return out;
@@ -1347,7 +1349,7 @@
         "</span>" +
         (x.n
           ? '<small title="' +
-            L("Pytania i fiszki z tym linkiem", "Questions and flashcards with this link") +
+            L("Pytania i katas z tym linkiem", "Questions and katas with this link") +
             '">' +
             x.n +
             "</small>"
@@ -1663,7 +1665,7 @@
           SIM_MIN +
           "</strong>, i <strong>" +
           SIM_P +
-          " zadania praktyczne</strong> z fiszek „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
+          " zadania praktyczne</strong> z katas „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
           "Wynik, także per obszar, i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.",
         "I draw <strong>" +
           SIM_Q +
@@ -1673,7 +1675,7 @@
           SIM_MIN +
           " from every area</strong>, and <strong>" +
           SIM_P +
-          " practical tasks</strong> from the “Practical” flashcards. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
+          " practical tasks</strong> from the “Practical” katas. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
           "You get the score, also per area, and the explanations at the end. The pass mark is <strong>80%</strong>."
       ) +
       "</p>" +
@@ -3360,7 +3362,7 @@
       Q.length +
       "</small></dd></div>" +
       "<div><dt>" +
-      L("Fiszki opanowane", "Flashcards mastered") +
+      L("Katas opanowane", "Katas mastered") +
       "</dt><dd>" +
       c.kf +
       " <small>/ " +
@@ -3487,7 +3489,7 @@
       "</legend>" +
       [
         ["q", L("Pytania", "Questions"), c.kq, Q.length],
-        ["f", L("Fiszki", "Flashcards"), c.kf, F.length],
+        ["f", "Katas", c.kf, F.length],
         ["n", L("Notatki", "Notes"), c.kn, NTOTAL]
       ]
         .map(function (x) {
@@ -3508,7 +3510,10 @@
         .join("") +
       "</fieldset>" +
       '<p class="seth">' +
-      L("Co najmniej jedno zostaje zaznaczone.", "At least one stays ticked.") +
+      L(
+        "Domyślnie liczy się wszystko. Odznaczona część znika też z paska u góry. Co najmniej jedna zostaje zaznaczona.",
+        "Everything counts by default. An unticked part also leaves the top bar. At least one stays ticked."
+      ) +
       "</p>";
   }
   function renderGrids() {
@@ -3551,7 +3556,7 @@
         '"' +
         (S.fknown[i] ? " checked" : "") +
         ' aria-label="' +
-        L("Fiszka ", "Flashcard ") +
+        L("Kata ", "Kata ") +
         (i + 1) +
         L(" opanowana", " mastered") +
         '"><span>F' +
@@ -3751,7 +3756,7 @@
           esc(when) +
           L(". Opanowane pytania: ", ". Questions mastered: ") +
           cnt(d.known) +
-          L(", fiszki: ", ", flashcards: ") +
+          ", katas: " +
           cnt(d.fknown) +
           L(", notatki: ", ", notes: ") +
           cnt(d.nknown) +
@@ -3844,7 +3849,7 @@
   var DECKS = [
     ["all", ["Wszystko", "Everything"]],
     ["q", ["Pytania", "Questions"]],
-    ["f", ["Fiszki", "Flashcards"]],
+    ["f", ["Katas", "Katas"]],
     ["p", ["Praktyczne", "Practical"]]
   ];
   function svg(p) {
@@ -3948,7 +3953,7 @@
       f.r +
       "</span>" +
       '<span class="rnd">' +
-      (prac ? L("zadanie praktyczne", "practical task") : L("fiszka", "flashcard")) +
+      (prac ? L("zadanie praktyczne", "practical task") : "kata") +
       "</span>" +
       (S.fknown[c.i] ? '<span class="kbadge">' + L("Umiem", "Known") + "</span>" : "") +
       "</div>";
@@ -4109,8 +4114,8 @@
       ) +
       '<p class="how">' +
       L(
-        "Możesz wybrać kilka poziomów. Karty bez odpowiedzi są ukryte. Fiszki trafiają do „Bez oceny”.",
-        "You can pick several levels. Unanswered cards are hidden. Flashcards count as “Not rated”."
+        "Możesz wybrać kilka poziomów. Karty bez odpowiedzi są ukryte. Katas trafiają do „Bez oceny”.",
+        "You can pick several levels. Unanswered cards are hidden. Katas count as “Not rated”."
       ) +
       "</p></div>" +
       '<div class="fs"><h3 id="fo-h-set">' +
@@ -4364,7 +4369,7 @@
               '"' +
               (x === c ? ' aria-current="true"' : "") +
               ' aria-label="' +
-              (x.t === "q" ? L("Pytanie ", "Question ") + (x.i + 1) : L("Fiszka ", "Flashcard ") + (x.i + 1)) +
+              (x.t === "q" ? L("Pytanie ", "Question ") + (x.i + 1) : L("Kata ", "Kata ") + (x.i + 1)) +
               (s === 1
                 ? L(", dobrze", ", right")
                 : s === 2
@@ -4758,6 +4763,12 @@
     bar("#pm-q", (c.kq / Q.length) * 100);
     $("#pg-f").textContent = c.kf + "/" + F.length;
     bar("#pm-f", (c.kf / F.length) * 100);
+    $("#pg-n").textContent = c.kn + "/" + NTOTAL;
+    bar("#pm-n", NTOTAL ? (c.kn / NTOTAL) * 100 : 0);
+    /* The bar shows only the parts the overall score counts. */
+    ["q", "f", "n"].forEach(function (k) {
+      $("#pg-" + k).parentNode.hidden = !S.cnt[k];
+    });
     if (c.ans) {
       var acc = (c.right / c.ans) * 100;
       $("#pg-a").textContent = Math.round(acc) + "%";
@@ -4829,7 +4840,7 @@
     if (card) {
       var num = card.querySelector(".num").textContent;
       from = /^F\d/.test(num)
-        ? L("fiszki ", "flashcard ") + num
+        ? L("kata ", "kata ") + num
         : /^#/.test(num)
           ? L("pytania ", "question ") + num
           : L("symulacji", "the simulation");
@@ -5108,7 +5119,7 @@
     GS_MAX = 5,
     GS_GROUPS = [
       ["q", ["Pytania", "Questions"]],
-      ["f", ["Fiszki", "Flashcards"]],
+      ["f", ["Katas", "Katas"]],
       ["n", ["Notatki", "Notes"]],
       ["a", ["API", "API"]]
     ];
@@ -5202,8 +5213,8 @@
       words = gsNorm(raw).split(/\s+/).filter(Boolean);
     if (raw.length < 2) {
       $("#gs-sum").textContent = L(
-        "Wpisz co najmniej 2 znaki. Szuka w pytaniach, fiszkach, notatkach i endpointach API Map.",
-        "Type at least 2 characters. Searches questions, flashcards, notes and API Map endpoints."
+        "Wpisz co najmniej 2 znaki. Szuka w pytaniach, katas, notatkach i endpointach API Map.",
+        "Type at least 2 characters. Searches questions, katas, notes and API Map endpoints."
       );
       $("#gs-res").innerHTML = "";
       return;
