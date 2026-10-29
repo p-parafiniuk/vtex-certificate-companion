@@ -4005,6 +4005,19 @@ div.setrow {
 #flist .rev {
   min-height: 44px;
 }
+/* Scroll hint on sideways strips (edgeFade in app.js): a mask, so it fades into whatever sits behind the strip. */
+.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent);
+}
+.fade-l {
+  -webkit-mask-image: linear-gradient(270deg, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(270deg, #000 calc(100% - 48px), transparent);
+}
+.fade-l.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
 </style>
 
 <header class="bar">
@@ -15515,6 +15528,25 @@ function bootApiMap(root, onNav, embed) {
     NAV.cur = r;
     apply(r, true);
     window.scrollTo(0, r.y || 0);
+  });
+
+  /* ---------- scroll hint ----------
+     A strip that scrolls sideways fades at each edge that still hides content, and the fade goes once that edge is
+     reached. Counts and chips redraw the strips, so a change inside them repaints the hint too. */
+  function edgeFade(el) {
+    function paint() {
+      var max = el.scrollWidth - el.clientWidth;
+      el.classList.toggle("fade-l", max > 1 && el.scrollLeft > 1);
+      el.classList.toggle("fade-r", max > 1 && el.scrollLeft < max - 1);
+    }
+    el.addEventListener("scroll", paint, { passive: true });
+    window.addEventListener("resize", paint);
+    if (window.MutationObserver) new MutationObserver(paint).observe(el, { childList: true, subtree: true });
+    if (window.ResizeObserver) new ResizeObserver(paint).observe(el);
+    paint();
+  }
+  [".bar .tabs", "#cats", "#ctabs", "#ptabs", "#rtabs"].forEach(function (q) {
+    if ($(q)) edgeFade($(q));
   });
 
   /* ---------- navigation ----------

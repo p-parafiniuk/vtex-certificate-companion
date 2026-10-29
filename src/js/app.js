@@ -5161,6 +5161,25 @@
     window.scrollTo(0, r.y || 0);
   });
 
+  /* ---------- scroll hint ----------
+     A strip that scrolls sideways fades at each edge that still hides content, and the fade goes once that edge is
+     reached. Counts and chips redraw the strips, so a change inside them repaints the hint too. */
+  function edgeFade(el) {
+    function paint() {
+      var max = el.scrollWidth - el.clientWidth;
+      el.classList.toggle("fade-l", max > 1 && el.scrollLeft > 1);
+      el.classList.toggle("fade-r", max > 1 && el.scrollLeft < max - 1);
+    }
+    el.addEventListener("scroll", paint, { passive: true });
+    window.addEventListener("resize", paint);
+    if (window.MutationObserver) new MutationObserver(paint).observe(el, { childList: true, subtree: true });
+    if (window.ResizeObserver) new ResizeObserver(paint).observe(el);
+    paint();
+  }
+  [".bar .tabs", "#cats", "#ctabs", "#ptabs", "#rtabs"].forEach(function (q) {
+    if ($(q)) edgeFade($(q));
+  });
+
   /* ---------- navigation ----------
      Each tab, HTTP Koty module, jumped-to status code, simulator card and Focus card is a history entry, so the
      browser's Back and Forward move between them and return to the same scroll position. The hash stays a bare
