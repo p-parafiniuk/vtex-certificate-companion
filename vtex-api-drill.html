@@ -34,6 +34,14 @@
   --k5: #7238bd;
   --k5-soft: #efe7fa;
   --kshadow: rgb(28 22 34 / 0.22);
+  --t1: #9a5a2a;
+  --t1-soft: #f6e9de;
+  --t2: #5f6772;
+  --t2-soft: #eceef1;
+  --t3: #8a6000;
+  --t3-soft: #fbf0d6;
+  --t4: #3f63a0;
+  --t4-soft: #e3ebf8;
   --nav-bg: #1c1622;
   --nav-ink: #f2edf5;
   --nav-muted: #c9bfd2;
@@ -64,6 +72,14 @@
     --k5: #c0a0ff;
     --k5-soft: #2a1f40;
     --kshadow: rgb(0 0 0 / 0.55);
+    --t1: #e3a272;
+    --t1-soft: #3a2516;
+    --t2: #c6ccd6;
+    --t2-soft: #2c2f36;
+    --t3: #f0c75e;
+    --t3-soft: #3a2f10;
+    --t4: #9cbcff;
+    --t4-soft: #1e2a44;
     --nav-bg: #0f0b12;
     --nav-ink: #f2edf5;
     --nav-muted: #a89db2;
@@ -92,6 +108,14 @@
   --k5: #c0a0ff;
   --k5-soft: #2a1f40;
   --kshadow: rgb(0 0 0 / 0.55);
+  --t1: #e3a272;
+  --t1-soft: #3a2516;
+  --t2: #c6ccd6;
+  --t2-soft: #2c2f36;
+  --t3: #f0c75e;
+  --t3-soft: #3a2f10;
+  --t4: #9cbcff;
+  --t4-soft: #1e2a44;
   --nav-bg: #0f0b12;
   --nav-ink: #f2edf5;
   --nav-muted: #a89db2;
@@ -3294,9 +3318,33 @@ body[data-view="pytania"] .wrap {
   background: var(--surface);
   min-width: 0;
 }
+/* Tier colours: bronze, silver, gold, platinum. The tier is also written out, so colour is never the only cue. */
+.t1 {
+  --tc: var(--t1);
+  --tc-soft: var(--t1-soft);
+}
+.t2 {
+  --tc: var(--t2);
+  --tc-soft: var(--t2-soft);
+}
+.t3 {
+  --tc: var(--t3);
+  --tc-soft: var(--t3-soft);
+}
+.t4 {
+  --tc: var(--t4);
+  --tc-soft: var(--t4-soft);
+}
 .badge.on {
-  border-color: var(--ok);
-  background: var(--ok-soft);
+  border-color: var(--tc);
+}
+.badge.plat {
+  grid-column: 1 / -1;
+  border: 1px dashed var(--tc);
+}
+.badge.plat.on {
+  border-style: solid;
+  background: var(--tc-soft);
 }
 .badge-i {
   flex: none;
@@ -3309,8 +3357,12 @@ body[data-view="pytania"] .wrap {
   color: var(--muted);
 }
 .badge.on .badge-i {
-  background: var(--ok);
+  background: var(--tc);
   color: var(--surface);
+}
+.badge.plat:not(.on) .badge-i {
+  background: var(--tc-soft);
+  color: var(--tc);
 }
 .badge-t {
   min-width: 0;
@@ -3325,6 +3377,96 @@ body[data-view="pytania"] .wrap {
   color: var(--muted);
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+.badge-t span.tier {
+  font: 600 0.66rem var(--f-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tc);
+}
+.badge-t .meter {
+  flex: none;
+  height: 4px;
+  margin-top: 5px;
+  background: var(--code);
+}
+.tiers {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+.tiers li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tiers b {
+  color: var(--ink);
+  font: 600 0.88rem var(--f-mono);
+}
+.tier-i {
+  width: 16px;
+  height: 16px;
+  border-radius: 99px;
+  border: 2px solid var(--tc);
+  background: var(--tc-soft);
+  box-sizing: border-box;
+}
+.bgrp {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.bgrp h3 {
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.pill {
+  font: 600 0.7rem var(--f-mono);
+  letter-spacing: 0;
+  border-radius: 99px;
+  padding: 2px 7px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.pill.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+.how-combo {
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--code);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+.how-combo summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.how-combo summary small {
+  font: 400 0.78rem var(--f-mono);
+  color: var(--muted);
+  margin-left: 6px;
+}
+.how-combo p {
+  margin: 8px 0 0;
 }
 
 .combo {
@@ -10302,8 +10444,111 @@ function bootApiMap(root, onNav, embed) {
       p: function (x) {
         return x.kn + " / " + NTOTAL + L(" bloków", " blocks");
       }
+    },
+    {
+      id: "f60",
+      n: ["Katas 60%", "Katas 60%"],
+      d: ["60% katas oznaczonych Umiem", "60% of katas marked Known"],
+      ok: function (x) {
+        return x.kf >= kNeed(0.6);
+      },
+      p: function (x) {
+        return x.kf + " / " + kNeed(0.6) + " katas";
+      }
+    },
+    {
+      id: "f80",
+      n: ["Katas 80%", "Katas 80%"],
+      d: ["80% katas oznaczonych Umiem", "80% of katas marked Known"],
+      ok: function (x) {
+        return x.kf >= kNeed(0.8);
+      },
+      p: function (x) {
+        return x.kf + " / " + kNeed(0.8) + " katas";
+      }
+    },
+    {
+      id: "plat",
+      n: ["Komplet", "Full set"],
+      d: ["Wszystkie pozostałe odznaki", "Every other badge"],
+      ok: function () {
+        return badgesGot(true) === BADGES.length - 1;
+      },
+      p: function () {
+        return badgesGot(true) + " / " + (BADGES.length - 1) + L(" odznak", " badges");
+      }
     }
   ];
+  function kNeed(r) {
+    return Math.ceil(F.length * r);
+  }
+  function badgesGot(noPlat) {
+    return BADGES.filter(function (b) {
+      return S.badges[b.id] && !(noPlat && b.id === "plat");
+    }).length;
+  }
+  /* Tiers work like trophies: 1 bronze, 2 silver, 3 gold, 4 platinum (every other badge). */
+  var TIERS = [null, ["Brąz", "Bronze"], ["Srebro", "Silver"], ["Złoto", "Gold"], ["Platyna", "Platinum"]];
+  var BTIER = {
+    first: 1,
+    a100: 2,
+    goal: 1,
+    s3: 1,
+    s7: 2,
+    s14: 3,
+    c10: 2,
+    c25: 3,
+    sim: 3,
+    dom: 2,
+    fall: 3,
+    ready: 3,
+    ndom: 1,
+    nall: 3,
+    f60: 1,
+    f80: 2,
+    plat: 4
+  };
+  var BGROUPS = [
+    [
+      ["Start", "Getting started"],
+      ["first", "a100"]
+    ],
+    [
+      ["Regularność", "Consistency"],
+      ["goal", "s3", "s7", "s14"]
+    ],
+    [
+      ["Combo", "Combo"],
+      ["c10", "c25"]
+    ],
+    [
+      ["Opanowanie", "Mastery"],
+      ["ndom", "dom", "f60", "f80", "fall", "nall"]
+    ],
+    [
+      ["Egzamin", "Exam"],
+      ["sim", "ready"]
+    ]
+  ];
+  /* Share of the way to a locked badge, for its progress bar; null when the badge has no count. */
+  function bFrac(id, x) {
+    var m = {
+      a100: [x.total, 100],
+      s3: [x.streak, 3],
+      s7: [x.streak, 7],
+      s14: [x.streak, 14],
+      c10: [x.comboBest, 10],
+      c25: [x.comboBest, 25],
+      fall: [x.kf, F.length],
+      f60: [x.kf, kNeed(0.6)],
+      f80: [x.kf, kNeed(0.8)],
+      nall: [x.kn, NTOTAL],
+      ready: [x.ready, 80],
+      goal: [x.today, x.goal],
+      plat: [badgesGot(true), BADGES.length - 1]
+    }[id];
+    return m && m[1] ? Math.min(m[0] / m[1], 1) : null;
+  }
   var BADGE_ID = Object.create(null);
   BADGES.forEach(function (b) {
     BADGE_ID[b.id] = true;
@@ -12933,6 +13178,8 @@ function bootApiMap(root, onNav, embed) {
       '</span><span class="toast-t"><strong>' +
       L("Nowa odznaka: ", "New badge: ") +
       esc(T(b.n)) +
+      " · " +
+      esc(T(TIERS[BTIER[b.id]])) +
       "</strong><span>" +
       esc(
         fresh.length > 1
@@ -13130,37 +13377,109 @@ function bootApiMap(root, onNav, embed) {
       ) +
       "</p>";
     renderRv();
-    var got = BADGES.filter(function (b) {
-      return S.badges[b.id];
-    }).length;
+    var byId = Object.create(null),
+      tiers = [0, [0, 0], [0, 0], [0, 0], [0, 0]];
+    BADGES.forEach(function (b) {
+      byId[b.id] = b;
+      tiers[BTIER[b.id]][1]++;
+      if (S.badges[b.id]) tiers[BTIER[b.id]][0]++;
+    });
+    function badge(b) {
+      var at = S.badges[b.id],
+        t = BTIER[b.id],
+        f = at ? null : bFrac(b.id, x);
+      return (
+        '<li class="badge t' +
+        t +
+        (at ? " on" : "") +
+        (t === 4 ? " plat" : "") +
+        '"><span class="badge-i" aria-hidden="true">' +
+        (at ? ICON.check : t === 4 ? ICON.medal : ICON.lock) +
+        "</span>" +
+        '<span class="badge-t"><span class="tier">' +
+        T(TIERS[t]) +
+        "</span><strong>" +
+        esc(T(b.n)) +
+        "</strong><span>" +
+        esc(at ? T(b.d) + " · " + fmtDay(new Date(at)) : b.p(x)) +
+        "</span>" +
+        (f === null ? "" : '<span class="meter" aria-hidden="true"><i style="width:' + f * 100 + '%"></i></span>') +
+        '<span class="sr">' +
+        (at ? L("zdobyta", "earned") : L("do zdobycia", "to earn")) +
+        "</span></span></li>"
+      );
+    }
     $("#gx-badges").innerHTML =
       '<div class="cardh"><h2 id="gx-badges-h">' +
       L("Odznaki", "Badges") +
       '</h2><span class="meter-label">' +
-      got +
+      badgesGot() +
       " / " +
       BADGES.length +
       "</span></div>" +
+      '<ul class="tiers" aria-label="' +
+      L("Odznaki według poziomu", "Badges by tier") +
+      '">' +
+      [1, 2, 3, 4]
+        .map(function (t) {
+          return (
+            '<li class="t' +
+            t +
+            '"><span class="tier-i" aria-hidden="true"></span><b>' +
+            tiers[t][0] +
+            "/" +
+            tiers[t][1] +
+            "</b> " +
+            T(TIERS[t]).toLowerCase() +
+            "</li>"
+          );
+        })
+        .join("") +
+      "</ul>" +
       '<ul class="badges">' +
-      BADGES.map(function (b) {
-        var at = S.badges[b.id];
+      badge(byId.plat) +
+      "</ul>" +
+      BGROUPS.map(function (g) {
+        var n = g[1].filter(function (id) {
+          return S.badges[id];
+        }).length;
         return (
-          '<li class="badge' +
-          (at ? " on" : "") +
-          '"><span class="badge-i" aria-hidden="true">' +
-          (at ? ICON.check : ICON.lock) +
-          "</span>" +
-          '<span class="badge-t"><strong>' +
-          esc(T(b.n)) +
-          "</strong><span>" +
-          esc(at ? T(b.d) + " · " + fmtDay(new Date(at)) : b.p(x)) +
-          "</span>" +
-          '<span class="sr">' +
-          (at ? L("zdobyta", "earned") : L("do zdobycia", "to earn")) +
-          "</span></span></li>"
+          '<section class="bgrp"><h3>' +
+          T(g[0]) +
+          ' <span class="pill' +
+          (n === g[1].length ? " ok" : "") +
+          '">' +
+          n +
+          "/" +
+          g[1].length +
+          "</span></h3>" +
+          (g[1][0] === "c10" ? comboHow() : "") +
+          '<ul class="badges">' +
+          g[1]
+            .map(function (id) {
+              return badge(byId[id]);
+            })
+            .join("") +
+          "</ul></section>"
         );
-      }).join("") +
-      "</ul>";
+      }).join("");
+  }
+  function comboHow() {
+    return (
+      '<details class="how-combo"><summary>' +
+      L("Jak działa Combo?", "How does Combo work?") +
+      " <small>" +
+      L("teraz ", "now ") +
+      S.combo +
+      L(", rekord ", ", best ") +
+      S.comboBest +
+      "</small></summary><p>" +
+      L(
+        "Combo liczy <strong>dobre odpowiedzi z rzędu</strong> w nauce: na liście pytań i w Focus, także ocenę katas. Symulacja się nie liczy. Jedna zła odpowiedź zeruje licznik. Karta liczy się raz dziennie, więc powtórka tej samej karty ani nie podbija, ani nie zrywa combo. Od 3 z rzędu Focus pokazuje <strong>Combo ×N</strong>. Odznaki liczą Twój rekord.",
+        "Combo counts <strong>right answers in a row</strong> while you study: in the question list and in Focus, katas you grade included. The simulation does not count. One wrong answer resets it. A card counts once a day, so repeating the same card neither raises nor breaks the combo. From 3 in a row Focus shows <strong>Combo ×N</strong>. The badges use your best run."
+      ) +
+      "</p></details>"
+    );
   }
   function renderRv() {
     var ids = Object.keys(S.rv),
