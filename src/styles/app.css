@@ -3986,3 +3986,8 @@ div.setrow {
 .gql-b .tblwrap {
   overflow-x: auto;
 }
+/* Katas inside a category: the controls repeat on every card, so they keep a full touch target. */
+#cs-katas .f-all,
+#flist .rev {
+  min-height: 44px;
+}

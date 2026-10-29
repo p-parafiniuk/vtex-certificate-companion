@@ -2629,8 +2629,10 @@
   function fSync() {
     var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length,
       all = document.querySelectorAll("#flist .rev").length;
-    $("#f-show-all").disabled = n === all;
-    $("#f-hide-all").disabled = !n;
+    var b = $("#f-all");
+    b.hidden = !all;
+    b.dataset.open = n === all ? "1" : "";
+    b.textContent = n === all ? L("Ukryj wszystkie", "Hide all") : L("Pokaż wszystkie", "Show all");
     $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + all;
   }
   function paintKataTab() {
@@ -2672,14 +2674,9 @@
     paintKataTab();
     header();
   });
-  /* The pressed button disables itself, so focus moves to its twin instead of falling to <body>. */
-  $("#f-show-all").addEventListener("click", function () {
-    setAll(true);
-    $("#f-hide-all").focus();
-  });
-  $("#f-hide-all").addEventListener("click", function () {
-    setAll(false);
-    $("#f-show-all").focus();
+  /* One button: it opens every answer until all are open, then closes them all. */
+  $("#f-all").addEventListener("click", function () {
+    setAll(!this.dataset.open);
   });
 
   /* ---------- Grywalizacja: streak, daily goal, readiness, badges, combo ----------
@@ -5242,7 +5239,8 @@
     NAV.ok = writeState(r, !replace);
   }
   function apply(r, restore) {
-    if (r.tab === "fiszki") {
+    var old = r.tab === "fiszki";
+    if (old) {
       r.tab = "pytania";
       r.sec = "katas";
       delete r.cat;
@@ -5354,6 +5352,8 @@
       pst.scrollLeft += pb.left - pst.getBoundingClientRect().left - (pst.clientWidth - pb.width) / 2;
     }
     paintBack();
+    /* An old #fiszki link keeps working, but the address bar shows the new one. */
+    if (old) writeState(r, false);
   }
   window.addEventListener("popstate", function (ev) {
     var r = ev.state && ev.state.tab ? ev.state : parseHash(location.hash);

@@ -4000,6 +4000,11 @@ div.setrow {
 .gql-b .tblwrap {
   overflow-x: auto;
 }
+/* Katas inside a category: the controls repeat on every card, so they keep a full touch target. */
+#cs-katas .f-all,
+#flist .rev {
+  min-height: 44px;
+}
 </style>
 
 <header class="bar">
@@ -4070,9 +4075,8 @@ div.setrow {
           <div class="list" id="qlist"></div>
         </div>
         <div class="csec" id="cs-katas" role="tabpanel" aria-labelledby="ct-katas" hidden>
-          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Focus:</strong> one kata at a time, with deck progress. Only the katas you see in this list."><strong>Focus:</strong> jedna kata naraz, z postępem talii. Tylko katas z tej listy.</span></div>
-          <p class="lead" data-en-html="<strong>A kata</strong> is a short drill: an open question or a practical task. <strong>Answer out loud or write the request on paper first</strong>, then reveal the model answer and grade yourself. The &ldquo;Practical&rdquo; katas train the 4 practical tasks: method, path, body."><strong>Kata</strong> to krótkie ćwiczenie: pytanie otwarte albo zadanie praktyczne. <strong>Najpierw odpowiedz na głos albo napisz żądanie na kartce</strong>, potem odsłoń wzorzec i oceń się. Katas „Practical” ćwiczą 4 zadania praktyczne: metoda, ścieżka, body.</p>
-          <div class="row"><button type="button" class="btn small" id="f-show-all" data-en="Show all answers">Pokaż wszystkie odpowiedzi</button><button type="button" class="btn small" id="f-hide-all" data-en="Hide all answers">Ukryj wszystkie odpowiedzi</button><span class="how" id="f-open-n"></span></div>
+          <div class="modebar"><div class="seg" role="group" aria-label="Tryb nauki" data-en-aria="Study mode"><button type="button" class="seg-b" data-mode="lista" aria-pressed="true" data-en="List">Lista</button><button type="button" class="seg-b" data-mode="focus" aria-pressed="false">Focus</button></div><span class="how" data-en-html="<strong>Kata:</strong> answer on your own, reveal the model answer, grade yourself. Focus: one at a time, only the katas in this list."><strong>Kata:</strong> odpowiedz sam, odsłoń wzorzec, oceń się. Focus: jedna naraz, tylko katas z tej listy.</span></div>
+          <div class="row"><button type="button" class="btn small f-all" id="f-all" aria-controls="flist"></button><span class="how" id="f-open-n"></span></div>
           <div class="list" id="flist"></div>
         </div>
         <div class="csec" id="cs-info" role="tabpanel" aria-labelledby="ct-info" hidden></div>
@@ -12981,8 +12985,10 @@ function bootApiMap(root, onNav, embed) {
   function fSync() {
     var n = document.querySelectorAll('#flist .rev[aria-expanded="true"]').length,
       all = document.querySelectorAll("#flist .rev").length;
-    $("#f-show-all").disabled = n === all;
-    $("#f-hide-all").disabled = !n;
+    var b = $("#f-all");
+    b.hidden = !all;
+    b.dataset.open = n === all ? "1" : "";
+    b.textContent = n === all ? L("Ukryj wszystkie", "Hide all") : L("Pokaż wszystkie", "Show all");
     $("#f-open-n").textContent = L("Odsłonięte: ", "Revealed: ") + n + L(" z ", " of ") + all;
   }
   function paintKataTab() {
@@ -13024,14 +13030,9 @@ function bootApiMap(root, onNav, embed) {
     paintKataTab();
     header();
   });
-  /* The pressed button disables itself, so focus moves to its twin instead of falling to <body>. */
-  $("#f-show-all").addEventListener("click", function () {
-    setAll(true);
-    $("#f-hide-all").focus();
-  });
-  $("#f-hide-all").addEventListener("click", function () {
-    setAll(false);
-    $("#f-show-all").focus();
+  /* One button: it opens every answer until all are open, then closes them all. */
+  $("#f-all").addEventListener("click", function () {
+    setAll(!this.dataset.open);
   });
 
   /* ---------- Grywalizacja: streak, daily goal, readiness, badges, combo ----------
@@ -15594,7 +15595,8 @@ function bootApiMap(root, onNav, embed) {
     NAV.ok = writeState(r, !replace);
   }
   function apply(r, restore) {
-    if (r.tab === "fiszki") {
+    var old = r.tab === "fiszki";
+    if (old) {
       r.tab = "pytania";
       r.sec = "katas";
       delete r.cat;
@@ -15706,6 +15708,8 @@ function bootApiMap(root, onNav, embed) {
       pst.scrollLeft += pb.left - pst.getBoundingClientRect().left - (pst.clientWidth - pb.width) / 2;
     }
     paintBack();
+    /* An old #fiszki link keeps working, but the address bar shows the new one. */
+    if (old) writeState(r, false);
   }
   window.addEventListener("popstate", function (ev) {
     var r = ev.state && ev.state.tab ? ev.state : parseHash(location.hash);
