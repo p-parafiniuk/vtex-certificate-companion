@@ -3991,3 +3991,16 @@ div.setrow {
 #flist .rev {
   min-height: 44px;
 }
+/* Scroll hint on sideways strips (edgeFade in app.js): a mask, so it fades into whatever sits behind the strip. */
+.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, #000 calc(100% - 48px), transparent);
+}
+.fade-l {
+  -webkit-mask-image: linear-gradient(270deg, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(270deg, #000 calc(100% - 48px), transparent);
+}
+.fade-l.fade-r {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
