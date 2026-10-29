@@ -1,4 +1,4 @@
-/* Layout: one 860px working column under a dark sticky navigation bar. A progress card opens the page: mastered overall, then questions, flashcards, accuracy and last simulation against the 80% pass line.
+/* Layout: one 860px working column under a dark sticky navigation bar. A progress card opens the page: mastered overall, then questions, katas, notes, accuracy and last simulation against the 80% pass line.
    Surfaces stay flat and quiet; colour is reserved for answer state and for what is mastered. */
 :root {
   --bg: #f5f2f6;
@@ -440,9 +440,11 @@ a {
   margin-top: 6px;
 }
 /* Columns never shrink below their content, so a long value or label cannot run into its neighbour. */
+/* Columns flow: a part the overall score leaves out is hidden and takes no column. */
 .prog {
   display: grid;
-  grid-template-columns: repeat(4, minmax(max-content, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(max-content, 1fr);
   gap: 10px 24px;
   border-left: 1px solid var(--line);
   padding-left: 28px;
