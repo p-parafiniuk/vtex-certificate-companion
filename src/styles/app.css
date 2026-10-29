@@ -20,6 +20,14 @@
   --k5: #7238bd;
   --k5-soft: #efe7fa;
   --kshadow: rgb(28 22 34 / 0.22);
+  --t1: #9a5a2a;
+  --t1-soft: #f6e9de;
+  --t2: #5f6772;
+  --t2-soft: #eceef1;
+  --t3: #8a6000;
+  --t3-soft: #fbf0d6;
+  --t4: #3f63a0;
+  --t4-soft: #e3ebf8;
   --nav-bg: #1c1622;
   --nav-ink: #f2edf5;
   --nav-muted: #c9bfd2;
@@ -50,6 +58,14 @@
     --k5: #c0a0ff;
     --k5-soft: #2a1f40;
     --kshadow: rgb(0 0 0 / 0.55);
+    --t1: #e3a272;
+    --t1-soft: #3a2516;
+    --t2: #c6ccd6;
+    --t2-soft: #2c2f36;
+    --t3: #f0c75e;
+    --t3-soft: #3a2f10;
+    --t4: #9cbcff;
+    --t4-soft: #1e2a44;
     --nav-bg: #0f0b12;
     --nav-ink: #f2edf5;
     --nav-muted: #a89db2;
@@ -78,6 +94,14 @@
   --k5: #c0a0ff;
   --k5-soft: #2a1f40;
   --kshadow: rgb(0 0 0 / 0.55);
+  --t1: #e3a272;
+  --t1-soft: #3a2516;
+  --t2: #c6ccd6;
+  --t2-soft: #2c2f36;
+  --t3: #f0c75e;
+  --t3-soft: #3a2f10;
+  --t4: #9cbcff;
+  --t4-soft: #1e2a44;
   --nav-bg: #0f0b12;
   --nav-ink: #f2edf5;
   --nav-muted: #a89db2;
@@ -3280,9 +3304,33 @@ body[data-view="pytania"] .wrap {
   background: var(--surface);
   min-width: 0;
 }
+/* Tier colours: bronze, silver, gold, platinum. The tier is also written out, so colour is never the only cue. */
+.t1 {
+  --tc: var(--t1);
+  --tc-soft: var(--t1-soft);
+}
+.t2 {
+  --tc: var(--t2);
+  --tc-soft: var(--t2-soft);
+}
+.t3 {
+  --tc: var(--t3);
+  --tc-soft: var(--t3-soft);
+}
+.t4 {
+  --tc: var(--t4);
+  --tc-soft: var(--t4-soft);
+}
 .badge.on {
-  border-color: var(--ok);
-  background: var(--ok-soft);
+  border-color: var(--tc);
+}
+.badge.plat {
+  grid-column: 1 / -1;
+  border: 1px dashed var(--tc);
+}
+.badge.plat.on {
+  border-style: solid;
+  background: var(--tc-soft);
 }
 .badge-i {
   flex: none;
@@ -3295,8 +3343,12 @@ body[data-view="pytania"] .wrap {
   color: var(--muted);
 }
 .badge.on .badge-i {
-  background: var(--ok);
+  background: var(--tc);
   color: var(--surface);
+}
+.badge.plat:not(.on) .badge-i {
+  background: var(--tc-soft);
+  color: var(--tc);
 }
 .badge-t {
   min-width: 0;
@@ -3311,6 +3363,96 @@ body[data-view="pytania"] .wrap {
   color: var(--muted);
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+.badge-t span.tier {
+  font: 600 0.66rem var(--f-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tc);
+}
+.badge-t .meter {
+  flex: none;
+  height: 4px;
+  margin-top: 5px;
+  background: var(--code);
+}
+.tiers {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+.tiers li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tiers b {
+  color: var(--ink);
+  font: 600 0.88rem var(--f-mono);
+}
+.tier-i {
+  width: 16px;
+  height: 16px;
+  border-radius: 99px;
+  border: 2px solid var(--tc);
+  background: var(--tc-soft);
+  box-sizing: border-box;
+}
+.bgrp {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.bgrp h3 {
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.pill {
+  font: 600 0.7rem var(--f-mono);
+  letter-spacing: 0;
+  border-radius: 99px;
+  padding: 2px 7px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.pill.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+.how-combo {
+  margin: 0 0 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--code);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+.how-combo summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.how-combo summary small {
+  font: 400 0.78rem var(--f-mono);
+  color: var(--muted);
+  margin-left: 6px;
+}
+.how-combo p {
+  margin: 8px 0 0;
 }
 
 .combo {
