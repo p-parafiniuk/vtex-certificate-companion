@@ -948,6 +948,42 @@ h3 {
   border-radius: 4px;
   padding: 0 5px;
 }
+/* Kata level: filled dots carry the level, the hollow ones show the scale, so it reads without colour. */
+.lvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--code);
+  border-radius: 99px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+.lvd {
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+.lvd i {
+  font-style: normal;
+  color: var(--muted);
+}
+.chip .lvl {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+}
+.chip[aria-pressed="true"] .lvd,
+.chip[aria-pressed="true"] .lvd i {
+  color: inherit;
+}
+.lvl-how {
+  margin: 0;
+}
 .doc {
   margin: 0;
   font-size: 0.92rem;
