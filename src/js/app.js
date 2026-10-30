@@ -5,9 +5,9 @@
   var SIM_Q = 36,
     SIM_P = 4,
     SIM_MIN = 3;
-  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "ustawienia"];
-  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql). */
-  var REFS = ["http", "api", "graphql"];
+  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "postman", "ustawienia"];
+  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman). */
+  var REFS = ["http", "api", "graphql", "postman"];
   /* Sections of a category; "all" shows only the first two. */
   var CSECS = ["pytania", "katas", "info", "api", "docs"];
   /* Sections of Postęp; the first one has no hash suffix. */
@@ -955,7 +955,11 @@
     if (!ks.length) return "";
     return (
       '<p class="doc"><span class="doc-k">' +
-      L("Dokumentacja VTEX:", "VTEX docs:") +
+      (ks.every(function (k) {
+        return FRAMEABLE.test(DOCS[k][0]);
+      })
+        ? L("Dokumentacja VTEX:", "VTEX docs:")
+        : L("Dokumentacja:", "Docs:")) +
       "</span> " +
       ks
         .map(function (k) {
@@ -5897,20 +5901,36 @@
     }
     kotyTop();
   }
-  /* ---------- Ściągi › GraphQL: static cards from GQL, redrawn only when the language changes ---------- */
+  /* ---------- Ściągi › GraphQL and Postman: static cards, redrawn only when the language changes ---------- */
   function renderGql() {
-    var el = $("#p-graphql");
+    renderCheat(
+      "graphql",
+      GQL,
+      L("GraphQL w VTEX IO", "GraphQL in VTEX IO"),
+      L("Endpointy REST są w ", "REST endpoints are in ")
+    );
+  }
+  function renderPm() {
+    renderCheat(
+      "postman",
+      PM,
+      L("Postman: testy API", "Postman: API tests"),
+      L("Endpointy VTEX są w ", "VTEX endpoints are in ")
+    );
+  }
+  function renderCheat(id, data, title, apiLead) {
+    var el = $("#p-" + id);
     if (el.dataset.k === S.lang) return;
     el.dataset.k = S.lang;
     el.innerHTML =
       "<div><h2>" +
-      L("GraphQL w VTEX IO", "GraphQL in VTEX IO") +
+      title +
       '</h2><p class="lead">' +
-      fmt(GQL.t) +
+      fmt(data.t) +
       " " +
-      L("Endpointy REST są w ", "REST endpoints are in ") +
+      apiLead +
       '<a data-nav href="#api">API Map</a>.</p></div><div class="gql-grid">' +
-      GQL.s
+      data.s
         .map(function (x) {
           return (
             '<section class="card gql-b' +
@@ -5927,12 +5947,13 @@
                   .join("") +
                 "</ol>"
               : "") +
+            (x.code ? '<pre class="gql-code"><code>' + esc(x.code) + "</code></pre>" : "") +
             (x.b ? noteList(x.b) : "") +
             (x.tree
               ? '<dl class="gql-tree">' +
                 x.tree
                   .map(function (y) {
-                    return "<dt><code>" + esc(y[0]) + "</code></dt><dd>" + fmt(y[1]) + "</dd>";
+                    return "<dt><code>" + esc(y[0]).replace(/\./g, ".<wbr>") + "</code></dt><dd>" + fmt(y[1]) + "</dd>";
                   })
                   .join("") +
                 "</dl>"
@@ -6202,6 +6223,7 @@
       if (r.sub) APIM.show(r.sub);
       r.sub = APIM.api();
     } else if (tab === "graphql") renderGql();
+    else if (tab === "postman") renderPm();
     else if (tab === "ustawienia") renderSettings();
     else {
       if (PSECS.indexOf(r.sub) < 1) delete r.sub;

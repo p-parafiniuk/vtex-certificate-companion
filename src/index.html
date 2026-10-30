@@ -21,7 +21,7 @@
     <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
       <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
       <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
-      <button class="tab tab-x" role="tab" id="t-ref" data-tab="ref" aria-controls="p-http" title="Ściągi: kody HTTP, mapa API i GraphQL" data-en-title="Reference: HTTP codes, API Map and GraphQL"><span data-en="Reference">Ściągi</span></button>
+      <button class="tab tab-x" role="tab" id="t-ref" data-tab="ref" aria-controls="p-http" title="Ściągi: kody HTTP, mapa API, GraphQL i Postman" data-en-title="Reference: HTTP codes, API Map, GraphQL and Postman"><span data-en="Reference">Ściągi</span></button>
       <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button>
     </nav>
     <!-- Not a tab: starting the exam is an action, so it sits apart as the one primary button. app.js fills it. -->
@@ -214,6 +214,7 @@
     <button type="button" class="ctab" role="tab" id="rt-http" data-rtab="http" aria-controls="p-http">HTTP<span class="ctab-l" data-en=" · status codes"> · kody statusu</span></button>
     <button type="button" class="ctab" role="tab" id="rt-api" data-rtab="api" aria-controls="p-api">API Map<span class="ctab-l" data-en=" · REST endpoints"> · endpointy REST</span></button>
     <button type="button" class="ctab" role="tab" id="rt-graphql" data-rtab="graphql" aria-controls="p-graphql">GraphQL<span class="ctab-l"> · VTEX IO</span></button>
+    <button type="button" class="ctab" role="tab" id="rt-postman" data-rtab="postman" aria-controls="p-postman">Postman<span class="ctab-l" data-en=" · API tests"> · testy API</span></button>
   </div>
 
   <section class="panel" id="p-http" role="tabpanel" aria-labelledby="rt-http" hidden>
@@ -225,6 +226,8 @@
   </section>
 
   <section class="panel gql" id="p-graphql" role="tabpanel" aria-labelledby="rt-graphql" hidden></section>
+
+  <section class="panel gql" id="p-postman" role="tabpanel" aria-labelledby="rt-postman" hidden></section>
 
   <dialog class="gs-dlg" id="gs-dlg" aria-label="Szukaj" data-en-aria="Search">
     <div class="gs-head">
@@ -288,6 +291,9 @@
 
 /* Ściągi › GraphQL: t = lead, s = blocks {h, b?, ol?, tree?, cmp?, l}. Polish only, same fact rule as notes. */
 /*@data GQL*/
+
+/* Ściągi › Postman: same shape as GQL, plus code = a code sample. Polish only, same fact rule as notes. */
+/*@data PM*/
 
 /* Labs: level-4 katas run step by step from a stated starting state. Keyed by id, not index: pre = [text, DOCS keys], s = steps {h, in?, do, ok?, keep?, warn?, l}, brk = break-it task, fix = what to check. Polish only. */
 /*@data LABS*/
