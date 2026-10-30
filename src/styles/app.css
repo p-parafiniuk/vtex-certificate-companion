@@ -2466,17 +2466,35 @@ body[data-view="focus"] .wrap {
   order: 2;
   flex: 0 1 auto;
 }
+/* Own chevron instead of the native arrow, which sits flush with the right border. Drawn with currentColor
+   gradients, so it follows the theme without an image. */
 .fsel {
+  appearance: none;
   font: 500 0.92rem var(--f-body);
   color: var(--ink);
-  background: var(--surface);
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 50%,
+    calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
   border: 1px solid var(--line);
   border-radius: 8px;
   height: 36px;
-  padding: 0 8px;
+  padding: 0 34px 0 12px;
   min-width: 0;
   max-width: 100%;
+  text-overflow: ellipsis;
   cursor: pointer;
+}
+.fsel:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+.fsel:disabled {
+  cursor: default;
 }
 .fsel.big {
   flex: 1 1 8rem;
@@ -2510,6 +2528,12 @@ body[data-view="focus"] .wrap {
   }
   .ftop-r {
     gap: 4px;
+  }
+  .ftop .fsel {
+    padding: 0 26px 0 10px;
+    background-position:
+      calc(100% - 15px) 50%,
+      calc(100% - 10px) 50%;
   }
 }
 .icn {
