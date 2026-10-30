@@ -296,6 +296,51 @@
       p: function () {
         return badgesGot(true) + " / " + (BADGES.length - 1) + L(" odznak", " badges");
       }
+    },
+    /* Labs: a full run, a run without opening the fix list, the break-it task, and every lab. */
+    {
+      id: "lab1",
+      n: ["Pierwszy lab", "First lab"],
+      d: ["Lab ukończony od warunków do ostatniego kroku", "A lab finished from the starting state to the last step"],
+      ok: function (x) {
+        return x.labs >= 1;
+      },
+      p: function () {
+        return L("Ukończ dowolny lab", "Finish any lab");
+      }
+    },
+    {
+      id: "labclean",
+      n: ["Czysty przebieg", "Clean run"],
+      d: ["Lab ukończony bez „Nie wyszło”", "A lab finished without “It failed”"],
+      ok: function (x) {
+        return x.labClean;
+      },
+      p: function () {
+        return L("Ukończ lab bez otwierania „Nie wyszło”", "Finish a lab without opening “It failed”");
+      }
+    },
+    {
+      id: "labbrk",
+      n: ["Celowa awaria", "On purpose"],
+      d: ["Zadanie „Zepsuj to” zrobione", "The “Break it” task done"],
+      ok: function (x) {
+        return x.labBrk;
+      },
+      p: function () {
+        return L("Ukończ lab i zrób „Zepsuj to”", "Finish a lab and do “Break it”");
+      }
+    },
+    {
+      id: "laball",
+      n: ["Wszystkie laby", "All labs"],
+      d: ["Każdy lab ukończony", "Every lab finished"],
+      ok: function (x) {
+        return LABS.length && x.labs >= LABS.length;
+      },
+      p: function (x) {
+        return x.labs + " / " + LABS.length + L(" laby", " labs");
+      }
     }
   ];
   function kNeed(r) {
@@ -327,7 +372,11 @@
     nall: 3,
     f60: 1,
     f80: 2,
-    plat: 4
+    plat: 4,
+    lab1: 1,
+    labclean: 2,
+    labbrk: 2,
+    laball: 3
   };
   var BGROUPS = [
     [
@@ -349,6 +398,10 @@
     [
       ["Egzamin", "Exam"],
       ["sim1", "sim", "sim3", "ready"]
+    ],
+    [
+      ["Laby", "Labs"],
+      ["lab1", "labclean", "labbrk", "laball"]
     ]
   ];
   /* Share of the way to a locked badge, for its progress bar; null when the badge has no count. */
@@ -367,6 +420,7 @@
       ready: [x.ready, 80],
       sim3: [x.simPassN, 3],
       goal: [x.today, x.goal],
+      laball: [x.labs, LABS.length],
       plat: [badgesGot(true), BADGES.length - 1]
     }[id];
     return m && m[1] ? Math.min(m[0] / m[1], 1) : null;
@@ -415,7 +469,8 @@
             x.pre.forEach(function (_, j) {
               if (r.pre[j]) o.pre[j] = 1;
             });
-          ["fail", "done"].forEach(function (k) {
+          if (r.rf) o.rf = 1;
+          ["fail", "done", "clean", "brk"].forEach(function (k) {
             if (typeof r[k] === "string" && /^\d{4}-\d{2}-\d{2}$/.test(r[k])) o[k] = r[k];
           });
           S.lab[x.id] = o;
@@ -3033,7 +3088,16 @@
       "</h4>" +
       /* The failure task shows only after a clean run: first get it working, then break it on purpose. */
       (done
-        ? "<p>" + fmt(x.brk[0]) + "</p>" + labDocs([x.brk])
+        ? "<p>" +
+          fmt(x.brk[0]) +
+          "</p>" +
+          labDocs([x.brk]) +
+          '<div class="row lab-acts"><button type="button" class="btn lab-brk-ok" aria-pressed="' +
+          !!o.brk +
+          '">' +
+          (o.brk ? "✓ " : "") +
+          L("Zepsułem i wiem dlaczego", "Broke it and I know why") +
+          "</button></div>"
         : '<p class="how">' +
           L(
             "Odblokuje się po ukończeniu labu: celowo go zepsujesz i zobaczysz, co się stanie.",
@@ -3043,9 +3107,15 @@
       "</section>" +
       (done
         ? '<div class="row lab-acts"><p class="lab-fin">' +
+          (o.clean !== o.done
+            ? L("Lab ukończony.", "Lab completed.")
+            : L(
+                "Lab ukończony <strong>bez „Nie wyszło”</strong>.",
+                "Lab completed <strong>without “It failed”</strong>."
+              )) +
           L(
-            "Lab ukończony. Powtórz go za kilka dni, bez zaglądania w kroki.",
-            "Lab completed. Run it again in a few days without looking at the steps."
+            " Powtórz go za kilka dni, bez zaglądania w kroki.",
+            " Run it again in a few days without looking at the steps."
           ) +
           '</p><button type="button" class="btn lab-reset">' +
           L("Powtórz od zera", "Run it again") +
@@ -3064,6 +3134,7 @@
     var nf = document.getElementById("lab-" + id).querySelector(focusSel);
     if (nf) nf.focus();
     renderLvChips();
+    header();
   }
   function renderLvChips() {
     var per = lvPer();
@@ -3090,13 +3161,17 @@
       LABFIX[id] = !LABFIX[id];
       if (LABFIX[id]) {
         o.fail = dayKey(new Date());
+        o.rf = 1;
         save();
       }
       return labRepaint(id, ".lab-fail");
     }
     if (ev.target.closest(".lab-next")) {
       o.st = Math.min(o.st + 1, x.s.length);
-      if (o.st >= x.s.length) o.done = dayKey(new Date());
+      if (o.st >= x.s.length) {
+        o.done = dayKey(new Date());
+        if (!o.rf) o.clean = o.done;
+      }
       LABFIX[id] = false;
       save();
       return labRepaint(id, o.st >= x.s.length ? ".lab-reset" : ".lab-next");
@@ -3107,9 +3182,19 @@
       save();
       return labRepaint(id, o.st ? ".lab-back" : ".lab-next");
     }
+    if (ev.target.closest(".lab-brk-ok")) {
+      if (o.brk) delete o.brk;
+      else o.brk = dayKey(new Date());
+      save();
+      return labRepaint(id, ".lab-brk-ok");
+    }
     if (ev.target.closest(".lab-reset")) {
       o.st = 0;
       o.pre = {};
+      /* A new run proves itself again; badges already earned stay in S.badges. */
+      delete o.rf;
+      delete o.clean;
+      delete o.brk;
       LABFIX[id] = false;
       save();
       return labRepaint(id, ".lpre");
@@ -3485,7 +3570,14 @@
         var p = c.per[d[0]];
         return p.nt && p.nk === p.nt;
       }),
-      nDomNear: nNear ? nNear.n + " " + nNear.k + " / " + nNear.t : "–"
+      nDomNear: nNear ? nNear.n + " " + nNear.k + " / " + nNear.t : "–",
+      labs: LABS.filter(labDone).length,
+      labClean: LABS.some(function (l) {
+        return !!labSt(l.id).clean;
+      }),
+      labBrk: LABS.some(function (l) {
+        return !!labSt(l.id).brk;
+      })
     };
   }
   var TOAST_T = null;
@@ -4364,6 +4456,9 @@
     b.textContent = L("Zresetuj cały postęp", "Reset all progress");
     S.known = {};
     S.fknown = {};
+    S.lab = {};
+    LABOPEN = {};
+    LABFIX = {};
     S.ans = {};
     S.sims = [];
     S.sim = null;
