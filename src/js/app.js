@@ -4908,8 +4908,9 @@
   var ICON = {
     play: svg('<path class="fill" d="M8 5.5v13l10-6.5z"/>'),
     clock: svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/>'),
-    psec: svg('<path d="M6 5v14M19 5l-9 7 9 7z"/>'),
-    nsec: svg('<path d="M18 5v14M5 5l9 7-9 7z"/>'),
+    psec: svg('<path d="M15 5l-7 7 7 7"/>'),
+    nsec: svg('<path d="M9 5l7 7-7 7"/>'),
+    target: svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>'),
     flame: svg(
       '<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 .8 1.2 1.5 1.6 2.3 1.6C11 7 11 5 12 3z"/>'
     ),
@@ -5256,12 +5257,10 @@
 
     var top =
       '<div class="ftop">' +
-      '<div class="seg" role="group" aria-label="' +
-      L("Tryb nauki", "Study mode") +
-      '"><button type="button" class="seg-b" data-mode="lista" aria-pressed="false">' +
-      L("Lista", "List") +
-      "</button>" +
-      '<button type="button" class="seg-b" data-mode="focus" aria-pressed="true">Focus</button></div>' +
+      /* A status, not a switch: the way out is the × (or Esc), so the bar spends one small pill on "you are in Focus". */
+      '<span class="fmode">' +
+      ICON.target +
+      "Focus</span>" +
       '<span class="ftop-r">' +
       (S.gx.combo && S.combo >= 3
         ? '<span class="combo' +
@@ -5270,7 +5269,7 @@
           L("Dobre odpowiedzi z rzędu", "Right answers in a row") +
           '">' +
           ICON.bolt +
-          "Combo ×" +
+          '<span class="combo-l">Combo </span>×' +
           S.combo +
           "</span>"
         : "") +
@@ -5283,6 +5282,8 @@
       "</button>" +
       '<button type="button" class="icn" id="fo-close" aria-label="' +
       L("Zamknij tryb Focus i wróć do listy", "Close Focus mode and go back to the list") +
+      '" title="' +
+      L("Wróć do listy (Esc)", "Back to the list (Esc)") +
       '">' +
       ICON.x +
       "</button></span>" +
@@ -5300,13 +5301,6 @@
       (si > 0 ? "" : " disabled") +
       ">" +
       ICON.psec +
-      "</button>" +
-      '<button type="button" class="icn" id="fo-nsec" aria-label="' +
-      L("Następny obszar", "Next area") +
-      '"' +
-      (si > -1 && si < secs.length - 1 ? "" : " disabled") +
-      ">" +
-      ICON.nsec +
       "</button>" +
       '<label class="sr" for="fo-sec">' +
       L("Obszar", "Area") +
@@ -5337,7 +5331,15 @@
         : "<option>" +
           (S.fo.shuf && deck.length ? L("Losowa kolejność", "Random order") : L("Brak kart", "No cards")) +
           "</option>") +
-      "</select></div></div>";
+      "</select>" +
+      '<button type="button" class="icn" id="fo-nsec" aria-label="' +
+      L("Następny obszar", "Next area") +
+      '"' +
+      (si > -1 && si < secs.length - 1 ? "" : " disabled") +
+      ">" +
+      ICON.nsec +
+      "</button>" +
+      "</div></div>";
 
     var C = 2 * Math.PI * 27;
     var head =
@@ -5601,7 +5603,12 @@
       var first = deck.filter(function (x) {
         return x.d === d;
       })[0];
-      if (first) goCard(first.id);
+      if (first) {
+        goCard(first.id);
+        /* The bar re-renders; keep keyboard users on the arrow, or on the area list once the arrow is disabled. */
+        var nb = $("#" + b.id);
+        (nb && !nb.disabled ? nb : $("#fo-sec")).focus({ preventScroll: true });
+      }
       return;
     }
     b = t.closest(".fd");
