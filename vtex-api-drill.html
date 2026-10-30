@@ -12300,14 +12300,27 @@ function bootApiMap(root, onNav, embed) {
         }
       }
     });
-    F.forEach(function (f, i) {
-      if (S.fknown[i]) kf++;
-    });
-    var kn = 0;
     DOMS.forEach(function (d) {
+      per[d[0]].ft = 0;
+      per[d[0]].fk = 0;
       per[d[0]].nt = 0;
       per[d[0]].nk = 0;
     });
+    F.forEach(function (f, i) {
+      var p = per[f.d];
+      if (p) p.ft++;
+      if (S.fknown[i]) {
+        kf++;
+        if (p) p.fk++;
+      }
+    });
+    LABS.forEach(function (x) {
+      var p = per[x.d];
+      if (!p) return;
+      p.ft++;
+      if (labDone(x)) p.fk++;
+    });
+    var kn = 0;
     Object.keys(NKEY).forEach(function (k) {
       var p = per[NKEY[k]];
       if (p) p.nt++;
@@ -14906,16 +14919,22 @@ function bootApiMap(root, onNav, embed) {
     }
     return n;
   }
+  /* Area mastery counts the parts ticked in Postęp › Wynik łączny, labs as katas; an area with nothing to count is skipped. */
   function readiness(c) {
     var m = 0,
+      nd = 0,
       weak = null;
     DOMS.forEach(function (d) {
       var p = c.per[d[0]],
-        r = p.t ? p.k / p.t : 0;
+        k = (S.cnt.q ? p.k : 0) + (S.cnt.f ? p.fk : 0) + (S.cnt.n ? p.nk : 0),
+        t = (S.cnt.q ? p.t : 0) + (S.cnt.f ? p.ft : 0) + (S.cnt.n ? p.nt : 0);
+      if (!t) return;
+      var r = k / t;
       m += r;
-      if (p.t && (!weak || r < weak.r)) weak = { d: d, r: r, p: p };
+      nd++;
+      if (!weak || r < weak.r) weak = { d: d, r: r, p: p, k: k, t: t };
     });
-    m /= DOMS.length;
+    m = nd ? m / nd : 0;
     var acc = c.ans >= 20 ? c.right / c.ans : 0;
     var sim = 0;
     S.sims.slice(0, 3).forEach(function (x) {
@@ -15084,9 +15103,9 @@ function bootApiMap(root, onNav, embed) {
       "<strong>" +
       esc(dn(w.d[0])) +
       "</strong> · " +
-      w.p.k +
+      w.k +
       " / " +
-      w.p.t +
+      w.t +
       "</p>" +
       (wk.n ? '<p class="how">' + L("Do ćwiczenia: ", "To drill: ") + parts.join(", ") + ".</p>" : "") +
       '<div class="weak-act">' +
@@ -15130,7 +15149,11 @@ function bootApiMap(root, onNav, embed) {
       '%"></i></div>' +
       '<dl class="rdl"><dt>' +
       L("Opanowanie obszarów", "Areas mastered") +
-      " · 50%</dt><dd>" +
+      " · 50% <small>(" +
+      [S.cnt.q && L("pytania", "questions"), S.cnt.f && "katas", S.cnt.n && L("notatki", "notes")]
+        .filter(Boolean)
+        .join(", ") +
+      ")</small></dt><dd>" +
       Math.round(rd.m * 100) +
       "%</dd>" +
       "<dt>" +
@@ -15840,7 +15863,7 @@ function bootApiMap(root, onNav, embed) {
       }
       S.cnt[t.dataset.cnt] = t.checked;
       save();
-      paintTotal(counts());
+      renderStats();
       header();
       $('#gx-total [data-cnt="' + t.dataset.cnt + '"]').focus();
       return;
