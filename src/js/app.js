@@ -86,12 +86,20 @@
   });
   var GOALS = [10, 20, 40];
   var DAY_RE = /^\d{4}-\d\d-\d\d$/;
-  /* Append only: unlock dates are stored by id. */
+  /* Append only: unlock dates are stored by id. x: how to earn it, w: why it is worth it (the badge tooltip). */
   var BADGES = [
     {
       id: "first",
       n: ["Pierwszy krok", "First step"],
       d: ["Pierwsza odpowiedź", "First answer"],
+      x: [
+        "Odpowiedz na pierwsze pytanie, na liście albo w Focus.",
+        "Answer your first question, in the list or in Focus."
+      ],
+      w: [
+        "Start jest najtrudniejszy. Od pierwszej odpowiedzi aplikacja liczy serię, cel dnia i wynik obszarów.",
+        "Starting is the hardest part. From your first answer the app tracks your streak, daily goal and area scores."
+      ],
       ok: function (x) {
         return x.total >= 1;
       },
@@ -103,6 +111,11 @@
       id: "a100",
       n: ["Setka", "Century"],
       d: ["100 odpowiedzi", "100 answers"],
+      x: ["Udziel 100 odpowiedzi, w dowolnych obszarach.", "Give 100 answers, in any areas."],
+      w: [
+        "Po 100 odpowiedziach wynik obszarów jest wiarygodny i widać, gdzie masz luki.",
+        "After 100 answers the area scores are reliable and your gaps show."
+      ],
       ok: function (x) {
         return x.total >= 100;
       },
@@ -114,6 +127,11 @@
       id: "goal",
       n: ["Cel dnia", "Goal of the day"],
       d: ["Cel dzienny osiągnięty", "Daily goal reached"],
+      x: ["Zrób dzienny cel pytań ustawiony w Ustawieniach.", "Reach the daily question goal set in Settings."],
+      w: [
+        "Krótka porcja codziennie zostaje w pamięci lepiej niż jedna długa sesja.",
+        "A short daily portion sticks better than one long session."
+      ],
       ok: function (x) {
         return x.goalHit;
       },
@@ -125,6 +143,14 @@
       id: "s3",
       n: ["Seria 3 dni", "3-day streak"],
       d: ["3 dni nauki z rzędu", "3 days of study in a row"],
+      x: [
+        "Ucz się 3 dni z rzędu. Jeden dzień przerwy w tygodniu nie zrywa serii.",
+        "Study 3 days in a row. One day off a week does not break the streak."
+      ],
+      w: [
+        "Trzy dni to początek nawyku. Wracasz do materiału, zanim go zapomnisz.",
+        "Three days start a habit. You come back to the material before you forget it."
+      ],
       ok: function (x) {
         return x.best >= 3;
       },
@@ -136,6 +162,14 @@
       id: "s7",
       n: ["Seria 7 dni", "7-day streak"],
       d: ["Tydzień nauki z rzędu", "A week of study in a row"],
+      x: [
+        "Ucz się 7 dni z rzędu. Jeden dzień przerwy w tygodniu nie zrywa serii.",
+        "Study 7 days in a row. One day off a week does not break the streak."
+      ],
+      w: [
+        "Materiał wraca co dzień, więc zostaje w pamięci na dłużej niż po jednym zrywie.",
+        "The material comes back every day, so it lasts longer than after one cram."
+      ],
       ok: function (x) {
         return x.best >= 7;
       },
@@ -147,6 +181,14 @@
       id: "s14",
       n: ["Seria 14 dni", "14-day streak"],
       d: ["Dwa tygodnie z rzędu", "Two weeks in a row"],
+      x: [
+        "Ucz się 14 dni z rzędu. Jeden dzień przerwy w tygodniu nie zrywa serii.",
+        "Study 14 days in a row. One day off a week does not break the streak."
+      ],
+      w: [
+        "Dwa tygodnie regularnej nauki to nawyk, który doprowadzi Cię do egzaminu.",
+        "Two weeks of steady study is a habit that carries you to the exam."
+      ],
       ok: function (x) {
         return x.best >= 14;
       },
@@ -158,6 +200,11 @@
       id: "c10",
       n: ["Combo 10", "Combo 10"],
       d: ["10 dobrych odpowiedzi z rzędu", "10 right answers in a row"],
+      x: [
+        "Daj 10 dobrych odpowiedzi z rzędu na liście pytań lub w Focus. Zła odpowiedź zeruje licznik.",
+        "Give 10 right answers in a row in the question list or in Focus. A wrong answer resets the count."
+      ],
+      w: ["10 z rzędu to znak, że nie zgadujesz, tylko wiesz.", "10 in a row means you are not guessing, you know."],
       ok: function (x) {
         return x.comboBest >= 10;
       },
@@ -169,6 +216,14 @@
       id: "c25",
       n: ["Combo 25", "Combo 25"],
       d: ["25 dobrych odpowiedzi z rzędu", "25 right answers in a row"],
+      x: [
+        "Daj 25 dobrych odpowiedzi z rzędu na liście pytań lub w Focus. Zła odpowiedź zeruje licznik.",
+        "Give 25 right answers in a row in the question list or in Focus. A wrong answer resets the count."
+      ],
+      w: [
+        "25 bez błędu to pewność, której potrzebujesz na egzaminie.",
+        "25 without a miss is the confidence you need on exam day."
+      ],
       ok: function (x) {
         return x.comboBest >= 25;
       },
@@ -180,6 +235,14 @@
       id: "sim1",
       n: ["Pierwsza symulacja", "First simulation"],
       d: ["Ukończona symulacja", "A simulation finished"],
+      x: [
+        "Ukończ jedną symulację egzaminu, do ostatniego pytania.",
+        "Finish one exam simulation, to the last question."
+      ],
+      w: [
+        "Symulacja pokazuje, jak wypadasz w warunkach egzaminu, a nie pytanie po pytaniu.",
+        "The simulation shows how you do under exam conditions, not question by question."
+      ],
       ok: function (x) {
         return x.sims > 0;
       },
@@ -191,6 +254,11 @@
       id: "sim",
       n: ["Zdana symulacja", "Simulation passed"],
       d: ["Co najmniej 80% w symulacji", "At least 80% in a simulation"],
+      x: ["Zdobądź co najmniej 80% w jednej symulacji.", "Score at least 80% in one simulation."],
+      w: [
+        "80% to linia zaliczenia w tej aplikacji. Zdana symulacja mówi, że jesteś blisko celu.",
+        "80% is the pass line in this app. A passed simulation says you are close."
+      ],
       ok: function (x) {
         return x.simPass;
       },
@@ -202,6 +270,11 @@
       id: "sim3",
       n: ["Hat-trick", "Hat-trick"],
       d: ["3 zdane symulacje", "3 simulations passed"],
+      x: ["Zdaj 3 symulacje, każdą z wynikiem co najmniej 80%.", "Pass 3 simulations, each with at least 80%."],
+      w: [
+        "Trzy zdane symulacje to już nie przypadek. Twój wynik jest powtarzalny.",
+        "Three passed simulations are no fluke. Your score is repeatable."
+      ],
       ok: function (x) {
         return x.simPassN >= 3;
       },
@@ -213,6 +286,11 @@
       id: "dom",
       n: ["Obszar na 100%", "Area at 100%"],
       d: ["Wszystkie pytania z obszaru opanowane", "Every question in one area mastered"],
+      x: ["Opanuj wszystkie pytania z jednego obszaru.", "Master every question in one area."],
+      w: [
+        "Opanowany obszar to pewne punkty. Możesz przejść do słabszych.",
+        "A mastered area is points in the bank. You can move on to the weaker ones."
+      ],
       ok: function (x) {
         return x.domFull;
       },
@@ -224,6 +302,11 @@
       id: "fall",
       n: ["Wszystkie katas", "All katas"],
       d: ["Każda kata oznaczona Umiem", "Every kata marked Known"],
+      x: ["Oznacz każdą katę jako Umiem.", "Mark every kata as Known."],
+      w: [
+        "Każdy fakt, request i flow z katas umiesz z pamięci.",
+        "You know every fact, request and flow in the katas by heart."
+      ],
       ok: function (x) {
         return x.kf >= F.length;
       },
@@ -235,6 +318,14 @@
       id: "ready",
       n: ["Gotowy", "Ready"],
       d: ["Gotowość co najmniej 80", "Readiness of at least 80"],
+      x: [
+        "Dojdź do gotowości 80. Liczy się opanowanie obszarów, trafność i wynik symulacji.",
+        "Reach a readiness of 80. It counts area mastery, accuracy and your simulation score."
+      ],
+      w: [
+        "To najlepszy sygnał w aplikacji, że możesz podejść do egzaminu.",
+        "It is the app's best signal that you can sit the exam."
+      ],
       ok: function (x) {
         return x.ready >= 80;
       },
@@ -246,6 +337,11 @@
       id: "ndom",
       n: ["Notatki obszaru", "Notes of an area"],
       d: ["Każdy blok notatek jednego obszaru oznaczony Umiem", "Every note block of one area marked Known"],
+      x: ["Oznacz Umiem każdy blok notatek w jednym obszarze.", "Mark every note block in one area as Known."],
+      w: [
+        "Teoria jednego obszaru przerobiona do końca to baza pod jego pytania.",
+        "One area's theory done end to end is the base for its questions."
+      ],
       ok: function (x) {
         return x.nDomFull;
       },
@@ -257,6 +353,11 @@
       id: "nall",
       n: ["Wszystkie notatki", "All notes"],
       d: ["Każdy blok notatek oznaczony Umiem", "Every note block marked Known"],
+      x: ["Oznacz Umiem każdy blok notatek.", "Mark every note block as Known."],
+      w: [
+        "Cały materiał z notatek przerobiony, razem z pułapkami egzaminu.",
+        "All the notes done, exam traps included."
+      ],
       ok: function (x) {
         return x.kn >= NTOTAL;
       },
@@ -268,6 +369,11 @@
       id: "f60",
       n: ["Katas 60%", "Katas 60%"],
       d: ["60% katas oznaczonych Umiem", "60% of katas marked Known"],
+      x: ["Oznacz Umiem 60% katas.", "Mark 60% of the katas as Known."],
+      w: [
+        "Ponad połowa katas z pamięci. Pytania praktyczne przestają zaskakiwać.",
+        "Over half the katas by heart. Practical questions stop surprising you."
+      ],
       ok: function (x) {
         return x.kf >= kNeed(0.6);
       },
@@ -279,6 +385,11 @@
       id: "f80",
       n: ["Katas 80%", "Katas 80%"],
       d: ["80% katas oznaczonych Umiem", "80% of katas marked Known"],
+      x: ["Oznacz Umiem 80% katas.", "Mark 80% of the katas as Known."],
+      w: [
+        "Większość requestów i flow masz w głowie, nie w dokumentacji.",
+        "Most requests and flows are in your head, not in the docs."
+      ],
       ok: function (x) {
         return x.kf >= kNeed(0.8);
       },
@@ -290,6 +401,11 @@
       id: "plat",
       n: ["Komplet", "Full set"],
       d: ["Wszystkie pozostałe odznaki", "Every other badge"],
+      x: ["Zdobądź wszystkie pozostałe odznaki.", "Earn every other badge."],
+      w: [
+        "Komplet to dowód, że przeszedłeś całą ścieżkę: pytania, notatki, katas, symulacje i laby.",
+        "The full set proves you walked the whole path: questions, notes, katas, simulations and labs."
+      ],
       ok: function () {
         return badgesGot(true) === BADGES.length - 1;
       },
@@ -302,6 +418,14 @@
       id: "lab1",
       n: ["Pierwszy lab", "First lab"],
       d: ["Lab ukończony od warunków do ostatniego kroku", "A lab finished from the starting state to the last step"],
+      x: [
+        "Ukończ jeden lab, od warunków startowych do ostatniego kroku.",
+        "Finish one lab, from the starting state to the last step."
+      ],
+      w: [
+        "Lab przechodzi cały scenariusz krok po kroku, tak jak zrobisz to w pracy.",
+        "A lab walks a whole scenario step by step, the way you will do it at work."
+      ],
       ok: function (x) {
         return x.labs >= 1;
       },
@@ -313,6 +437,11 @@
       id: "labclean",
       n: ["Czysty przebieg", "Clean run"],
       d: ["Lab ukończony bez „Nie wyszło”", "A lab finished without “It failed”"],
+      x: ["Ukończ lab bez otwierania „Nie wyszło”.", "Finish a lab without opening “It failed”."],
+      w: [
+        "Bez podpowiedzi znaczy, że rozumiesz każdy krok, a nie tylko go powtarzasz.",
+        "No hints means you understand each step, not just repeat it."
+      ],
       ok: function (x) {
         return x.labClean;
       },
@@ -324,6 +453,11 @@
       id: "labbrk",
       n: ["Celowa awaria", "On purpose"],
       d: ["Zadanie „Zepsuj to” zrobione", "The “Break it” task done"],
+      x: ["Ukończ lab i zrób zadanie „Zepsuj to”.", "Finish a lab and do the “Break it” task."],
+      w: [
+        "Celowy błąd uczy czytać odpowiedzi API, gdy coś nie działa.",
+        "A deliberate failure teaches you to read API responses when something breaks."
+      ],
       ok: function (x) {
         return x.labBrk;
       },
@@ -335,6 +469,11 @@
       id: "laball",
       n: ["Wszystkie laby", "All labs"],
       d: ["Każdy lab ukończony", "Every lab finished"],
+      x: ["Ukończ każdy lab.", "Finish every lab."],
+      w: [
+        "Wszystkie scenariusze praktyczne z aplikacji zrobione samodzielnie.",
+        "Every practical scenario in the app done on your own."
+      ],
       ok: function (x) {
         return LABS.length && x.labs >= LABS.length;
       },
@@ -424,6 +563,42 @@
       plat: [badgesGot(true), BADGES.length - 1]
     }[id];
     return m && m[1] ? Math.min(m[0] / m[1], 1) : null;
+  }
+  /* Medals are drawn in SVG from the tier tokens (--tN-hi/-mid/-lo), so the metal follows light and dark mode.
+     The gradients live once at the top of the badges card; a locked medal is greyed out in CSS. */
+  var MEDAL_DEFS =
+    '<svg class="mdefs" aria-hidden="true" focusable="false"><defs>' +
+    [1, 2, 3, 4]
+      .map(function (t) {
+        return (
+          '<linearGradient id="mg' +
+          t +
+          '" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--t' +
+          t +
+          '-hi)"/><stop offset=".5" style="stop-color:var(--t' +
+          t +
+          '-mid)"/><stop offset="1" style="stop-color:var(--t' +
+          t +
+          '-lo)"/></linearGradient>'
+        );
+      })
+      .join("") +
+    "</defs></svg>";
+  function medal(t, on) {
+    return (
+      '<svg viewBox="0 0 40 40" aria-hidden="true"><path class="rb" d="M11 1h7l5 15h-7z"/><path class="rb rb2" d="M29 1h-7l-5 15h7z"/>' +
+      '<circle class="disc" cx="20" cy="25" r="13" fill="url(#mg' +
+      t +
+      ')"/><circle class="ring" cx="20" cy="25" r="9.6"/>' +
+      (on
+        ? '<path class="gl" d="' +
+          (t === 4
+            ? "M16 21.5h8l3 3.5-7 6.5-7-6.5z"
+            : "M20 19.5l1.35 3.64 3.88.16-3.04 2.41 1.04 3.74L20 27.3l-3.23 2.15 1.04-3.74-3.04-2.41 3.88-.16z") +
+          '"/>'
+        : '<path class="lk" d="M16.6 24.2h6.8a1 1 0 0 1 1 1v4.2a1 1 0 0 1-1 1h-6.8a1 1 0 0 1-1-1v-4.2a1 1 0 0 1 1-1zM17.8 24.2v-1.7a2.2 2.2 0 0 1 4.4 0v1.7"/>') +
+      "</svg>"
+    );
   }
   var BADGE_ID = Object.create(null);
   BADGES.forEach(function (b) {
@@ -1625,6 +1800,25 @@
   /* Tabs pattern: arrows move between sections, only the selected tab is in the Tab order. */
   $("#ptabs").addEventListener("keydown", tabKeys);
   $("#rtabs").addEventListener("keydown", tabKeys);
+  /* Esc dismisses a badge tooltip, the hovered one too (WCAG 1.4.13), until another badge is hovered or focused.
+     Focus stays where it is, so a keyboard user keeps their place. */
+  var tipOff = null;
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Escape") return;
+    var b = $("#gx-badges .badge:hover") || $("#gx-badges .badge:focus");
+    if (!b) return;
+    tipOff = b;
+    $("#gx-badges").classList.add("tipoff");
+  });
+  ["mouseover", "focusin"].forEach(function (e) {
+    $("#gx-badges").addEventListener(e, function (ev) {
+      var b = ev.target.closest(".badge");
+      if (b && b !== tipOff) {
+        tipOff = null;
+        this.classList.remove("tipoff");
+      }
+    });
+  });
   $("#rtabs").addEventListener("click", function (ev) {
     var b = ev.target.closest(".ctab");
     if (b && b.getAttribute("aria-selected") !== "true") go({ tab: b.dataset.rtab });
@@ -3816,8 +4010,12 @@
         t +
         (at ? " on" : "") +
         (t === 4 ? " plat" : "") +
+        '" tabindex="0" role="group" aria-label="' +
+        esc(T(b.n) + ", " + T(TIERS[t]) + ", " + (at ? L("zdobyta", "earned") : L("do zdobycia", "to earn"))) +
+        '" aria-describedby="bt-' +
+        b.id +
         '"><span class="badge-i" aria-hidden="true">' +
-        (at ? ICON.check : t === 4 ? ICON.medal : ICON.lock) +
+        medal(t, at) +
         "</span>" +
         '<span class="badge-t"><span class="tier">' +
         T(TIERS[t]) +
@@ -3829,10 +4027,25 @@
         (f === null ? "" : '<span class="meter" aria-hidden="true"><i style="width:' + f * 100 + '%"></i></span>') +
         '<span class="sr">' +
         (at ? L("zdobyta", "earned") : L("do zdobycia", "to earn")) +
+        '</span></span><span class="btip" role="tooltip" id="bt-' +
+        b.id +
+        '"><span class="btip-h"><strong>' +
+        esc(T(b.n)) +
+        "</strong> " +
+        esc(T(TIERS[t])) +
+        "</span><b>" +
+        L("Czym jest", "What it is") +
+        "</b><span>" +
+        esc(T(b.x)) +
+        "</span><b>" +
+        L("Dlaczego warto", "Why it is worth it") +
+        "</b><span>" +
+        esc(T(b.w)) +
         "</span></span></li>"
       );
     }
     $("#gx-badges").innerHTML =
+      MEDAL_DEFS +
       '<div class="cardh"><h2 id="gx-badges-h">' +
       L("Odznaki", "Badges") +
       '</h2><span class="meter-label">' +
