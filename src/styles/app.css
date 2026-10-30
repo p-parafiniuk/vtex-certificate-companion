@@ -3017,10 +3017,11 @@ kbd {
 }
 body[data-view="http"] .pcard,
 body[data-view="api"] .pcard,
-body[data-view="graphql"] .pcard {
+body[data-view="graphql"] .pcard,
+body[data-view="postman"] .pcard {
   display: none;
 }
-/* Ściągi: the sub-tab strip sits above HTTP Koty, API Map and GraphQL, which start right under the bar. */
+/* Ściągi: the sub-tab strip sits above HTTP Koty, API Map, GraphQL and Postman, which start right under the bar. */
 .rtabs {
   margin-top: 16px;
 }
@@ -3033,7 +3034,8 @@ body[data-view="graphql"] .pcard {
   font-weight: 400;
   color: var(--muted);
 }
-body[data-view="graphql"] .wrap {
+body[data-view="graphql"] .wrap,
+body[data-view="postman"] .wrap {
   max-width: 1040px;
 }
 .gql-grid {
@@ -3067,13 +3069,28 @@ body[data-view="graphql"] .wrap {
   border-radius: 10px;
   background: var(--code);
   display: grid;
-  grid-template-columns: max-content 1fr;
+  grid-template-columns: fit-content(60%) 1fr;
   gap: 6px 14px;
   font-size: 0.9rem;
+}
+.gql-code {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--code);
+  font-family: var(--f-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  overflow-x: auto;
+}
+.gql-code code {
+  background: none;
+  padding: 0;
 }
 .gql-tree dt code {
   background: none;
   padding: 0;
+  overflow-wrap: anywhere;
 }
 .gql-tree dd {
   margin: 0;
