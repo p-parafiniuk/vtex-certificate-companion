@@ -2417,6 +2417,51 @@ body[data-view="focus"] .wrap {
   align-items: center;
   gap: 8px;
 }
+.fmode {
+  order: 1;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  margin-right: 4px;
+  padding: 0 12px 0 10px;
+  border-radius: 99px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.fmode svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+}
+/* Settings, close and Combo are quiet; only the area pickers keep a border. "Combo" itself is left to screen readers. */
+.ftop .combo {
+  border-color: transparent;
+  background: none;
+  padding: 0 6px;
+}
+.ftop .combo-l {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Settings and close are quiet icons; only the area pickers keep a border. */
+.ftop-r .icn {
+  border-color: transparent;
+  background: none;
+  color: var(--muted);
+}
+.ftop-r .icn:hover:not(:disabled) {
+  border-color: transparent;
+  color: var(--ink);
+}
 .ftop-r {
   display: flex;
   gap: 8px;
@@ -2461,6 +2506,24 @@ body[data-view="focus"] .wrap {
   }
   .seg-b {
     padding-inline: 10px;
+  }
+  .ftop .fsel,
+  .ftop .icn {
+    height: 44px;
+  }
+  .ftop .icn {
+    width: 44px;
+  }
+  .fmode {
+    height: 32px;
+    margin-right: 0;
+  }
+  /* One row for mode, deck and the icons: the deck gives way, Combo keeps only its count. */
+  .fsel.deck {
+    flex: 1 1 0;
+  }
+  .ftop-r {
+    gap: 4px;
   }
 }
 .icn {
@@ -15756,8 +15819,9 @@ function bootApiMap(root, onNav, embed) {
   var ICON = {
     play: svg('<path class="fill" d="M8 5.5v13l10-6.5z"/>'),
     clock: svg('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M10 2h4"/>'),
-    psec: svg('<path d="M6 5v14M19 5l-9 7 9 7z"/>'),
-    nsec: svg('<path d="M18 5v14M5 5l9 7-9 7z"/>'),
+    psec: svg('<path d="M15 5l-7 7 7 7"/>'),
+    nsec: svg('<path d="M9 5l7 7-7 7"/>'),
+    target: svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/>'),
     flame: svg(
       '<path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 .8 1.2 1.5 1.6 2.3 1.6C11 7 11 5 12 3z"/>'
     ),
@@ -16104,12 +16168,10 @@ function bootApiMap(root, onNav, embed) {
 
     var top =
       '<div class="ftop">' +
-      '<div class="seg" role="group" aria-label="' +
-      L("Tryb nauki", "Study mode") +
-      '"><button type="button" class="seg-b" data-mode="lista" aria-pressed="false">' +
-      L("Lista", "List") +
-      "</button>" +
-      '<button type="button" class="seg-b" data-mode="focus" aria-pressed="true">Focus</button></div>' +
+      /* A status, not a switch: the way out is the × (or Esc), so the bar spends one small pill on "you are in Focus". */
+      '<span class="fmode">' +
+      ICON.target +
+      "Focus</span>" +
       '<span class="ftop-r">' +
       (S.gx.combo && S.combo >= 3
         ? '<span class="combo' +
@@ -16118,7 +16180,7 @@ function bootApiMap(root, onNav, embed) {
           L("Dobre odpowiedzi z rzędu", "Right answers in a row") +
           '">' +
           ICON.bolt +
-          "Combo ×" +
+          '<span class="combo-l">Combo </span>×' +
           S.combo +
           "</span>"
         : "") +
@@ -16131,6 +16193,8 @@ function bootApiMap(root, onNav, embed) {
       "</button>" +
       '<button type="button" class="icn" id="fo-close" aria-label="' +
       L("Zamknij tryb Focus i wróć do listy", "Close Focus mode and go back to the list") +
+      '" title="' +
+      L("Wróć do listy (Esc)", "Back to the list (Esc)") +
       '">' +
       ICON.x +
       "</button></span>" +
@@ -16148,13 +16212,6 @@ function bootApiMap(root, onNav, embed) {
       (si > 0 ? "" : " disabled") +
       ">" +
       ICON.psec +
-      "</button>" +
-      '<button type="button" class="icn" id="fo-nsec" aria-label="' +
-      L("Następny obszar", "Next area") +
-      '"' +
-      (si > -1 && si < secs.length - 1 ? "" : " disabled") +
-      ">" +
-      ICON.nsec +
       "</button>" +
       '<label class="sr" for="fo-sec">' +
       L("Obszar", "Area") +
@@ -16185,7 +16242,15 @@ function bootApiMap(root, onNav, embed) {
         : "<option>" +
           (S.fo.shuf && deck.length ? L("Losowa kolejność", "Random order") : L("Brak kart", "No cards")) +
           "</option>") +
-      "</select></div></div>";
+      "</select>" +
+      '<button type="button" class="icn" id="fo-nsec" aria-label="' +
+      L("Następny obszar", "Next area") +
+      '"' +
+      (si > -1 && si < secs.length - 1 ? "" : " disabled") +
+      ">" +
+      ICON.nsec +
+      "</button>" +
+      "</div></div>";
 
     var C = 2 * Math.PI * 27;
     var head =
@@ -16449,7 +16514,12 @@ function bootApiMap(root, onNav, embed) {
       var first = deck.filter(function (x) {
         return x.d === d;
       })[0];
-      if (first) goCard(first.id);
+      if (first) {
+        goCard(first.id);
+        /* The bar re-renders; keep keyboard users on the arrow, or on the area list once the arrow is disabled. */
+        var nb = $("#" + b.id);
+        (nb && !nb.disabled ? nb : $("#fo-sec")).focus({ preventScroll: true });
+      }
       return;
     }
     b = t.closest(".fd");
