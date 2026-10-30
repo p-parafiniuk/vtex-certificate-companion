@@ -177,5 +177,12 @@
   "pmtests": ["https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-scripts/","Postman: Write test scripts"],
   "pmexamples": ["https://learning.postman.com/docs/tests-and-scripts/write-scripts/test-examples/","Postman: Test script examples"],
   "pmresponse": ["https://learning.postman.com/docs/tests-and-scripts/write-scripts/postman-sandbox-reference/pm-response/","Postman: pm.response reference"],
-  "pmprereq": ["https://learning.postman.com/docs/tests-and-scripts/write-scripts/pre-request-scripts/","Postman: Pre-request scripts"]
+  "pmprereq": ["https://learning.postman.com/docs/tests-and-scripts/write-scripts/pre-request-scripts/","Postman: Pre-request scripts"],
+  "pmvars": ["https://learning.postman.com/docs/sending-requests/variables/variables/","Postman: Store and reuse values using variables"],
+  "pmvarsref": ["https://learning.postman.com/docs/tests-and-scripts/write-scripts/postman-sandbox-reference/pm-variables/","Postman: pm.variables reference"],
+  "pmsend": ["https://learning.postman.com/docs/tests-and-scripts/write-scripts/postman-sandbox-reference/pm-send-request/","Postman: pm.sendRequest reference"],
+  "pmrunner": ["https://learning.postman.com/docs/collections/running-collections/intro-to-collection-runs/","Postman: Run collections with the Collection Runner"],
+  "pmnewman": ["https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/","Postman: Run collections with Newman"],
+  "pmecho": ["https://learning.postman.com/docs/developer/echo-api/","Postman: Echo API"],
+  "cattree": ["https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pub/category/tree/-categoryLevels-","Catalog API: Get category tree"]
 }

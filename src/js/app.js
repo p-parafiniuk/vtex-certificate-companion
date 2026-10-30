@@ -64,6 +64,7 @@
     lang: "pl",
     nknown: {},
     lab: {},
+    pmk: {},
     cnt: { q: true, f: true, n: true },
     cntV: 1,
     rv: {},
@@ -655,6 +656,10 @@
       if (raw.theme === "light" || raw.theme === "dark") S.theme = raw.theme;
       if (raw.lang === "en") S.lang = "en";
       if (REFS.indexOf(raw.ref) > -1) S.ref = raw.ref;
+      if (raw.pmk && typeof raw.pmk === "object")
+        PM.k.forEach(function (x) {
+          if (raw.pmk[x.id] === 1) S.pmk[x.id] = 1;
+        });
       if (raw.days && typeof raw.days === "object" && !Array.isArray(raw.days)) {
         Object.keys(raw.days).forEach(function (k) {
           var n = raw.days[k] >>> 0;
@@ -5910,27 +5915,278 @@
       L("Endpointy REST są w ", "REST endpoints are in ")
     );
   }
-  function renderPm() {
-    renderCheat(
-      "postman",
-      PM,
-      L("Postman: testy API", "Postman: API tests"),
-      L("Endpointy VTEX są w ", "VTEX endpoints are in ")
+  /* Postman: the cheat sheet plus a mini course, runnable examples and katas, each a tinted section reached from
+     the chips at the top (buttons, not #anchors: the hash is the router's). */
+  function renderPm(force) {
+    var el = $("#p-postman");
+    if (!force && el.dataset.k === S.lang) return;
+    el.dataset.k = S.lang;
+    var done = PM.k.filter(function (x) {
+      return S.pmk[x.id];
+    }).length;
+    var secs = [
+      ["cheat", L("Ściąga", "Cheat sheet"), L("Najważniejsze fakty i pułapki", "Key facts and traps"), ""],
+      [
+        "kurs",
+        L("Mini kurs", "Mini course"),
+        L("Krótkie lekcje, od pierwszego requestu do CLI", "Short lessons, from the first request to the CLI"),
+        " · " + PM.c.length
+      ],
+      [
+        "ex",
+        L("Przykłady", "Examples"),
+        L("Kopiuj i wklej do <b>Scripts › Post-response</b>", "Copy and paste into <b>Scripts › Post-response</b>"),
+        " · " + PM.x.length
+      ],
+      [
+        "katas",
+        "Katas",
+        L(
+          "Zrób sam w Postmanie, potem porównaj z rozwiązaniem",
+          "Do it yourself in Postman, then compare with the solution"
+        ),
+        " · " + done + "/" + PM.k.length
+      ]
+    ];
+    function head(i) {
+      var s = secs[i];
+      return (
+        '<div class="pm-head pm-' +
+        s[0] +
+        '"><h2 class="pm-eye" tabindex="-1" id="pmh-' +
+        s[0] +
+        '">' +
+        (i + 1 < 10 ? "0" : "") +
+        (i + 1) +
+        " · " +
+        s[1] +
+        '</h2><span class="pm-sub">' +
+        s[2] +
+        "</span>" +
+        (i === 2
+          ? '<span class="pm-badge">' + L("każdy uruchomiony w Newman", "each one run in Newman") + "</span>"
+          : i === 3
+            ? '<span class="pm-cnt">' +
+              L(done + " z " + PM.k.length + " zrobione", done + " of " + PM.k.length + " done") +
+              "</span>"
+            : "") +
+        "</div>"
+      );
+    }
+    el.innerHTML =
+      cheatHead(
+        PM,
+        L("Postman: testy API", "Postman: API tests"),
+        L("Endpointy VTEX są w ", "VTEX endpoints are in ")
+      ) +
+      '<div class="pm-nav" role="group" aria-label="' +
+      L("Sekcje", "Sections") +
+      '">' +
+      secs
+        .map(function (s) {
+          return (
+            '<button type="button" class="pm-chip pm-' +
+            s[0] +
+            '" data-pmgo="pm-' +
+            s[0] +
+            '">' +
+            s[1] +
+            s[3] +
+            "</button>"
+          );
+        })
+        .join("") +
+      "</div>" +
+      '<section class="pm-sec" id="pm-cheat" aria-labelledby="pmh-cheat">' +
+      head(0) +
+      cheatGrid(PM.s) +
+      "</section>" +
+      '<section class="pm-sec" id="pm-kurs" aria-labelledby="pmh-kurs">' +
+      head(1) +
+      '<ol class="pm-course">' +
+      PM.c
+        .map(function (x, i) {
+          return (
+            '<li><span class="pm-num" aria-hidden="true">' +
+            (i + 1) +
+            '</span><div class="card pm-card"><h3>' +
+            esc(x.h) +
+            "</h3>" +
+            (x.code ? pmCode(x.code) : "") +
+            (x.b ? noteList(x.b) : "") +
+            docLinks(x) +
+            "</div></li>"
+          );
+        })
+        .join("") +
+      "</ol></section>" +
+      '<section class="pm-sec" id="pm-ex" aria-labelledby="pmh-ex">' +
+      head(2) +
+      '<div class="gql-grid">' +
+      PM.x
+        .map(function (x) {
+          return (
+            '<section class="card pm-card pm-xc"><h3>' +
+            esc(x.h) +
+            "</h3>" +
+            pmReq(x.m, x.u) +
+            (x.body ? pmCode(x.body, "Body · raw JSON") : "") +
+            (x.pre ? pmCode(x.pre, "Scripts › Pre-request") : "") +
+            pmCode(x.code, "Scripts › Post-response") +
+            docLinks(x) +
+            "</section>"
+          );
+        })
+        .join("") +
+      "</div></section>" +
+      '<section class="pm-sec" id="pm-katas" aria-labelledby="pmh-katas">' +
+      head(3) +
+      '<div class="gql-grid">' +
+      PM.k
+        .map(function (x, i) {
+          var ok = !!S.pmk[x.id];
+          return (
+            '<section class="card pm-card pm-kata' +
+            (ok ? " done" : "") +
+            '"><p class="pm-kmeta">Kata ' +
+            (i + 1) +
+            " · " +
+            L("ok. ", "about ") +
+            x.min +
+            " min" +
+            (ok ? '<span class="pm-ok">✓ ' + L("Zrobione", "Done") + "</span>" : "") +
+            "</p><h3>" +
+            esc(x.h) +
+            '</h3><p class="pm-goal"><b>' +
+            L("Cel:", "Goal:") +
+            "</b> " +
+            fmt(x.goal) +
+            "</p>" +
+            x.rq
+              .map(function (r) {
+                return pmReq(r[0], r[1]);
+              })
+              .join("") +
+            "<ol>" +
+            x.ol
+              .map(function (y) {
+                return "<li>" + fmt(y) + "</li>";
+              })
+              .join("") +
+            '</ol><details class="pm-sol"><summary>' +
+            L("Pokaż rozwiązanie", "Show solution") +
+            "</summary>" +
+            pmCode(x.sol) +
+            '</details><button type="button" class="pm-done" data-pmk="' +
+            esc(x.id) +
+            '" aria-pressed="' +
+            ok +
+            '">' +
+            (ok ? L("Cofnij „zrobione”", "Undo done") : L("Oznacz jako zrobione", "Mark as done")) +
+            "</button>" +
+            docLinks(x) +
+            "</section>"
+          );
+        })
+        .join("") +
+      "</div></section>";
+  }
+  function pmCode(s, lbl) {
+    return (
+      '<div class="pm-code"><div class="pm-bar"><span class="pm-lbl">' +
+      (lbl || "") +
+      '</span><button type="button" class="pm-copy" aria-live="polite">' +
+      L("Kopiuj", "Copy") +
+      '</button></div><pre class="gql-code"><code>' +
+      esc(s) +
+      "</code></pre></div>"
     );
+  }
+  function pmReq(m, u) {
+    return (
+      '<div class="pm-reqw"><pre class="pm-req"><code><b>' +
+      esc(m) +
+      "</b> " +
+      esc(u) +
+      '</code></pre><button type="button" class="pm-copy" aria-live="polite" data-url="' +
+      esc(u) +
+      '">' +
+      L("Kopiuj URL", "Copy URL") +
+      "</button></div>"
+    );
+  }
+  $("#p-postman").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button");
+    if (!b) return;
+    if (b.dataset.pmgo) {
+      var t = $("#" + b.dataset.pmgo);
+      t.scrollIntoView({
+        block: "start",
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
+      });
+      t.querySelector(".pm-eye").focus({ preventScroll: true });
+    } else if (b.dataset.pmk) {
+      var id = b.dataset.pmk;
+      if (S.pmk[id]) delete S.pmk[id];
+      else S.pmk[id] = 1;
+      save();
+      renderPm(true);
+      var again = $("#p-postman").querySelector('[data-pmk="' + id.replace(/["\\]/g, "") + '"]');
+      if (again) again.focus({ preventScroll: true });
+    }
+  });
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest ? ev.target.closest(".pm-copy") : null;
+    if (b) pmCopy(b);
+  });
+  /* Clipboard needs a secure context; file:// usually is one, but fall back to selecting the text so Ctrl+C works. */
+  function pmCopy(b) {
+    var pre = b.closest(".pm-code, .pm-reqw").querySelector("pre"),
+      text = b.dataset.url || pre.textContent,
+      label = b.textContent;
+    function said(ok) {
+      b.textContent = ok ? L("Skopiowano", "Copied") : L("Zaznaczono: Ctrl+C", "Selected: Ctrl+C");
+      b.classList.add("on");
+      setTimeout(function () {
+        b.textContent = label;
+        b.classList.remove("on");
+      }, 1600);
+    }
+    function pick() {
+      var r = document.createRange();
+      r.selectNodeContents(pre);
+      var sel = getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      said(false);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText)
+      navigator.clipboard.writeText(text).then(function () {
+        said(true);
+      }, pick);
+    else pick();
   }
   function renderCheat(id, data, title, apiLead) {
     var el = $("#p-" + id);
     if (el.dataset.k === S.lang) return;
     el.dataset.k = S.lang;
-    el.innerHTML =
+    el.innerHTML = cheatHead(data, title, apiLead) + cheatGrid(data.s);
+  }
+  function cheatHead(data, title, apiLead) {
+    return (
       "<div><h2>" +
       title +
       '</h2><p class="lead">' +
       fmt(data.t) +
       " " +
       apiLead +
-      '<a data-nav href="#api">API Map</a>.</p></div><div class="gql-grid">' +
-      data.s
+      '<a data-nav href="#api">API Map</a>.</p></div>'
+    );
+  }
+  function cheatGrid(blocks) {
+    return (
+      '<div class="gql-grid">' +
+      blocks
         .map(function (x) {
           return (
             '<section class="card gql-b' +
@@ -5947,7 +6203,7 @@
                   .join("") +
                 "</ol>"
               : "") +
-            (x.code ? '<pre class="gql-code"><code>' + esc(x.code) + "</code></pre>" : "") +
+            (x.code ? pmCode(x.code) : "") +
             (x.b ? noteList(x.b) : "") +
             (x.tree
               ? '<dl class="gql-tree">' +
@@ -5980,7 +6236,8 @@
           );
         })
         .join("") +
-      "</div>";
+      "</div>"
+    );
   }
   /* ---------- VTEX API Map view ---------- */
   var APIM = null;
