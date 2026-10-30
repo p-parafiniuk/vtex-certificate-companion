@@ -90,7 +90,11 @@ const used = new Set(
     .concat(Object.values(D.NOTES).flatMap(n => (n.s || []).flatMap(s => s[2] || [])))
     .concat(Object.values(D.APIOV).flatMap(cs => (Array.isArray(cs) ? cs : []).flatMap(c => c.l || [])))
     .concat((Array.isArray(D.ROLETRAPS) ? D.ROLETRAPS : []).flatMap(x => x.l || []))
-    .concat([D.GQL, D.PM].flatMap(g => (g && Array.isArray(g.s) ? g.s : [])).flatMap(x => x.l || []))
+    .concat(
+      [D.GQL, D.PM]
+        .flatMap(g => (g ? ["s", "c", "x", "k"].flatMap(f => (Array.isArray(g[f]) ? g[f] : [])) : []))
+        .flatMap(x => x.l || [])
+    )
     .concat(
       (Array.isArray(D.LABS) ? D.LABS : []).flatMap(x =>
         [x.pre, x.fix, [x.brk]]
@@ -306,35 +310,77 @@ for (const name of ["GQL", "PM"]) {
       markup(w, x);
       if (/\[UNVERIFIED|https?:|</i.test(x)) E(w, "no [UNVERIFIED], URLs or raw < : sources go in DOCS keys");
       if (x.split(/\s+/).length > 30) W(w, "over 30 words");
-    };
-  for (const f of Object.keys(g)) if (f !== "t" && f !== "s") E(name, "unknown field `" + f + "`");
+    },
+    docs = (w, l) =>
+      !Array.isArray(l) || !l.length
+        ? E(w, "needs DOCS keys in l")
+        : l.forEach(d => D.DOCS[d] || E(w, "DOCS key `" + d + "` not in DOCS")),
+    req = (w, m, u) => {
+      if (!["GET", "POST", "PUT", "PATCH", "DELETE"].includes(m)) E(w, "bad method `" + m + "`");
+      if (!/^https:\/\/\S+$/.test(u || "")) E(w, "url must be https:// with no spaces");
+    },
+    fields = name === "PM" ? ["t", "s", "c", "x", "k"] : ["t", "s"];
+  for (const f of Object.keys(g)) if (!fields.includes(f)) E(name, "unknown field `" + f + "`");
   txt(name + ".t", g.t);
   if (!Array.isArray(g.s) || !g.s.length) E(name, "s needs at least one block");
-  else
-    g.s.forEach((x, i) => {
-      const w = name + ".s[" + i + "]";
-      for (const f of Object.keys(x))
-        if (!["h", "b", "ol", "code", "tree", "cmp", "l"].includes(f)) E(w, "unknown field `" + f + "`");
-      if (!isStr(x.h)) E(w, "needs a heading h");
-      if (!x.b && !x.ol && !x.code && !x.tree && !x.cmp) E(w, "needs b, ol, code, tree or cmp");
-      if (x.code !== undefined && !isStr(x.code)) E(w, "code is a non-empty string");
-      [x.b, x.ol].forEach(
-        xs =>
-          xs !== undefined &&
-          (Array.isArray(xs) ? xs.forEach((y, j) => txt(w + "." + j, y)) : E(w, "b and ol are lists"))
-      );
-      [x.tree, x.cmp].forEach((rows, k) => {
-        if (rows === undefined) return;
-        if (!Array.isArray(rows)) return E(w, "tree and cmp are lists of rows");
-        rows.forEach((r, j) => {
-          if (!Array.isArray(r) || r.length !== (k ? 3 : 2))
-            E(w, (k ? "cmp" : "tree") + " row " + j + " needs " + (k ? 3 : 2) + " cells");
-          else r.forEach(c => txt(w + "." + j, c));
-        });
+  /* Postman: c = mini-course lessons (same shape as s), x = runnable examples, k = katas. Every code sample in x
+     and k was run in Newman before it shipped; keep it that way when you change one. */
+  const blocks = (Array.isArray(g.s) ? g.s : [])
+    .map((x, i) => [x, name + ".s[" + i + "]"])
+    .concat((Array.isArray(g.c) ? g.c : []).map((x, i) => [x, name + ".c[" + i + "]"]));
+  blocks.forEach(([x, w]) => {
+    for (const f of Object.keys(x))
+      if (!["h", "b", "ol", "code", "tree", "cmp", "l"].includes(f)) E(w, "unknown field `" + f + "`");
+    if (!isStr(x.h)) E(w, "needs a heading h");
+    if (!x.b && !x.ol && !x.code && !x.tree && !x.cmp) E(w, "needs b, ol, code, tree or cmp");
+    if (x.code !== undefined && !isStr(x.code)) E(w, "code is a non-empty string");
+    [x.b, x.ol].forEach(
+      xs =>
+        xs !== undefined && (Array.isArray(xs) ? xs.forEach((y, j) => txt(w + "." + j, y)) : E(w, "b and ol are lists"))
+    );
+    [x.tree, x.cmp].forEach((rows, k) => {
+      if (rows === undefined) return;
+      if (!Array.isArray(rows)) return E(w, "tree and cmp are lists of rows");
+      rows.forEach((r, j) => {
+        if (!Array.isArray(r) || r.length !== (k ? 3 : 2))
+          E(w, (k ? "cmp" : "tree") + " row " + j + " needs " + (k ? 3 : 2) + " cells");
+        else r.forEach(c => txt(w + "." + j, c));
       });
-      if (!Array.isArray(x.l) || !x.l.length) E(w, "needs DOCS keys in l");
-      else x.l.forEach(d => D.DOCS[d] || E(w, "DOCS key `" + d + "` not in DOCS"));
     });
+    docs(w, x.l);
+  });
+  if (name !== "PM") continue;
+  (Array.isArray(g.x) ? g.x : []).forEach((x, i) => {
+    const w = "PM.x[" + i + "]";
+    for (const f of Object.keys(x))
+      if (!["h", "m", "u", "body", "pre", "code", "l"].includes(f)) E(w, "unknown field `" + f + "`");
+    if (!isStr(x.h)) E(w, "needs a heading h");
+    req(w, x.m, x.u);
+    ["body", "pre"].forEach(f => x[f] !== undefined && !isStr(x[f]) && E(w, f + " is a non-empty string"));
+    if (!isStr(x.code)) E(w, "needs code");
+    docs(w, x.l);
+  });
+  const ids = new Set();
+  (Array.isArray(g.k) ? g.k : []).forEach((x, i) => {
+    const w = "PM.k[" + i + "]";
+    for (const f of Object.keys(x))
+      if (!["id", "h", "min", "goal", "rq", "ol", "sol", "l"].includes(f)) E(w, "unknown field `" + f + "`");
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(x.id || "")) E(w, "id must be kebab-case");
+    else if (ids.has(x.id)) E(w, "duplicate id " + x.id);
+    ids.add(x.id);
+    if (!isStr(x.h)) E(w, "needs a heading h");
+    if (!Number.isInteger(x.min) || x.min < 1 || x.min > 120) E(w, "min must be 1 to 120");
+    txt(w + ".goal", x.goal);
+    if (!Array.isArray(x.rq) || !x.rq.length) E(w, "rq needs at least one [method, url]");
+    else
+      x.rq.forEach((r, j) =>
+        Array.isArray(r) && r.length === 2 ? req(w + ".rq" + j, r[0], r[1]) : E(w, "rq rows are [method, url]")
+      );
+    if (!Array.isArray(x.ol) || !x.ol.length) E(w, "ol needs steps");
+    else x.ol.forEach((y, j) => txt(w + "." + j, y));
+    if (!isStr(x.sol)) E(w, "needs a solution sol");
+    docs(w, x.l);
+  });
 }
 
 /* HTTP Koty */
