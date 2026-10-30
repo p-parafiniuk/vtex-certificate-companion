@@ -307,14 +307,22 @@ a {
   gap: 8px;
   display: inline-flex;
   align-items: center;
-  padding: 0 10px 0 12px;
-  background: var(--nav-ink);
-  color: var(--nav-bg);
+  min-width: 180px;
+  padding: 0 8px 0 12px;
+  /* At least 3:1 against the bar (WCAG 1.4.11): the border is what makes it read as a field. */
+  border: 1px solid color-mix(in srgb, var(--nav-muted) 55%, var(--nav-bg));
+  background: transparent;
+  color: var(--nav-muted);
   font: 500 0.9rem var(--f-body);
 }
+/* A ghost field, not a button: it reads as "type here" and leaves the pink fill to the one primary action. */
+.bar .srch-btn .srch-l {
+  flex: 1;
+  text-align: left;
+}
 .bar .srch-btn:hover {
-  background: var(--nav-accent);
-  color: var(--nav-bg);
+  border-color: var(--nav-muted);
+  color: var(--nav-ink);
 }
 .srch-btn svg {
   width: 16px;
@@ -336,7 +344,7 @@ a {
   gap: 7px;
   min-height: 40px;
   margin-left: -12px;
-  padding: 0 16px 0 12px;
+  padding: 0 18px;
   border-radius: 99px;
   background: var(--nav-accent);
   color: var(--nav-bg);
@@ -361,6 +369,9 @@ a {
   font: 500 0.75rem var(--f-mono);
   color: inherit;
   opacity: 0.8;
+}
+.sim-cta.run {
+  padding-left: 12px;
 }
 .sim-cta.run .num {
   font-size: 0.85rem;
@@ -422,8 +433,10 @@ a {
   .bar .srch-btn {
     margin-left: 0;
     width: 44px;
+    min-width: 0;
     height: 44px;
     padding: 0;
+    border: 0;
     justify-content: center;
     background: none;
     color: var(--nav-muted);
@@ -447,7 +460,7 @@ a {
     border: 4px solid transparent;
     background-clip: padding-box;
     margin: 0 44px 0 0;
-    padding: 0 12px 0 9px;
+    padding: 0 14px;
     font-size: 0.95rem;
   }
   .sim-cta svg {
@@ -12831,24 +12844,23 @@ function bootApiMap(root, onNav, embed) {
     var html = run
       ? ICON.clock +
         '<span class="tab-long">' +
-        L("Wróć do testu", "Back to the exam") +
+        L("Wróć do egzaminu", "Back to the exam") +
         "</span> " +
         '<span class="num">' +
         esc(clock(left)) +
         "</span>"
-      : ICON.play +
+      : /* A plain label: the size and rules are on the simulation page, so the button only names where it goes. */
         '<span class="tab-long">' +
-        L("Zacznij symulację", "Start the simulation") +
+        L("Egzamin próbny", "Practice exam") +
         '</span><span class="tab-short">' +
-        L("Test", "Exam") +
-        '</span> <span class="num tab-long">' +
-        SIM_Q +
-        "+" +
-        SIM_P +
+        L("Egzamin", "Exam") +
         "</span>";
     if (a.dataset.html !== html) a.innerHTML = a.dataset.html = html;
     a.classList.toggle("run", !!run);
     a.title = run ? L("Symulacja trwa: zostało ", "Exam running: ") + clock(left) + L("", " left") : "";
+    /* The phone shows only "Egzamin", so the full name stays in the accessible name. */
+    if (run) a.removeAttribute("aria-label");
+    else a.setAttribute("aria-label", L("Egzamin próbny", "Practice exam"));
     if (CUR === "symulacja") a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   }
