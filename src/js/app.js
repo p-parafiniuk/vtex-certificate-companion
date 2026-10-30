@@ -1996,24 +1996,23 @@
     var html = run
       ? ICON.clock +
         '<span class="tab-long">' +
-        L("Wróć do testu", "Back to the exam") +
+        L("Wróć do egzaminu", "Back to the exam") +
         "</span> " +
         '<span class="num">' +
         esc(clock(left)) +
         "</span>"
-      : ICON.play +
+      : /* A plain label: the size and rules are on the simulation page, so the button only names where it goes. */
         '<span class="tab-long">' +
-        L("Zacznij symulację", "Start the simulation") +
+        L("Egzamin próbny", "Practice exam") +
         '</span><span class="tab-short">' +
-        L("Test", "Exam") +
-        '</span> <span class="num tab-long">' +
-        SIM_Q +
-        "+" +
-        SIM_P +
+        L("Egzamin", "Exam") +
         "</span>";
     if (a.dataset.html !== html) a.innerHTML = a.dataset.html = html;
     a.classList.toggle("run", !!run);
     a.title = run ? L("Symulacja trwa: zostało ", "Exam running: ") + clock(left) + L("", " left") : "";
+    /* The phone shows only "Egzamin", so the full name stays in the accessible name. */
+    if (run) a.removeAttribute("aria-label");
+    else a.setAttribute("aria-label", L("Egzamin próbny", "Practice exam"));
     if (CUR === "symulacja") a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   }
