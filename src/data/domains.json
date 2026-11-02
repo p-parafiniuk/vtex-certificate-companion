@@ -8,5 +8,6 @@
   ["orders","Orders, Feed, Hook","📋"],
   ["payments","Payments i anti-fraud","💳","Payments & anti-fraud"],
   ["md","Master Data","🗄️"],
-  ["mkt","Marketplace / Seller","🏪"]
+  ["mkt","Marketplace / Seller","🏪"],
+  ["sec","Bezpieczeństwo API","🛡️","API security"]
 ]
