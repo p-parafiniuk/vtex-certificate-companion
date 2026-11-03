@@ -6,7 +6,8 @@
   "logistics": {"api":[["logistics"]],"ref":[["logistics-api","Logistics API"]]},
   "checkout": {"api":[["checkout"]],"ref":[["checkout-api","Checkout API"]]},
   "orders": {"api":[["orders"]],"ref":[["orders-api","Orders API"]]},
-  "payments": {"api":[["payments"],["payment-provider"],["antifraud"],["giftcard"],["giftcard-hub"]],"ref":[["payments-gateway-api","Payments Gateway API"],["payment-provider-protocol","Payment Provider Protocol"],["antifraud-provider-protocol","Anti-fraud Provider Protocol"],["giftcard-api","Giftcard API"],["giftcard-hub-api","GiftCard Hub API"]]},
+  "payments": {"api":[["payments"],["payment-provider"],["antifraud"]],"ref":[["payments-gateway-api","Payments Gateway API"],["payment-provider-protocol","Payment Provider Protocol"],["antifraud-provider-protocol","Anti-fraud Provider Protocol"]]},
+  "gift": {"api":[["giftcard"],["giftcard-hub"]],"ref":[["giftcard-api","Giftcard API"],["giftcard-hub-api","GiftCard Hub API"],["giftcard-provider-protocol","Giftcard Provider Protocol"]]},
   "md": {"api":[["md-v1"],["md-v2"]],"ref":[["master-data-api-v2","Master Data API v2"],["masterdata-api","Master Data API v1"]]},
   "mkt": {"api":[["marketplace"],["mkt-orders"],["catalog",["Seller","SKU seller"]],["checkout",["Fulfillment"]],["orders",["Change seller"]]],"ref":[["marketplace-apis","Marketplace API"],["marketplace-protocol-external-marketplace-orders","Marketplace Protocol: external marketplace orders"]]},
   "sec": {"api":[["license"],["vtex-id"]],"ref":[["license-manager-api","License Manager API"],["vtex-id-api","VTEX ID API"]]}

@@ -7,6 +7,7 @@
   ["checkout","Checkout","🛒"],
   ["orders","Orders, Feed, Hook","📋"],
   ["payments","Payments i anti-fraud","💳","Payments & anti-fraud"],
+  ["gift","Gift cards","🎁"],
   ["md","Master Data","🗄️"],
   ["mkt","Marketplace / Seller","🏪"],
   ["sec","Bezpieczeństwo API","🛡️","API security"]
