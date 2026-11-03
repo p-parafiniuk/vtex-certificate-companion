@@ -1975,15 +1975,62 @@ h3 {
   border-width: 2px;
   border-style: dashed;
 }
-.cell input:checked + span {
+.cell {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+}
+.cell.on span {
   background: var(--accent);
   color: var(--accent-ink);
   border-color: var(--accent);
   border-style: solid;
 }
-.cell input:focus-visible + span {
+.cell:focus-visible {
+  outline: none;
+}
+.cell:focus-visible span {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+.gpop {
+  position: absolute;
+  z-index: 40;
+  width: min(300px, calc(100vw - 16px));
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 8px 24px var(--kshadow);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+.gpop p {
+  margin: 0 0 8px;
+}
+.gpop .gp-h {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.gpop .gp-a {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+@media (max-width: 520px) {
+  .gpop {
+    position: fixed;
+    left: 0 !important;
+    right: 0;
+    top: auto !important;
+    bottom: 0;
+    width: auto;
+    border-radius: 12px 12px 0 0;
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+  }
 }
 .legend {
   display: flex;
