@@ -184,5 +184,10 @@
   "pmrunner": ["https://learning.postman.com/docs/collections/running-collections/intro-to-collection-runs/","Postman: Run collections with the Collection Runner"],
   "pmnewman": ["https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/","Postman: Run collections with Newman"],
   "pmecho": ["https://learning.postman.com/docs/developer/echo-api/","Postman: Echo API"],
-  "cattree": ["https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pub/category/tree/-categoryLevels-","Catalog API: Get category tree"]
+  "cattree": ["https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pub/category/tree/-categoryLevels-","Catalog API: Get category tree"],
+  "gcmanage": ["https://developers.vtex.com/docs/guides/managing-vtex-gift-cards","Guide: Managing VTEX gift cards"],
+  "gcprov": ["https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider","Guide: Configuring an external gift card provider"],
+  "gcarch": ["https://developers.vtex.com/docs/guides/gift-card-integration-guide-system-architecture","Guide: Gift card system architecture"],
+  "gcppp": ["https://developers.vtex.com/docs/api-reference/giftcard-provider-protocol","Giftcard Provider Protocol"],
+  "gchelp": ["https://help.vtex.com/en/tutorial/gift-card--tutorials_995","Help: Gift card"]
 }
