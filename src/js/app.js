@@ -4650,12 +4650,24 @@
       esc(dn(it.d)) +
       L(" · runda ", " · round ") +
       it.r +
-      '</p><p class="gp-q" hidden>' +
+      '</p><div class="gp-q" hidden><p>' +
       fmt(it.q) +
-      '</p><div class="gp-a"><button type="button" class="btn small primary gp-k">' +
+      "</p>" +
+      (isQ
+        ? '<ul class="gp-o">' +
+          shuffle(it.o.slice())
+            .map(function (x) {
+              return "<li>" + fmt(x) + "</li>";
+            })
+            .join("") +
+          "</ul>"
+        : "") +
+      '</div><div class="gp-a"><button type="button" class="btn small primary gp-k">' +
       (on ? L("↺ Odznacz", "↺ Unmark") : L("✓ Zalicz", "✓ Mark mastered")) +
       '</button><button type="button" class="btn small gp-s" aria-expanded="false">' +
       L("Pokaż treść", "Show text") +
+      '</button><button type="button" class="btn small gp-f">' +
+      L("Otwórz w Focus →", "Open in Focus →") +
       "</button></div>";
     document.body.appendChild(el);
     GPOP = { el: el, cell: cell, isQ: isQ, i: i };
@@ -4687,6 +4699,16 @@
       GPOP.cell.className = tmp.firstChild.className;
       GPOP.cell.setAttribute("aria-label", tmp.firstChild.getAttribute("aria-label"));
       ev.target.closest(".gp-k").textContent = m[i] ? L("↺ Odznacz", "↺ Unmark") : L("✓ Zalicz", "✓ Mark mastered");
+    } else if (ev.target.closest(".gp-f")) {
+      var id = (GPOP.isQ ? "q" : "f") + (GPOP.i + 1);
+      closeGpop(false);
+      if (BY_ID[id]) {
+        S.fo.flt = "all";
+        S.fo.deck = "all";
+        S.fo.dom = "all";
+        save();
+        go({ tab: "focus", id: id });
+      }
     } else if (ev.target.closest(".gp-s")) {
       var q = GPOP.el.querySelector(".gp-q"),
         b = ev.target.closest(".gp-s");
