@@ -4595,55 +4595,112 @@
       ) +
       "</p>";
   }
+  function gridCell(kind, i, st, on) {
+    return (
+      '<button type="button" class="cell' +
+      st +
+      (on ? " on" : "") +
+      '" data-g' +
+      kind +
+      '="' +
+      i +
+      '" aria-haspopup="dialog" aria-label="' +
+      (kind === "q" ? L("Pytanie ", "Question ") : "Kata ") +
+      (i + 1) +
+      (on ? L(", opanowane", ", mastered") : "") +
+      '"><span>' +
+      (kind === "q" ? "" : "F") +
+      (i + 1) +
+      "</span></button>"
+    );
+  }
   function renderGrids() {
+    closeGpop(false);
     $("#qgrid").innerHTML = Q.map(function (q, i) {
       var st = S.ans[i] === undefined ? "" : isRight(i, S.ans[i]) ? " st-right" : " st-wrong";
-      return (
-        '<label class="cell' +
-        st +
-        '" for="gq-' +
-        (i + 1) +
-        '" title="' +
-        esc(dn(q.d)) +
-        L(" · runda ", " · round ") +
-        q.r +
-        '"><input type="checkbox" class="sr" id="gq-' +
-        (i + 1) +
-        '" data-q="' +
-        i +
-        '"' +
-        (S.known[i] ? " checked" : "") +
-        ' aria-label="' +
-        L("Pytanie ", "Question ") +
-        (i + 1) +
-        L(" opanowane", " mastered") +
-        '"><span>' +
-        (i + 1) +
-        "</span></label>"
-      );
+      return gridCell("q", i, st, S.known[i]);
     }).join("");
     $("#fgrid").innerHTML = F.map(function (f, i) {
-      return (
-        '<label class="cell" for="gf-' +
-        (i + 1) +
-        '" title="' +
-        esc(dn(f.d)) +
-        '"><input type="checkbox" class="sr" id="gf-' +
-        (i + 1) +
-        '" data-f="' +
-        i +
-        '"' +
-        (S.fknown[i] ? " checked" : "") +
-        ' aria-label="' +
-        L("Kata ", "Kata ") +
-        (i + 1) +
-        L(" opanowana", " mastered") +
-        '"><span>F' +
-        (i + 1) +
-        "</span></label>"
-      );
+      return gridCell("f", i, "", S.fknown[i]);
     }).join("");
   }
+  var GPOP = null;
+  function closeGpop(refocus) {
+    if (!GPOP) return;
+    var c = GPOP.cell;
+    GPOP.el.remove();
+    GPOP = null;
+    if (refocus && c && document.body.contains(c)) c.focus();
+  }
+  function openGpop(cell) {
+    var isQ = cell.dataset.gq !== undefined,
+      i = +(isQ ? cell.dataset.gq : cell.dataset.gf),
+      it = isQ ? Q[i] : F[i],
+      on = isQ ? S.known[i] : S.fknown[i],
+      el = document.createElement("div");
+    closeGpop(false);
+    el.className = "gpop";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", (isQ ? L("Pytanie ", "Question ") : "Kata ") + (i + 1));
+    el.innerHTML =
+      '<p class="gp-h">' +
+      (isQ ? "#" : "F") +
+      (i + 1) +
+      " · " +
+      esc(dn(it.d)) +
+      L(" · runda ", " · round ") +
+      it.r +
+      '</p><p class="gp-q" hidden>' +
+      fmt(it.q) +
+      '</p><div class="gp-a"><button type="button" class="btn small primary gp-k">' +
+      (on ? L("↺ Odznacz", "↺ Unmark") : L("✓ Zalicz", "✓ Mark mastered")) +
+      '</button><button type="button" class="btn small gp-s" aria-expanded="false">' +
+      L("Pokaż treść", "Show text") +
+      "</button></div>";
+    document.body.appendChild(el);
+    GPOP = { el: el, cell: cell, isQ: isQ, i: i };
+    var r = cell.getBoundingClientRect(),
+      w = el.offsetWidth;
+    el.style.left = Math.max(8, Math.min(r.left, document.documentElement.clientWidth - w - 8)) + window.scrollX + "px";
+    el.style.top = r.bottom + 6 + window.scrollY + "px";
+    el.querySelector(".gp-k").focus();
+  }
+  document.addEventListener("click", function (ev) {
+    var cell = ev.target.closest && ev.target.closest("#qgrid .cell, #fgrid .cell");
+    if (cell) {
+      if (GPOP && GPOP.cell === cell) closeGpop(true);
+      else openGpop(cell);
+      return;
+    }
+    if (!GPOP) return;
+    if (!GPOP.el.contains(ev.target)) return closeGpop(false);
+    if (ev.target.closest(".gp-k")) {
+      var m = GPOP.isQ ? S.known : S.fknown,
+        i = GPOP.i,
+        tmp = document.createElement("div");
+      if (m[i]) delete m[i];
+      else m[i] = true;
+      save();
+      renderStats();
+      header();
+      tmp.innerHTML = gridCell(GPOP.isQ ? "q" : "f", i, GPOP.cell.className.replace(/cell| on/g, ""), m[i]);
+      GPOP.cell.className = tmp.firstChild.className;
+      GPOP.cell.setAttribute("aria-label", tmp.firstChild.getAttribute("aria-label"));
+      ev.target.closest(".gp-k").textContent = m[i] ? L("↺ Odznacz", "↺ Unmark") : L("✓ Zalicz", "✓ Mark mastered");
+    } else if (ev.target.closest(".gp-s")) {
+      var q = GPOP.el.querySelector(".gp-q"),
+        b = ev.target.closest(".gp-s");
+      q.hidden = !q.hidden;
+      b.setAttribute("aria-expanded", String(!q.hidden));
+      b.textContent = q.hidden ? L("Pokaż treść", "Show text") : L("Ukryj treść", "Hide text");
+    }
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (GPOP && ev.key === "Escape") closeGpop(true);
+  });
+  window.addEventListener("resize", function () {
+    closeGpop(false);
+  });
   $("#p-postep").addEventListener("change", function (ev) {
     var t = ev.target;
     if (["q", "f", "n"].indexOf(t.dataset.cnt) > -1) {
@@ -4664,16 +4721,6 @@
       $('#gx-total [data-cnt="' + t.dataset.cnt + '"]').focus();
       return;
     }
-    if (t.dataset.q !== undefined) {
-      if (t.checked) S.known[t.dataset.q] = true;
-      else delete S.known[t.dataset.q];
-    } else if (t.dataset.f !== undefined) {
-      if (t.checked) S.fknown[t.dataset.f] = true;
-      else delete S.fknown[t.dataset.f];
-    } else return;
-    save();
-    renderStats();
-    header();
   });
   $("#clear-ans").addEventListener("click", function () {
     S.ans = {};
