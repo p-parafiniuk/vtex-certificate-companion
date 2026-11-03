@@ -13,7 +13,7 @@ A study app for VTEX certifications, starting with the **VTEX APIs badge**. It s
 | **Pytania** | 171 exam-style multiple-choice questions in 10 categories. Each category has a side panel entry with the question list or **Focus** mode, **Katas**, **Notatki** (TL;DR and verified study notes, exam traps included), **Ścieżki API** (the category's endpoints) and **Dokumentacja** (the official page in a frame). |
 | **Katas** (in each category) | 38 open-answer katas, 15 of them hands-on practical tasks you grade yourself, plus 5 step-by-step **labs**. Every kata has a difficulty level, and the list and Focus can be filtered by it. |
 | **Symulacja** | A timed exam simulation drawn per area, with a score per area. Results can be filtered down to the questions you flagged to revisit, and answers count toward today's goal. |
-| **Postęp** | Tabs for the overview, exam readiness, cards, simulations and badges. Leitner spaced reviews (boxes 1 to 5, next review after 1, 3, 7, 16 or 35 days), optional confidence before you check, streaks, a daily goal, badges in tiers and groups. Export and import progress as a file. |
+| **Postęp** | Tabs for the overview, exam readiness, cards, simulations and badges. Leitner spaced reviews (boxes 1 to 5, next review after 1, 3, 7, 16 or 35 days), optional confidence before you check, streaks, a daily goal, 35 badges in tiers and groups (combo runs and graded shares of katas, notes and passed questions). Export and import progress as a file. |
 | **Ściągi** | **HTTP Koty**: all 78 status codes from http.cat with memory hooks, how the VTEX docs use them, and a 24-question quiz. **API Map**: 21 VTEX APIs from `vtex/openapi-schemas`, with endpoints grouped by tag, the API Reference page next to each endpoint, **Z lotu ptaka** summaries and **Role i uprawnienia** (License Manager resources and predefined roles behind every endpoint). **GraphQL**: a cheat sheet for GraphQL in VTEX IO. |
 | **Ustawienia** | Polish or English UI, light or dark theme, and switches for the gamification. |
 
@@ -44,7 +44,8 @@ A **lab** starts with its **starting state**: everything that must already exist
 ## Releases
 | Version | What's new |
 |---|---|
-| **main** | Difficulty levels on katas, 5 step-by-step labs with a starting state, "Nie wyszło" and "Zepsuj to", lab badges, 44 px chips on touch screens, a fix for the rotated accuracy ring in Focus. |
+| **1.5** | Gift cards as a top-level category, a mini popover on Postęp cards (Zalicz, Pokaż treść, Open in Focus), 35 badges: Combo 5 and 15, Katas 20/40%, Notatki 20–80% and a new Pytania group (20–80% of the bank passed). |
+| **1.4** | Difficulty levels on katas, 5 step-by-step labs with a starting state, "Nie wyszło" and "Zepsuj to", lab badges, 44 px chips on touch screens, a fix for the rotated accuracy ring in Focus. |
 | **1.3** | Katas move into each category, a **Ściągi** tab with GraphQL, Postęp split into tabs, badge tiers and groups, search that lands on the hit, simulation answers counted toward today. |
 | **1.2** | Weighted simulation with a score per area, last-answer confidence and a filter by it, "Show all" in the katas list, option lengths evened out in 22 questions, e2e tests that guard saved progress. |
 | **1.1** | API Map **Role i uprawnienia**: the Permissions section of all 617 endpoints, imported from `vtex/openapi-schemas`, as a permission tree and role cards with an edge-case filter and sourced traps. Since 1.0: global search, weak-area drill, confidence stats in the simulation, Search & Session round 1, lazy-parsed data blocks. |
