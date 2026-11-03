@@ -483,6 +483,48 @@
       }
     }
   ];
+  /* Graded steps of one counter: combo runs and shares of katas, notes and passed questions. */
+  var BFRAC = {};
+  function bStep(id, frac, fmt, ok, words, tier) {
+    BFRAC[id] = frac;
+    BADGES.push({
+      id: id,
+      n: words.n,
+      d: words.d,
+      x: words.x,
+      w: words.w,
+      ok: ok,
+      p: fmt
+    });
+    BTIER[id] = tier;
+  }
+  function pctBadges(pre, pcts, of, tot, unit, tx) {
+    pcts.forEach(function (r, i) {
+      var pc = Math.round(r * 100) + "%";
+      function need() {
+        return Math.ceil(tot() * r);
+      }
+      bStep(
+        pre + pc.slice(0, -1),
+        function (x) {
+          return [x[of], need()];
+        },
+        function (x) {
+          return x[of] + " / " + need() + " " + L(unit[0], unit[1]);
+        },
+        function (x) {
+          return tot() > 0 && x[of] >= need();
+        },
+        {
+          n: [tx.n[0] + " " + pc, tx.n[1] + " " + pc],
+          d: [pc + " " + tx.d[0], pc + " " + tx.d[1]],
+          x: [tx.x[0].replace("%", pc), tx.x[1].replace("%", pc)],
+          w: tx.w
+        },
+        i < 2 ? 1 : 2
+      );
+    });
+  }
   function kNeed(r) {
     return Math.ceil(F.length * r);
   }
@@ -544,6 +586,108 @@
       ["lab1", "labclean", "labbrk", "laball"]
     ]
   ];
+  [5, 15].forEach(function (k) {
+    bStep(
+      "c" + k,
+      function (x) {
+        return [x.comboBest, k];
+      },
+      function (x) {
+        return L("Rekord ", "Best ") + x.comboBest + L(" z rzędu", " in a row");
+      },
+      function (x) {
+        return x.comboBest >= k;
+      },
+      {
+        n: ["Combo " + k, "Combo " + k],
+        d: [k + " dobrych odpowiedzi z rzędu", k + " right answers in a row"],
+        x: [
+          "Daj " + k + " dobrych odpowiedzi z rzędu na liście pytań lub w Focus. Zła odpowiedź zeruje licznik.",
+          "Give " + k + " right answers in a row in the question list or in Focus. A wrong answer resets the count."
+        ],
+        w:
+          k < 10
+            ? ["Pierwsza seria bez błędu. Rozgrzewka przed 10.", "Your first run without a miss. A warm-up for 10."]
+            : [
+                "15 z rzędu: wiedza trzyma się dłużej niż jedna sesja.",
+                "15 in a row: the knowledge holds beyond one session."
+              ]
+      },
+      k < 10 ? 1 : 2
+    );
+  });
+  pctBadges(
+    "f",
+    [0.2, 0.4],
+    "kf",
+    function () {
+      return F.length;
+    },
+    ["katas", "katas"],
+    {
+      n: ["Katas", "Katas"],
+      d: ["katas oznaczonych Umiem", "of katas marked Known"],
+      x: ["Oznacz Umiem % katas.", "Mark % of the katas as Known."],
+      w: [
+        "Każde kata z pamięci to jedno pytanie praktyczne mniej do zgadywania.",
+        "Every kata by heart is one practical question less to guess."
+      ]
+    }
+  );
+  pctBadges(
+    "n",
+    [0.2, 0.4, 0.6, 0.8],
+    "kn",
+    function () {
+      return NTOTAL;
+    },
+    ["bloków", "blocks"],
+    {
+      n: ["Notatki", "Notes"],
+      d: ["bloków notatek oznaczonych Umiem", "of note blocks marked Known"],
+      x: ["Oznacz Umiem % bloków notatek.", "Mark % of the note blocks as Known."],
+      w: [
+        "Notatki to teoria pod pytania. Im więcej umiesz, tym mniej pułapek.",
+        "Notes are the theory behind the questions. The more you know, the fewer traps."
+      ]
+    }
+  );
+  pctBadges(
+    "q",
+    [0.2, 0.4, 0.6, 0.8],
+    "kq",
+    function () {
+      return Q.length;
+    },
+    ["pytań", "questions"],
+    {
+      n: ["Pytania", "Questions"],
+      d: ["pytań zaliczonych", "of questions passed"],
+      x: ["Zalicz % pytań z banku.", "Pass % of the question bank."],
+      w: [
+        "Zaliczone pytania to pokrycie egzaminu, nie tylko liczba odpowiedzi.",
+        "Passed questions are exam coverage, not just answer count."
+      ]
+    }
+  );
+  BGROUPS[2][1] = ["c5", "c10", "c15", "c25"];
+  BGROUPS[3][1] = ["ndom", "dom"];
+  BGROUPS.splice(
+    4,
+    0,
+    [
+      ["Katas", "Katas"],
+      ["f20", "f40", "f60", "f80", "fall"]
+    ],
+    [
+      ["Notatki", "Notes"],
+      ["n20", "n40", "n60", "n80", "nall"]
+    ],
+    [
+      ["Pytania", "Questions"],
+      ["q20", "q40", "q60", "q80"]
+    ]
+  );
   /* Share of the way to a locked badge, for its progress bar; null when the badge has no count. */
   function bFrac(id, x) {
     var m = {
@@ -563,6 +707,7 @@
       laball: [x.labs, LABS.length],
       plat: [badgesGot(true), BADGES.length - 1]
     }[id];
+    if (!m && BFRAC[id]) m = BFRAC[id](x);
     return m && m[1] ? Math.min(m[0] / m[1], 1) : null;
   }
   /* Medals are drawn in SVG from the tier tokens (--tN-hi/-mid/-lo), so the metal follows light and dark mode.
@@ -3764,6 +3909,7 @@
       best: S.best,
       comboBest: S.comboBest,
       kf: c.kf,
+      kq: c.kq,
       ready: rd.v,
       rd: rd,
       goalHit: Object.keys(S.days).some(function (k) {

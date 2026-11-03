@@ -2,6 +2,12 @@
 
 A study app for the VTEX APIs badge. It ships as **one self-contained HTML file**, `vtex-api-drill.html`, with no server, no dependencies and all images inlined. That file is a **build output**. Edit `src/`, then run `npm run build`.
 
+## Token economy
+The user is on a tight plan. Spend few tokens:
+- Read only the region you need (`grep -n`, then `sed -n a,bp`), never whole large files.
+- Batch shell steps into one call; keep replies short, no recaps of what the tools showed.
+- Skip optional subagents and reviewers unless the change needs them; prefer 2 shots (375 dark, 1280 light) over the full set.
+
 ## Never
 - Never edit `vtex-api-drill.html` by hand, and never Read or grep it. It is 3.4 MB, and one line alone is 3 MB of base64.
 - Never open `src/img/cats/*`. They are binary JPEGs.
