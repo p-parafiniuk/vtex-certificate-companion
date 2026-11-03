@@ -2012,7 +2012,7 @@ h3 {
 .gpop {
   position: absolute;
   z-index: 40;
-  width: min(300px, calc(100vw - 16px));
+  width: min(380px, calc(100vw - 16px));
   padding: 12px;
   border: 1px solid var(--line);
   border-radius: 10px;
@@ -2028,6 +2028,17 @@ h3 {
 .gpop .gp-h {
   color: var(--muted);
   font-size: 0.8rem;
+}
+.gpop .gp-q {
+  max-height: 45vh;
+  overflow-y: auto;
+}
+.gpop .gp-o {
+  margin: 0 0 10px;
+  padding-left: 18px;
+}
+.gpop .gp-o li {
+  margin-bottom: 4px;
 }
 .gpop .gp-a {
   display: flex;
@@ -15942,12 +15953,24 @@ function bootApiMap(root, onNav, embed) {
       esc(dn(it.d)) +
       L(" · runda ", " · round ") +
       it.r +
-      '</p><p class="gp-q" hidden>' +
+      '</p><div class="gp-q" hidden><p>' +
       fmt(it.q) +
-      '</p><div class="gp-a"><button type="button" class="btn small primary gp-k">' +
+      "</p>" +
+      (isQ
+        ? '<ul class="gp-o">' +
+          shuffle(it.o.slice())
+            .map(function (x) {
+              return "<li>" + fmt(x) + "</li>";
+            })
+            .join("") +
+          "</ul>"
+        : "") +
+      '</div><div class="gp-a"><button type="button" class="btn small primary gp-k">' +
       (on ? L("↺ Odznacz", "↺ Unmark") : L("✓ Zalicz", "✓ Mark mastered")) +
       '</button><button type="button" class="btn small gp-s" aria-expanded="false">' +
       L("Pokaż treść", "Show text") +
+      '</button><button type="button" class="btn small gp-f">' +
+      L("Otwórz w Focus →", "Open in Focus →") +
       "</button></div>";
     document.body.appendChild(el);
     GPOP = { el: el, cell: cell, isQ: isQ, i: i };
@@ -15979,6 +16002,16 @@ function bootApiMap(root, onNav, embed) {
       GPOP.cell.className = tmp.firstChild.className;
       GPOP.cell.setAttribute("aria-label", tmp.firstChild.getAttribute("aria-label"));
       ev.target.closest(".gp-k").textContent = m[i] ? L("↺ Odznacz", "↺ Unmark") : L("✓ Zalicz", "✓ Mark mastered");
+    } else if (ev.target.closest(".gp-f")) {
+      var id = (GPOP.isQ ? "q" : "f") + (GPOP.i + 1);
+      closeGpop(false);
+      if (BY_ID[id]) {
+        S.fo.flt = "all";
+        S.fo.deck = "all";
+        S.fo.dom = "all";
+        save();
+        go({ tab: "focus", id: id });
+      }
     } else if (ev.target.closest(".gp-s")) {
       var q = GPOP.el.querySelector(".gp-q"),
         b = ev.target.closest(".gp-s");
