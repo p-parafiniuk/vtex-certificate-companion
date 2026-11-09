@@ -3361,6 +3361,218 @@ body[data-view="postman"] .wrap {
   background: var(--ok-soft);
   color: var(--ok);
 }
+/* Ściągi › Dzień egzaminu: one stage at a time under a sticky progress bar. */
+body[data-view="egzamin"] .wrap {
+  max-width: 1040px;
+}
+.card.ex-tldr {
+  display: grid;
+  gap: 10px;
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.ex-tldr p {
+  margin: 0;
+}
+.ex-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ex-fact {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  font: 600 0.8rem var(--f-mono);
+  color: var(--accent);
+}
+.ex-bar {
+  position: sticky;
+  top: var(--apimap-top, 0px);
+  z-index: 2;
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  background: var(--bg);
+}
+.ex-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.ex-track {
+  flex: 1 1 140px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--line);
+  overflow: hidden;
+}
+.ex-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ok);
+  transition: width 0.25s;
+}
+.ex-count {
+  font: 600 0.85rem var(--f-mono);
+}
+.ex-hide {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.ex-hide input,
+.ex-list input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--ok);
+  flex: none;
+}
+@media (max-width: 520px) {
+  .ex-track {
+    flex-basis: 100%;
+  }
+  .ex-reset {
+    margin-left: auto;
+  }
+}
+.ex-reset.arm {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.ex-tabs .pill {
+  margin-left: 4px;
+}
+.ex-pane {
+  display: grid;
+  gap: 12px;
+}
+.ex-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.ex-head h3 {
+  margin: 0;
+}
+.ex-when {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.ex-sc.all {
+  color: var(--ok);
+  font-weight: 600;
+}
+.ex-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.ex-list label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.ex-list input {
+  margin-top: 2px;
+}
+.ex-list label:hover {
+  border-color: var(--muted);
+}
+.ex-txt {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ex-note {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.ex-list li.on label {
+  background: var(--ok-soft);
+  border-color: transparent;
+}
+.ex-list li.on .ex-main {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--ok);
+}
+.ex-hiding .ex-list li.on {
+  display: none;
+}
+.ex-empty {
+  display: none;
+  margin: 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--ok-soft);
+  color: var(--ok);
+  font-weight: 600;
+  text-align: center;
+}
+.ex-hiding .alldone .ex-empty {
+  display: block;
+}
+.ex-next {
+  justify-self: end;
+}
+.ex-tpl {
+  display: grid;
+  gap: 8px;
+}
+.ex-tplh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ex-tpl pre {
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--code);
+  font-family: var(--f-mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ex-tpl pre code {
+  padding: 0;
+  background: none;
+  font: inherit;
+}
+.card.ex-warn {
+  background: var(--k3-soft);
+  border-color: transparent;
+}
+.ex-warn h3 {
+  margin-top: 0;
+  color: var(--k3);
+}
+.ex-warn p {
+  margin: 8px 0 0;
+}
+.card.ex-nextstep {
+  margin: 0;
+  border-left: 4px solid var(--accent);
+}
 .card.pm-kata {
   background: var(--k5-soft);
   border-color: transparent;

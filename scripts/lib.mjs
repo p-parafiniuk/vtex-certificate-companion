@@ -34,6 +34,7 @@ export const BLOCKS = {
   ROLETRAPS: { file: "data/roletraps.json", keys: "json", layout: "inline" },
   GQL: { file: "data/graphql.json", keys: "json", layout: "inline" },
   PM: { file: "data/postman.json", keys: "json", layout: "inline" },
+  EXAM: { file: "data/examday.json", keys: "json", layout: "inline" },
   LABS: { file: "data/labs.json", keys: "json", layout: "lines", indent: " " }
 };
 

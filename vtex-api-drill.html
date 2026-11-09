@@ -3375,6 +3375,218 @@ body[data-view="postman"] .wrap {
   background: var(--ok-soft);
   color: var(--ok);
 }
+/* Ściągi › Dzień egzaminu: one stage at a time under a sticky progress bar. */
+body[data-view="egzamin"] .wrap {
+  max-width: 1040px;
+}
+.card.ex-tldr {
+  display: grid;
+  gap: 10px;
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+.ex-tldr p {
+  margin: 0;
+}
+.ex-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ex-fact {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--surface);
+  font: 600 0.8rem var(--f-mono);
+  color: var(--accent);
+}
+.ex-bar {
+  position: sticky;
+  top: var(--apimap-top, 0px);
+  z-index: 2;
+  display: grid;
+  gap: 4px;
+  padding-top: 8px;
+  background: var(--bg);
+}
+.ex-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.ex-track {
+  flex: 1 1 140px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--line);
+  overflow: hidden;
+}
+.ex-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ok);
+  transition: width 0.25s;
+}
+.ex-count {
+  font: 600 0.85rem var(--f-mono);
+}
+.ex-hide {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.ex-hide input,
+.ex-list input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--ok);
+  flex: none;
+}
+@media (max-width: 520px) {
+  .ex-track {
+    flex-basis: 100%;
+  }
+  .ex-reset {
+    margin-left: auto;
+  }
+}
+.ex-reset.arm {
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.ex-tabs .pill {
+  margin-left: 4px;
+}
+.ex-pane {
+  display: grid;
+  gap: 12px;
+}
+.ex-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+.ex-head h3 {
+  margin: 0;
+}
+.ex-when {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.ex-sc.all {
+  color: var(--ok);
+  font-weight: 600;
+}
+.ex-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.ex-list label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.ex-list input {
+  margin-top: 2px;
+}
+.ex-list label:hover {
+  border-color: var(--muted);
+}
+.ex-txt {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ex-note {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.ex-list li.on label {
+  background: var(--ok-soft);
+  border-color: transparent;
+}
+.ex-list li.on .ex-main {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: var(--ok);
+}
+.ex-hiding .ex-list li.on {
+  display: none;
+}
+.ex-empty {
+  display: none;
+  margin: 0;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--ok-soft);
+  color: var(--ok);
+  font-weight: 600;
+  text-align: center;
+}
+.ex-hiding .alldone .ex-empty {
+  display: block;
+}
+.ex-next {
+  justify-self: end;
+}
+.ex-tpl {
+  display: grid;
+  gap: 8px;
+}
+.ex-tplh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ex-tpl pre {
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--code);
+  font-family: var(--f-mono);
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ex-tpl pre code {
+  padding: 0;
+  background: none;
+  font: inherit;
+}
+.card.ex-warn {
+  background: var(--k3-soft);
+  border-color: transparent;
+}
+.ex-warn h3 {
+  margin-top: 0;
+  color: var(--k3);
+}
+.ex-warn p {
+  margin: 8px 0 0;
+}
+.card.ex-nextstep {
+  margin: 0;
+  border-left: 4px solid var(--accent);
+}
 .card.pm-kata {
   background: var(--k5-soft);
   border-color: transparent;
@@ -4897,7 +5109,7 @@ div.setrow {
     <nav class="tabs" role="tablist" aria-label="Sekcje" data-en-aria="Sections">
       <button class="tab" role="tab" id="t-pytania" data-tab="pytania" aria-controls="p-pytania"><span data-en-html='<span class="tab-long">Questions</span><span class="tab-short">Quiz</span>'>Pytania</span> <span class="num">161</span></button>
       <button class="tab" role="tab" id="t-postep" data-tab="postep" aria-controls="p-postep"><span data-en-html='<span class="tab-long">Progress</span><span class="tab-short">Stats</span>'>Postęp</span></button>
-      <button class="tab tab-x" role="tab" id="t-ref" data-tab="ref" aria-controls="p-http" title="Ściągi: kody HTTP, mapa API, GraphQL i Postman" data-en-title="Reference: HTTP codes, API Map, GraphQL and Postman"><span data-en="Reference">Ściągi</span></button>
+      <button class="tab tab-x" role="tab" id="t-ref" data-tab="ref" aria-controls="p-http" title="Ściągi: kody HTTP, mapa API, GraphQL, Postman i dzień egzaminu" data-en-title="Reference: HTTP codes, API Map, GraphQL, Postman and exam day"><span data-en="Reference">Ściągi</span></button>
       <button class="tab tab-set" role="tab" id="t-ustawienia" data-tab="ustawienia" aria-controls="p-ustawienia" aria-label="Ustawienia" title="Ustawienia" data-en-aria="Settings" data-en-title="Settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h8M18 6h2M4 12h2M12 12h8M4 18h8M18 18h2"/><circle cx="15" cy="6" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="18" r="2.4"/></svg></button>
     </nav>
     <!-- Not a tab: starting the exam is an action, so it sits apart as the one primary button. app.js fills it. -->
@@ -5091,6 +5303,7 @@ div.setrow {
     <button type="button" class="ctab" role="tab" id="rt-api" data-rtab="api" aria-controls="p-api">API Map<span class="ctab-l" data-en=" · REST endpoints"> · endpointy REST</span></button>
     <button type="button" class="ctab" role="tab" id="rt-graphql" data-rtab="graphql" aria-controls="p-graphql">GraphQL<span class="ctab-l"> · VTEX IO</span></button>
     <button type="button" class="ctab" role="tab" id="rt-postman" data-rtab="postman" aria-controls="p-postman">Postman<span class="ctab-l" data-en=" · API tests"> · testy API</span></button>
+    <button type="button" class="ctab" role="tab" id="rt-egzamin" data-rtab="egzamin" aria-controls="p-egzamin"><span data-en="Exam day">Dzień egzaminu</span></button>
   </div>
 
   <section class="panel" id="p-http" role="tabpanel" aria-labelledby="rt-http" hidden>
@@ -5104,6 +5317,8 @@ div.setrow {
   <section class="panel gql" id="p-graphql" role="tabpanel" aria-labelledby="rt-graphql" hidden></section>
 
   <section class="panel gql" id="p-postman" role="tabpanel" aria-labelledby="rt-postman" hidden></section>
+
+  <section class="panel gql ex" id="p-egzamin" role="tabpanel" aria-labelledby="rt-egzamin" hidden></section>
 
   <dialog class="gs-dlg" id="gs-dlg" aria-label="Szukaj" data-en-aria="Search">
     <div class="gs-head">
@@ -8808,6 +9023,9 @@ const GQL = {"t":"GraphQL to język zapytań do API: klient prosi tylko o dane, 
 /* Ściągi › Postman: same shape as GQL, plus code = a code sample. Polish only, same fact rule as notes. */
 const PM = {"t":"Postman wysyła requesty do API i sprawdza odpowiedzi testami w JavaScript.","s":[{"h":"Pułapki","b":["Testy działają **po** wysłaniu requestu i otrzymaniu odpowiedzi z API. Wpisujesz je w **Scripts › Post-response**.","`pm.response.to.be.ok` to skrót: sprawdza, czy kod statusu to **200**.","Kolejność testów: najpierw kolekcja, potem folder, na końcu request.","Schemat JSON sprawdza `pm.response.to.have.jsonSchema(schema)`. Postman używa do tego walidatora **Ajv**."],"l":["pmtests","pmexamples","pmresponse"]},{"h":"Anatomia testu","code":"pm.test(\"Status test\", function () {\n  pm.response.to.have.status(200);\n});","b":["`pm.test` dostaje nazwę i funkcję. Wynik widzisz w zakładce **Test Results**.","Asercje piszesz w składni **Chai BDD** przez `pm.expect`.","Gotowe testy: **Snippets** w prawym dolnym rogu edytora."],"l":["pmtests"]},{"h":"Gotowe asercje","tree":[["pm.response.to.have.status(200)","kod statusu"],["pm.expect(pm.response.responseTime).to.be.below(200)","odpowiedź szybsza niż 200 ms"],["pm.response.to.have.header(\"Content-Type\")","nagłówek jest w odpowiedzi"],["pm.response.json()","body odpowiedzi jako obiekt"],["pm.environment.get(\"name\")","wartość zmiennej środowiska"]],"l":["pmexamples"]},{"h":"API VTEX w Postmanie","ol":["Pobierz schemat wybranego API z repozytorium `vtex/openapi-schemas` na GitHubie.","Zaimportuj pobrany plik JSON do Postmana."],"b":["Dokumentacja API VTEX jest zbudowana w standardzie **OpenAPI 3.0**."],"l":["postman"]},{"h":"Przykład: zamówienie z OMS","code":"GET /api/oms/pvt/orders/{orderId}","b":["Adres zawiera zmienne `{accountName}` i `{environment}`. Domyślne `environment` to `vtexcommercestable`.","Uwierzytelnienie: `X-VTEX-API-AppKey` razem z `X-VTEX-API-AppToken` albo sam `VtexIdclientAutCookie`."],"l":["getorder"]},{"h":"Pre-request script","b":["Uruchamia JavaScript, **zanim** Postman wyśle request do API.","Skrypt na kolekcji lub folderze działa przed każdym requestem w tej kolekcji lub folderze."],"l":["pmprereq"]}],"c":[{"h":"Request i zmienne","b":["`{{base_url}}` w requeście wstawia wartość zmiennej `base_url`.","Zakresy od najszerszego: global, collection, environment, data, local.","Ta sama nazwa w dwóch zakresach: wygrywa wartość z najwęższego."],"l":["pmvars"]},{"h":"Pierwszy test","code":"pm.test(\"Status 200\", function () {\n  pm.response.to.have.status(200);\n});","b":["`pm.test` dostaje nazwę i funkcję.","Wynik widzisz w zakładce **Test Results** odpowiedzi."],"l":["pmtests"]},{"h":"Czytanie body","b":["`pm.response.json()` zwraca body jako obiekt, `pm.response.text()` jako tekst.","`to.eql` porównuje wartość. `to.have.property` sprawdza, czy pole istnieje."],"l":["pmexamples"]},{"h":"Zmienne ze skryptu","code":"pm.collectionVariables.set(\"orderId\", \"v123\");\npm.collectionVariables.get(\"orderId\");","b":["`pm.variables.get` bierze wartość z najwęższego zakresu.","Postman zapisuje zmienne jako tekst. Obiekt zapisz przez `JSON.stringify()`, odczytaj przez `JSON.parse()`."],"l":["pmvarsref","pmvars"]},{"h":"Collection Runner","b":["Wysyła requesty z kolekcji w wybranej kolejności i zapisuje wyniki testów.","Skrypt zmienia następny request przez `pm.execution.setNextRequest()`."],"l":["pmrunner"]},{"h":"Pre-request i pm.sendRequest","b":["Pre-request script działa, **zanim** Postman wyśle request.","`pm.sendRequest` wysyła ze skryptu dodatkowy request, asynchronicznie.","Przyjmuje sam URL albo pełną konfigurację: metodę, nagłówki, body."],"l":["pmprereq","pmsend"]},{"h":"Testy z wiersza poleceń","code":"npm install -g newman\nnewman run my-collection.json -e my-environment.json --bail","b":["`--bail` przerywa run i kończy go kodem **1**, gdy test nie przejdzie. CI oznaczy build jako nieudany.","Newman nie dostaje już poprawek. Postman zaleca przejście na **Postman CLI**."],"l":["pmnewman"]}],"x":[{"h":"Status i czas odpowiedzi","m":"GET","u":"https://postman-echo.com/get?foo=bar","code":"pm.test(\"Status 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Odpowiedź poniżej 1000 ms\", function () {\n  pm.expect(pm.response.responseTime).to.be.below(1000);\n});","l":["pmexamples"]},{"h":"Nagłówek Content-Type","m":"GET","u":"https://postman-echo.com/get?foo=bar","code":"pm.test(\"Content-Type to JSON\", function () {\n  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});","l":["pmexamples"]},{"h":"Pole w body","m":"GET","u":"https://postman-echo.com/get?foo=bar","code":"pm.test(\"Parametr foo wrócił\", function () {\n  const json = pm.response.json();\n  pm.expect(json.args).to.have.property(\"foo\");\n  pm.expect(json.args.foo).to.eql(\"bar\");\n});","l":["pmexamples"]},{"h":"Kod z listy","m":"GET","u":"https://postman-echo.com/get?foo=bar","code":"pm.test(\"Status 200 albo 201\", function () {\n  pm.expect(pm.response.code).to.be.oneOf([200, 201]);\n});","l":["pmexamples"]},{"h":"Tekst body","m":"GET","u":"https://postman-echo.com/get?foo=bar","code":"pm.test(\"Body zawiera foo\", function () {\n  pm.expect(pm.response.text()).to.include(\"foo\");\n});","l":["pmexamples"]},{"h":"Schemat JSON","m":"GET","u":"https://postman-echo.com/get?foo=bar","code":"const schema = {\n  type: \"object\",\n  required: [\"args\", \"url\"],\n  properties: { args: { type: \"object\" }, url: { type: \"string\" } }\n};\npm.test(\"Body zgodne ze schematem\", function () {\n  pm.response.to.have.jsonSchema(schema);\n});","l":["pmresponse"]},{"h":"Zapisz wartość do zmiennej","m":"POST","u":"https://postman-echo.com/post","body":"{\"orderId\": \"v123\"}","code":"const json = pm.response.json();\npm.collectionVariables.set(\"orderId\", json.json.orderId);\npm.test(\"orderId zapisany\", function () {\n  pm.expect(pm.collectionVariables.get(\"orderId\")).to.eql(\"v123\");\n});","l":["pmvarsref","pmecho"]},{"h":"Token z pm.sendRequest","m":"GET","u":"https://postman-echo.com/get?foo=bar","pre":"pm.sendRequest(\"https://postman-echo.com/get?token=abc\", function (err, res) {\n  pm.collectionVariables.set(\"token\", res.json().args.token);\n});","code":"pm.test(\"Pre-request ustawił token\", function () {\n  pm.expect(pm.collectionVariables.get(\"token\")).to.eql(\"abc\");\n});","l":["pmsend"]},{"h":"VTEX: drzewo kategorii","m":"GET","u":"https://{{accountName}}.vtexcommercestable.com.br/api/catalog_system/pub/category/tree/1","code":"pm.test(\"Drzewo kategorii to niepusta tablica\", function () {\n  const tree = pm.response.json();\n  pm.expect(tree).to.be.an(\"array\");\n  pm.expect(tree).to.not.be.empty;\n});\npm.test(\"Każda kategoria ma id i name\", function () {\n  pm.response.json().forEach(function (c) {\n    pm.expect(c).to.have.property(\"id\");\n    pm.expect(c).to.have.property(\"name\");\n  });\n});","l":["cattree"]},{"h":"VTEX: bez kluczy jest 401","m":"GET","u":"https://{{accountName}}.vtexcommercestable.com.br/api/oms/pvt/orders/123","code":"pm.test(\"Bez kluczy: 401\", function () {\n  pm.response.to.have.status(401);\n});","l":["getorder"]}],"k":[{"id":"pm-first-tests","h":"Pierwsze testy","min":5,"goal":"Trzy testy na jednym requeście: status 200, JSON w `Content-Type` i `args.foo` równe `bar`.","rq":[["GET","https://postman-echo.com/get?foo=bar"]],"ol":["Utwórz request i wyślij go raz bez testów.","W **Scripts › Post-response** dopisz trzy `pm.test`.","Wyślij ponownie. W **Test Results** wszystkie trzy mają być zielone."],"sol":"pm.test(\"Status 200\", function () {\n  pm.response.to.have.status(200);\n});\npm.test(\"Content-Type to JSON\", function () {\n  pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\n});\npm.test(\"Parametr foo wrócił\", function () {\n  const json = pm.response.json();\n  pm.expect(json.args).to.have.property(\"foo\");\n  pm.expect(json.args.foo).to.eql(\"bar\");\n});","l":["pmtests","pmexamples"]},{"id":"pm-chain","h":"Łańcuch: zapisz i użyj","min":10,"goal":"Pierwszy request zapisuje `orderId` w zmiennej kolekcji, drugi go używa.","rq":[["POST","https://postman-echo.com/post"],["GET","https://postman-echo.com/get?orderId={{orderId}}"]],"ol":["Request 1: body **raw JSON** `{\"orderId\": \"v123\"}`.","W Post-response requestu 1 zapisz `json.json.orderId` przez `pm.collectionVariables.set`.","W requeście 2 sprawdź, że `args.orderId` równa się zmiennej.","Uruchom oba w **Collection Runner**, w tej kolejności."],"sol":"// Request 1, Post-response\nconst json = pm.response.json();\npm.collectionVariables.set(\"orderId\", json.json.orderId);\npm.test(\"orderId zapisany\", function () {\n  pm.expect(pm.collectionVariables.get(\"orderId\")).to.eql(\"v123\");\n});\n\n// Request 2, Post-response\npm.test(\"Drugi request dostał orderId\", function () {\n  pm.expect(pm.response.json().args.orderId).to.eql(pm.collectionVariables.get(\"orderId\"));\n});","l":["pmvarsref","pmrunner"]},{"id":"pm-vtex-tree","h":"VTEX: publiczne drzewo kategorii","min":10,"goal":"Testy dla publicznego endpointu Catalog API, bez kluczy.","rq":[["GET","https://{{accountName}}.vtexcommercestable.com.br/api/catalog_system/pub/category/tree/1"]],"ol":["Dodaj zmienną kolekcji `accountName`, np. `apiexamples`.","Wyślij request bez nagłówków uwierzytelnienia.","Sprawdź, że odpowiedź to niepusta tablica, a każda kategoria ma `id` i `name`."],"sol":"pm.test(\"Drzewo kategorii to niepusta tablica\", function () {\n  const tree = pm.response.json();\n  pm.expect(tree).to.be.an(\"array\");\n  pm.expect(tree).to.not.be.empty;\n});\npm.test(\"Każda kategoria ma id i name\", function () {\n  pm.response.json().forEach(function (c) {\n    pm.expect(c).to.have.property(\"id\");\n    pm.expect(c).to.have.property(\"name\");\n  });\n});","l":["cattree"]},{"id":"pm-vtex-401","h":"VTEX: pułapka 401","min":5,"goal":"Test, który oczekuje **401** dla endpointu `pvt` bez poprawnych kluczy.","rq":[["GET","https://{{accountName}}.vtexcommercestable.com.br/api/oms/pvt/orders/123"]],"ol":["Wyślij request bez nagłówków i napisz test na **401**.","Dodaj `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken` z wymyślonymi wartościami. Prawdziwych kluczy nie wysyłaj mailem, czatem ani w ticketach.","Wyślij ponownie. Test dalej przechodzi: złe klucze to też **401**."],"sol":"pm.test(\"Bez kluczy: 401\", function () {\n  pm.response.to.have.status(401);\n});","l":["getorder","keys"]},{"id":"pm-schema","h":"Schemat odpowiedzi","min":10,"goal":"Sprawdź drzewo kategorii schematem JSON: tablica obiektów z liczbowym `id` i tekstowym `name`.","rq":[["GET","https://{{accountName}}.vtexcommercestable.com.br/api/catalog_system/pub/category/tree/1"]],"ol":["Zapisz schemat w stałej `schema`.","Sprawdź body przez `pm.response.to.have.jsonSchema(schema)`.","Zmień `number` na `string` przy `id` i zobacz, że test nie przechodzi."],"sol":"const schema = {\n  type: \"array\",\n  items: {\n    type: \"object\",\n    required: [\"id\", \"name\"],\n    properties: { id: { type: \"number\" }, name: { type: \"string\" } }\n  }\n};\npm.test(\"Drzewo zgodne ze schematem\", function () {\n  pm.response.to.have.jsonSchema(schema);\n});","l":["pmresponse","cattree"]}]};
 
+/* Ściągi › Dzień egzaminu: t = TL;DR, f = facts, s = stages {t, w, i: [text, note, [url, label]?]}, m = mail templates [title, body], x = open questions [heading, text], n = next step. Ticks are keyed by a hash of the item text. Polish only. */
+const EXAM = {"t":"Największe ryzyko to **nie wiedza, tylko technika**. Zainstaluj i przetestuj Inspera **min. 72 h przed**, problemy zgłoś **min. 24 h przed**, a w dniu egzaminu: **sam w pokoju, dobre światło, jeden ekran, zero innych apek**.","f":["36 pytań ABCD + 4 praktyczne","2 h od kliknięcia Start","próg 80%","7 dni od rejestracji"],"s":[{"t":"Zaraz po rejestracji","w":"dzień 0","i":[["Email rejestracji = **ten sam co w licencji VTEX Academy**","Inny email = problem z przypisaniem egzaminu"],["Zapisz w kalendarzu **ostatni dzień** na podejście","Masz 7 dni od rejestracji"],["Zaplanuj dni: **demo w dniu 1–2**, **egzamin w dniu 5–6**, **dzień 7** jako zapas","Demo 2 dni przed egzaminem to za mało, przewodnik wymaga 72 h"],["Masz maila z **loginem, hasłem i PIN-em Inspera**","Brak → academy@vtex.com"],["Przeczytaj **Electronic Devices Policy** i **Misconduct Policy**","Złamanie zasad = unieważnienie egzaminu"],["Obejrzyj **film VTEX o room scanie**","Z ich materiałów lub maila, nie jest publiczny"],["Obejrzyj Inspera: Overview for students","Ogólny interfejs Inspera. Ustawienia VTEX mogą się różnić",["https://www.youtube.com/watch?v=O_LmRJICIdI","Inspera: Overview for students"]],["Obejrzyj Inspera Proctoring – Explainer","Jak działa nadzór, kamera i nagrywanie",["https://www.youtube.com/watch?v=5nGmW6r3LXE","Inspera Proctoring – Explainer"]]]},{"t":"Sprzęt","w":"najpóźniej 72 h przed","i":[["**macOS 10.15+** albo **Windows 64-bit** (zalecany 11)","Linux, Chromebook, tablet, telefon nie działają"],["Masz **prawa admina** na laptopie","Laptop służbowy zwykle ich nie daje"],["Min. **500 MB** wolnego miejsca",""],["**Wbudowana** kamera i mikrofon działają",""],["**Odepnij zewnętrzny mikrofon i interfejs audio**","Wymagany jest wbudowany mikrofon. Zewnętrzny tylko z pisemną zgodą VTEX"],["**Rozłącz AirPods / słuchawki BT** albo wyłącz Bluetooth","Słuchawek nie wolno nosić, a macOS może się na nie sam przełączyć"],["**Odłącz drugi monitor**","Inspera nie dopuszcza dwóch ekranów"],["Stabilny internet, upload min. **0,15 Mbps**","Lepiej kabel niż Wi-Fi, jeśli możesz"],["Zainstaluj **Postman** i zaimportuj **kolekcje VTEX API**","VTEX to zaleca do ćwiczeń praktycznych.",["https://github.com/vtex/openapi-schemas","github.com/vtex/openapi-schemas"]],["W Postmanie ustaw **accountName**, **environment**, **AppKey** i **AppToken**","Wyślij 1 testowy GET, np. listę produktów z Catalog API"],["**Data i strefa czasowa** systemu ustawione poprawnie","Inaczej Inspera pokaże „za wcześnie / za późno”"]]},{"t":"Test Inspera","w":"min. 72 h przed","i":[["**Pobierz i zainstaluj** Inspera Exam Portal","Link w ich przewodniku"],["Demo zrób **od razu, gdy przyjdą dane**","Dane do testu i demo przychodzą osobnym mailem, termin może się różnić"],["Zaloguj się na **dane testowe**",""],["Przejdź **demo egzaminu**","Sprawdź flagowanie, ekran podsumowania, zmianę rozmiaru okien"],["W demo sprawdź **oświetlenie o porze egzaminu**","Za ciemno = Inspera się zamyka"],["macOS: nadaj Inspera **dostęp do kamery**","Ustawienia → Prywatność i ochrona"],["Problemy zgłoś **min. 24 h przed**","academy@vtex.com"]]},{"t":"Pokój","w":"dzień egzaminu","i":[["**Sam w pokoju** przez całe 2 h","Inna osoba lub rozmowa = flaga"],["**Mocne światło na twarz**, bez odblasków","Jesienią i zimą szybko robi się ciemno, zapal lampę"],["**Bez słuchawek** (także AirPods) i bez nakrycia głowy","Zatyczki z pianki OK, pokaż je do kamery"],["Wentylator / grzejnik **z dala od mikrofonu**",""],["Przećwicz **room scan**: blat, podłoga, sufit, potem **obrót 360°**","Masz **1 minutę**, można kliknąć Retake. Sprawdź, czy kabel ładowarki sięga"],["Na biurku i w pokoju **nic zakazanego** w kadrze","Notatki, drugie urządzenia, telefon"],["**Woda i przekąska** na biurku od startu",""],["**Kartka i długopis** przygotowane","Są dozwolone"],["**Paszport** albo dowód / prawo jazdy pod ręką","Do kontroli ID"],["Telefon **poza zasięgiem**, ładowarka laptopa podpięta",""]]},{"t":"Tuż przed Start","w":"15 min przed","i":[["**Zamknij wszystkie aplikacje**","Mogą crashować Inspera"],["**Wyłącz antywirus**","Najczęstsza przyczyna problemów"],["macOS: **wyłącz Siri**",""],["Ustawienia → Dźwięk → Wejście = **Mikrofon MacBooka**","Sprawdź też, że nie ma słuchawek na uszach ani na szyi"],["Wyłącz powiadomienia (tryb skupienia)",""],["Toaleta teraz","W trakcie masz tylko **1 przerwę**, a czas leci"],["Zapisz na kartce: **academy@vtex.com**","Na wypadek wyrzucenia z egzaminu"]]},{"t":"Po zalogowaniu, przed Start","w":"czas jeszcze nie leci","i":[["Loguj się **danymi do egzaminu**, nie testowymi ani demo","Każdy egzamin ma **osobny login, hasło i PIN**. Logowanie do demo nie uruchamia egzaminu"],["Godzina na ekranie startowym to **okno egzaminu**, nie czas trwania","Nie panikuj, że widzisz inną godzinę"],["Inspera robi **testy zgodności** (kamera, mikrofon, sieć)","Od tego momentu siedź już w **warunkach egzaminu**, z dobrym światłem"],["**Kontrola ID**: pokaż do kamery paszport albo dowód","Trzymaj go nieruchomo i bez odblasków"],["**Room scan**, jeśli Inspera o niego poprosi","Blat, podłoga, sufit, obrót 360°, w 1 minutę"],["Pokaż do kamery **zatyczki z pianki**, jeśli ich używasz",""],["**2 h zaczynają lecieć dopiero po kliknięciu Start**","Problemy z logowaniem nie zabierają czasu egzaminu"],["Klikasz Start, gdy jesteś gotowy","Musisz zdążyć zacząć **w oknie egzaminu**"]]},{"t":"W trakcie","w":"2 h","i":[["Patrz na **zegar Inspera** (lewy górny róg)","Nie na własny"],["Plan czasu: **~50 min** na 36 pytań, **~60 min** na 4 praktyczne, **10 min** zapasu","Propozycja, nie zasada VTEX"],["Trudne pytanie → **flaga** i dalej","Wrócisz z ekranu podsumowania"],["Na końcu ekran ✓: **zero nieodpowiedzianych**","Za złą odpowiedź nic nie tracisz, za pustą też nic nie zyskasz"],["Po Submit **nie zamykaj okna uploadu**","Może trwać do 30 min"],["Wyrzuciło cię → maila do academy@vtex.com po **invigilator password**","Zostań w warunkach egzaminu, nagrywanie może trwać"]]},{"t":"Gdy coś się zepsuje","w":"awaryjnie","i":[["**Nie panikuj i nie wychodź z pokoju**","Zostań w kadrze i w warunkach egzaminu"],["Na kartce zapisz **godzinę** i **dokładną treść błędu**","Nie bierz telefonu do ręki, żeby zrobić zdjęcie, bo to może zostać oflagowane"],["Spróbuj **raz** otworzyć Inspera ponownie","Odpowiedzi zwykle zapisują się na bieżąco"],["Inspera prosi o hasło → wyślij **mail A** (szablon niżej)","Z laptopa, gdy Inspera jest zamknięta"],["Czekaj na **invigilator password**, nie zaczynaj nic innego","Można też pisać na **web chat** supportu. ⚠️ Czas egzaminu leci, gdy jesteś wylogowany, więc pisz od razu"],["Nie da się wrócić → wyślij **mail B** z prośbą o ponowne podejście","Wyślij jeszcze tego samego dnia"],["Po egzaminie zrób **screenshoty** błędu i maili","Zachowaj dowody, gdyby trzeba było się odwołać"]]}],"m":[["A · Inspera padła w trakcie","Subject: Inspera issue during APIs & Integrations Badge exam – [Your name]\n\nHi VTEX Academy team,\n\nI'm taking the Implementation APIs & Integrations Badge exam in Inspera right now and ran into a technical problem.\n\n- Name: [Your name]\n- VTEX Academy email: [email]\n- Time of issue (CET): [hh:mm]\n- What happened: [Inspera froze / closed / lost connection / camera error]\n- Error message: \"[exact text]\"\n- Device: MacBook, macOS [version]\n\nI've stayed in exam conditions. Could you please send me the invigilator password so I can resume?\n\nThank you,\n[Your name]"],["B · Nie dało się dokończyć","Subject: Request for exam retake – APIs & Integrations Badge – [Your name]\n\nHi VTEX Academy team,\n\nToday I attempted the Implementation APIs & Integrations Badge exam, but I couldn't finish it because of a technical issue in Inspera.\n\n- Name: [Your name]\n- VTEX Academy email: [email]\n- Exam start time (CET): [hh:mm]\n- Time of issue (CET): [hh:mm]\n- What happened: [short description]\n- Error message: \"[exact text]\"\n- Steps I took: [restarted Inspera / emailed for invigilator password at hh:mm]\n\nI followed the exam rules the whole time. Could you please reset my attempt or give me a new one? I can send screenshots if needed.\n\nThank you,\n[Your name]"]],"x":[["Ćwiczenia praktyczne","VTEX zaleca zainstalować kolekcje API, więc Postman jest najpewniej potrzebny. Nie wiadomo jednak, czy używa się go w trakcie sesji Inspera, czy obok niej. Inspera domyślnie **blokuje inne aplikacje**. Zapytaj przed egzaminem: `academy@vtex.com`."],["Zewnętrzny mikrofon","Przewodnik wymaga wbudowanego i nie mówi nic o zewnętrznych. Jeśli chcesz go użyć, dopisz to pytanie do tego samego maila i miej zgodę na piśmie."],["Room scan","Szczegóły są tylko w ich filmie instruktażowym. Obejrzyj go."]],"n":"Sprawdź, czy masz maila z loginem do **testu i demo egzaminu**. Jeśli nie, napisz na `academy@vtex.com`."};
+
 /* Labs: level-4 katas run step by step from a stated starting state. Keyed by id, not index: pre = [text, DOCS keys], s = steps {h, in?, do, ok?, keep?, warn?, l}, brk = break-it task, fix = what to check. Polish only. */
 const LABS = [
  {"id":"checkout-order","d":"checkout","t":"Zamówienie od zera przez Checkout API","min":25,"goal":"Składasz zwykłe zamówienie samymi requestami i widzisz je w OMS.","pre":[["Znasz host konta: `{accountName}.{environment}.com.br`. Ścieżki w krokach są względem niego.",["order"]],["`appKey` i `appToken` z uprawnieniami do **Checkout API** i **Payments Gateway API**",["order"]],["SKU **aktywny**: `RefId` lub `EAN`, min. 1 obrazek, aktywny produkt z aktywną marką i kategorią",["skus"]],["**Cena** SKU w trade policy, z której kupujesz",["skus"]],["**Stock** w magazynie połączonym przez dok z przewoźnikiem, który dowozi na twój adres",["inv"]],["Skonfigurowane **konektory bramki** płatności: przez nie idzie płatność. Ćwicz tak, żeby uniknąć prawdziwych obciążeń.",["order"]]],"s":[{"h":"Symuluj koszyk","do":"`POST /api/checkout/pub/orderForms/simulation?RnbBehavior=0`\nBody: `items` (`id`, `quantity`, `seller`), `country` (3 litery) i `postalCode` albo współrzędne.","keep":"`items`, `logisticsInfo` z `slas` i cenami, `paymentData`","l":["order","sim"]},{"h":"Sprawdź, czy klient istnieje","do":"`GET /api/checkout/pub/profiles?email={email}`","keep":"`availableAddresses`, `userProfile`. Puste pola: klienta nie ma albo profil jest niepełny.","l":["order"]},{"h":"Złóż orderForm","in":"`items`, `slas` i `paymentData` z kroku 1, adresy z kroku 2","do":"`items` z symulacji\n`clientProfileData`: nowy klient pełne dane, istniejący tylko `email`\n`shippingData`: nowy klient pełny `address`, istniejący `addressId`; w `logisticsInfo` na item `itemIndex`, `selectedSla`, `price`\n`paymentData.payments`: `paymentSystem`, `referenceValue`, `value`, `installments` z `paymentData` symulacji","l":["order"]},{"h":"Złóż zamówienie","in":"orderForm z kroku 3","do":"`PUT /api/checkout/pub/orders`, body = orderForm","ok":"`201 Created`","keep":"`transactionId` z `merchantTransactions`, `orderId`, `orderGroup`, `addressId`, cookie `Vtex_CHKO_Auth`","warn":"Od tej chwili masz **5 minut** na kroki 5 i 6. Potem zamówienie jest anulowane automatycznie.","l":["order","placeord"]},{"h":"Wyślij płatność","in":"`transactionId` i `orderId` z kroku 4","do":"`POST https://{accountName}.vtexpayments.com.br/api/pub/transactions/{transactionId}/payments?orderId={orderId}`\n`transactionId` także w polu `id` transakcji, `merchantName` = nazwa konta. Płatność budujesz z `paymentData` orderForm: dane karty albo `addressId` z kroku 4.","ok":"`201 Created`, bez body","l":["order"]},{"h":"Przetwórz zamówienie","in":"`orderGroup` i cookie z kroku 4","do":"`POST /api/checkout/pub/gatewayCallback/{orderGroup}` z nagłówkiem `Cookie`","ok":"`204 No Content`. `500` znaczy, że coś poszło nie tak.","l":["order","gwcb"],"warn":"Ten request może uruchomić **prawdziwe obciążenie** albo odmowę płatności. Ćwicz na konektorze testowym."},{"h":"Sprawdź zamówienie","in":"`orderId` z kroku 4","do":"`GET /api/oms/pvt/orders/{orderId}` albo Order management w Adminie","l":["order"]}],"brk":["Po kroku 4 odczekaj ponad **5 minut** i dopiero wtedy wyślij płatność. Sprawdź status zamówienia w OMS.",["order"]],"fix":[["Item niedostępny w symulacji? Sprawdź stock i trasę **magazyn → dok → przewoźnik** dla tego adresu.",["inv"]],["Konto klienta istnieje? Musi być **zalogowane** w sklepie, inaczej proces się nie powiedzie.",["order"]],["`401` to złe dane uwierzytelniające, `403` to brak roli z potrzebnym zasobem.",["codes"]],["`500` z `gatewayCallback`? Sprawdź cookie z kroku 4 i czy zmieściłeś się w 5 minutach.",["order"]]]},
@@ -11308,9 +11526,9 @@ function bootApiMap(root, onNav, embed) {
   var SIM_Q = 36,
     SIM_P = 4,
     SIM_MIN = 3;
-  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "postman", "ustawienia"];
-  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman). */
-  var REFS = ["http", "api", "graphql", "postman"];
+  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "postman", "egzamin", "ustawienia"];
+  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
+  var REFS = ["http", "api", "graphql", "postman", "egzamin"];
   /* Sections of a category; "all" shows only the first two. */
   var CSECS = ["pytania", "katas", "info", "api", "docs"];
   /* Sections of Postęp; the first one has no hash suffix. */
@@ -11368,6 +11586,7 @@ function bootApiMap(root, onNav, embed) {
     nknown: {},
     lab: {},
     pmk: {},
+    ex: { c: {}, tab: "s0", hide: false },
     cnt: { q: true, f: true, n: true },
     cntV: 1,
     rv: {},
@@ -12108,6 +12327,14 @@ function bootApiMap(root, onNav, embed) {
         PM.k.forEach(function (x) {
           if (raw.pmk[x.id] === 1) S.pmk[x.id] = 1;
         });
+      if (raw.ex && typeof raw.ex === "object") {
+        if (raw.ex.c && typeof raw.ex.c === "object")
+          Object.keys(raw.ex.c).forEach(function (k) {
+            if (/^c[0-9a-z]+$/.test(k) && raw.ex.c[k] === 1) S.ex.c[k] = 1;
+          });
+        if (typeof raw.ex.tab === "string" && /^(s\d{1,2}|mail|info)$/.test(raw.ex.tab)) S.ex.tab = raw.ex.tab;
+        if (raw.ex.hide === true) S.ex.hide = true;
+      }
       if (raw.days && typeof raw.days === "object" && !Array.isArray(raw.days)) {
         Object.keys(raw.days).forEach(function (k) {
           var n = raw.days[k] >>> 0;
@@ -17433,6 +17660,7 @@ function bootApiMap(root, onNav, embed) {
     $("#apimap").style.setProperty("--apimap-top", bar.offsetHeight + "px");
     $("#catapi").style.setProperty("--apimap-top", bar.offsetHeight + "px");
     $("#cats").style.setProperty("--apimap-top", bar.offsetHeight + "px");
+    $("#p-egzamin").style.setProperty("--apimap-top", bar.offsetHeight + "px");
   }
   window.addEventListener("resize", kotyTop);
   function openKoty() {
@@ -17682,7 +17910,7 @@ function bootApiMap(root, onNav, embed) {
   });
   /* Clipboard needs a secure context; file:// usually is one, but fall back to selecting the text so Ctrl+C works. */
   function pmCopy(b) {
-    var pre = b.closest(".pm-code, .pm-reqw").querySelector("pre"),
+    var pre = b.closest(".pm-code, .pm-reqw, .ex-tpl").querySelector("pre"),
       text = b.dataset.url || pre.textContent,
       label = b.textContent;
     function said(ok) {
@@ -17707,6 +17935,257 @@ function bootApiMap(root, onNav, embed) {
       }, pick);
     else pick();
   }
+  /* Ściągi › Dzień egzaminu: a checklist by stage. A tick is keyed by a hash of the item text, so rewording an
+     item clears only that tick and reordering keeps them all. Ticking updates counts in place to keep focus. */
+  function exId(t) {
+    var h = 0;
+    for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
+    return "c" + (h >>> 0).toString(36);
+  }
+  function renderExam(force) {
+    var el = $("#p-egzamin");
+    if (!force && el.dataset.k === S.lang) return exUpdate();
+    el.dataset.k = S.lang;
+    var panes = EXAM.s
+      .map(function (s, i) {
+        return ["s" + i, esc(s.t), i];
+      })
+      .concat([
+        ["mail", L("Maile", "Emails"), -1],
+        ["info", L("Braki", "Gaps"), -1]
+      ]);
+    function stage(s, i) {
+      return (
+        '<div class="ex-head"><h3>' +
+        esc(s.t) +
+        '</h3><span class="ex-when">' +
+        esc(s.w) +
+        ' · <span class="ex-sc" data-s="' +
+        i +
+        '"></span></span></div><p class="ex-empty">' +
+        L("Wszystko odhaczone ✓", "All ticked ✓") +
+        '</p><ul class="ex-list">' +
+        s.i
+          .map(function (it) {
+            var id = exId(it[0]);
+            return (
+              '<li><label><input type="checkbox" data-exc="' +
+              id +
+              '" data-s="' +
+              i +
+              '"' +
+              (S.ex.c[id] ? " checked" : "") +
+              '><span class="ex-txt"><span class="ex-main">' +
+              fmt(it[0]) +
+              "</span>" +
+              (it[1] || it[2]
+                ? '<span class="ex-note">' +
+                  fmt(it[1] || "") +
+                  (it[2]
+                    ? (it[1] ? " " : "") +
+                      '<a href="' +
+                      esc(it[2][0]) +
+                      '" target="_blank" rel="noopener noreferrer">' +
+                      esc(it[2][1]) +
+                      " ↗</a>"
+                    : "") +
+                  "</span>"
+                : "") +
+              "</span></label></li>"
+            );
+          })
+          .join("") +
+        "</ul>" +
+        (i < EXAM.s.length - 1
+          ? '<button type="button" class="btn ex-next" data-exgo="s' +
+            (i + 1) +
+            '">' +
+            L("Dalej: ", "Next: ") +
+            esc(EXAM.s[i + 1].t) +
+            " →</button>"
+          : "")
+      );
+    }
+    var body = {
+      mail:
+        '<div class="ex-head"><h3>' +
+        L("Szablony maili awaryjnych", "Emergency email templates") +
+        '</h3><span class="ex-when">' +
+        L("do ", "to ") +
+        "academy@vtex.com</span></div>" +
+        EXAM.m
+          .map(function (m) {
+            return (
+              '<div class="card ex-tpl"><div class="ex-tplh"><strong>' +
+              esc(m[0]) +
+              '</strong><button type="button" class="pm-copy" aria-live="polite">' +
+              L("Kopiuj", "Copy") +
+              "</button></div><pre><code>" +
+              esc(m[1]) +
+              "</code></pre></div>"
+            );
+          })
+          .join(""),
+      info:
+        '<div class="card ex-warn"><h3>⚠️ ' +
+        L("Czego nie ma w materiałach", "What the materials don't say") +
+        "</h3>" +
+        EXAM.x
+          .map(function (x) {
+            return "<p><strong>" + esc(x[0]) + ":</strong> " + fmt(x[1]) + "</p>";
+          })
+          .join("") +
+        "</div>"
+    };
+    el.innerHTML =
+      "<div><h2>" +
+      L("Dzień egzaminu", "Exam day") +
+      '</h2><p class="lead">' +
+      L(
+        "Checklista od rejestracji do wyniku: sprzęt, test Inspera, pokój i plan na awarię.",
+        "A checklist from sign-up to result: hardware, the Inspera test, the room and a fallback plan."
+      ) +
+      '</p></div><div class="card ex-tldr"><p><strong>TL;DR:</strong> ' +
+      fmt(EXAM.t) +
+      '</p><div class="ex-facts">' +
+      EXAM.f
+        .map(function (f) {
+          return '<span class="ex-fact">' + esc(f) + "</span>";
+        })
+        .join("") +
+      '</div></div><div class="ex-bar"><div class="ex-row"><div class="ex-track" aria-hidden="true"><div class="ex-fill"></div></div><span class="ex-count" aria-live="polite"></span><label class="ex-hide"><input type="checkbox" data-exhide' +
+      (S.ex.hide ? " checked" : "") +
+      "><span>" +
+      L("Ukryj odhaczone", "Hide ticked") +
+      '</span></label><button type="button" class="pm-copy ex-reset" data-exreset>' +
+      L("Wyczyść", "Clear") +
+      '</button></div><div class="ctabs ex-tabs" role="tablist" aria-label="' +
+      L("Etapy", "Stages") +
+      '">' +
+      panes
+        .map(function (p) {
+          return (
+            '<button type="button" class="ctab" role="tab" id="ext-' +
+            p[0] +
+            '" aria-controls="exp-' +
+            p[0] +
+            '" data-exgo="' +
+            p[0] +
+            '">' +
+            p[1] +
+            (p[2] > -1 ? ' <span class="pill" data-n="' + p[2] + '"></span>' : "") +
+            "</button>"
+          );
+        })
+        .join("") +
+      "</div></div>" +
+      panes
+        .map(function (p) {
+          return (
+            '<section class="ex-pane" id="exp-' +
+            p[0] +
+            '" role="tabpanel" aria-labelledby="ext-' +
+            p[0] +
+            '"' +
+            (p[2] > -1 ? ' data-s="' + p[2] + '"' : "") +
+            ">" +
+            (p[2] > -1 ? stage(EXAM.s[p[2]], p[2]) : body[p[0]]) +
+            "</section>"
+          );
+        })
+        .join("") +
+      '<p class="card ex-nextstep"><strong>' +
+      L("Następny krok teraz:", "Next step now:") +
+      "</strong> " +
+      fmt(EXAM.n) +
+      "</p>";
+    el.querySelector(".ex-tabs").addEventListener("keydown", tabKeys);
+    kotyTop();
+    exShow(S.ex.tab);
+    exUpdate();
+  }
+  function exShow(t) {
+    var el = $("#p-egzamin");
+    if (!el.querySelector("#exp-" + t)) t = "s0";
+    S.ex.tab = t;
+    [].forEach.call(el.querySelectorAll(".ex-pane"), function (p) {
+      p.hidden = p.id !== "exp-" + t;
+    });
+    [].forEach.call(el.querySelectorAll(".ex-tabs .ctab"), function (b) {
+      var on = b.dataset.exgo === t;
+      b.setAttribute("aria-selected", on);
+      b.tabIndex = on ? 0 : -1;
+      if (on && b.scrollIntoView) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+    });
+  }
+  function exUpdate() {
+    var el = $("#p-egzamin"),
+      all = [].slice.call(el.querySelectorAll("[data-exc]")),
+      done = 0;
+    if (!all.length) return;
+    el.classList.toggle("ex-hiding", S.ex.hide);
+    all.forEach(function (c) {
+      if (c.checked) done++;
+      c.closest("li").classList.toggle("on", c.checked);
+    });
+    el.querySelector(".ex-count").textContent = done + "/" + all.length;
+    el.querySelector(".ex-fill").style.width = (done / all.length) * 100 + "%";
+    EXAM.s.forEach(function (_, i) {
+      var cs = all.filter(function (c) {
+          return c.dataset.s === String(i);
+        }),
+        d = cs.filter(function (c) {
+          return c.checked;
+        }).length,
+        full = d === cs.length;
+      var sc = el.querySelector('.ex-sc[data-s="' + i + '"]');
+      sc.textContent = full ? L("gotowe", "done") : d + "/" + cs.length;
+      sc.classList.toggle("all", full);
+      var n = el.querySelector('.pill[data-n="' + i + '"]');
+      n.textContent = full ? "✓" : d + "/" + cs.length;
+      n.classList.toggle("ok", full);
+      el.querySelector('.ex-pane[data-s="' + i + '"]').classList.toggle("alldone", full);
+    });
+  }
+  $("#p-egzamin").addEventListener("change", function (ev) {
+    var c = ev.target;
+    if (c.dataset.exc) {
+      if (c.checked) S.ex.c[c.dataset.exc] = 1;
+      else delete S.ex.c[c.dataset.exc];
+    } else if (c.hasAttribute("data-exhide")) S.ex.hide = c.checked;
+    else return;
+    save();
+    exUpdate();
+  });
+  $("#p-egzamin").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button");
+    if (!b) return;
+    if (b.dataset.exgo) {
+      var fromNext = b.classList.contains("ex-next");
+      exShow(b.dataset.exgo);
+      save();
+      if (fromNext) {
+        var t = $("#ext-" + b.dataset.exgo);
+        $("#p-egzamin").scrollIntoView({ block: "start" });
+        t.focus({ preventScroll: true });
+      }
+    } else if (b.hasAttribute("data-exreset")) {
+      /* Two taps, so one stray click cannot wipe a week of ticks. */
+      if (!b.classList.contains("arm")) {
+        b.classList.add("arm");
+        b.textContent = L("Na pewno?", "Sure?");
+        setTimeout(function () {
+          b.classList.remove("arm");
+          b.textContent = L("Wyczyść", "Clear");
+        }, 3000);
+        return;
+      }
+      S.ex.c = {};
+      save();
+      renderExam(true);
+      $("#p-egzamin [data-exreset]").focus();
+    }
+  });
   function renderCheat(id, data, title, apiLead) {
     var el = $("#p-" + id);
     if (el.dataset.k === S.lang) return;
@@ -18022,6 +18501,7 @@ function bootApiMap(root, onNav, embed) {
       r.sub = APIM.api();
     } else if (tab === "graphql") renderGql();
     else if (tab === "postman") renderPm();
+    else if (tab === "egzamin") renderExam();
     else if (tab === "ustawienia") renderSettings();
     else {
       if (PSECS.indexOf(r.sub) < 1) delete r.sub;
