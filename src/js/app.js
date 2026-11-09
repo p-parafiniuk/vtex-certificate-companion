@@ -5,9 +5,9 @@
   var SIM_Q = 36,
     SIM_P = 4,
     SIM_MIN = 3;
-  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "postman", "ustawienia"];
-  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman). */
-  var REFS = ["http", "api", "graphql", "postman"];
+  var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "postman", "egzamin", "ustawienia"];
+  /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
+  var REFS = ["http", "api", "graphql", "postman", "egzamin"];
   /* Sections of a category; "all" shows only the first two. */
   var CSECS = ["pytania", "katas", "info", "api", "docs"];
   /* Sections of Postęp; the first one has no hash suffix. */
@@ -65,6 +65,7 @@
     nknown: {},
     lab: {},
     pmk: {},
+    ex: { c: {}, tab: "s0", hide: false },
     cnt: { q: true, f: true, n: true },
     cntV: 1,
     rv: {},
@@ -805,6 +806,14 @@
         PM.k.forEach(function (x) {
           if (raw.pmk[x.id] === 1) S.pmk[x.id] = 1;
         });
+      if (raw.ex && typeof raw.ex === "object") {
+        if (raw.ex.c && typeof raw.ex.c === "object")
+          Object.keys(raw.ex.c).forEach(function (k) {
+            if (/^c[0-9a-z]+$/.test(k) && raw.ex.c[k] === 1) S.ex.c[k] = 1;
+          });
+        if (typeof raw.ex.tab === "string" && /^(s\d{1,2}|mail|info)$/.test(raw.ex.tab)) S.ex.tab = raw.ex.tab;
+        if (raw.ex.hide === true) S.ex.hide = true;
+      }
       if (raw.days && typeof raw.days === "object" && !Array.isArray(raw.days)) {
         Object.keys(raw.days).forEach(function (k) {
           var n = raw.days[k] >>> 0;
@@ -6130,6 +6139,7 @@
     $("#apimap").style.setProperty("--apimap-top", bar.offsetHeight + "px");
     $("#catapi").style.setProperty("--apimap-top", bar.offsetHeight + "px");
     $("#cats").style.setProperty("--apimap-top", bar.offsetHeight + "px");
+    $("#p-egzamin").style.setProperty("--apimap-top", bar.offsetHeight + "px");
   }
   window.addEventListener("resize", kotyTop);
   function openKoty() {
@@ -6379,7 +6389,7 @@
   });
   /* Clipboard needs a secure context; file:// usually is one, but fall back to selecting the text so Ctrl+C works. */
   function pmCopy(b) {
-    var pre = b.closest(".pm-code, .pm-reqw").querySelector("pre"),
+    var pre = b.closest(".pm-code, .pm-reqw, .ex-tpl").querySelector("pre"),
       text = b.dataset.url || pre.textContent,
       label = b.textContent;
     function said(ok) {
@@ -6404,6 +6414,257 @@
       }, pick);
     else pick();
   }
+  /* Ściągi › Dzień egzaminu: a checklist by stage. A tick is keyed by a hash of the item text, so rewording an
+     item clears only that tick and reordering keeps them all. Ticking updates counts in place to keep focus. */
+  function exId(t) {
+    var h = 0;
+    for (var i = 0; i < t.length; i++) h = (h * 31 + t.charCodeAt(i)) | 0;
+    return "c" + (h >>> 0).toString(36);
+  }
+  function renderExam(force) {
+    var el = $("#p-egzamin");
+    if (!force && el.dataset.k === S.lang) return exUpdate();
+    el.dataset.k = S.lang;
+    var panes = EXAM.s
+      .map(function (s, i) {
+        return ["s" + i, esc(s.t), i];
+      })
+      .concat([
+        ["mail", L("Maile", "Emails"), -1],
+        ["info", L("Braki", "Gaps"), -1]
+      ]);
+    function stage(s, i) {
+      return (
+        '<div class="ex-head"><h3>' +
+        esc(s.t) +
+        '</h3><span class="ex-when">' +
+        esc(s.w) +
+        ' · <span class="ex-sc" data-s="' +
+        i +
+        '"></span></span></div><p class="ex-empty">' +
+        L("Wszystko odhaczone ✓", "All ticked ✓") +
+        '</p><ul class="ex-list">' +
+        s.i
+          .map(function (it) {
+            var id = exId(it[0]);
+            return (
+              '<li><label><input type="checkbox" data-exc="' +
+              id +
+              '" data-s="' +
+              i +
+              '"' +
+              (S.ex.c[id] ? " checked" : "") +
+              '><span class="ex-txt"><span class="ex-main">' +
+              fmt(it[0]) +
+              "</span>" +
+              (it[1] || it[2]
+                ? '<span class="ex-note">' +
+                  fmt(it[1] || "") +
+                  (it[2]
+                    ? (it[1] ? " " : "") +
+                      '<a href="' +
+                      esc(it[2][0]) +
+                      '" target="_blank" rel="noopener noreferrer">' +
+                      esc(it[2][1]) +
+                      " ↗</a>"
+                    : "") +
+                  "</span>"
+                : "") +
+              "</span></label></li>"
+            );
+          })
+          .join("") +
+        "</ul>" +
+        (i < EXAM.s.length - 1
+          ? '<button type="button" class="btn ex-next" data-exgo="s' +
+            (i + 1) +
+            '">' +
+            L("Dalej: ", "Next: ") +
+            esc(EXAM.s[i + 1].t) +
+            " →</button>"
+          : "")
+      );
+    }
+    var body = {
+      mail:
+        '<div class="ex-head"><h3>' +
+        L("Szablony maili awaryjnych", "Emergency email templates") +
+        '</h3><span class="ex-when">' +
+        L("do ", "to ") +
+        "academy@vtex.com</span></div>" +
+        EXAM.m
+          .map(function (m) {
+            return (
+              '<div class="card ex-tpl"><div class="ex-tplh"><strong>' +
+              esc(m[0]) +
+              '</strong><button type="button" class="pm-copy" aria-live="polite">' +
+              L("Kopiuj", "Copy") +
+              "</button></div><pre><code>" +
+              esc(m[1]) +
+              "</code></pre></div>"
+            );
+          })
+          .join(""),
+      info:
+        '<div class="card ex-warn"><h3>⚠️ ' +
+        L("Czego nie ma w materiałach", "What the materials don't say") +
+        "</h3>" +
+        EXAM.x
+          .map(function (x) {
+            return "<p><strong>" + esc(x[0]) + ":</strong> " + fmt(x[1]) + "</p>";
+          })
+          .join("") +
+        "</div>"
+    };
+    el.innerHTML =
+      "<div><h2>" +
+      L("Dzień egzaminu", "Exam day") +
+      '</h2><p class="lead">' +
+      L(
+        "Checklista od rejestracji do wyniku: sprzęt, test Inspera, pokój i plan na awarię.",
+        "A checklist from sign-up to result: hardware, the Inspera test, the room and a fallback plan."
+      ) +
+      '</p></div><div class="card ex-tldr"><p><strong>TL;DR:</strong> ' +
+      fmt(EXAM.t) +
+      '</p><div class="ex-facts">' +
+      EXAM.f
+        .map(function (f) {
+          return '<span class="ex-fact">' + esc(f) + "</span>";
+        })
+        .join("") +
+      '</div></div><div class="ex-bar"><div class="ex-row"><div class="ex-track" aria-hidden="true"><div class="ex-fill"></div></div><span class="ex-count" aria-live="polite"></span><label class="ex-hide"><input type="checkbox" data-exhide' +
+      (S.ex.hide ? " checked" : "") +
+      "><span>" +
+      L("Ukryj odhaczone", "Hide ticked") +
+      '</span></label><button type="button" class="pm-copy ex-reset" data-exreset>' +
+      L("Wyczyść", "Clear") +
+      '</button></div><div class="ctabs ex-tabs" role="tablist" aria-label="' +
+      L("Etapy", "Stages") +
+      '">' +
+      panes
+        .map(function (p) {
+          return (
+            '<button type="button" class="ctab" role="tab" id="ext-' +
+            p[0] +
+            '" aria-controls="exp-' +
+            p[0] +
+            '" data-exgo="' +
+            p[0] +
+            '">' +
+            p[1] +
+            (p[2] > -1 ? ' <span class="pill" data-n="' + p[2] + '"></span>' : "") +
+            "</button>"
+          );
+        })
+        .join("") +
+      "</div></div>" +
+      panes
+        .map(function (p) {
+          return (
+            '<section class="ex-pane" id="exp-' +
+            p[0] +
+            '" role="tabpanel" aria-labelledby="ext-' +
+            p[0] +
+            '"' +
+            (p[2] > -1 ? ' data-s="' + p[2] + '"' : "") +
+            ">" +
+            (p[2] > -1 ? stage(EXAM.s[p[2]], p[2]) : body[p[0]]) +
+            "</section>"
+          );
+        })
+        .join("") +
+      '<p class="card ex-nextstep"><strong>' +
+      L("Następny krok teraz:", "Next step now:") +
+      "</strong> " +
+      fmt(EXAM.n) +
+      "</p>";
+    el.querySelector(".ex-tabs").addEventListener("keydown", tabKeys);
+    kotyTop();
+    exShow(S.ex.tab);
+    exUpdate();
+  }
+  function exShow(t) {
+    var el = $("#p-egzamin");
+    if (!el.querySelector("#exp-" + t)) t = "s0";
+    S.ex.tab = t;
+    [].forEach.call(el.querySelectorAll(".ex-pane"), function (p) {
+      p.hidden = p.id !== "exp-" + t;
+    });
+    [].forEach.call(el.querySelectorAll(".ex-tabs .ctab"), function (b) {
+      var on = b.dataset.exgo === t;
+      b.setAttribute("aria-selected", on);
+      b.tabIndex = on ? 0 : -1;
+      if (on && b.scrollIntoView) b.scrollIntoView({ block: "nearest", inline: "nearest" });
+    });
+  }
+  function exUpdate() {
+    var el = $("#p-egzamin"),
+      all = [].slice.call(el.querySelectorAll("[data-exc]")),
+      done = 0;
+    if (!all.length) return;
+    el.classList.toggle("ex-hiding", S.ex.hide);
+    all.forEach(function (c) {
+      if (c.checked) done++;
+      c.closest("li").classList.toggle("on", c.checked);
+    });
+    el.querySelector(".ex-count").textContent = done + "/" + all.length;
+    el.querySelector(".ex-fill").style.width = (done / all.length) * 100 + "%";
+    EXAM.s.forEach(function (_, i) {
+      var cs = all.filter(function (c) {
+          return c.dataset.s === String(i);
+        }),
+        d = cs.filter(function (c) {
+          return c.checked;
+        }).length,
+        full = d === cs.length;
+      var sc = el.querySelector('.ex-sc[data-s="' + i + '"]');
+      sc.textContent = full ? L("gotowe", "done") : d + "/" + cs.length;
+      sc.classList.toggle("all", full);
+      var n = el.querySelector('.pill[data-n="' + i + '"]');
+      n.textContent = full ? "✓" : d + "/" + cs.length;
+      n.classList.toggle("ok", full);
+      el.querySelector('.ex-pane[data-s="' + i + '"]').classList.toggle("alldone", full);
+    });
+  }
+  $("#p-egzamin").addEventListener("change", function (ev) {
+    var c = ev.target;
+    if (c.dataset.exc) {
+      if (c.checked) S.ex.c[c.dataset.exc] = 1;
+      else delete S.ex.c[c.dataset.exc];
+    } else if (c.hasAttribute("data-exhide")) S.ex.hide = c.checked;
+    else return;
+    save();
+    exUpdate();
+  });
+  $("#p-egzamin").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button");
+    if (!b) return;
+    if (b.dataset.exgo) {
+      var fromNext = b.classList.contains("ex-next");
+      exShow(b.dataset.exgo);
+      save();
+      if (fromNext) {
+        var t = $("#ext-" + b.dataset.exgo);
+        $("#p-egzamin").scrollIntoView({ block: "start" });
+        t.focus({ preventScroll: true });
+      }
+    } else if (b.hasAttribute("data-exreset")) {
+      /* Two taps, so one stray click cannot wipe a week of ticks. */
+      if (!b.classList.contains("arm")) {
+        b.classList.add("arm");
+        b.textContent = L("Na pewno?", "Sure?");
+        setTimeout(function () {
+          b.classList.remove("arm");
+          b.textContent = L("Wyczyść", "Clear");
+        }, 3000);
+        return;
+      }
+      S.ex.c = {};
+      save();
+      renderExam(true);
+      $("#p-egzamin [data-exreset]").focus();
+    }
+  });
   function renderCheat(id, data, title, apiLead) {
     var el = $("#p-" + id);
     if (el.dataset.k === S.lang) return;
@@ -6719,6 +6980,7 @@
       r.sub = APIM.api();
     } else if (tab === "graphql") renderGql();
     else if (tab === "postman") renderPm();
+    else if (tab === "egzamin") renderExam();
     else if (tab === "ustawienia") renderSettings();
     else {
       if (PSECS.indexOf(r.sub) < 1) delete r.sub;

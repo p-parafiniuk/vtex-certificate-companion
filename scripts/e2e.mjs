@@ -166,6 +166,7 @@ const tabs = [
   "api",
   "graphql",
   "postman",
+  "egzamin",
   "ustawienia"
 ];
 for (const h of tabs)
