@@ -1566,10 +1566,14 @@
       ? ""
       : q.ord
         ? '<p class="how">' +
+          '<span class="lh-p">' +
           L(
             "Ułóż kroki w kolejności: przyciski ↑ ↓, strzałki na uchwycie albo przeciągnij.",
             "Put the steps in order: the ↑ ↓ buttons, arrow keys on the handle, or drag."
           ) +
+          '</span><span class="lh-t">' +
+          L("Ułóż kroki w kolejności przyciskami ↑ ↓.", "Put the steps in order with the ↑ ↓ buttons.") +
+          "</span>" +
           "</p>"
         : q.c
           ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
@@ -2075,9 +2079,25 @@
         reveal,
         L("Krok: ", "Step: ")
       ) +
-      "</ol>"
+      "</ol>" +
+      /* In the exam an untouched list is no answer; this records the order as shown when the learner agrees with it. */
+      (mode === "sim" && !reveal && !ordValid(sel, q.o.length)
+        ? '<button type="button" class="btn small ord-keep">' +
+          L("Zostawiam tę kolejność", "Keep this order") +
+          "</button>"
+        : "")
     );
   }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest && ev.target.closest(".ord-keep");
+    if (!b) return;
+    var ol = b.previousElementSibling;
+    ordSync(ol);
+    b.remove();
+    live(L("Kolejność zapisana.", "Order saved."));
+    var h = ol.querySelector(".ord-mv");
+    if (h) h.focus();
+  });
   var LORD = Object.create(null);
   function ordSync(ol) {
     var arr = [].map.call(ol.querySelectorAll(".ord-i"), function (li, pos) {
@@ -2090,6 +2110,8 @@
       S.sim.ans[i] = arr;
       save();
       paintPal();
+      var kb = ol.parentNode.querySelector(".ord-keep");
+      if (kb) kb.remove();
     } else if (st === "q") {
       DRAFT[i] = arr;
       var chk = ol.closest(".q") && ol.closest(".q").querySelector(".chk");

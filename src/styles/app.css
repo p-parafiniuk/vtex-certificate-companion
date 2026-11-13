@@ -5768,3 +5768,7 @@ div.setrow {
     margin-left: auto;
   }
 }
+.ord-keep {
+  justify-self: start;
+  margin-top: 8px;
+}
