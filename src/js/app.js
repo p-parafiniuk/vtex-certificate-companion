@@ -10,7 +10,7 @@
   /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
   var REFS = ["http", "api", "graphql", "postman", "egzamin"];
   /* Sections of a category; "all" shows only the first two. */
-  var CSECS = ["pytania", "katas", "info", "api", "docs"];
+  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn"];
   /* Sections of Postęp; the first one has no hash suffix. */
   var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
@@ -64,6 +64,8 @@
     gx: { head: true, combo: true, toast: true },
     lang: "pl",
     nknown: {},
+    /* Deep knowledge loop: n["mod.node"] = {lv, miss, seen}, a["mod|level|text"] = 1 for a known accordion point */
+    learn: { n: {}, a: {} },
     lab: {},
     pmk: {},
     ex: { c: {}, tab: "s0", hide: false },
@@ -85,6 +87,22 @@
     NOTES[d].s.forEach(function (s) {
       NKEY[d + "|" + s[0]] = d;
       NTOTAL++;
+    });
+  });
+  /* Learn modules per category ("all" and "http" too). Accordion points are keyed like note blocks, by their text. */
+  var LMOD = Object.create(null),
+    LKEY = Object.create(null),
+    LNODE = Object.create(null),
+    LLV = ["must", "prac", "deep"];
+  LEARN.forEach(function (m) {
+    (LMOD[m.d] = LMOD[m.d] || []).push(m);
+    m.nodes.forEach(function (n) {
+      LNODE[m.id + "." + n.id] = m.d;
+    });
+    LLV.forEach(function (f) {
+      (m.acc[f] || []).forEach(function (pt) {
+        LKEY[m.id + "|" + f + "|" + pt[0]] = m.d;
+      });
     });
   });
   var GOALS = [10, 20, 40];
@@ -762,6 +780,23 @@
         Object.keys(raw.nknown).forEach(function (k) {
           if (NKEY[k] && raw.nknown[k]) S.nknown[k] = true;
         });
+      }
+      if (raw.learn && typeof raw.learn === "object") {
+        var rl = raw.learn;
+        if (rl.a && typeof rl.a === "object")
+          Object.keys(rl.a).forEach(function (k) {
+            if (LKEY[k] && rl.a[k]) S.learn.a[k] = 1;
+          });
+        if (rl.n && typeof rl.n === "object")
+          Object.keys(rl.n).forEach(function (k) {
+            var v = rl.n[k];
+            if (!LNODE[k] || !v || typeof v !== "object") return;
+            S.learn.n[k] = {
+              lv: Math.min(3, Math.max(0, Math.floor(+v.lv) || 0)),
+              miss: Math.max(0, Math.floor(+v.miss) || 0),
+              seen: Math.max(0, +v.seen || 0)
+            };
+          });
       }
       /* Choices saved before cntV were often an old default, not a decision: everything counts again once. */
       if (raw.cnt && typeof raw.cnt === "object" && raw.cntV === 1)
@@ -1639,32 +1674,38 @@
       .join("");
     /* Switching category keeps the open section, so API paths can be compared across areas. */
     var sec = S.dom === "all" ? undefined : NAV.cur.sec;
-    $("#cats").innerHTML = [["all", L("Wszystkie pytania", "All questions"), "📚"]]
-      .concat(DOMS)
-      .map(function (d) {
-        var p = per[d[0]];
-        return (
-          '<a class="cat" data-nav href="' +
-          catHref(d[0], d[0] === "all" ? undefined : sec) +
-          '"' +
-          (S.dom === d[0] ? ' aria-current="page"' : "") +
-          ' title="' +
-          L("Opanowane w tej kategorii: ", "Mastered in this category: ") +
-          p[0] +
-          L(" z ", " of ") +
-          p[1] +
-          '"><span class="cat-i" aria-hidden="true">' +
-          esc(d[2]) +
-          '</span><span class="cat-n">' +
-          esc(d[0] === "all" ? d[1] : dn(d[0])) +
-          "</span><small>" +
-          p[0] +
-          "/" +
-          p[1] +
-          "</small></a>"
-        );
-      })
-      .join("");
+    var lall = lProgAll();
+    $("#cats").innerHTML =
+      (lall.t ? lSum(lall) : "") +
+      [["all", L("Wszystkie pytania", "All questions"), "📚"]]
+        .concat(DOMS)
+        .map(function (d) {
+          var p = per[d[0]],
+            lp = lProg(d[0]);
+          return (
+            '<a class="cat" data-nav href="' +
+            catHref(d[0], d[0] === "all" ? undefined : sec) +
+            '"' +
+            (S.dom === d[0] ? ' aria-current="page"' : "") +
+            ' title="' +
+            L("Opanowane w tej kategorii: ", "Mastered in this category: ") +
+            p[0] +
+            L(" z ", " of ") +
+            p[1] +
+            '"><span class="cat-i" aria-hidden="true">' +
+            esc(d[2]) +
+            '</span><span class="cat-n">' +
+            esc(d[0] === "all" ? d[1] : dn(d[0])) +
+            "</span><small>" +
+            p[0] +
+            "/" +
+            p[1] +
+            "</small>" +
+            (lp.t ? lMeter(lp) : "") +
+            "</a>"
+          );
+        })
+        .join("");
     /* On phones the panel is one scrolling row: keep the open category in view. */
     var cats = $("#cats"),
       on = cats.querySelector('[aria-current="page"]');
@@ -1775,7 +1816,7 @@
       sec = NAV.cur.sec || "pytania";
     CSECS.forEach(function (k, i) {
       $("#cs-" + k).hidden = k !== sec;
-      $("#ct-" + k).hidden = all && i > 1;
+      $("#ct-" + k).hidden = k === "learn" ? !LMOD[S.dom] : all && i > 1;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
@@ -1788,6 +1829,7 @@
       "</span>" +
       (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
     paintNoteTab();
+    paintLearnTab();
     renderTldr(S.dom);
     if (sec !== "docs") clearDocs();
     if (sec === "pytania") renderQ();
@@ -1796,6 +1838,7 @@
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
     if (sec === "info") renderInfo(S.dom);
     if (sec === "katas") renderF();
+    if (sec === "learn") renderLearn(S.dom);
   }
   /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
   /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.
@@ -1939,6 +1982,230 @@
         : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
     paintNoteProg();
   }
+  /* ---------- Schematy: the Top→Bottom accordion of the deep knowledge loop ---------- */
+  /* Must have opens, W praktyce follows the note fold rule (closed on phones), Głębiej starts closed. */
+  var LHEAD = {
+    must: ["Must have na egzamin", "Must have for the exam"],
+    prac: ["W praktyce", "In practice"],
+    deep: ["Głębiej", "Deeper"]
+  };
+  function lCards(keys) {
+    return CARDS.filter(function (c) {
+      var k = (c.t === "q" ? Q : F)[c.i].k;
+      return (
+        k &&
+        k.some(function (x) {
+          return keys.indexOf(x) > -1;
+        })
+      );
+    });
+  }
+  /* t: accordion points, k: known ones, weak: nodes missed in a check and not yet mastered */
+  function lProg(d) {
+    var r = { t: 0, k: 0, weak: 0 };
+    (LMOD[d] || []).forEach(function (m) {
+      LLV.forEach(function (f) {
+        (m.acc[f] || []).forEach(function (pt) {
+          r.t++;
+          if (S.learn.a[m.id + "|" + f + "|" + pt[0]]) r.k++;
+        });
+      });
+      m.nodes.forEach(function (n) {
+        var v = S.learn.n[m.id + "." + n.id];
+        if (v && v.miss > 0 && v.lv < 3) r.weak++;
+      });
+    });
+    return r;
+  }
+  function lProgAll() {
+    var r = { t: 0, k: 0, weak: 0 };
+    Object.keys(LMOD).forEach(function (d) {
+      var p = lProg(d);
+      r.t += p.t;
+      r.k += p.k;
+      r.weak += p.weak;
+    });
+    return r;
+  }
+  function lMiss(p) {
+    return p.t - p.k
+      ? L("brakuje " + (p.t - p.k) + " z " + p.t, p.t - p.k + " of " + p.t + " to go")
+      : L("opanowane", "mastered");
+  }
+  /* Side panel: how much of a category's knowledge is still missing, and the total above the list. */
+  function lMeter(p) {
+    var pct = Math.round((p.k / p.t) * 100);
+    return (
+      '<span class="lmeter"><span class="meter" aria-hidden="true"><i style="width:' +
+      pct +
+      '%"></i></span><span class="lm-t">' +
+      lMiss(p) +
+      (p.weak
+        ? ' · <b class="lm-w">' + plural(p.weak, L("słaby", "weak"), L("słabe", "weak"), L("słabych", "weak")) + "</b>"
+        : "") +
+      "</span></span>"
+    );
+  }
+  function lSum(p) {
+    var pct = Math.round((p.k / p.t) * 100);
+    return (
+      '<div class="lsum"><span class="lsum-h"><b>' +
+      L("Twoja głębia", "Your depth") +
+      "</b><span>" +
+      pct +
+      "%</span></span>" +
+      lMeter(p) +
+      "</div>"
+    );
+  }
+  function paintLearnTab() {
+    var p = lProg(S.dom);
+    $("#ct-learn").innerHTML =
+      L("Schematy", "Diagrams") + (p.t ? ' <span class="num">' + p.k + "/" + p.t + "</span>" : "");
+  }
+  function lPoint(m, f, pt) {
+    var key = m.id + "|" + f + "|" + pt[0],
+      keys = [].concat(pt[1]),
+      n = lCards(keys).length,
+      on = !!S.learn.a[key];
+    return (
+      '<li class="lpt' +
+      (on ? " is-known" : "") +
+      '"><div class="lpt-t">' +
+      fmt(pt[0]) +
+      (pt[3] ? '<code class="lpt-ex">' + esc(pt[3]) + "</code>" : "") +
+      docLinks({ l: pt[2] }) +
+      '</div><div class="lpt-a">' +
+      (n
+        ? '<button type="button" class="btn small primary" data-lk="' +
+          esc(keys.join(" ")) +
+          '" data-lt="' +
+          esc(pt[0].replace(/[`*]/g, "")) +
+          '" aria-label="' +
+          L("Ćwicz to: ", "Practise it: ") +
+          esc(pt[0].replace(/[`*]/g, "")) +
+          '">' +
+          L("Ćwicz to", "Practise it") +
+          ' <span class="num">' +
+          n +
+          "</span></button>"
+        : "") +
+      '<label class="check"><input type="checkbox" data-la="' +
+      esc(key) +
+      '"' +
+      (on ? " checked" : "") +
+      "> " +
+      L("Umiem", "Known") +
+      "</label></div></li>"
+    );
+  }
+  function lModule(m) {
+    return (
+      '<section class="lmod" aria-labelledby="lm-' +
+      esc(m.id) +
+      '"><h3 id="lm-' +
+      esc(m.id) +
+      '">' +
+      esc(m.t) +
+      "</h3>" +
+      LLV.map(function (f, i) {
+        var pts = m.acc[f] || [];
+        if (!pts.length) return "";
+        var open =
+          f === "must" ||
+          (f === "prac" &&
+            !PHONE.matches &&
+            noteOpen([
+              0,
+              pts.map(function (p) {
+                return p[0];
+              })
+            ]));
+        return (
+          '<details class="note lacc lacc-' +
+          f +
+          '"' +
+          (open ? " open" : "") +
+          "><summary><span>" +
+          (i + 1) +
+          " · " +
+          L(LHEAD[f][0], LHEAD[f][1]) +
+          "</span><small>" +
+          plural(pts.length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) +
+          '</small></summary><ul class="lpts">' +
+          pts
+            .map(function (pt) {
+              return lPoint(m, f, pt);
+            })
+            .join("") +
+          "</ul></details>"
+        );
+      }).join("") +
+      "</section>"
+    );
+  }
+  function paintLearnProg() {
+    var el = $("#lprog"),
+      p = lProg(S.dom);
+    if (!el || !p.t) return;
+    var pct = Math.round((p.k / p.t) * 100);
+    el.innerHTML =
+      '<b class="np-v">' +
+      pct +
+      '%</b><span class="np-t">' +
+      L("Umiesz " + p.k + " z " + p.t + " punktów wiedzy", "You know " + p.k + " of " + p.t + " knowledge points") +
+      '</span><div class="meter" aria-hidden="true"><i style="width:' +
+      pct +
+      '%"></i></div><span class="meter-label">' +
+      lMiss(p) +
+      "</span>";
+  }
+  function renderLearn(d) {
+    var el = $("#cs-learn"),
+      k = d + " " + S.lang;
+    if (el.dataset.k === k) return;
+    el.dataset.k = k;
+    var mods = LMOD[d] || [];
+    el.innerHTML =
+      '<p class="lead">' +
+      L(
+        "Od najważniejszego: <strong>Must have</strong>, potem <strong>W praktyce</strong> i <strong>Głębiej</strong>. Każdy punkt ma <strong>Ćwicz to</strong>: od razu dostajesz pytania do niego w trybie Focus.",
+        "Most important first: <strong>Must have</strong>, then <strong>In practice</strong> and <strong>Deeper</strong>. Every point has <strong>Practise it</strong>: you get its questions in Focus mode right away."
+      ) +
+      "</p>" +
+      (mods.length
+        ? '<div class="nprog" id="lprog"></div>' + mods.map(lModule).join("")
+        : '<p class="empty">' +
+          L("Ta kategoria nie ma jeszcze schematów.", "This category has no diagrams yet.") +
+          "</p>");
+    paintLearnProg();
+  }
+  document.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (!t.dataset || t.dataset.la === undefined || !LKEY[t.dataset.la]) return;
+    if (t.checked) S.learn.a[t.dataset.la] = 1;
+    else delete S.learn.a[t.dataset.la];
+    t.closest(".lpt").classList.toggle("is-known", t.checked);
+    save();
+    paintLearnTab();
+    paintLearnProg();
+    renderChips();
+  });
+  /* "Ćwicz to": Focus over the items whose k names this point, whatever the round and level filters say. */
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest && ev.target.closest("[data-lk]");
+    if (!b) return;
+    var keys = b.dataset.lk.split(" "),
+      list = lCards(keys);
+    if (!list.length) return;
+    FOC.k = keys;
+    FOC.kt = b.dataset.lt;
+    S.fo.deck = "all";
+    S.fo.flt = "all";
+    S.fo.dom = "all";
+    save();
+    go({ tab: "focus", id: list[0].id });
+  });
   function renderCatApi(d) {
     var list = CATMAP[d].api;
     $("#api-lead").innerHTML = list.length
@@ -2363,7 +2630,14 @@
     });
     var ids = [];
     Object.keys(mix).forEach(function (k) {
-      ids = ids.concat(shuffle(by[k]).slice(0, mix[k]));
+      /* p1 must-have items first, then practice, unrated, theory: the draw stays random within each priority */
+      ids = ids.concat(
+        shuffle(by[k])
+          .sort(function (a, b) {
+            return (Q[a].p || 2.5) - (Q[b].p || 2.5);
+          })
+          .slice(0, mix[k])
+      );
     });
     return shuffle(ids);
   }
@@ -5096,6 +5370,7 @@
     S.best = 0;
     S.badges = {};
     S.nknown = {};
+    S.learn = { n: {}, a: {} };
     S.rv = {};
     S.cal = [
       [0, 0],
@@ -5304,7 +5579,7 @@
     c.n = n;
     BY_ID[c.id] = c;
   });
-  var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0 };
+  var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0, k: null, kt: "" };
   var DECKS = [
     ["all", ["Wszystko", "Everything"]],
     ["q", ["Pytania", "Questions"]],
@@ -5355,6 +5630,7 @@
     return x >>> 0;
   }
   function fBase() {
+    if (FOC.k) return lCards(FOC.k);
     return CARDS.filter(function (c) {
       return (
         (S.fo.deck === "all" || c.t === S.fo.deck) && (S.fo.dom === "all" || c.d === S.fo.dom) && inSet(c) && lvPass(c)
@@ -5670,6 +5946,16 @@
       '<span class="fmode">' +
       ICON.target +
       "Focus</span>" +
+      (FOC.k
+        ? '<button type="button" class="chip on fk" id="fo-k" title="' +
+          L("Pokaż całą talię", "Show the whole deck") +
+          '"><span class="fk-t">' +
+          L("Ćwiczysz: ", "Practising: ") +
+          esc(FOC.kt) +
+          '</span> <span aria-hidden="true">×</span><span class="sr">' +
+          L(" (wyłącz)", " (turn off)") +
+          "</span></button>"
+        : "") +
       '<span class="ftop-r">' +
       (S.gx.combo && S.combo >= 3
         ? '<span class="combo' +
@@ -5943,6 +6229,7 @@
     if (el) el.focus({ preventScroll: true });
   }
   function enterFocus(from) {
+    FOC.k = null;
     var flash = from === "pytania" && NAV.cur.sec === "katas";
     /* The deck holds what the list showed: the open category, questions or katas. */
     S.fo.dom = S.dom;
@@ -5956,6 +6243,7 @@
     go({ tab: "focus", id: c ? c.id : "" });
   }
   function startDue() {
+    FOC.k = null;
     S.fo.flt = "due";
     S.fo.deck = "all";
     S.fo.dom = "all";
@@ -5965,6 +6253,7 @@
   }
   $("#gx-due").addEventListener("click", startDue);
   function startWeak(dom) {
+    FOC.k = null;
     S.fo.flt = "weak";
     S.fo.deck = "q";
     S.fo.dom = dom;
@@ -5988,6 +6277,10 @@
   }
 
   $("#focusroot").addEventListener("click", function (ev) {
+    if (ev.target.closest("#fo-k")) {
+      FOC.k = null;
+      return refocus();
+    }
     var t = ev.target,
       b;
     if (t.closest("#fo-close")) return exitFocus();

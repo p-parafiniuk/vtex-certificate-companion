@@ -5254,6 +5254,155 @@ div.setrow {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
   mask-image: linear-gradient(90deg, transparent, #000 48px, #000 calc(100% - 48px), transparent);
 }
+
+/* Schematy: the deep knowledge accordion and the depth meters in the category panel. Depth fills in ok green,
+   so it never reads as the accent "current" state. */
+.lmeter {
+  flex-basis: 100%;
+  display: grid;
+  gap: 3px;
+  padding-left: calc(1.5em + 10px);
+  font-weight: 400;
+}
+.lmeter .meter {
+  flex: none;
+  height: 4px;
+}
+.lmeter .meter i,
+.lsum .meter i {
+  background: var(--ok);
+}
+.lm-t {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.lm-w {
+  color: var(--bad);
+  font-weight: 600;
+}
+.cat:has(.lmeter) {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+.lsum {
+  display: grid;
+  gap: 6px;
+  padding: 10px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.lsum-h {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+}
+.lsum-h span {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.lsum .lmeter {
+  padding-left: 0;
+}
+.lmod {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.lmod h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.lacc-must {
+  border-color: var(--accent);
+}
+.lpts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.lpts .lpt {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.lpt:first-child {
+  border-top: 0;
+}
+.lpt-t {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.lpt-ex {
+  display: block;
+  margin-top: 6px;
+  padding: 6px 8px;
+  background: var(--code);
+  border-radius: 6px;
+  font: 0.82rem var(--f-mono);
+  overflow-x: auto;
+  white-space: pre;
+}
+.lpt-a {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+.lpt.is-known .lpt-t {
+  opacity: 0.7;
+}
+.fk {
+  max-width: 50vw;
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.fk-t {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 760px) {
+  .lsum {
+    flex: none;
+    min-width: 170px;
+    margin: 0;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .cat .lmeter {
+    padding-left: 0;
+    min-width: 90px;
+  }
+  .cat[aria-current="page"] .lm-t,
+  .cat[aria-current="page"] .lm-w {
+    color: inherit;
+  }
+  .lpts .lpt {
+    flex-direction: column;
+  }
+  .lpt-a {
+    flex-direction: row;
+    align-items: center;
+    align-self: stretch;
+    justify-content: space-between;
+  }
+}
+.btn.primary .num {
+  color: inherit;
+  background: none;
+  opacity: 0.85;
+}
 </style>
 
 <header class="bar">
@@ -5309,6 +5458,7 @@ div.setrow {
           <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania" data-en="Questions">Pytania</button>
           <button type="button" class="ctab" role="tab" id="ct-katas" data-sec="katas" aria-controls="cs-katas" title="Kata to krótkie ćwiczenie do powtarzania: pytanie otwarte albo zadanie praktyczne. Najpierw odpowiadasz sam, potem porównujesz z wzorcem i sam się oceniasz." data-en-title="A kata is a short drill you repeat: an open question or a practical task. You answer on your own first, then compare with the model answer and grade yourself.">Katas</button>
           <button type="button" class="ctab" role="tab" id="ct-info" data-sec="info" aria-controls="cs-info" data-en="Notes">Notatki</button>
+          <button type="button" class="ctab" role="tab" id="ct-learn" data-sec="learn" aria-controls="cs-learn" hidden>Schematy</button>
           <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api"><span class="ctab-l" data-en="API paths">Ścieżki API</span><span class="ctab-s">API</span></button>
           <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
         </div>
@@ -5331,6 +5481,7 @@ div.setrow {
           <div class="list" id="flist"></div>
         </div>
         <div class="csec" id="cs-info" role="tabpanel" aria-labelledby="ct-info" hidden></div>
+        <div class="csec" id="cs-learn" role="tabpanel" aria-labelledby="ct-learn" hidden></div>
         <div class="csec" id="cs-api" role="tabpanel" aria-labelledby="ct-api" hidden>
           <p class="lead" id="api-lead"></p>
           <div id="catapi"></div>
@@ -9192,6 +9343,11 @@ const LABS = [
  {"id":"giftcard-hub-provider","d":"gift","t":"Zewnętrzny provider w Gift Card Hub","min":40,"goal":"Podłączasz własny middleware gift cardów przez Gift Card Hub i udostępniasz go w checkoucie.","pre":[["Middleware z **11 endpointami** Giftcard Provider Protocol pod publicznym adresem HTTPS.",["gcppp","gcarch"]],["`appKey` i `appToken` **konta** VTEX do wywołania Gift Card Hub API.",["gcprov"]],["Para poświadczeń providera, którą sam ustalisz i którą sprawdza twój middleware.",["gcprov"]]],"s":[{"h":"Ustal serviceUrl","do":"Weź bazowy adres middleware z co najmniej jednym segmentem ścieżki, np. `https://api.example.com/v1/giftcard`. Bez końcowego `/`.","ok":"VTEX doklei ścieżki wprost: `.../v1/giftcard/giftcards/_search`","keep":"`serviceUrl`","l":["gcprov"]},{"h":"Zabezpiecz middleware","do":"Sprawdzaj `X-PROVIDER-API-AppKey` i `X-PROVIDER-API-AppToken`. Brak nagłówków → `401`, złe dane → `403`, oba z pustym body. Przyjmuj `application/vnd.vtex.giftcards.v1+json` i odpowiadaj w 15 s.","l":["gcprov"]},{"h":"Zarejestruj providera","in":"`serviceUrl` z kroku 1, poświadczenia providera","do":"`PUT /api/giftcardproviders/{giftCardProviderId}` z `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken` konta.\nBody: `id`, `serviceUrl`, `oauthProvider`, `preAuthEnabled`, `cancelEnabled`, `appKey`, `appToken`.","keep":"`giftCardProviderId`","warn":"`appKey` i `appToken` w body to poświadczenia **providera**, nie konta.","l":["gcprov","o_gifthub"]},{"h":"Potwierdź rejestrację","do":"`GET /api/giftcardproviders`","ok":"twój provider jest na liście","l":["gcprov"]},{"h":"Włącz płatność","in":"`giftCardProviderId` z kroku 3","do":"**Store Settings > Payment > Settings**, zakładka **Payment Conditions**, `+`, konektor **Vale**. Włącz **Status** i w **Process with provider** wybierz swojego providera.","ok":"warunek płatności jest aktywny","l":["gchelp"]},{"h":"Przetestuj klienta bez kart","do":"Dla klienta bez gift cardów twój `POST /giftcards/_search` ma zwrócić `[]`.","warn":"Nie zwracaj obiektu z `\"balance\": 0`. To może zepsuć flow gift carda w VTEX.","l":["gcprov"]}],"brk":["Niech middleware przyjmuje błędny `X-PROVIDER-API-AppToken` z `200`. Czym to grozi transakcjom według poradnika?",["gcprov"]],"fix":[["Provider akceptuje złe poświadczenia? Platforma może automatycznie anulować powiązane transakcje. Zwracaj `403`.",["gcprov"]],["Provider nie dostaje wywołań? Sprawdź, czy `serviceUrl` ma segment ścieżki i nie kończy się `/`.",["gcprov"]],["Settlement nie dochodzi? VTEX najpierw woła `GET`, a potem `POST`. Oba endpointy muszą działać.",["gcprov"]]]}
 ];
 
+/* Deep knowledge loop: modules {id, d, t, kind, nodes, edges, ord?, acc: {must, prac, deep}}; acc points are [text, k, DOCS, ex?]. Polish only. */
+const LEARN = [
+
+];
+
 const Q = [
  {"d":"auth","r":1,"q":"Which HTTP headers authenticate a request to a VTEX API with an application key?","o":["`X-VTEX-API-AppKey`","`X-VTEX-API-AppToken`","`Authorization: Bearer {appToken}`","`X-VTEX-AppSecret`","`X-VTEX-Account`"],"e":"Para **appKey + appToken** idzie w dwóch nagłówkach: `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`.","l":["keys"],"n":2},
  {"d":"auth","r":1,"q":"What defines which API resources an application key is allowed to access?","o":["The License Manager roles associated with the key","The trade policy the key was created in","The IP allowlist configured in the Catalog","The expiration date of the appToken"],"e":"Uprawnienia klucza to **role License Managera**. Rola składa się z resources.","l":["keys"]},
@@ -11686,7 +11842,7 @@ function bootApiMap(root, onNav, embed) {
   /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
   var REFS = ["http", "api", "graphql", "postman", "egzamin"];
   /* Sections of a category; "all" shows only the first two. */
-  var CSECS = ["pytania", "katas", "info", "api", "docs"];
+  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn"];
   /* Sections of Postęp; the first one has no hash suffix. */
   var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
@@ -11740,6 +11896,8 @@ function bootApiMap(root, onNav, embed) {
     gx: { head: true, combo: true, toast: true },
     lang: "pl",
     nknown: {},
+    /* Deep knowledge loop: n["mod.node"] = {lv, miss, seen}, a["mod|level|text"] = 1 for a known accordion point */
+    learn: { n: {}, a: {} },
     lab: {},
     pmk: {},
     ex: { c: {}, tab: "s0", hide: false },
@@ -11761,6 +11919,22 @@ function bootApiMap(root, onNav, embed) {
     NOTES[d].s.forEach(function (s) {
       NKEY[d + "|" + s[0]] = d;
       NTOTAL++;
+    });
+  });
+  /* Learn modules per category ("all" and "http" too). Accordion points are keyed like note blocks, by their text. */
+  var LMOD = Object.create(null),
+    LKEY = Object.create(null),
+    LNODE = Object.create(null),
+    LLV = ["must", "prac", "deep"];
+  LEARN.forEach(function (m) {
+    (LMOD[m.d] = LMOD[m.d] || []).push(m);
+    m.nodes.forEach(function (n) {
+      LNODE[m.id + "." + n.id] = m.d;
+    });
+    LLV.forEach(function (f) {
+      (m.acc[f] || []).forEach(function (pt) {
+        LKEY[m.id + "|" + f + "|" + pt[0]] = m.d;
+      });
     });
   });
   var GOALS = [10, 20, 40];
@@ -12438,6 +12612,23 @@ function bootApiMap(root, onNav, embed) {
         Object.keys(raw.nknown).forEach(function (k) {
           if (NKEY[k] && raw.nknown[k]) S.nknown[k] = true;
         });
+      }
+      if (raw.learn && typeof raw.learn === "object") {
+        var rl = raw.learn;
+        if (rl.a && typeof rl.a === "object")
+          Object.keys(rl.a).forEach(function (k) {
+            if (LKEY[k] && rl.a[k]) S.learn.a[k] = 1;
+          });
+        if (rl.n && typeof rl.n === "object")
+          Object.keys(rl.n).forEach(function (k) {
+            var v = rl.n[k];
+            if (!LNODE[k] || !v || typeof v !== "object") return;
+            S.learn.n[k] = {
+              lv: Math.min(3, Math.max(0, Math.floor(+v.lv) || 0)),
+              miss: Math.max(0, Math.floor(+v.miss) || 0),
+              seen: Math.max(0, +v.seen || 0)
+            };
+          });
       }
       /* Choices saved before cntV were often an old default, not a decision: everything counts again once. */
       if (raw.cnt && typeof raw.cnt === "object" && raw.cntV === 1)
@@ -13315,32 +13506,38 @@ function bootApiMap(root, onNav, embed) {
       .join("");
     /* Switching category keeps the open section, so API paths can be compared across areas. */
     var sec = S.dom === "all" ? undefined : NAV.cur.sec;
-    $("#cats").innerHTML = [["all", L("Wszystkie pytania", "All questions"), "📚"]]
-      .concat(DOMS)
-      .map(function (d) {
-        var p = per[d[0]];
-        return (
-          '<a class="cat" data-nav href="' +
-          catHref(d[0], d[0] === "all" ? undefined : sec) +
-          '"' +
-          (S.dom === d[0] ? ' aria-current="page"' : "") +
-          ' title="' +
-          L("Opanowane w tej kategorii: ", "Mastered in this category: ") +
-          p[0] +
-          L(" z ", " of ") +
-          p[1] +
-          '"><span class="cat-i" aria-hidden="true">' +
-          esc(d[2]) +
-          '</span><span class="cat-n">' +
-          esc(d[0] === "all" ? d[1] : dn(d[0])) +
-          "</span><small>" +
-          p[0] +
-          "/" +
-          p[1] +
-          "</small></a>"
-        );
-      })
-      .join("");
+    var lall = lProgAll();
+    $("#cats").innerHTML =
+      (lall.t ? lSum(lall) : "") +
+      [["all", L("Wszystkie pytania", "All questions"), "📚"]]
+        .concat(DOMS)
+        .map(function (d) {
+          var p = per[d[0]],
+            lp = lProg(d[0]);
+          return (
+            '<a class="cat" data-nav href="' +
+            catHref(d[0], d[0] === "all" ? undefined : sec) +
+            '"' +
+            (S.dom === d[0] ? ' aria-current="page"' : "") +
+            ' title="' +
+            L("Opanowane w tej kategorii: ", "Mastered in this category: ") +
+            p[0] +
+            L(" z ", " of ") +
+            p[1] +
+            '"><span class="cat-i" aria-hidden="true">' +
+            esc(d[2]) +
+            '</span><span class="cat-n">' +
+            esc(d[0] === "all" ? d[1] : dn(d[0])) +
+            "</span><small>" +
+            p[0] +
+            "/" +
+            p[1] +
+            "</small>" +
+            (lp.t ? lMeter(lp) : "") +
+            "</a>"
+          );
+        })
+        .join("");
     /* On phones the panel is one scrolling row: keep the open category in view. */
     var cats = $("#cats"),
       on = cats.querySelector('[aria-current="page"]');
@@ -13451,7 +13648,7 @@ function bootApiMap(root, onNav, embed) {
       sec = NAV.cur.sec || "pytania";
     CSECS.forEach(function (k, i) {
       $("#cs-" + k).hidden = k !== sec;
-      $("#ct-" + k).hidden = all && i > 1;
+      $("#ct-" + k).hidden = k === "learn" ? !LMOD[S.dom] : all && i > 1;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
@@ -13464,6 +13661,7 @@ function bootApiMap(root, onNav, embed) {
       "</span>" +
       (all ? "" : ' <span class="num">' + catDocs(S.dom, {}).length + "</span>");
     paintNoteTab();
+    paintLearnTab();
     renderTldr(S.dom);
     if (sec !== "docs") clearDocs();
     if (sec === "pytania") renderQ();
@@ -13472,6 +13670,7 @@ function bootApiMap(root, onNav, embed) {
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
     if (sec === "info") renderInfo(S.dom);
     if (sec === "katas") renderF();
+    if (sec === "learn") renderLearn(S.dom);
   }
   /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
   /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.
@@ -13615,6 +13814,230 @@ function bootApiMap(root, onNav, embed) {
         : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
     paintNoteProg();
   }
+  /* ---------- Schematy: the Top→Bottom accordion of the deep knowledge loop ---------- */
+  /* Must have opens, W praktyce follows the note fold rule (closed on phones), Głębiej starts closed. */
+  var LHEAD = {
+    must: ["Must have na egzamin", "Must have for the exam"],
+    prac: ["W praktyce", "In practice"],
+    deep: ["Głębiej", "Deeper"]
+  };
+  function lCards(keys) {
+    return CARDS.filter(function (c) {
+      var k = (c.t === "q" ? Q : F)[c.i].k;
+      return (
+        k &&
+        k.some(function (x) {
+          return keys.indexOf(x) > -1;
+        })
+      );
+    });
+  }
+  /* t: accordion points, k: known ones, weak: nodes missed in a check and not yet mastered */
+  function lProg(d) {
+    var r = { t: 0, k: 0, weak: 0 };
+    (LMOD[d] || []).forEach(function (m) {
+      LLV.forEach(function (f) {
+        (m.acc[f] || []).forEach(function (pt) {
+          r.t++;
+          if (S.learn.a[m.id + "|" + f + "|" + pt[0]]) r.k++;
+        });
+      });
+      m.nodes.forEach(function (n) {
+        var v = S.learn.n[m.id + "." + n.id];
+        if (v && v.miss > 0 && v.lv < 3) r.weak++;
+      });
+    });
+    return r;
+  }
+  function lProgAll() {
+    var r = { t: 0, k: 0, weak: 0 };
+    Object.keys(LMOD).forEach(function (d) {
+      var p = lProg(d);
+      r.t += p.t;
+      r.k += p.k;
+      r.weak += p.weak;
+    });
+    return r;
+  }
+  function lMiss(p) {
+    return p.t - p.k
+      ? L("brakuje " + (p.t - p.k) + " z " + p.t, p.t - p.k + " of " + p.t + " to go")
+      : L("opanowane", "mastered");
+  }
+  /* Side panel: how much of a category's knowledge is still missing, and the total above the list. */
+  function lMeter(p) {
+    var pct = Math.round((p.k / p.t) * 100);
+    return (
+      '<span class="lmeter"><span class="meter" aria-hidden="true"><i style="width:' +
+      pct +
+      '%"></i></span><span class="lm-t">' +
+      lMiss(p) +
+      (p.weak
+        ? ' · <b class="lm-w">' + plural(p.weak, L("słaby", "weak"), L("słabe", "weak"), L("słabych", "weak")) + "</b>"
+        : "") +
+      "</span></span>"
+    );
+  }
+  function lSum(p) {
+    var pct = Math.round((p.k / p.t) * 100);
+    return (
+      '<div class="lsum"><span class="lsum-h"><b>' +
+      L("Twoja głębia", "Your depth") +
+      "</b><span>" +
+      pct +
+      "%</span></span>" +
+      lMeter(p) +
+      "</div>"
+    );
+  }
+  function paintLearnTab() {
+    var p = lProg(S.dom);
+    $("#ct-learn").innerHTML =
+      L("Schematy", "Diagrams") + (p.t ? ' <span class="num">' + p.k + "/" + p.t + "</span>" : "");
+  }
+  function lPoint(m, f, pt) {
+    var key = m.id + "|" + f + "|" + pt[0],
+      keys = [].concat(pt[1]),
+      n = lCards(keys).length,
+      on = !!S.learn.a[key];
+    return (
+      '<li class="lpt' +
+      (on ? " is-known" : "") +
+      '"><div class="lpt-t">' +
+      fmt(pt[0]) +
+      (pt[3] ? '<code class="lpt-ex">' + esc(pt[3]) + "</code>" : "") +
+      docLinks({ l: pt[2] }) +
+      '</div><div class="lpt-a">' +
+      (n
+        ? '<button type="button" class="btn small primary" data-lk="' +
+          esc(keys.join(" ")) +
+          '" data-lt="' +
+          esc(pt[0].replace(/[`*]/g, "")) +
+          '" aria-label="' +
+          L("Ćwicz to: ", "Practise it: ") +
+          esc(pt[0].replace(/[`*]/g, "")) +
+          '">' +
+          L("Ćwicz to", "Practise it") +
+          ' <span class="num">' +
+          n +
+          "</span></button>"
+        : "") +
+      '<label class="check"><input type="checkbox" data-la="' +
+      esc(key) +
+      '"' +
+      (on ? " checked" : "") +
+      "> " +
+      L("Umiem", "Known") +
+      "</label></div></li>"
+    );
+  }
+  function lModule(m) {
+    return (
+      '<section class="lmod" aria-labelledby="lm-' +
+      esc(m.id) +
+      '"><h3 id="lm-' +
+      esc(m.id) +
+      '">' +
+      esc(m.t) +
+      "</h3>" +
+      LLV.map(function (f, i) {
+        var pts = m.acc[f] || [];
+        if (!pts.length) return "";
+        var open =
+          f === "must" ||
+          (f === "prac" &&
+            !PHONE.matches &&
+            noteOpen([
+              0,
+              pts.map(function (p) {
+                return p[0];
+              })
+            ]));
+        return (
+          '<details class="note lacc lacc-' +
+          f +
+          '"' +
+          (open ? " open" : "") +
+          "><summary><span>" +
+          (i + 1) +
+          " · " +
+          L(LHEAD[f][0], LHEAD[f][1]) +
+          "</span><small>" +
+          plural(pts.length, L("punkt", "point"), L("punkty", "points"), L("punktów", "points")) +
+          '</small></summary><ul class="lpts">' +
+          pts
+            .map(function (pt) {
+              return lPoint(m, f, pt);
+            })
+            .join("") +
+          "</ul></details>"
+        );
+      }).join("") +
+      "</section>"
+    );
+  }
+  function paintLearnProg() {
+    var el = $("#lprog"),
+      p = lProg(S.dom);
+    if (!el || !p.t) return;
+    var pct = Math.round((p.k / p.t) * 100);
+    el.innerHTML =
+      '<b class="np-v">' +
+      pct +
+      '%</b><span class="np-t">' +
+      L("Umiesz " + p.k + " z " + p.t + " punktów wiedzy", "You know " + p.k + " of " + p.t + " knowledge points") +
+      '</span><div class="meter" aria-hidden="true"><i style="width:' +
+      pct +
+      '%"></i></div><span class="meter-label">' +
+      lMiss(p) +
+      "</span>";
+  }
+  function renderLearn(d) {
+    var el = $("#cs-learn"),
+      k = d + " " + S.lang;
+    if (el.dataset.k === k) return;
+    el.dataset.k = k;
+    var mods = LMOD[d] || [];
+    el.innerHTML =
+      '<p class="lead">' +
+      L(
+        "Od najważniejszego: <strong>Must have</strong>, potem <strong>W praktyce</strong> i <strong>Głębiej</strong>. Każdy punkt ma <strong>Ćwicz to</strong>: od razu dostajesz pytania do niego w trybie Focus.",
+        "Most important first: <strong>Must have</strong>, then <strong>In practice</strong> and <strong>Deeper</strong>. Every point has <strong>Practise it</strong>: you get its questions in Focus mode right away."
+      ) +
+      "</p>" +
+      (mods.length
+        ? '<div class="nprog" id="lprog"></div>' + mods.map(lModule).join("")
+        : '<p class="empty">' +
+          L("Ta kategoria nie ma jeszcze schematów.", "This category has no diagrams yet.") +
+          "</p>");
+    paintLearnProg();
+  }
+  document.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (!t.dataset || t.dataset.la === undefined || !LKEY[t.dataset.la]) return;
+    if (t.checked) S.learn.a[t.dataset.la] = 1;
+    else delete S.learn.a[t.dataset.la];
+    t.closest(".lpt").classList.toggle("is-known", t.checked);
+    save();
+    paintLearnTab();
+    paintLearnProg();
+    renderChips();
+  });
+  /* "Ćwicz to": Focus over the items whose k names this point, whatever the round and level filters say. */
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest && ev.target.closest("[data-lk]");
+    if (!b) return;
+    var keys = b.dataset.lk.split(" "),
+      list = lCards(keys);
+    if (!list.length) return;
+    FOC.k = keys;
+    FOC.kt = b.dataset.lt;
+    S.fo.deck = "all";
+    S.fo.flt = "all";
+    S.fo.dom = "all";
+    save();
+    go({ tab: "focus", id: list[0].id });
+  });
   function renderCatApi(d) {
     var list = CATMAP[d].api;
     $("#api-lead").innerHTML = list.length
@@ -14039,7 +14462,14 @@ function bootApiMap(root, onNav, embed) {
     });
     var ids = [];
     Object.keys(mix).forEach(function (k) {
-      ids = ids.concat(shuffle(by[k]).slice(0, mix[k]));
+      /* p1 must-have items first, then practice, unrated, theory: the draw stays random within each priority */
+      ids = ids.concat(
+        shuffle(by[k])
+          .sort(function (a, b) {
+            return (Q[a].p || 2.5) - (Q[b].p || 2.5);
+          })
+          .slice(0, mix[k])
+      );
     });
     return shuffle(ids);
   }
@@ -16772,6 +17202,7 @@ function bootApiMap(root, onNav, embed) {
     S.best = 0;
     S.badges = {};
     S.nknown = {};
+    S.learn = { n: {}, a: {} };
     S.rv = {};
     S.cal = [
       [0, 0],
@@ -16980,7 +17411,7 @@ function bootApiMap(root, onNav, embed) {
     c.n = n;
     BY_ID[c.id] = c;
   });
-  var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0 };
+  var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0, k: null, kt: "" };
   var DECKS = [
     ["all", ["Wszystko", "Everything"]],
     ["q", ["Pytania", "Questions"]],
@@ -17031,6 +17462,7 @@ function bootApiMap(root, onNav, embed) {
     return x >>> 0;
   }
   function fBase() {
+    if (FOC.k) return lCards(FOC.k);
     return CARDS.filter(function (c) {
       return (
         (S.fo.deck === "all" || c.t === S.fo.deck) && (S.fo.dom === "all" || c.d === S.fo.dom) && inSet(c) && lvPass(c)
@@ -17346,6 +17778,16 @@ function bootApiMap(root, onNav, embed) {
       '<span class="fmode">' +
       ICON.target +
       "Focus</span>" +
+      (FOC.k
+        ? '<button type="button" class="chip on fk" id="fo-k" title="' +
+          L("Pokaż całą talię", "Show the whole deck") +
+          '"><span class="fk-t">' +
+          L("Ćwiczysz: ", "Practising: ") +
+          esc(FOC.kt) +
+          '</span> <span aria-hidden="true">×</span><span class="sr">' +
+          L(" (wyłącz)", " (turn off)") +
+          "</span></button>"
+        : "") +
       '<span class="ftop-r">' +
       (S.gx.combo && S.combo >= 3
         ? '<span class="combo' +
@@ -17619,6 +18061,7 @@ function bootApiMap(root, onNav, embed) {
     if (el) el.focus({ preventScroll: true });
   }
   function enterFocus(from) {
+    FOC.k = null;
     var flash = from === "pytania" && NAV.cur.sec === "katas";
     /* The deck holds what the list showed: the open category, questions or katas. */
     S.fo.dom = S.dom;
@@ -17632,6 +18075,7 @@ function bootApiMap(root, onNav, embed) {
     go({ tab: "focus", id: c ? c.id : "" });
   }
   function startDue() {
+    FOC.k = null;
     S.fo.flt = "due";
     S.fo.deck = "all";
     S.fo.dom = "all";
@@ -17641,6 +18085,7 @@ function bootApiMap(root, onNav, embed) {
   }
   $("#gx-due").addEventListener("click", startDue);
   function startWeak(dom) {
+    FOC.k = null;
     S.fo.flt = "weak";
     S.fo.deck = "q";
     S.fo.dom = dom;
@@ -17664,6 +18109,10 @@ function bootApiMap(root, onNav, embed) {
   }
 
   $("#focusroot").addEventListener("click", function (ev) {
+    if (ev.target.closest("#fo-k")) {
+      FOC.k = null;
+      return refocus();
+    }
     var t = ev.target,
       b;
     if (t.closest("#fo-close")) return exitFocus();
