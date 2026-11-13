@@ -14205,9 +14205,7 @@ function bootApiMap(root, onNav, embed) {
   function simResult() {
     var m = S.sim,
       nq = m.ids.length,
-      score = simScore(),
-      pass = Math.ceil(nq * 0.8),
-      ok = score >= pass;
+      score = simScore();
     var doms = simDoms(m);
     var pOk = 0,
       pSet = 0;
@@ -14217,22 +14215,26 @@ function bootApiMap(root, onNav, embed) {
         if (m.self[fi]) pOk++;
       }
     });
-    var all = nq + m.pr.length;
+    var tot = simTot({ s: score, n: nq, pn: m.pr.length, p: pOk, pd: pSet === m.pr.length }),
+      pass = Math.ceil(tot.n * 0.8),
+      ok = tot.k >= pass,
+      wait = m.pr.length && pSet < m.pr.length;
     var prLine = "";
     if (m.pr.length) {
       prLine =
         pSet === m.pr.length
-          ? "<p><strong>" +
-            L("Razem z zadaniami praktycznymi:", "With the practical tasks:") +
-            "</strong> " +
-            (score + pOk) +
+          ? "<p>" +
+            L("Test ", "Test ") +
+            score +
             " / " +
-            all +
-            " · " +
-            Math.round(((score + pOk) / all) * 100) +
+            nq +
+            L(", praktyczne ", ", practical ") +
+            pOk +
+            " / " +
+            m.pr.length +
             L(
-              "% (praktyczne " + pOk + " / " + m.pr.length + " według Twojej oceny, każda karta liczona za 1 punkt).",
-              "% (practical " + pOk + " / " + m.pr.length + " by your own grade, each card counts as 1 point)."
+              " według Twojej oceny. Każde zadanie liczy się za 1 punkt.",
+              " by your own grade. Each task counts as 1 point."
             ) +
             "</p>"
           : "<p><strong>" +
@@ -14249,22 +14251,33 @@ function bootApiMap(root, onNav, embed) {
       (ok ? "pass" : "fail") +
       '" tabindex="-1" id="sim-res-box">' +
       '<p class="score">' +
-      score +
+      tot.k +
       " / " +
-      nq +
+      tot.n +
       " · " +
-      Math.round((score / nq) * 100) +
+      Math.round((tot.k / tot.n) * 100) +
       "%</p>" +
       '<p class="verdict ' +
       (ok ? "ok" : "no") +
       '">' +
-      L("Część testowa: ", "Test part: ") +
+      (wait
+        ? L("Część testowa: ", "Test part: ")
+        : m.pr.length
+          ? L("Wynik łączny: ", "Total score: ")
+          : L("Wynik: ", "Score: ")) +
       (ok ? L("zdane.", "passed.") : L("niezdane.", "failed.")) +
       L(" Próg to ", " The pass mark is ") +
       pass +
       L(" z ", " of ") +
-      nq +
-      " (80%).</p>" +
+      tot.n +
+      " (80%)." +
+      (wait
+        ? L(
+            " Wynik końcowy policzę po ocenie zadań praktycznych.",
+            " The final score comes once you grade the practical tasks."
+          )
+        : "") +
+      "</p>" +
       prLine +
       "<p>" +
       L("Czas: ", "Time: ") +
@@ -15409,12 +15422,19 @@ function bootApiMap(root, onNav, embed) {
     var acc = c.ans >= 20 ? c.right / c.ans : 0;
     var sim = 0;
     S.sims.slice(0, 3).forEach(function (x) {
-      sim = Math.max(sim, x.s / (x.n || SIM_Q));
+      var t = simTot(x);
+      sim = Math.max(sim, t.k / t.n);
     });
     return { v: Math.round(50 * m + 30 * acc + 20 * sim), m: m, acc: acc, accOk: c.ans >= 20, sim: sim, weak: weak };
   }
+  /* Practical tasks join the score once all of them are self-graded; until then only the test part counts. */
+  function simTot(x) {
+    var n = x.n || SIM_Q;
+    return x.pn && x.pd ? { k: x.s + (x.p || 0), n: n + x.pn } : { k: x.s, n: n };
+  }
   function simPassed(x) {
-    return x.s >= Math.ceil((x.n || SIM_Q) * 0.8);
+    var t = simTot(x);
+    return t.k >= Math.ceil(t.n * 0.8);
   }
   function gxCtx(c) {
     var rd = readiness(c),
@@ -15428,7 +15448,8 @@ function bootApiMap(root, onNav, embed) {
       if (p.nt && p.nk < p.nt && (!nNear || p.nk / p.nt > nNear.k / nNear.t)) nNear = { n: dn(d[0]), k: p.nk, t: p.nt };
     });
     S.sims.forEach(function (x) {
-      if (!simBest || x.s / (x.n || SIM_Q) > simBest.s / (simBest.n || SIM_Q)) simBest = x;
+      var t = simTot(x);
+      if (!simBest || t.k / t.n > simBest.k / simBest.n) simBest = t;
     });
     if (st > S.best) S.best = st;
     return {
@@ -15451,11 +15472,11 @@ function bootApiMap(root, onNav, embed) {
       sims: S.sims.length,
       simBest: simBest
         ? L("Najlepiej ", "Best ") +
-          simBest.s +
+          simBest.k +
           " / " +
-          (simBest.n || SIM_Q) +
+          simBest.n +
           L(", próg ", ", pass mark ") +
-          Math.ceil((simBest.n || SIM_Q) * 0.8)
+          Math.ceil(simBest.n * 0.8)
         : L("Jeszcze żadnej symulacji", "No simulation yet"),
       domFull: DOMS.some(function (d) {
         var p = c.per[d[0]];
@@ -16053,18 +16074,19 @@ function bootApiMap(root, onNav, embed) {
 
   /* ---------- Postęp ---------- */
   function simLine(x) {
-    var n = x.n || SIM_Q,
-      ok = x.s >= Math.ceil(n * 0.8),
+    var t = simTot(x),
+      n = t.n,
+      ok = simPassed(x),
       d = new Date(x.t);
     return (
       '<li><span class="' +
       (ok ? "p" : "f") +
       '">' +
-      x.s +
+      t.k +
       " / " +
       n +
       " · " +
-      Math.round((x.s / n) * 100) +
+      Math.round((t.k / n) * 100) +
       "% · " +
       (ok ? L("zdane", "passed") : L("niezdane", "failed")) +
       "</span>" +
@@ -16204,7 +16226,8 @@ function bootApiMap(root, onNav, embed) {
     var o = overall(c),
       best = null;
     S.sims.forEach(function (x) {
-      var v = x.s / (x.n || SIM_Q);
+      var t = simTot(x),
+        v = t.k / t.n;
       if (best === null || v > best) best = v;
     });
     [
@@ -17641,10 +17664,9 @@ function bootApiMap(root, onNav, embed) {
       bar("#pm-a", 0);
     }
     if (S.sims.length) {
-      var last = S.sims[0],
-        n = last.n || SIM_Q;
-      $("#pg-s").textContent = last.s + "/" + n;
-      bar("#pm-s", (last.s / n) * 100, last.s >= Math.ceil(n * 0.8) ? "ok" : "no");
+      var last = simTot(S.sims[0]);
+      $("#pg-s").textContent = last.k + "/" + last.n;
+      bar("#pm-s", (last.k / last.n) * 100, simPassed(S.sims[0]) ? "ok" : "no");
     } else {
       $("#pg-s").textContent = "–";
       bar("#pm-s", 0);
