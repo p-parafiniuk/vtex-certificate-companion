@@ -5342,6 +5342,14 @@ div.setrow {
   align-items: flex-end;
   gap: 6px;
 }
+.lpt-doc {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+.lpt-doc a {
+  color: var(--muted);
+}
 .lpt.is-known .lpt-t {
   opacity: 0.7;
 }
@@ -5368,7 +5376,19 @@ div.setrow {
   }
   .cat .lmeter {
     padding-left: 0;
-    min-width: 90px;
+  }
+  .cat:has(.lmeter) {
+    max-width: 220px;
+  }
+  .lpt-a .check {
+    min-height: 44px;
+    padding-inline: 8px;
+  }
+  .ftop:has(.fk) {
+    flex-wrap: wrap;
+  }
+  .fk {
+    max-width: 100%;
   }
   .cat[aria-current="page"] .lm-t,
   .cat[aria-current="page"] .lm-w {
@@ -5376,6 +5396,10 @@ div.setrow {
   }
   .lpts .lpt {
     flex-direction: column;
+  }
+  .lpt-a .btn {
+    min-height: 44px;
+    padding-inline: 16px;
   }
   .lpt-a {
     flex-direction: row;
