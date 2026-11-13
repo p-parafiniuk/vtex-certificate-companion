@@ -64,7 +64,7 @@
     gx: { head: true, combo: true, toast: true },
     lang: "pl",
     nknown: {},
-    /* Deep knowledge loop: n["mod.node"] = {lv, miss, seen}, a["mod|level|text"] = 1 for a known accordion point */
+    /* Deep knowledge loop: n["mod.node"] = {lv, miss, seen, ok} (lv 1 seen, 2 understood, 3 mastered by 2 right in a row), a["mod|level|text"] = 1 for a known accordion point */
     learn: { n: {}, a: {} },
     lab: {},
     pmk: {},
@@ -794,7 +794,8 @@
             S.learn.n[k] = {
               lv: Math.min(3, Math.max(0, Math.floor(+v.lv) || 0)),
               miss: Math.max(0, Math.floor(+v.miss) || 0),
-              seen: Math.max(0, +v.seen || 0)
+              seen: Math.max(0, +v.seen || 0),
+              ok: Math.min(2, Math.max(0, Math.floor(+v.ok) || 0))
             };
           });
       }
@@ -2118,6 +2119,7 @@
       '">' +
       esc(m.t) +
       "</h3>" +
+      '<div class="lmod-b"><div class="lmod-acc">' +
       LLV.map(function (f, i) {
         var pts = m.acc[f] || [];
         if (!pts.length) return "";
@@ -2151,7 +2153,11 @@
           "</ul></details>"
         );
       }).join("") +
-      "</section>"
+      '</div><div class="ldia" id="ld-' +
+      esc(m.id) +
+      '">' +
+      lDiagram(m) +
+      "</div></div></section>"
     );
   }
   function paintLearnProg() {
@@ -2200,6 +2206,339 @@
     paintLearnTab();
     paintLearnProg();
     renderChips();
+  });
+  /* ---------- Schematy: the diagram with layered explanations ---------- */
+  /* Hover or focus shows L1 (CSS tooltip, so nothing redraws under the pointer). A click, tap or Enter pins the
+     popover; each further click or "Głębiej" adds a layer: L2, L3, then the example and the sources. */
+  var LPOP = Object.create(null);
+  function lSt(key) {
+    return S.learn.n[key] || { lv: 0, miss: 0, seen: 0, ok: 0 };
+  }
+  function lWeak(st) {
+    return st.miss > 0 && st.lv < 3;
+  }
+  /* Rows by longest path from a start node, so a flow reads top to bottom and branches sit side by side. */
+  function lRows(m) {
+    var rank = {};
+    m.nodes.forEach(function (n) {
+      rank[n.id] = 0;
+    });
+    for (var i = 0; i < m.nodes.length; i++)
+      m.edges.forEach(function (e) {
+        if (rank[e[1]] < rank[e[0]] + 1 && rank[e[0]] + 1 < m.nodes.length) rank[e[1]] = rank[e[0]] + 1;
+      });
+    var rows = [];
+    m.nodes.forEach(function (n) {
+      (rows[rank[n.id]] = rows[rank[n.id]] || []).push(n);
+    });
+    return rows.filter(Boolean);
+  }
+  function lDepth(m) {
+    var t = m.nodes.length,
+      k = m.nodes.filter(function (n) {
+        return lSt(m.id + "." + n.id).lv >= 3;
+      }).length;
+    return { k: k, t: t, pct: Math.round((k / t) * 100) };
+  }
+  function lNode(m, n, pop) {
+    var key = m.id + "." + n.id,
+      st = lSt(key),
+      on = pop && pop.n === n.id,
+      tip = "lt-" + m.id + "-" + n.id;
+    return (
+      '<span class="lwrap"><button type="button" class="lnode' +
+      (lWeak(st) ? " weak" : "") +
+      (st.lv >= 3 ? " done" : "") +
+      (on ? " on" : "") +
+      '" data-ln="' +
+      esc(key) +
+      '" aria-expanded="' +
+      !!on +
+      '"' +
+      (on ? ' aria-controls="lp-' + esc(m.id) + '"' : ' aria-describedby="' + esc(tip) + '"') +
+      "><b>" +
+      esc(n.label) +
+      "</b>" +
+      (n.ex ? "<small>" + esc(n.ex) + "</small>" : n.sub ? "<small>" + esc(n.sub) + "</small>" : "") +
+      (lWeak(st)
+        ? '<span class="lbad">' +
+          plural(st.miss, L("błąd", "miss"), L("błędy", "misses"), L("błędów", "misses")) +
+          "</span>"
+        : st.lv >= 3
+          ? '<span class="lok">' + L("opanowane", "mastered") + "</span>"
+          : "") +
+      "</button>" +
+      /* a sibling, not a child: inside the button the tooltip would also become part of its name */
+      (on ? "" : '<span class="ltip" role="tooltip" id="' + esc(tip) + '">' + fmt(n.L1) + "</span>") +
+      "</span>"
+    );
+  }
+  var LLAY = [
+    ["L1", "Co to", "What it is"],
+    ["L2", "Jak działa", "How it works"],
+    ["L3", "Pułapka", "Exam trap"],
+    ["ex", "Przykład", "Example"]
+  ];
+  function lPop(m, n, lv) {
+    var key = m.id + "." + n.id,
+      st = lSt(key),
+      nq = lCards([key]).length;
+    return (
+      '<div class="lpop" id="lp-' +
+      esc(m.id) +
+      '" role="region" aria-label="' +
+      esc(n.label) +
+      '"><div class="llay" aria-hidden="true">' +
+      LLAY.map(function (x, i) {
+        return '<span class="' + (i + 1 === lv ? "cur" : i + 1 < lv ? "past" : "") + '">' + x[0] + "</span>";
+      }).join("") +
+      '</div><span class="sr">' +
+      L("Warstwa " + lv + " z 4", "Layer " + lv + " of 4") +
+      "</span>" +
+      [n.L1, n.L2, n.L3]
+        .slice(0, Math.min(lv, 3))
+        .map(function (t, i) {
+          return (
+            '<p class="' +
+            (i + 1 === lv ? "cur" : "") +
+            '"><strong>' +
+            L(LLAY[i][1], LLAY[i][2]) +
+            ":</strong> " +
+            fmt(t) +
+            "</p>"
+          );
+        })
+        .join("") +
+      (lv >= 4
+        ? (n.ex ? '<code class="lpt-ex">' + esc(n.ex) + "</code>" : "") +
+          '<span class="lpt-doc">' +
+          n.l
+            .map(function (k) {
+              return '<a href="' + esc(DOCS[k][0]) + '" target="_blank" rel="noopener">' + esc(DOCS[k][1]) + " ↗</a>";
+            })
+            .join(" · ") +
+          "</span>"
+        : "") +
+      '<div class="lpop-a">' +
+      (lv < 4
+        ? '<button type="button" class="btn small" data-lg="' + esc(key) + '">' + L("Głębiej", "Deeper") + " ▸</button>"
+        : "") +
+      '<button type="button" class="btn small lu" data-lu="' +
+      esc(key) +
+      '">' +
+      L("Rozumiem", "Got it") +
+      '</button><button type="button" class="btn small lx" data-lx="' +
+      esc(key) +
+      '">' +
+      L("Nie łapię", "Don't get it") +
+      '</button><button type="button" class="icn lc" data-lc="' +
+      esc(m.id) +
+      '" aria-label="' +
+      L("Zamknij wyjaśnienie", "Close the explanation") +
+      '">' +
+      ICON.x +
+      "</button></div>" +
+      /* "Sprawdź się" comes once the learner went past L1: a check right after the definition proves little */
+      (nq && lv >= 2
+        ? '<button type="button" class="btn primary lchk" data-lk="' +
+          esc(key) +
+          '" data-lt="' +
+          esc(n.label) +
+          '">' +
+          L("Sprawdź się", "Check yourself") +
+          " · " +
+          plural(Math.min(nq, 3), L("pytanie", "question"), L("pytania", "questions"), L("pytań", "questions")) +
+          "</button>"
+        : "") +
+      (st.ok === 1
+        ? '<p class="how">' + L("Jeszcze 1 trafienie do opanowania.", "1 more right answer to master it.") + "</p>"
+        : "") +
+      "</div>"
+    );
+  }
+  function lDiagram(m) {
+    var pop = LPOP[m.id],
+      dp = lDepth(m),
+      rows = lRows(m);
+    return (
+      '<div class="ldia-h"><b>' +
+      L("Schemat", "Diagram") +
+      "</b><span>" +
+      L("Głębia ", "Depth ") +
+      dp.k +
+      "/" +
+      dp.t +
+      '</span></div><div class="meter" aria-hidden="true"><i style="width:' +
+      dp.pct +
+      '%"></i></div>' +
+      rows
+        .map(function (row, r) {
+          var into = m.edges.filter(function (e) {
+            return (
+              e[2] &&
+              row.some(function (n) {
+                return n.id === e[1];
+              })
+            );
+          });
+          var hit =
+            pop &&
+            row.filter(function (n) {
+              return n.id === pop.n;
+            })[0];
+          return (
+            (r
+              ? '<div class="larr" aria-hidden="true">↓' +
+                (row.length > 1 ? " " + L("jedno z " + row.length, "one of " + row.length) : "") +
+                into
+                  .map(function (e) {
+                    return ' <span class="lel">' + fmt(e[2]) + "</span>";
+                  })
+                  .join("") +
+                "</div>"
+              : "") +
+            '<div class="lrow' +
+            (row.length > 2 ? " many" : "") +
+            '" style="--n:' +
+            row.length +
+            '">' +
+            row
+              .map(function (n) {
+                return lNode(m, n, pop);
+              })
+              .join("") +
+            "</div>" +
+            (hit ? lPop(m, hit, pop.lv) : "")
+          );
+        })
+        .join("") +
+      '<p class="how"><span class="lh-p">' +
+      L(
+        "Najedź lub ustaw fokus: L1. Kliknij lub Enter: przypina i pogłębia. Esc zamyka.",
+        "Hover or focus: L1. Click or Enter: pins and goes deeper. Esc closes."
+      ) +
+      '</span><span class="lh-t">' +
+      L("Dotknij krok: L1. Kolejne dotknięcie pogłębia.", "Tap a step: L1. Tap again to go deeper.") +
+      "</span>" +
+      "</p>"
+    );
+  }
+  function lFind(key) {
+    var mid = key.split(".")[0],
+      nid = key.slice(mid.length + 1),
+      m = (LMOD[LNODE[key]] || []).filter(function (x) {
+        return x.id === mid;
+      })[0];
+    return (
+      m && {
+        m: m,
+        n: m.nodes.filter(function (x) {
+          return x.id === nid;
+        })[0]
+      }
+    );
+  }
+  function lPaint(mid, sel) {
+    var el = document.getElementById("ld-" + mid),
+      m = LEARN.filter(function (x) {
+        return x.id === mid;
+      })[0];
+    if (!el || !m) return;
+    el.innerHTML = lDiagram(m);
+    var f = sel && el.querySelector(sel);
+    if (f) f.focus();
+  }
+  function lSet(key, fn) {
+    var st = lSt(key);
+    fn(st);
+    st.seen = Date.now();
+    S.learn.n[key] = st;
+    save();
+  }
+  /* The loop: every answer to an item with k moves its nodes. A miss marks the node weak; two right in a row master it. */
+  function learnHit(id, ok) {
+    var c = BY_ID[id],
+      k = c && (c.t === "q" ? Q : F)[c.i].k;
+    if (!k) return;
+    k.forEach(function (key) {
+      if (!LNODE[key]) return;
+      lSet(key, function (st) {
+        if (ok) {
+          st.miss = Math.max(0, st.miss - 1);
+          st.ok = Math.min(2, st.ok + 1);
+          if (st.ok >= 2) st.lv = 3;
+        } else {
+          st.miss++;
+          st.ok = 0;
+          st.lv = Math.min(st.lv, 1);
+        }
+      });
+    });
+  }
+  function lRefresh(mid, sel) {
+    lPaint(mid, sel);
+    var pop = LPOP[mid],
+      f = pop && lFind(mid + "." + pop.n);
+    if (f && f.n) live(f.n.label + ": " + L("warstwa ", "layer ") + pop.lv + L(" z 4", " of 4"));
+    paintLearnTab();
+    renderChips();
+  }
+  document.addEventListener("click", function (ev) {
+    var t = ev.target.closest && ev.target.closest("[data-ln],[data-lg],[data-lu],[data-lx],[data-lc]");
+    if (!t || !t.closest(".ldia")) return;
+    var d = t.dataset,
+      key = d.ln || d.lg || d.lu || d.lx,
+      mid = d.lc || key.split(".")[0],
+      pop = LPOP[mid],
+      f = key && lFind(key);
+    if (d.lc) {
+      var was = pop && pop.n;
+      delete LPOP[mid];
+      return lPaint(mid, was ? '[data-ln="' + mid + "." + was + '"]' : null);
+    }
+    if (!f || !f.n) return;
+    var nid = f.n.id,
+      st = lSt(key);
+    if (d.ln) {
+      if (pop && pop.n === nid) pop.lv = Math.min(4, pop.lv + 1);
+      else LPOP[mid] = { n: nid, lv: lWeak(st) ? 2 : 1 };
+      if (st.lv < 1)
+        lSet(key, function (x) {
+          x.lv = 1;
+        });
+      return lRefresh(mid, '[data-ln="' + key + '"]');
+    }
+    if (d.lg) {
+      pop.lv = Math.min(4, pop.lv + 1);
+      return lRefresh(mid, pop.lv < 4 ? '[data-lg="' + key + '"]' : '[data-lu="' + key + '"]');
+    }
+    if (d.lu) {
+      lSet(key, function (x) {
+        x.lv = Math.max(x.lv, pop && pop.lv >= 2 ? 2 : 1);
+      });
+      live(L("Zapisane: rozumiesz „", "Saved: you get “") + f.n.label + L("”.", "”."));
+      return lRefresh(mid, '[data-lu="' + key + '"]');
+    }
+    if (d.lx) {
+      lSet(key, function (x) {
+        x.miss++;
+        x.ok = 0;
+        x.lv = Math.min(x.lv, 1);
+      });
+      if (pop) pop.lv = Math.max(pop.lv, 2);
+      return lRefresh(mid, '[data-lg="' + key + '"],[data-lx="' + key + '"]');
+    }
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Escape" || !ev.target.closest) return;
+    var dia = ev.target.closest(".ldia");
+    if (!dia) return;
+    var mid = dia.id.slice(3),
+      pop = LPOP[mid];
+    if (!pop) return;
+    ev.preventDefault();
+    delete LPOP[mid];
+    lPaint(mid, '[data-ln="' + mid + "." + pop.n + '"]');
   });
   /* "Ćwicz to": Focus over the items whose k names this point, whatever the round and level filters say. */
   document.addEventListener("click", function (ev) {
@@ -4254,6 +4593,7 @@
   /* quiet: a whole simulation is credited at once, so it skips the combo (Focus only) and the per-answer announcements. */
   function recordAnswer(id, ok, cf, quiet) {
     review(id, ok, cf);
+    learnHit(id, ok);
     var t = dayKey(new Date());
     if (S.tday.d !== t) {
       S.tday = { d: t, ids: {} };
