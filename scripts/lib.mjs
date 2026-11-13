@@ -125,7 +125,8 @@ export function loadData() {
 }
 
 /* Deep knowledge loop: which Q/F practise each "mod.node" key (Q/F field k). Shared by validate and stats. */
-export const LEARN_DOMS = ["all", "http"];
+/* "all" is the Podstawy API view; HTTP by RFC lives there too, linked from the HTTP tab */
+export const LEARN_DOMS = ["all"];
 export const LEARN_WORDS = { L1: 25, L2: 40, L3: 30 };
 export function learnCoverage(D) {
   const cov = {};

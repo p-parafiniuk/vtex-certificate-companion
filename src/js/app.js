@@ -7944,7 +7944,8 @@
     if (r.tab === "postep" && r.sub && r.sub !== PSECS[0]) return "postep-" + r.sub;
     if (r.tab === "pytania" && r.cat)
       return "pytania-" + r.cat + (r.sec ? "-" + r.sec + (r.sec === "docs" && r.doc ? "-" + r.doc : "") : "");
-    if (r.tab === "pytania" && r.sec === "katas") return "pytania-katas";
+    /* "all" has no category key, so its sections ride on the tab: #pytania-katas, #pytania-learn */
+    if (r.tab === "pytania" && (r.sec === "katas" || r.sec === "learn")) return "pytania-" + r.sec;
     return r.tab;
   }
   function parseHash(h) {
@@ -7959,7 +7960,7 @@
     if (m[2] && r.tab === "postep" && PSECS.indexOf(m[2]) > 0) r.sub = m[2];
     if (m[2] && r.tab === "pytania") {
       var p = m[2].split("-");
-      if (p[0] === "katas") r.sec = "katas";
+      if (p[0] === "katas" || p[0] === "learn") r.sec = p[0];
       if (DOM_NAME[p[0]]) {
         r.cat = p[0];
         if (CSECS.indexOf(p[1]) > 0) r.sec = p[1];
@@ -8045,7 +8046,7 @@
       if (!DOM_NAME[r.cat]) {
         delete r.cat;
       }
-      if (r.cat ? CSECS.indexOf(r.sec) < 1 : r.sec !== "katas") delete r.sec;
+      if (r.cat ? CSECS.indexOf(r.sec) < 1 : r.sec !== "katas" && r.sec !== "learn") delete r.sec;
       if (r.sec !== "docs" || !/^[a-z0-9_-]+$/.test(r.doc || "")) delete r.doc;
       if (r.doc !== "ep" || !EP_URL.test(r.url || "")) {
         delete r.url;

@@ -1,46 +1,50 @@
 # Question changes vs `origin/main`
 
-- Q: 24 new, 2 reworded, 224 unchanged
-- F: 6 new, 0 reworded, 46 unchanged
+- Q: 32 new, 0 reworded, 250 unchanged
+- F: 4 new, 0 reworded, 52 unchanged
 
 ## Questions
 
 | # | domain | p | status | before | after | why |
 |---|---|---|---|---|---|---|
-| Q33 | logistics | 2 | reworded | At which level is the stock availability of an SKU stored? | Your ERP sends stock for an SKU kept in two warehouses. At which level is the s… |  |
-| Q41 | checkout |  | reworded | What is the orderForm? | Your integration keeps a shopping cart through the Checkout API. What is the or… |  |
-| Q226 | mkt | 1 | new |  | Put the calls of an external seller's order from a VTEX marketplace in the righ… |  |
-| Q227 | mkt | 1 | new |  | In an external seller integration, match each call to its direction. |  |
-| Q228 | mkt | 1 | new |  | An external seller calls the catalog change notification for an SKU and gets `4… |  |
-| Q229 | mkt | 2 | new |  | How long does a VTEX marketplace wait for an external seller's fulfillment simu… |  |
-| Q230 | mkt | 2 | new |  | The marketplace calls the seller's `POST /pvt/orders/{sellerOrderId}/fulfill`. … |  |
-| Q231 | mkt | 2 | new |  | An external seller has the tracking number of an invoiced order. How does it se… |  |
-| Q232 | mkt | 1 | new |  | A VTEX marketplace wants to cancel an order at an external seller. How does the… |  |
-| Q233 | mkt | 2 | new |  | An external seller wants to rename an SKU directly in the VTEX marketplace cata… |  |
-| Q234 | orders | 1 | new |  | Put the steps of an ERP order integration that uses the feed in the right order. |  |
-| Q235 | orders | 1 | new |  | Match each property to the order notification method it belongs to. |  |
-| Q236 | orders | 1 | new |  | Your ERP reads feed events and crashes before it commits them. What happens to … |  |
-| Q237 | orders | 1 | new |  | When should the ERP call `POST /api/oms/pvt/orders/{orderId}/start-handling`? |  |
-| Q238 | orders | 2 | new |  | You configure a hook with `POST /api/orders/hook/config`, and your endpoint fai… |  |
-| Q239 | orders | 2 | new |  | Put these order statuses in the order in which a regular order goes through the… |  |
-| Q240 | orders | 2 | new |  | An order has a partial invoice. Can the retailer still cancel it? |  |
-| Q241 | orders | 2 | new |  | Your feed receives no new events for longer than its retention period. What hap… |  |
-| Q242 | logistics | 1 | new |  | Put the steps to make an SKU sellable from a new warehouse in the right order. |  |
-| Q243 | logistics | 1 | new |  | Match each description to the logistics entity. |  |
-| Q244 | logistics | 1 | new |  | A shopper adds an SKU to the cart but has not placed the order. Is a reservatio… |  |
-| Q245 | logistics | 1 | new |  | An SKU was sold and the order was invoiced. Does VTEX subtract the sold units f… |  |
-| Q246 | logistics | 2 | new |  | Which statements about the lead time of an SKU in a warehouse are correct? |  |
-| Q247 | logistics | 3 | new |  | What is the maximum lead time you can set for an SKU in a warehouse? |  |
-| Q248 | logistics | 2 | new |  | When does an inventory reservation stop being subject to its expiration date? |  |
-| Q249 | logistics | 2 | new |  | An SKU has unlimited inventory enabled in its warehouse. Is it valid for sale? |  |
+| Q250 | auth | 1 | new |  | Match each HTTP method to its RFC 9110 properties. |  |
+| Q251 | auth | 1 | new |  | A `PUT` that updates a price times out before any response arrives. Per RFC 911… |  |
+| Q252 | auth | 2 | new |  | Per RFC 9110, which header must a `401 Unauthorized` response include? |  |
+| Q253 | auth | 1 | new |  | A VTEX API call returns `403` although the app key and token are correct. What … |  |
+| Q254 | auth | 1 | new |  | Your integration sends `GET` with `If-None-Match` and the stored ETag, which st… |  |
+| Q255 | auth | 2 | new |  | A `PUT` carries `If-Match` with an outdated ETag. What does RFC 9110 say the se… |  |
+| Q256 | auth | 2 | new |  | Which values can the `Retry-After` header carry? |  |
+| Q257 | auth | 2 | new |  | Match each `Cache-Control` directive to what it tells a cache. |  |
+| Q258 | auth | 1 | new |  | Your backend integration syncs orders every hour. Which authentication do the V… |  |
+| Q259 | auth | 2 | new |  | In which cookie does the user token of a store shopper travel? |  |
+| Q260 | auth | 2 | new |  | For how long can a VTEX ID user token authenticate requests to VTEX APIs? |  |
+| Q261 | auth | 2 | new |  | A user token issued for account A is used to call an API on account B's host. W… |  |
+| Q262 | auth | 1 | new |  | An API you need cannot be authenticated with application keys. How do you still… |  |
+| Q263 | auth | 2 | new |  | Which permissions does a token from `POST /api/vtexid/apptoken/login` have? |  |
+| Q264 | auth | 1 | new |  | Match each request source to the authentication the VTEX docs give for it. |  |
+| Q265 | auth | 1 | new |  | Your call to `GET /api/oms/pvt/orders` returns `401`. What do you check first? |  |
+| Q266 | sec | 1 | new |  | Put the steps of rotating an API token without downtime in the right order. |  |
+| Q267 | sec | 1 | new |  | Right after the `renew` call, what happens to the old API token? |  |
+| Q268 | sec | 2 | new |  | Which credentials authenticate the `renew` call for an API key? |  |
+| Q269 | sec | 2 | new |  | How does the `finish-renewal` response confirm that the rotation is complete? |  |
+| Q270 | sec | 2 | new |  | After `finish-renewal` you find an integration that still used the old token. C… |  |
+| Q271 | sec | 1 | new |  | Your team wants to reuse the store's browser JavaScript to build a back-office … |  |
+| Q272 | sec | 2 | new |  | Which data should an integration cache to avoid rate-limit errors? |  |
+| Q273 | sec | 2 | new |  | A legacy client calls a VTEX API over plain HTTP. What does it get? |  |
+| Q274 | sec | 2 | new |  | Your integration queues API calls to stay within rate limits. Which requests sh… |  |
+| Q275 | sec | 1 | new |  | An integration gets a rate-limit error. How should it space its retries? |  |
+| Q276 | sec | 2 | new |  | A VTEX IO app calls VTEX APIs directly in many places and hits rate limits. Wha… |  |
+| Q277 | sec | 2 | new |  | Why do the VTEX docs suggest GraphQL for storefront data when rate limits are a… |  |
+| Q278 | sec | 2 | new |  | Your client calls `https://sandbox.vtexcommercestable.com.br/api/test` and gets… |  |
+| Q279 | sec | 1 | new |  | An integration retries a failed `POST /api/checkout/pub/orders` automatically. … |  |
+| Q280 | sec | 2 | new |  | How often can the API Keys settings remind you to renew keys? |  |
+| Q281 | sec | 2 | new |  | Why should a store run a periodic access review of its API keys? |  |
 
 ## Flashcards
 
 | # | domain | p | status | before | after | why |
 |---|---|---|---|---|---|---|
-| F46 | checkout | 1 | new |  | Practical: you have the orderFormId of a complete cart. Place the order and fin… |  |
-| F47 | payments | 1 | new |  | Practical: your payment connector gets a payment it can only decide later. Walk… |  |
-| F48 | gift | 1 | new |  | Practical: list what an external gift card provider must answer during a purcha… |  |
-| F49 | mkt | 1 | new |  | Practical: an external seller gets an order from a VTEX marketplace. List the c… |  |
-| F50 | orders | 2 | new |  | Practical: configure a hook for order status changes and make your endpoint pas… |  |
-| F51 | logistics | 1 | new |  | Practical: a new store must sell SKU 123 from a new warehouse. Set up the logis… |  |
+| F52 | auth | 1 | new |  | Practical: make a conditional GET that saves bandwidth, and say what each answe… |  |
+| F53 | auth | 1 | new |  | Practical: an API you need rejects application keys. Authenticate with your key… |  |
+| F54 | sec | 1 | new |  | Practical: design the retry policy of an integration that hits rate limits. |  |
+| F55 | sec | 2 | new |  | Practical: check whether your client can call VTEX APIs securely before you go … |  |
