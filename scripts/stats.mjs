@@ -1,5 +1,5 @@
 /* Coverage table: where the question bank is thin. Usage: node scripts/stats.mjs */
-import { loadData, optLens } from "./lib.mjs";
+import { loadData, optLens, learnCoverage, LEARN_DOMS } from "./lib.mjs";
 
 const D = loadData();
 const pad = (s, n) => String(s).padEnd(n),
@@ -80,3 +80,35 @@ console.log(
     D.QUESTIONS.length +
     " quiz questions"
 );
+
+/* Głębia: the deep knowledge loop per module. A gap is a node without all of L1-L3, DOCS or a Q/F with its k. */
+const cov = learnCoverage(D),
+  mods = D.LEARN || [];
+console.log("\nGłębia (learn.json): " + mods.length + " modules");
+if (mods.length) {
+  const hd = ["module", "nodes", "L1-L3", "DOCS", "Q/F k", "acc", "gaps"];
+  const mw = Math.max(...mods.map(m => (m.d + "/" + m.id).length), 6) + 2;
+  console.log(
+    pad(hd[0], mw) +
+      hd
+        .slice(1)
+        .map(h => num(h, 8))
+        .join("")
+  );
+  mods.forEach(m => {
+    const n = m.nodes || [],
+      full = n.filter(x => x.L1 && x.L2 && x.L3).length,
+      dl = n.filter(x => (x.l || []).length).length,
+      kq = n.filter(x => cov[m.id + "." + x.id]).length,
+      acc = ["must", "prac", "deep"].map(f => ((m.acc || {})[f] || []).length).join("/"),
+      gaps = n.filter(x => !(x.L1 && x.L2 && x.L3 && (x.l || []).length && cov[m.id + "." + x.id])).map(x => x.id);
+    console.log(
+      pad(m.d + "/" + m.id + (m.req ? "*" : ""), mw) +
+        [n.length, full, dl, kq, acc, gaps.length].map(v => num(v, 8)).join("") +
+        (gaps.length ? "  " + gaps.join(", ") : "")
+    );
+  });
+}
+const have = new Set(mods.map(m => m.d));
+const none = [...D.DOMS.map(d => d[0]), ...LEARN_DOMS].filter(d => !have.has(d));
+console.log("no module yet: " + (none.join(", ") || "none") + (mods.some(m => m.req) ? " · * req: true" : ""));

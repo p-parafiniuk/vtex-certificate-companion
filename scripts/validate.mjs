@@ -2,7 +2,7 @@
    Usage: node scripts/validate.mjs [--update-lock]
    The lock (tests/ids.lock.json) guards stable ids: saved progress is keyed by array index of Q and F. */
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { LOCK, CATS, loadData, hash, optLens } from "./lib.mjs";
+import { LOCK, CATS, loadData, hash, optLens, learnCoverage, LEARN_DOMS, LEARN_WORDS } from "./lib.mjs";
 
 const D = loadData();
 const err = [],
@@ -40,11 +40,15 @@ function common(w, x, allowed) {
       });
   }
   markup(w, x.q);
+  /* p: 1 must-have, 2 practice, 3 theory. k: "mod.node" keys of LEARN, checked with the LEARN block */
+  if (x.p !== undefined && ![1, 2, 3].includes(x.p)) E(w, "p must be 1, 2 or 3");
+  if (x.k !== undefined && (!Array.isArray(x.k) || !x.k.length || !x.k.every(isStr)))
+    E(w, "k must list LEARN keys mod.node");
 }
 
 D.Q.forEach((x, i) => {
   const w = "Q[" + i + "]";
-  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h"]);
+  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h", "p", "k"]);
   if (x.c !== undefined) matrix(w, x);
   if (!Array.isArray(x.o) || x.o.length < 2) E(w, "needs at least 2 options");
   else {
@@ -84,7 +88,7 @@ function matrix(w, x) {
 
 D.F.forEach((x, i) => {
   const w = "F[" + i + "]";
-  common(w, x, ["d", "r", "lv", "q", "a", "l", "h"]);
+  common(w, x, ["d", "r", "lv", "q", "a", "l", "h", "p", "k"]);
   /* 1 recall, 2 one request, 3 a flow of steps, 4 a lab from a stated starting state */
   if (![1, 2, 3, 4].includes(x.lv)) E(w, "lv must be 1, 2, 3 or 4");
   if (!isStr(x.a)) E(w, "empty answer a");
@@ -123,13 +127,21 @@ const used = new Set(
           .concat((x.s || []).flatMap(s => s.l || []))
       )
     )
+    .concat(
+      (Array.isArray(D.LEARN) ? D.LEARN : []).flatMap(m =>
+        (m.nodes || [])
+          .flatMap(n => n.l || [])
+          .concat((m.edges || []).flatMap(e => (Array.isArray(e) && e[3]) || []))
+          .concat(["must", "prac", "deep"].flatMap(f => ((m.acc || {})[f] || []).flatMap(p => (p && p[2]) || [])))
+      )
+    )
     /* linked from the header of the API Map roles view */
     .concat(["lmres", "predroles"])
 );
 for (const [k, v] of Object.entries(D.DOCS)) {
   if (!Array.isArray(v) || v.length !== 2 || !isStr(v[1])) E("DOCS." + k, "must be [url, label]");
   else if (
-    !/^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\/|^https:\/\/learning\.postman\.com\/docs\//.test(
+    !/^https:\/\/(developers|help|learn)\.vtex\.com\/|^https:\/\/github\.com\/vtex\/|^https:\/\/learning\.postman\.com\/docs\/|^https:\/\/www\.rfc-editor\.org\/rfc\/rfc\d+/.test(
       v[0]
     )
   )
@@ -402,6 +414,99 @@ for (const name of ["GQL", "PM"]) {
     if (!isStr(x.sol)) E(w, "needs a solution sol");
     docs(w, x.l);
   });
+}
+
+/* Deep knowledge loop (LEARN): one module per line, progress saved as learn.<mod>.<node>, so module and node ids
+   stay stable once shipped. Same fact rule as notes. Practice-first: every must/prac point of the accordion needs
+   at least one Q/F with its k. A node no Q/F practises is a warning, an error once its module has req: true. */
+{
+  const cov = learnCoverage(D),
+    keys = new Set(),
+    mids = new Set(),
+    lDoms = new Set([...doms, ...LEARN_DOMS]);
+  const docs = (w, l) => {
+    if (!Array.isArray(l) || !l.length) return E(w, "needs at least one DOCS key");
+    l.forEach(k => D.DOCS[k] || E(w, "DOCS key `" + k + "` not in DOCS"));
+  };
+  const words = (w, s, max) => {
+    if (!isStr(s)) return E(w, "empty");
+    markup(w, s);
+    if (s.split(/\s+/).length > max) E(w, "over " + max + " words");
+  };
+  const mods = Array.isArray(D.LEARN) ? D.LEARN : E("LEARN", "must be an array") || [];
+  mods.forEach((m, i) => {
+    const w = "LEARN[" + i + "]";
+    for (const k of Object.keys(m))
+      if (!["id", "d", "t", "kind", "req", "nodes", "edges", "ord", "acc"].includes(k))
+        E(w, "unknown field `" + k + "`");
+    if (!/^[a-z0-9-]{3,40}$/.test(m.id || "")) E(w, "id must be a kebab-case slug");
+    else if (mids.has(m.id)) E(w, "duplicate id " + m.id);
+    else mids.add(m.id);
+    if (!lDoms.has(m.d)) E(w, "d=" + JSON.stringify(m.d) + " not in DOMS, all or http");
+    if (!isStr(m.t)) E(w, "needs t");
+    if (!["flow", "actors", "rfc"].includes(m.kind)) E(w, "kind must be flow, actors or rfc");
+    if (m.req !== undefined && m.req !== true) E(w, "req is true or left out");
+    const nids = new Set();
+    if (!Array.isArray(m.nodes) || m.nodes.length < 2) E(w, "needs at least 2 nodes");
+    (Array.isArray(m.nodes) ? m.nodes : []).forEach((n, j) => {
+      const wn = w + ".nodes[" + j + "]";
+      for (const k of Object.keys(n))
+        if (!["id", "label", "sub", "x", "y", "L1", "L2", "L3", "ex", "l"].includes(k))
+          E(wn, "unknown field `" + k + "`");
+      if (!/^[a-z0-9-]{2,30}$/.test(n.id || "")) E(wn, "id must be a kebab-case slug");
+      else if (nids.has(n.id)) E(wn, "duplicate node id " + n.id);
+      else (nids.add(n.id), keys.add(m.id + "." + n.id));
+      if (!isStr(n.label)) E(wn, "needs label");
+      for (const L of ["L1", "L2", "L3"]) words(wn + "." + L, n[L], LEARN_WORDS[L]);
+      if (n.ex !== undefined) markup(wn + ".ex", n.ex);
+      docs(wn + ".l", n.l);
+      const key = m.id + "." + n.id;
+      if (!cov[key]) (m.req ? E : W)(wn, "no Q/F practises " + key + " (add one with k)");
+    });
+    (Array.isArray(m.edges) ? m.edges : E(w, "edges must be an array") || []).forEach((e, j) => {
+      const we = w + ".edges[" + j + "]";
+      if (!Array.isArray(e) || e.length < 2 || e.length > 4) return E(we, "must be [from, to, label?, DOCS?]");
+      if (!nids.has(e[0]) || !nids.has(e[1])) E(we, "points to a missing node");
+      if (e[2] !== undefined) markup(we, e[2]);
+      if (e[3] !== undefined) docs(we, e[3]);
+    });
+    if (m.ord !== undefined) {
+      if (!Array.isArray(m.ord) || m.ord.length < 3) E(w + ".ord", "needs at least 3 node ids");
+      else if (new Set(m.ord).size !== m.ord.length) E(w + ".ord", "duplicate node id");
+      else m.ord.forEach(id => nids.has(id) || E(w + ".ord", "missing node " + id));
+    }
+    const acc = m.acc || E(w, "needs acc {must, prac, deep}") || {};
+    for (const k of Object.keys(acc)) if (!["must", "prac", "deep"].includes(k)) E(w + ".acc", "unknown level " + k);
+    if (!Array.isArray(acc.must) || acc.must.length < 3 || acc.must.length > 6)
+      E(w + ".acc.must", "needs 3 to 6 points");
+    if (!Array.isArray(acc.prac) || !acc.prac.length) E(w + ".acc.prac", "needs at least one point");
+    ["must", "prac", "deep"].forEach(f =>
+      (Array.isArray(acc[f]) ? acc[f] : []).forEach((p, j) => {
+        const wp = w + ".acc." + f + "[" + j + "]";
+        if (!Array.isArray(p) || p.length < 3 || p.length > 4) return E(wp, "must be [text, k, DOCS, ex?]");
+        words(wp, p[0], 30);
+        const pk = Array.isArray(p[1]) ? p[1] : [p[1]];
+        if (!pk.every(isStr) || !pk.length) E(wp, "k must name mod.node keys");
+        docs(wp, p[2]);
+        if (p[3] !== undefined) markup(wp, p[3]);
+        if (f !== "deep" && !pk.some(k => cov[k])) E(wp, "practice-first: no Q/F with k " + pk.join(", "));
+      })
+    );
+  });
+  for (const [k, items] of Object.entries(cov)) if (!keys.has(k)) E(items.join(","), "k `" + k + "` not in LEARN");
+  /* every acc point key must name a node */
+  mods.forEach((m, i) =>
+    ["must", "prac", "deep"].forEach(f =>
+      ((m.acc || {})[f] || []).forEach((p, j) =>
+        (Array.isArray(p) ? [].concat(p[1]) : []).forEach(
+          k => isStr(k) && !keys.has(k) && E("LEARN[" + i + "].acc." + f + "[" + j + "]", "k `" + k + "` not in LEARN")
+        )
+      )
+    )
+  );
+  const have = new Set(mods.map(m => m.d));
+  const miss = [...doms, ...LEARN_DOMS].filter(d => !have.has(d));
+  if (miss.length) W("LEARN", "no module yet for " + miss.join(", "));
 }
 
 /* HTTP Koty */

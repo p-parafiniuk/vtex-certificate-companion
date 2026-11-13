@@ -21,7 +21,9 @@ The user is on a tight plan. Spend few tokens:
 | `npm run format` | format JS, CSS, templates and scripts with Prettier. Run it before every commit and before opening a PR. |
 | `npm run build` | validate, then write `vtex-api-drill.html` |
 | `npm run check` | branch name, formatting, validate, then confirm the built file matches `src/`. Run it before every commit. |
-| `npm run stats` | table of questions per domain × round, to find gaps |
+| `npm run stats` | table of questions per domain × round, to find gaps, plus the **Głębia** table of `learn.json` (nodes, L1–L3, DOCS, Q/F with `k`, gaps) |
+| `npm run audit` | read-only audit of every Q/F: priority `p` (set, or guessed 2 practice / 3 theory from its endpoint, header, code or scenario) per domain, and the items with no practical hook. `-- --d=<dom>`, `-- --json` |
+| `npm run qdiff -- <ref>` | every Q/F against a git ref (new / reworded / unchanged) into `reports/question-changes.md`; reasons from an optional `reports/reasons.json` `{"Q12": "…"}`. Its excerpt goes in every content PR |
 | `npm run review-scope` | which reviewers a diff needs (no LLM): fact-checker, ui-reviewer, security-reviewer |
 | `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
 | `npm run prune` | list branches merged into `origin/main` and the unmerged ones with their PR state; `-- --apply` deletes the merged ones (see `/maintenance`) |
@@ -47,6 +49,7 @@ src/apimap/template.html, src/styles/apimap.css, src/js/apimap.js
 src/data/*.json         all content, one item per line (apimap.json: one API per line, from vtex/openapi-schemas, `ref` = api-reference slug)
 src/data/apioverview.json per category: API Map "Z lotu ptaka" cards {k, do, no?, alt?, edge?, l}. Polish only, same fact rule as notes
 src/data/notes.json      per category (+ "all"): TL;DR and study notes for the Notatki section
+src/data/learn.json      deep knowledge modules, one per line (LEARN, see Content schema)
 src/data/categories.json per category: `api` = [apiKey, tags?] for its embedded API Map, `ref` = [slug, label] API Reference pages
 src/img/cats/<code>.jpg http.cat images, inlined as KCAT at build time
 scripts/                lib (block formats), build, extract, validate, stats, format. Node >= 18; Prettier is the one devDependency.
@@ -58,6 +61,7 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 - `d` domain key from `domains.json`; `r` round, 1 or 2; `q` question; `o` options; `e` explanation; `l` DOCS keys
 - `n`, optional, at least 2: number of correct answers. **The first `n` options are the correct ones.** Options are shuffled at runtime, so always put the correct answers first.
 - `h`, optional: HTTP codes from `http-names.json`, shown as chips
+- `p`, optional: priority 1 must-have, 2 practice, 3 theory. `k`, optional: `learn.json` keys `<mod>.<node>` this item practises. Both are additive: add them to new items, or in place to old ones without changing their meaning (F takes them too)
 
 **F** (`flashcards.json`): `d, r, lv, q, a, l, h?`. `lv` is the difficulty, 1 to 4: 1 Przypomnij (a fact or definition), 2 Request (one call), 3 Flow (steps in order), 4 Lab (from scratch, with the starting state stated). A `q` starting with `Practical:` makes a hands-on task. The user writes their answer and self-grades it against `a`.
 
@@ -67,7 +71,11 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 
 **API Reference links** are built, not stored: `https://developers.vtex.com/docs/api-reference/<slug>` for an API, plus `#<method>-<path>` with `{param}` written as `-param-` for an endpoint (the same format as the endpoint links in `docs.json`).
 
-**DOCS** (`docs.json`): `key: [url, label]`. Every Q/F needs at least one `l` key. URLs must be official (developers.vtex.com, help.vtex.com, learn.vtex.com, github.com/vtex). Before adding or changing a fact, fetch the source page and confirm it states the fact.
+**DOCS** (`docs.json`): `key: [url, label]`. Every Q/F needs at least one `l` key. URLs must be official (developers.vtex.com, help.vtex.com, learn.vtex.com, github.com/vtex), or the primary source for HTTP: `https://www.rfc-editor.org/rfc/rfcNNNN` (RFC 9110, 9111). Before adding or changing a fact, fetch the source page and confirm it states the fact.
+
+**LEARN** (`learn.json`): deep knowledge loop modules, one per line. `{id, d, t, kind: flow|actors|rfc, req?, nodes: [{id, label, sub?, x?, y?, L1, L2, L3, ex?, l}], edges: [[from, to, label?, DOCS?]], ord?: [nodeId…], acc: {must: [[text, k, DOCS, ex?]], prac: […], deep: […]}}`. `d` is a DOMS key, `all` or `http`. L1 is what it is (≤25 words), L2 why / how it works (≤40), L3 the exam trap or edge case (≤30), `ex` a request or header. `acc` is the Top→Bottom accordion: Must have (3–6), W praktyce, Głębiej; `k` names the `<mod>.<node>` keys a point is about. Progress is saved under `learn.<mod>.<node>`, so module and node ids never change once shipped. Polish only, same fact rule as notes.
+- **Practice-first**: every `acc` must/prac point needs at least one Q/F with its `k` (error). A node no Q/F practises is a warning, an error once the module has `req: true`. A category, `all` or `http` without a module is a warning until the last content PR sets `req: true` everywhere.
+- **The loop**: a change to `learn.json` goes through `/deepen <module>` (sources → layers → practice items → fact-checker, at most 3 iterations, until `stats` shows no gaps), and `review-scope` sends it to the fact-checker.
 
 **NOTES** (`notes.json`): `{ <domKey>|"all": { t: [TL;DR bullets], s: [[heading, [bullets], [DOCS keys]]] } }`. `t` sits above the category tabs (on `all`: the "Podstawy API" box). `s` fills the Notatki section; a block headed exactly `Pułapki` holds exam traps and gets the accent tint (the heading text is load-bearing). Polish only, never translated. Same fact rule as Q/F: every bullet must be stated by a page its block links; no `[UNVERIFIED]`, no URLs in text. Not keyed by index, so blocks may be reordered. "Umiem" on a block is saved as `<category>|<heading>`: headings must be unique per category, and renaming one drops its mark.
 
@@ -86,6 +94,7 @@ Every answer that changes or proposes UI ends with a visualization the user can 
 - **Change made**: run `npm run build`, then `npm run shots -- <hash of each touched view>`, look at the PNGs yourself, and send the relevant ones to the user (SendUserFile, or attach them to the PR). At least 375 px dark and desktop light.
 - **Change proposed, not made yet**: a **Claude Design** mockup, before writing code. Use the Artifact tool (`quickstart` with intent `design`, then the Design type), build the screens from the tokens in `src/styles/app.css` (no other design system unless the user names one), with at least 390 px dark and desktop light, and give the user the link. When the user says "vis" or "dawaj vis", this is what they mean. ASCII or Mermaid is fine for a data flow, never as the only picture of a UI.
 - **Data or structure change**: a short table or diagram of what maps to what (e.g. category → APIs → doc pages).
+- **A/B before code**: every UI change starts with two variants (A and B) in Claude Design, 390 px dark and desktop light, with the key interaction state visible. Give your pick, let the user choose, and save it in `design/<topic>/ab.json` (`{pick, why, date}`) before writing UI code. In `compare.json` an entry with `variant` reads `<Variant>-<Board>.dc.html` and writes `shots/compare-<topic>-<variant>-<board>.png`; without `hash` only the mockup is shot.
 - **Change built from a mockup**: before saying it is done, prove it matches. Copy the canvas into `design/<topic>/` (gitignored): each artboard as `<Board>.dc.html`, the runtime from an Artifact `read` of `artifact-type/dc-runtime.js` saved as `support.js`, and a `compare.json` that maps each board to a hash, width, theme and the clicks that reach that state (format in the header of `scripts/compare.mjs`). Run `npm run compare -- <topic>`, open every `shots/compare-<topic>-<board>.png`, list each difference, then fix it or name it as deliberate (with the reason). Send the user the compare images. "Done" without them is not done.
 A report without a picture of a UI change is not finished.
 
@@ -106,7 +115,7 @@ Prettier formats the code (`.prettierrc.json`: 120 columns, double quotes, no tr
 - PR title in English, imperative. The body lists what changed, how it was verified (`npm run format`, `npm run check`, the shots), and includes the screenshots.
 
 ## Skills and reviewers
-`/feature`, `/fix`, `/ux`, `/security`, `/gamify` do the work. `/maintenance` prunes branches and checks repo health. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.
+`/feature`, `/fix`, `/ux`, `/security`, `/gamify` do the work; `/deepen <module>` runs the deep knowledge loop on `learn.json`. `/maintenance` prunes branches and checks repo health. `/review` is the gate after them: it runs only the Sonnet reviewers in `.claude/agents/` that `review-scope` picks, in parallel, with at most one fix round. There is no auto-merge.
 
 ## Verifying a change
 1. Run `npm run check`. It must be green, with no warnings you didn't expect.

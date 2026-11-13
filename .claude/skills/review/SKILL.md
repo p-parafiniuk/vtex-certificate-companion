@@ -14,6 +14,7 @@ Run `npm run format`, then `npm run check`. If it fails, fix that first. Never s
 Run `npm run review-scope --silent` (base defaults to `main`; pass another base after `--` if the user names one). It prints JSON with `reviewers`, `files` and `reasons`.
 - `reviewers` is empty: say "no review needed (only <files>)" and stop.
 - Never add a reviewer the script didn't pick, unless the user asks for one.
+- A reason "learn modules changed" means `/deepen <module>` must have run in this branch (its iteration report in the PR). If it did not, run it before the fact-checker.
 
 ## 3. Run them in parallel
 Spawn each picked agent in **one message** with the Agent tool (`subagent_type` = the name). Give each a short, self-contained prompt with only what it needs:

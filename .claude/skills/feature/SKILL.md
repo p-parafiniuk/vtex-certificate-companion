@@ -9,6 +9,7 @@ Read `CLAUDE.md` first if it is not already in context. Work in `src/` only.
 
 ## 0. Plan and branch
 - Before code, show the plan: for UI, a Claude Design mockup of the new screens (`CLAUDE.md` › Always show it), with its link; for data, a table of what maps to what. Say which views (hashes) change.
+- **A/B, required for any UI change**: before code, build two variants (A and B) of the changed screens in Claude Design, each at 390 px dark and desktop light, with the key interaction state visible (open popover, open accordion). Name the variants by what differs, give your pick and why, then ask the user to choose. Save the choice in `design/<topic>/ab.json` as `{"pick": "B", "why": "…", "date": "YYYY-MM-DD"}`. No UI code before that file exists. `compare.json` entries take `variant`, so `npm run compare -- <topic>` can shoot both (without `hash` it shoots the mockup only).
 - Create the branch as `CLAUDE.md` › Branches and PRs says (e.g. `feat/<topic>`) It applies in cloud sessions too: fast-forward to `origin/main`, then cut `<type>/<topic>` before the first commit. `npm run branch` must pass.
 
 ## 1. Decide the type
@@ -31,6 +32,7 @@ Read `CLAUDE.md` first if it is not already in context. Work in `src/` only.
 4. **Append** to the end of `questions.json` / `flashcards.json`. Never insert in the middle.
 5. Self-review every item as a strict examiner before building. Is exactly one reading correct? Could a distractor also be true? Does the explanation say *why*, in one or two sentences?
 6. Run `npm run build`, then `npm run lock` to accept the appended items.
+7. Deep knowledge loop: a new item that practises a `learn.json` node gets `k: ["<mod>.<node>"]` and, when known, `p` (1 must-have, 2 practice, 3 theory). A change to `learn.json` goes through `/deepen <module>` before `/review`. Practice-first: never add a knowledge point (an `acc` must/prac entry) without a Q/F that carries its `k`.
 
 ## 4. Verify
 - `npm run format`, then `npm run build`; `npm run check` must be green (it fails on unformatted code).
