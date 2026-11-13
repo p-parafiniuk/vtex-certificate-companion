@@ -1,40 +1,46 @@
 # Question changes vs `origin/main`
 
-- Q: 24 new, 2 reworded, 200 unchanged
-- F: 0 new, 0 reworded, 46 unchanged
+- Q: 24 new, 2 reworded, 224 unchanged
+- F: 6 new, 0 reworded, 46 unchanged
 
 ## Questions
 
 | # | domain | p | status | before | after | why |
 |---|---|---|---|---|---|---|
-| Q43 | checkout | 2 | reworded | Which data is sent in the cart simulation request body? | Your integration simulates a cart before it places an order. Which data goes in… |  |
-| Q48 | checkout | 2 | reworded | What is the `orderGroup`? | Your integration placed an order and got an `orderGroup` back. What is the `ord… |  |
-| Q202 | checkout | 1 | new |  | Put the calls that place an order from an existing cart in the right order. |  |
-| Q203 | checkout | 1 | new |  | Put the steps of placing a new order without a cart in the right order. |  |
-| Q204 | checkout | 1 | new |  | Match each statement to the way of placing an order it describes. |  |
-| Q205 | checkout | 1 | new |  | Your integration placed an order from a cart. It sends the payment information … |  |
-| Q206 | checkout | 1 | new |  | `POST /api/checkout/pub/gatewayCallback/{orderGroup}` returns `500`. Which caus… |  |
-| Q207 | checkout | 2 | new |  | A headless storefront calls `GET /api/checkout/pub/orderForm` without the `Chec… |  |
-| Q208 | checkout | 2 | new |  | Your integration places an order with only the email of an existing customer in… |  |
-| Q209 | checkout | 2 | new |  | You place an order from a cart worth $24.99 with `POST .../orderForm/{orderForm… |  |
-| Q210 | payments | 1 | new |  | Put the steps of an asynchronous payment in the Payment Provider Protocol in th… |  |
-| Q211 | payments | 1 | new |  | Match each situation to the PPP request VTEX sends to the provider. |  |
-| Q212 | payments | 1 | new |  | Create Payment returned `undefined`, and the provider has not called back yet. … |  |
-| Q213 | payments | 2 | new |  | A payment connector built on VTEX IO gets the final result of an `undefined` pa… |  |
-| Q214 | payments | 2 | new |  | The provider's callback does not include `delayToAutoSettle`. Which value does … |  |
-| Q215 | payments | 2 | new |  | VTEX sends the same settlement request twice for one payment. What should the p… |  |
-| Q216 | payments | 2 | new |  | A provider sets `delayToCancel` for a payment method that can stay pending for … |  |
-| Q217 | payments | 1 | new |  | A store refunds one of three items from a payment that was already captured. Wh… |  |
-| Q218 | gift | 1 | new |  | Put the calls of a purchase paid with a gift card through the Gift Card Hub in … |  |
-| Q219 | gift | 1 | new |  | Match each task to the part of the gift card integration that does it. |  |
-| Q220 | gift | 2 | new |  | A gift card provider receives `GET /giftcards/{giftCardId}`. What must its resp… |  |
-| Q221 | gift | 2 | new |  | Where does VTEX take the `{transactionId}` for the gift card settlement and can… |  |
-| Q222 | gift | 2 | new |  | A store wants the native gift card provider and an external one at the same tim… |  |
-| Q223 | gift | 2 | new |  | Before a settlement, VTEX calls GET and finds no amount left to settle. What do… |  |
-| Q224 | gift | 1 | new |  | Which credentials authenticate `PUT /api/giftcardproviders/{giftCardProviderId}… |  |
-| Q225 | gift | 2 | new |  | In the gift card integration, what is the external provider responsible for? |  |
+| Q33 | logistics | 2 | reworded | At which level is the stock availability of an SKU stored? | Your ERP sends stock for an SKU kept in two warehouses. At which level is the s… |  |
+| Q41 | checkout |  | reworded | What is the orderForm? | Your integration keeps a shopping cart through the Checkout API. What is the or… |  |
+| Q226 | mkt | 1 | new |  | Put the calls of an external seller's order from a VTEX marketplace in the righ… |  |
+| Q227 | mkt | 1 | new |  | In an external seller integration, match each call to its direction. |  |
+| Q228 | mkt | 1 | new |  | An external seller calls the catalog change notification for an SKU and gets `4… |  |
+| Q229 | mkt | 2 | new |  | How long does a VTEX marketplace wait for an external seller's fulfillment simu… |  |
+| Q230 | mkt | 2 | new |  | The marketplace calls the seller's `POST /pvt/orders/{sellerOrderId}/fulfill`. … |  |
+| Q231 | mkt | 2 | new |  | An external seller has the tracking number of an invoiced order. How does it se… |  |
+| Q232 | mkt | 1 | new |  | A VTEX marketplace wants to cancel an order at an external seller. How does the… |  |
+| Q233 | mkt | 2 | new |  | An external seller wants to rename an SKU directly in the VTEX marketplace cata… |  |
+| Q234 | orders | 1 | new |  | Put the steps of an ERP order integration that uses the feed in the right order. |  |
+| Q235 | orders | 1 | new |  | Match each property to the order notification method it belongs to. |  |
+| Q236 | orders | 1 | new |  | Your ERP reads feed events and crashes before it commits them. What happens to … |  |
+| Q237 | orders | 1 | new |  | When should the ERP call `POST /api/oms/pvt/orders/{orderId}/start-handling`? |  |
+| Q238 | orders | 2 | new |  | You configure a hook with `POST /api/orders/hook/config`, and your endpoint fai… |  |
+| Q239 | orders | 2 | new |  | Put these order statuses in the order in which a regular order goes through the… |  |
+| Q240 | orders | 2 | new |  | An order has a partial invoice. Can the retailer still cancel it? |  |
+| Q241 | orders | 2 | new |  | Your feed receives no new events for longer than its retention period. What hap… |  |
+| Q242 | logistics | 1 | new |  | Put the steps to make an SKU sellable from a new warehouse in the right order. |  |
+| Q243 | logistics | 1 | new |  | Match each description to the logistics entity. |  |
+| Q244 | logistics | 1 | new |  | A shopper adds an SKU to the cart but has not placed the order. Is a reservatio… |  |
+| Q245 | logistics | 1 | new |  | An SKU was sold and the order was invoiced. Does VTEX subtract the sold units f… |  |
+| Q246 | logistics | 2 | new |  | Which statements about the lead time of an SKU in a warehouse are correct? |  |
+| Q247 | logistics | 3 | new |  | What is the maximum lead time you can set for an SKU in a warehouse? |  |
+| Q248 | logistics | 2 | new |  | When does an inventory reservation stop being subject to its expiration date? |  |
+| Q249 | logistics | 2 | new |  | An SKU has unlimited inventory enabled in its warehouse. Is it valid for sale? |  |
 
 ## Flashcards
 
 | # | domain | p | status | before | after | why |
 |---|---|---|---|---|---|---|
+| F46 | checkout | 1 | new |  | Practical: you have the orderFormId of a complete cart. Place the order and fin… |  |
+| F47 | payments | 1 | new |  | Practical: your payment connector gets a payment it can only decide later. Walk… |  |
+| F48 | gift | 1 | new |  | Practical: list what an external gift card provider must answer during a purcha… |  |
+| F49 | mkt | 1 | new |  | Practical: an external seller gets an order from a VTEX marketplace. List the c… |  |
+| F50 | orders | 2 | new |  | Practical: configure a hook for order status changes and make your endpoint pas… |  |
+| F51 | logistics | 1 | new |  | Practical: a new store must sell SKU 123 from a new warehouse. Set up the logis… |  |
