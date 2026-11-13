@@ -1,0 +1,115 @@
+{
+  "_": "Test-only learn module for scripts/e2e.mjs. Patched into a copy of the built page, never into src/data.",
+  "module": {
+    "id": "e2e-flow",
+    "d": "payments",
+    "t": "E2E fixture (not content)",
+    "kind": "flow",
+    "nodes": [
+      {
+        "id": "manifest",
+        "label": "Manifest",
+        "L1": "Connector opisuje metody płatności i ustawienia.",
+        "L2": "VTEX czyta manifest przy konfiguracji afiliacji.",
+        "L3": "Demo L3.",
+        "ex": "GET /manifest",
+        "l": ["ppp"]
+      },
+      {
+        "id": "create",
+        "label": "Create payment",
+        "L1": "VTEX wysyła do connectora dane płatności, a connector odpowiada statusem.",
+        "L2": "Status `approved`, `denied` albo `undefined`. Przy `undefined` VTEX czeka na callback i ponawia wywołanie.",
+        "L3": "Demo L3: `undefined` to nie odmowa.",
+        "ex": "POST /payments",
+        "l": ["ppp"]
+      },
+      {
+        "id": "callback",
+        "label": "Callback / retry",
+        "L1": "Connector zgłasza wynik później.",
+        "L2": "Demo L2.",
+        "L3": "Demo L3.",
+        "ex": "callbackUrl",
+        "l": ["ppp"]
+      },
+      {
+        "id": "settle",
+        "label": "Settle",
+        "L1": "VTEX przechwytuje kwotę.",
+        "L2": "Demo L2.",
+        "L3": "Demo L3.",
+        "ex": "POST /payments/{paymentId}/settlements",
+        "l": ["ppp"]
+      },
+      {
+        "id": "cancel",
+        "label": "Cancel",
+        "L1": "VTEX anuluje płatność.",
+        "L2": "Demo L2.",
+        "L3": "Demo L3.",
+        "ex": "POST /payments/{paymentId}/cancellations",
+        "l": ["ppp"]
+      },
+      {
+        "id": "refund",
+        "label": "Refund",
+        "L1": "VTEX zwraca pieniądze.",
+        "L2": "Demo L2.",
+        "L3": "Demo L3.",
+        "ex": "POST /payments/{paymentId}/refunds",
+        "l": ["ppp"]
+      }
+    ],
+    "edges": [
+      ["manifest", "create"],
+      ["create", "callback", "undefined"],
+      ["callback", "settle"],
+      ["callback", "cancel"],
+      ["callback", "refund"]
+    ],
+    "ord": ["manifest", "create", "callback", "settle"],
+    "acc": {
+      "must": [
+        [
+          "Connector implementuje endpointy PPP, a VTEX je woła: `POST /payments` tworzy płatność.",
+          ["e2e-flow.create"],
+          ["ppp"]
+        ],
+        [
+          "Status `undefined` oznacza odpowiedź później, przez `callbackUrl`.",
+          ["e2e-flow.create", "e2e-flow.callback"],
+          ["flows"]
+        ],
+        ["`GET /manifest` opisuje metody płatności connectora.", ["e2e-flow.manifest"], ["ppp"]]
+      ],
+      "prac": [
+        [
+          "Capture: VTEX wysyła settle z kwotą do przechwycenia.",
+          ["e2e-flow.settle"],
+          ["settle"],
+          "POST /payments/{paymentId}/settlements"
+        ],
+        ["Anulowanie zatwierdzonej płatności idzie przez cancellations.", ["e2e-flow.cancel"], ["flows"]]
+      ],
+      "deep": [["Demo punkt głębiej.", ["e2e-flow.callback"], ["ppp"]]]
+    }
+  },
+  "k": {
+    "72": ["e2e-flow.manifest"],
+    "74": ["e2e-flow.create"],
+    "75": ["e2e-flow.create", "e2e-flow.callback"],
+    "79": ["e2e-flow.settle"],
+    "80": ["e2e-flow.cancel"]
+  },
+  "ordQ": {
+    "d": "payments",
+    "r": 2,
+    "q": "E2E: put the steps in order.",
+    "o": ["one", "two", "three", "four"],
+    "e": "E2E.",
+    "l": ["ppp"],
+    "ord": true,
+    "k": ["e2e-flow.callback"]
+  }
+}

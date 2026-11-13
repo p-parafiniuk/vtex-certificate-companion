@@ -29,7 +29,7 @@ The user is on a tight plan. Spend few tokens:
 | `npm run prune` | list branches merged into `origin/main` and the unmerged ones with their PR state; `-- --apply` deletes the merged ones (see `/maintenance`) |
 | `node scripts/apimap-import.mjs <key> "<name>" "<schema file>" <ref>` | add or refresh one API Map entry from vtex/openapi-schemas (keeps hand-set LEGACY/DEPR flags) |
 | `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json`. The lock pins each Q's text, option count, `n` and right options: `validate` fails when the count or `n` changes and warns when the right options change |
-| `npm run e2e` | built page in a real browser: saved progress from `tests/fixtures/progress-main.json` keeps its meaning, and every tab renders at 375/1280, light/dark, PL/EN with no console error or horizontal scroll. Run it before a `feat/*` or content PR. Never regenerate the fixture to make it pass |
+| `npm run e2e` | built page in a real browser (plus a copy with the test-only learn module `tests/fixtures/learn-e2e.json`, which never goes into `src/data`): saved progress from `tests/fixtures/progress-main.json` keeps its meaning, and every tab renders at 375/1280, light/dark, PL/EN with no console error or horizontal scroll. Run it before a `feat/*` or content PR. Never regenerate the fixture to make it pass |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
 | `npm run compare -- <topic>` | mockup vs built page, side by side, into `shots/compare-<topic>-<board>.png`. Needs `design/<topic>/` (see Always show it). Exits 1 on a console error |
 | `npm run shots -- <hash>…` | screenshots of the built page into `shots/` (gitignored) at 375 and 1280 px, light and dark. Exits 1 on a console error. Flags: `--w=375`, `--theme=dark`, `--lang=en`, `--full` |
@@ -61,6 +61,7 @@ Data blocks and how they serialize into the HTML are defined in `scripts/lib.mjs
 - `d` domain key from `domains.json`; `r` round, 1 or 2; `q` question; `o` options; `e` explanation; `l` DOCS keys
 - `n`, optional, at least 2: number of correct answers. **The first `n` options are the correct ones.** Options are shuffled at runtime, so always put the correct answers first.
 - `h`, optional: HTTP codes from `http-names.json`, shown as chips
+- `ord: true`, optional: an ordering question. `o` lists 3 to 7 steps **in the right order**; the runtime shuffles them, the learner reorders (↑ ↓, arrow keys on the handle, or drag), and only the exact order scores (0 or 1). No `n`, no `c`. The saved answer is the option order as shown, not sorted
 - `p`, optional: priority 1 must-have, 2 practice, 3 theory. `k`, optional: `learn.json` keys `<mod>.<node>` this item practises. Both are additive: add them to new items, or in place to old ones without changing their meaning (F takes them too)
 
 **F** (`flashcards.json`): `d, r, lv, q, a, l, h?`. `lv` is the difficulty, 1 to 4: 1 Przypomnij (a fact or definition), 2 Request (one call), 3 Flow (steps in order), 4 Lab (from scratch, with the starting state stated). A `q` starting with `Practical:` makes a hands-on task. The user writes their answer and self-grades it against `a`.

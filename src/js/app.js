@@ -807,7 +807,8 @@
       if (!S.cnt.q && !S.cnt.f && !S.cnt.n) S.cnt = { q: true, f: true, n: true };
       if (raw.v === 2 && raw.ans && typeof raw.ans === "object" && !Array.isArray(raw.ans)) {
         Object.keys(raw.ans).forEach(function (k) {
-          if (Array.isArray(raw.ans[k]) && Q[k]) S.ans[k] = raw.ans[k];
+          if (Array.isArray(raw.ans[k]) && Q[k] && (!Q[k].ord || ordValid(raw.ans[k], Q[k].o.length)))
+            S.ans[k] = raw.ans[k];
         });
       }
       if (Array.isArray(raw.sims)) S.sims = raw.sims;
@@ -1093,6 +1094,15 @@
   /* An answer is right only when the selected set equals the correct set (the first n options). */
   function isRight(i, sel) {
     if (Q[i].c) return mxHits(i, sel) === Q[i].o.length;
+    /* ord: the saved answer is the option order as shown, right only when it is the order of o */
+    if (Q[i].ord)
+      return (
+        Array.isArray(sel) &&
+        sel.length === Q[i].o.length &&
+        sel.every(function (o, pos) {
+          return o === pos;
+        })
+      );
     var n = nRight(Q[i]);
     return (
       Array.isArray(sel) &&
@@ -1431,6 +1441,7 @@
     var rightLetters = [],
       opts = "";
     if (q.c) opts = mxBody(i, sel, reveal);
+    else if (q.ord) opts = ordBody(i, sel, reveal, mode);
     else
       PERM[i].forEach(function (oi, pos) {
         var letter = LET.charAt(pos);
@@ -1477,19 +1488,30 @@
       var word = need > 1 ? L("Poprawne: ", "Right answers: ") : L("Poprawna: ", "Right answer: ");
       var verdict = ok
         ? '<span class="verdict ok">' + L("Dobrze.", "Right.") + "</span>"
-        : q.c
+        : q.ord
           ? '<span class="verdict no">' +
             (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-            L("Trafione wiersze: ", "Rows right: ") +
-            mxHits(i, sel) +
-            " / " +
-            q.o.length +
-            ".</span>"
-          : '<span class="verdict no">' +
-            (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-            word +
-            rightLetters.join(", ") +
-            ".</span>";
+            L("Poprawna kolejność:", "Right order:") +
+            '</span><ol class="ord-ok">' +
+            q.o
+              .map(function (o) {
+                return "<li>" + fmt(o) + "</li>";
+              })
+              .join("") +
+            "</ol>"
+          : q.c
+            ? '<span class="verdict no">' +
+              (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+              L("Trafione wiersze: ", "Rows right: ") +
+              mxHits(i, sel) +
+              " / " +
+              q.o.length +
+              ".</span>"
+            : '<span class="verdict no">' +
+              (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+              word +
+              rightLetters.join(", ") +
+              ".</span>";
       tail =
         '<div class="exp"><p>' +
         verdict +
@@ -1509,7 +1531,7 @@
       tail =
         (S.conf ? confRow(i) : "") +
         '<div class="row"><button type="button" class="btn primary chk"' +
-        (sel.length ? "" : " disabled") +
+        (sel.length || q.ord ? "" : " disabled") +
         ">" +
         L("Sprawdź odpowiedź", "Check answer") +
         "</button></div>";
@@ -1542,12 +1564,19 @@
           (mode === "learn" ? lcBadge(i) : "");
     var how = reveal
       ? ""
-      : q.c
-        ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
-        : '<p class="how">' +
-          L("Zaznacz wszystkie poprawne odpowiedzi", "Select all right answers") +
-          (S.hint ? " <strong>(" + L("poprawnych: ", "right: ") + need + ")</strong>" : "") +
-          ".</p>";
+      : q.ord
+        ? '<p class="how">' +
+          L(
+            "Ułóż kroki w kolejności: przyciski ↑ ↓, strzałki na uchwycie albo przeciągnij.",
+            "Put the steps in order: the ↑ ↓ buttons, arrow keys on the handle, or drag."
+          ) +
+          "</p>"
+        : q.c
+          ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
+          : '<p class="how">' +
+            L("Zaznacz wszystkie poprawne odpowiedzi", "Select all right answers") +
+            (S.hint ? " <strong>(" + L("poprawnych: ", "right: ") + need + ")</strong>" : "") +
+            ".</p>";
 
     return (
       '<article class="q' +
@@ -1983,6 +2012,148 @@
         : '<p class="empty">' + L("Ta kategoria nie ma jeszcze notatek.", "This category has no notes yet.") + "</p>");
     paintNoteProg();
   }
+  /* ---------- Ordering: shared by ord questions and the order exercise in Schematy ---------- */
+  /* The list is reordered in place (a neighbour moves, never the focused item), then ordSync stores the order. */
+  function ordItems(list, reveal, label) {
+    return list
+      .map(function (x, pos) {
+        var t = x[1].replace(/[`*]/g, "");
+        return (
+          '<li class="ord-i' +
+          (reveal ? (x[2] ? " is-right" : " is-wrong") : "") +
+          '" data-o="' +
+          (+x[0] | 0) +
+          '"><span class="ord-n" aria-hidden="true">' +
+          (pos + 1) +
+          "</span>" +
+          (reveal
+            ? ""
+            : '<button type="button" class="ord-h" aria-label="' +
+              esc(label + t) +
+              L(". Strzałki góra i dół przesuwają.", ". Up and down arrows move it.") +
+              '"><span aria-hidden="true">⋮⋮</span></button>') +
+          '<span class="otxt">' +
+          fmt(x[1]) +
+          "</span>" +
+          (reveal
+            ? '<span class="mark">' + (x[2] ? L("na miejscu", "in place") : L("nie tu", "wrong place")) + "</span>"
+            : '<span class="ord-b"><button type="button" class="icn ord-mv" data-d="-1" aria-label="' +
+              esc(L("Wyżej: ", "Up: ") + t) +
+              '">↑</button><button type="button" class="icn ord-mv" data-d="1" aria-label="' +
+              esc(L("Niżej: ", "Down: ") + t) +
+              '">↓</button></span>') +
+          "</li>"
+        );
+      })
+      .join("");
+  }
+  /* A saved order is used only when it is a permutation of the option indexes: storage is not trusted. */
+  function ordValid(sel, n) {
+    var seen = {};
+    return (
+      Array.isArray(sel) &&
+      sel.length === n &&
+      sel.every(function (v) {
+        if (v !== (v | 0) || v < 0 || v >= n || seen[v]) return false;
+        return (seen[v] = true);
+      })
+    );
+  }
+  function ordBody(i, sel, reveal, mode) {
+    var q = Q[i],
+      order = ordValid(sel, q.o.length) ? sel : PERM[i];
+    return (
+      '<ol class="ord" data-i="' +
+      i +
+      '" data-st="' +
+      (mode === "sim" ? "s" : "q") +
+      '">' +
+      ordItems(
+        order.map(function (oi, pos) {
+          return [oi, q.o[oi], oi === pos];
+        }),
+        reveal,
+        L("Krok: ", "Step: ")
+      ) +
+      "</ol>"
+    );
+  }
+  var LORD = Object.create(null);
+  function ordSync(ol) {
+    var arr = [].map.call(ol.querySelectorAll(".ord-i"), function (li, pos) {
+      li.querySelector(".ord-n").textContent = pos + 1;
+      return +li.dataset.o;
+    });
+    var st = ol.dataset.st,
+      i = +ol.dataset.i;
+    if (st === "s" && S.sim && !S.sim.done) {
+      S.sim.ans[i] = arr;
+      save();
+      paintPal();
+    } else if (st === "q") {
+      DRAFT[i] = arr;
+      var chk = ol.closest(".q") && ol.closest(".q").querySelector(".chk");
+      if (chk) chk.disabled = false;
+    } else if (st === "l" && LORD[ol.dataset.m]) LORD[ol.dataset.m].order = arr;
+  }
+  function ordMove(li, d) {
+    var ol = li.parentNode,
+      nb = d < 0 ? li.previousElementSibling : li.nextElementSibling;
+    if (!nb) return false;
+    if (d < 0) ol.insertBefore(nb, li.nextSibling);
+    else ol.insertBefore(nb, li);
+    ordSync(ol);
+    ordSay(li);
+    return true;
+  }
+  function ordSay(li) {
+    var ol = li.parentNode;
+    live(
+      li.querySelector(".otxt").textContent +
+        ": " +
+        L("pozycja ", "position ") +
+        ([].indexOf.call(ol.children, li) + 1) +
+        L(" z ", " of ") +
+        ol.children.length
+    );
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest && ev.target.closest(".ord-mv");
+    if (b) ordMove(b.closest(".ord-i"), +b.dataset.d);
+  });
+  document.addEventListener("keydown", function (ev) {
+    var h = ev.target.closest && ev.target.closest(".ord-h");
+    if (!h || (ev.key !== "ArrowUp" && ev.key !== "ArrowDown")) return;
+    ev.preventDefault();
+    ordMove(h.closest(".ord-i"), ev.key === "ArrowUp" ? -1 : 1);
+  });
+  /* Pointer drag on the handle: the item follows the pointer past each neighbour's middle. */
+  document.addEventListener("pointerdown", function (ev) {
+    var h = ev.target.closest && ev.target.closest(".ord-h");
+    if (!h || ev.button) return;
+    var li = h.closest(".ord-i"),
+      ol = li.parentNode;
+    ev.preventDefault();
+    li.classList.add("is-drag");
+    function mv(e) {
+      var prev = li.previousElementSibling,
+        next = li.nextElementSibling,
+        r;
+      if (prev && e.clientY < (r = prev.getBoundingClientRect()).top + r.height / 2) ol.insertBefore(li, prev);
+      else if (next && e.clientY > (r = next.getBoundingClientRect()).top + r.height / 2) ol.insertBefore(next, li);
+    }
+    function up() {
+      li.classList.remove("is-drag");
+      document.removeEventListener("pointermove", mv);
+      document.removeEventListener("pointerup", up);
+      document.removeEventListener("pointercancel", up);
+      ordSync(ol);
+      ordSay(li);
+    }
+    document.addEventListener("pointermove", mv);
+    document.addEventListener("pointerup", up);
+    document.addEventListener("pointercancel", up);
+  });
   /* ---------- Schematy: the Top→Bottom accordion of the deep knowledge loop ---------- */
   /* Must have opens, W praktyce follows the note fold rule (closed on phones), Głębiej starts closed. */
   var LHEAD = {
@@ -2416,6 +2587,7 @@
           );
         })
         .join("") +
+      lOrder(m) +
       '<p class="how"><span class="lh-p">' +
       L(
         "Najedź lub ustaw fokus: L1. Kliknij lub Enter: przypina i pogłębia. Esc zamyka.",
@@ -2427,6 +2599,112 @@
       "</p>"
     );
   }
+  /* "Ułóż w kolejności": a wrong position counts as a miss on that node, a fully right order as a right answer. */
+  function lOrder(m) {
+    if (!m.ord) return "";
+    var o = LORD[m.id];
+    if (!o)
+      return (
+        '<button type="button" class="btn small lord" aria-expanded="false" data-lo="' +
+        esc(m.id) +
+        '">' +
+        L("Ułóż kroki w kolejności", "Put the steps in order") +
+        " · " +
+        m.ord.length +
+        "</button>"
+      );
+    var names = {};
+    m.nodes.forEach(function (n) {
+      names[n.id] = n.label;
+    });
+    var good = o.res
+      ? o.order.filter(function (x, pos) {
+          return x === pos;
+        }).length
+      : 0;
+    return (
+      '<div class="lordx"><b>' +
+      L("Ułóż kroki w kolejności", "Put the steps in order") +
+      '</b><ol class="ord" data-st="l" data-m="' +
+      esc(m.id) +
+      '">' +
+      ordItems(
+        o.order.map(function (x, pos) {
+          return [x, names[m.ord[x]], x === pos];
+        }),
+        !!o.res,
+        L("Krok: ", "Step: ")
+      ) +
+      '</ol><div class="row">' +
+      (o.res
+        ? '<span class="verdict ' +
+          (good === m.ord.length ? "ok" : "no") +
+          '">' +
+          L("Na miejscu: ", "In place: ") +
+          good +
+          "/" +
+          m.ord.length +
+          '</span><button type="button" class="btn small" data-lo="' +
+          esc(m.id) +
+          '">' +
+          L("Jeszcze raz", "Again") +
+          "</button>" +
+          (good === m.ord.length
+            ? ""
+            : '<p class="how">' +
+              L("Poprawna kolejność:", "Right order:") +
+              '</p><ol class="ord-ok">' +
+              m.ord
+                .map(function (id) {
+                  return "<li>" + esc(names[id]) + "</li>";
+                })
+                .join("") +
+              "</ol>")
+        : '<button type="button" class="btn small primary" data-lok="' +
+          esc(m.id) +
+          '">' +
+          L("Sprawdź kolejność", "Check the order") +
+          "</button>") +
+      "</div></div>"
+    );
+  }
+  document.addEventListener("click", function (ev) {
+    var b = ev.target.closest && ev.target.closest("[data-lo],[data-lok]");
+    if (!b) return;
+    var mid = b.dataset.lo || b.dataset.lok,
+      m = LEARN.filter(function (x) {
+        return x.id === mid;
+      })[0];
+    if (!m || !m.ord) return;
+    if (b.dataset.lo !== undefined) {
+      var idx = m.ord.map(function (_, i) {
+        return i;
+      });
+      var ord = shuffle(idx.slice());
+      /* never start already solved */
+      if (
+        ord.every(function (x, p) {
+          return x === p;
+        })
+      )
+        ord.push(ord.shift());
+      LORD[mid] = { order: ord, res: false };
+      return lPaint(mid, '[data-m="' + mid + '"] .ord-h');
+    }
+    var o = LORD[mid];
+    if (!o || o.res) return;
+    var all = o.order.every(function (x, p) {
+      return x === p;
+    });
+    o.order.forEach(function (x, pos) {
+      var key = mid + "." + m.ord[x];
+      if (x !== pos) lAnswer(key, false);
+      else if (all) lAnswer(key, true);
+    });
+    o.res = true;
+    lRefresh(mid, '[data-lo="' + mid + '"]');
+    renderChips();
+  });
   function lFind(key) {
     var mid = key.split(".")[0],
       nid = key.slice(mid.length + 1),
@@ -2465,19 +2743,30 @@
       k = c && (c.t === "q" ? Q : F)[c.i].k;
     if (!k) return;
     k.forEach(function (key) {
-      if (!LNODE[key]) return;
-      lSet(key, function (st) {
-        if (ok) {
-          st.miss = Math.max(0, st.miss - 1);
-          st.ok = Math.min(2, st.ok + 1);
-          if (st.ok >= 2) st.lv = 3;
-        } else {
-          st.miss++;
-          st.ok = 0;
-          st.lv = lDrop(st.lv);
-        }
-      });
+      if (LNODE[key]) lAnswer(key, ok);
     });
+  }
+  function lAnswer(key, ok) {
+    lSet(key, function (st) {
+      if (ok) {
+        st.miss = Math.max(0, st.miss - 1);
+        st.ok = Math.min(2, st.ok + 1);
+        if (st.ok >= 2) st.lv = 3;
+      } else {
+        st.miss++;
+        st.ok = 0;
+        st.lv = lDrop(st.lv);
+      }
+    });
+  }
+  /* Weak nodes and must-have items come first in Focus and in the exam draw. */
+  function itemPri(it) {
+    var weak =
+      it.k &&
+      it.k.some(function (k) {
+        return LNODE[k] && lWeak(lSt(k));
+      });
+    return (weak ? 0 : 10) + (it.p || 2.5);
   }
   function lRefresh(mid, sel) {
     lPaint(mid, sel);
@@ -2795,8 +3084,9 @@
       return;
     }
     if (ev.target.closest(".chk")) {
+      if (Q[i].ord && !DRAFT[i]) DRAFT[i] = PERM[i].slice();
       if (!DRAFT[i] || !DRAFT[i].length) return;
-      S.ans[i] = DRAFT[i].slice().sort();
+      S.ans[i] = Q[i].ord ? DRAFT[i].slice() : DRAFT[i].slice().sort();
       delete DRAFT[i];
       recordAnswer("q" + (i + 1), isRight(i, S.ans[i]), CONF[i]);
       delete CONF[i];
@@ -2987,11 +3277,11 @@
     });
     var ids = [];
     Object.keys(mix).forEach(function (k) {
-      /* p1 must-have items first, then practice, unrated, theory: the draw stays random within each priority */
+      /* weak nodes, then p1, p2, unrated, p3: the draw stays random within each priority */
       ids = ids.concat(
         shuffle(by[k])
           .sort(function (a, b) {
-            return (Q[a].p || 2.5) - (Q[b].p || 2.5);
+            return itemPri(Q[a]) - itemPri(Q[b]);
           })
           .slice(0, mix[k])
       );
@@ -6022,10 +6312,13 @@
     var list = fBase().filter(function (c) {
       return c.id === cur || (fPass(c) && lcPass(c.id));
     });
-    if (S.fo.shuf)
-      list.sort(function (a, b) {
-        return mix(a.n) - mix(b.n);
-      });
+    /* weak nodes, then must-have items first; without p or k this keeps the old order */
+    list.sort(function (a, b) {
+      return (
+        itemPri((a.t === "q" ? Q : F)[a.i]) - itemPri((b.t === "q" ? Q : F)[b.i]) ||
+        (S.fo.shuf ? mix(a.n) - mix(b.n) : a.n - b.n)
+      );
+    });
     return list;
   }
   function fResume() {
@@ -6742,8 +7035,9 @@
       return;
     }
     if (t.closest(".chk")) {
+      if (Q[i].ord && !DRAFT[i]) DRAFT[i] = PERM[i].slice();
       if (!DRAFT[i] || !DRAFT[i].length) return;
-      S.ans[i] = DRAFT[i].slice().sort();
+      S.ans[i] = Q[i].ord ? DRAFT[i].slice() : DRAFT[i].slice().sort();
       delete DRAFT[i];
       recordAnswer("q" + (i + 1), isRight(i, S.ans[i]), CONF[i]);
       delete CONF[i];

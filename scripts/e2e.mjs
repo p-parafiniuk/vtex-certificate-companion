@@ -4,7 +4,8 @@
    The fixture tests/fixtures/progress-main.json is localStorage recorded on main; never regenerate it to make
    a failure go away, because a failure here means a learner's saved answers changed meaning. */
 import { execSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { ROOT, OUT, loadData } from "./lib.mjs";
@@ -26,11 +27,13 @@ const ok = (cond, name, detail) => {
   if (!cond) fails.push(name);
 };
 
-/* Same rule as isRight() in app.js: exactly n options, all among the first n. */
+/* Same rule as isRight() in app.js: exactly n options, all among the first n; ord: the order of o. */
 const isRight = (q, sel) =>
-  q.c
-    ? sel.length === q.o.length && sel.every(v => q.a[v >> 4] === (v & 15))
-    : sel.length === (q.n || 1) && sel.every(o => o < (q.n || 1));
+  q.ord
+    ? sel.length === q.o.length && sel.every((o, p) => o === p)
+    : q.c
+      ? sel.length === q.o.length && sel.every(v => q.a[v >> 4] === (v & 15))
+      : sel.length === (q.n || 1) && sel.every(o => o < (q.n || 1));
 const st = FX.state;
 for (const i of Object.keys(st.ans))
   ok(
@@ -43,7 +46,7 @@ const { chromium } = await playwright();
 const browser = await chromium.launch();
 const url = pathToFileURL(OUT).href;
 
-async function open(hash, { w = 1280, theme = "light", state, lang } = {}) {
+async function open(hash, { w = 1280, theme = "light", state, lang, src = url } = {}) {
   const page = await browser.newPage({ viewport: { width: w, height: w < 600 ? 812 : 900 }, colorScheme: theme });
   const errs = [];
   page.on("console", m => {
@@ -62,7 +65,7 @@ async function open(hash, { w = 1280, theme = "light", state, lang } = {}) {
     },
     [KEY, state || null, lang || null]
   );
-  await page.goto(url + "#" + hash);
+  await page.goto(src + "#" + hash);
   await page.waitForTimeout(300);
   return { page, errs };
 }
@@ -156,6 +159,80 @@ let lastDraw;
       await page.waitForTimeout(200);
       ok((await page.evaluate(() => location.hash)) === "#pytania-orders", "an area name opens its questions");
     }
+    await page.close();
+  }
+}
+
+/* Schematy: a copy of the page with a test-only learn module (tests/fixtures/learn-e2e.json), since learn.json
+   may be empty on main. Covers render, Ćwicz to, the popover layers, the miss loop, the order exercise, ord. */
+{
+  const LX = JSON.parse(readFileSync(join(ROOT, "tests", "fixtures", "learn-e2e.json"), "utf8"));
+  const qi = D.Q.length;
+  const patch =
+    Object.entries(LX.k)
+      .map(([i, k]) => "Q[" + i + "].k=" + JSON.stringify(k) + ";")
+      .join("") +
+    "Q.push(" +
+    JSON.stringify(LX.ordQ) +
+    ");";
+  const html = readFileSync(OUT, "utf8")
+    .replace(
+      /const LEARN = \[[\s\S]*?\n\];/,
+      () => "const LEARN = [" + JSON.stringify(LX.module).replace(/</g, "\\u003c") + "];"
+    )
+    .replace(/(const F = \[[\s\S]*?\n\];)/, (m0, f) => f + "\n" + patch);
+  /* a fresh private directory, not a fixed name in the shared temp dir */
+  const tmp = join(mkdtempSync(join(tmpdir(), "vtex-drill-e2e-")), "learn.html");
+  writeFileSync(tmp, html);
+  const src = pathToFileURL(tmp).href;
+  for (const [w, theme] of [
+    [375, "dark"],
+    [1280, "light"]
+  ]) {
+    const tag = " (" + w + " " + theme + ")";
+    const { page, errs } = await open("pytania-payments-learn", { w, theme, src });
+    ok(await page.isVisible("#ct-learn"), "Schematy tab shown" + tag);
+    ok((await page.$$(".lacc")).length === 3, "accordion has 3 levels" + tag);
+    await page.click('[data-ln="e2e-flow.create"]');
+    await page.click('[data-lg="e2e-flow.create"]');
+    ok((await page.textContent(".llay .cur")) === "L2", "popover deepens to L2" + tag);
+    await page.click('[data-lx="e2e-flow.create"]');
+    ok(await page.isVisible('[data-ln="e2e-flow.create"].weak'), "Nie łapię marks the step weak" + tag);
+    ok(/słab/.test(await page.textContent('.cat[aria-current="page"] .lm-t')), "side panel counts weak steps" + tag);
+    await page.click('[data-lo="e2e-flow"]');
+    await page.click('[data-lok="e2e-flow"]');
+    ok(/\d\/4/.test(await page.textContent(".lordx .verdict")), "order exercise is checked" + tag);
+    const over = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    await page.click(".lpt [data-lk]");
+    await page.waitForTimeout(200);
+    ok(
+      /^#focus-/.test(await page.evaluate(() => location.hash)) && (await page.isVisible("#fo-k")),
+      "Ćwicz to opens a scoped Focus" + tag
+    );
+    ok(
+      !errs.length && over <= 0,
+      "Schematy without errors or horizontal scroll" + tag,
+      errs.join(" | ") || over + "px"
+    );
+    await page.close();
+  }
+  {
+    const { page, errs } = await open("pytania-payments", { src });
+    const card = '.q[data-i="' + qi + '"]';
+    const order = () => page.$$eval(card + " .ord-i", els => els.map(e => +e.dataset.o));
+    for (let t = 0; t < 4; t++) {
+      const cur = await order();
+      for (let p = cur.indexOf(t); p > t; p--)
+        await page.click(card + " .ord-i:nth-child(" + (p + 1) + ") .ord-mv[data-d='-1']");
+    }
+    await page.click(card + " .chk");
+    const saved = await page.evaluate(k => JSON.parse(localStorage.getItem(k)).ans, KEY);
+    ok(JSON.stringify(saved[qi]) === "[0,1,2,3]", "ord answer is saved in its order", JSON.stringify(saved[qi]));
+    ok(
+      /Dobrze|Right/.test(await page.textContent(card + " .verdict")) && !errs.length,
+      "ord question graded right",
+      errs.join(" | ")
+    );
     await page.close();
   }
 }
