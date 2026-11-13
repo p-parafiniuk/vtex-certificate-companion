@@ -48,7 +48,13 @@ function common(w, x, allowed) {
 
 D.Q.forEach((x, i) => {
   const w = "Q[" + i + "]";
-  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h", "p", "k"]);
+  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h", "p", "k", "ord"]);
+  if (x.ord !== undefined) {
+    /* ord: o is written in the right order, the runtime shuffles it; 0 or 1 point, no n, no matrix */
+    if (x.ord !== true) E(w, "ord is true or left out");
+    if (x.n !== undefined || x.c !== undefined) E(w, "an ord question takes no n and no c");
+    if (!Array.isArray(x.o) || x.o.length < 3 || x.o.length > 7) E(w, "ord needs 3 to 7 steps in o");
+  }
   if (x.c !== undefined) matrix(w, x);
   if (!Array.isArray(x.o) || x.o.length < 2) E(w, "needs at least 2 options");
   else {
@@ -58,7 +64,7 @@ D.Q.forEach((x, i) => {
       markup(w + ".o[" + j + "]", o);
     });
     const n = x.n === undefined ? 1 : x.n;
-    if (x.c === undefined) {
+    if (x.c === undefined && !x.ord) {
       if (x.n !== undefined && x.n < 2) E(w, "n given but < 2 (omit n for single answer)");
       if (!Number.isInteger(n) || n >= x.o.length) E(w, "n=" + n + " must be < options (" + x.o.length + ")");
       if (x.o.length > 7) E(w, "more than 7 options (letters A-G)");

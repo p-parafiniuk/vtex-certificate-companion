@@ -5658,3 +5658,113 @@ div.setrow {
     justify-self: stretch;
   }
 }
+
+/* Ordering: ord questions and "Ułóż kroki w kolejności". The handle drags and takes arrow keys; ↑ ↓ for touch. */
+.ord {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.ord-i {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 4px 6px 4px 10px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.ord-i.is-drag {
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px var(--kshadow);
+}
+.ord-i.is-right {
+  border-color: var(--ok);
+  background: var(--ok-soft);
+}
+.ord-i.is-wrong {
+  border-color: var(--bad);
+  background: var(--bad-soft);
+}
+.ord-n {
+  flex: none;
+  min-width: 1.4em;
+  font: 600 0.85rem var(--f-mono);
+  color: var(--muted);
+}
+.ord-h {
+  flex: none;
+  min-width: 32px;
+  min-height: 40px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  cursor: grab;
+  touch-action: none;
+}
+.ord-h:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+}
+.ord-i .otxt {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ord-b {
+  flex: none;
+  display: flex;
+  gap: 2px;
+}
+.ord-i .mark {
+  flex: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.ord-ok {
+  margin: 6px 0 0;
+  padding-left: 1.4em;
+}
+/* touch has the ↑ ↓ buttons; the drag handle there only costs the step text its width */
+@media (pointer: coarse) {
+  .ord-h {
+    display: none;
+  }
+}
+.lord {
+  justify-self: start;
+  margin-top: 6px;
+}
+.lordx {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+@media (max-width: 760px) {
+  .ord-b .icn,
+  .ord-h {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .lordx .btn,
+  .lord {
+    min-height: 44px;
+  }
+  /* long steps keep most of the row; the arrows drop under the text when they do not fit */
+  .ord-i {
+    flex-wrap: wrap;
+  }
+  .ord-i .otxt {
+    flex: 1 1 0;
+    min-width: 8em;
+  }
+  .ord-b {
+    margin-left: auto;
+  }
+}
