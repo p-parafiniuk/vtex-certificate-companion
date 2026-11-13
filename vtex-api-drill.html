@@ -11525,6 +11525,7 @@ function bootApiMap(root, onNav, embed) {
   var KEY = "vtex-drill-v1";
   var SIM_Q = 36,
     SIM_P = 4,
+    SIM_PP = 2,
     SIM_MIN = 3;
   var TABS = ["pytania", "symulacja", "postep", "http", "api", "graphql", "postman", "egzamin", "ustawienia"];
   /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
@@ -13813,7 +13814,9 @@ function bootApiMap(root, onNav, embed) {
           SIM_MIN +
           "</strong>, i <strong>" +
           SIM_P +
-          " zadania praktyczne</strong> z katas „Practical”. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
+          " zadania praktyczne</strong> z katas „Practical”, każde za 0–" +
+          SIM_PP +
+          " pkt. Widzisz <strong>jedną kartę naraz</strong>, możesz wracać i oznaczać pytania do powrotu. " +
           "Wynik, także per obszar, i wyjaśnienia poznasz po zakończeniu. Zdajesz od <strong>80%</strong>.",
         "I draw <strong>" +
           SIM_Q +
@@ -13823,7 +13826,9 @@ function bootApiMap(root, onNav, embed) {
           SIM_MIN +
           " from every area</strong>, and <strong>" +
           SIM_P +
-          " practical tasks</strong> from the “Practical” katas. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
+          " practical tasks</strong> from the “Practical” katas, 0–" +
+          SIM_PP +
+          " pts each. You see <strong>one card at a time</strong> and can go back and flag questions to revisit. " +
           "You get the score, also per area, and the explanations at the end. The pass mark is <strong>80%</strong>."
       ) +
       "</p>" +
@@ -14212,10 +14217,10 @@ function bootApiMap(root, onNav, embed) {
     m.pr.forEach(function (fi) {
       if (m.self[fi] !== undefined) {
         pSet++;
-        if (m.self[fi]) pOk++;
+        pOk += selfPts(m.self[fi]);
       }
     });
-    var tot = simTot({ s: score, n: nq, pn: m.pr.length, p: pOk, pd: pSet === m.pr.length }),
+    var tot = simTot({ s: score, n: nq, pn: m.pr.length, pp: SIM_PP, p: pOk, pd: pSet === m.pr.length }),
       pass = Math.ceil(tot.n * 0.8),
       ok = tot.k >= pass,
       wait = m.pr.length && pSet < m.pr.length;
@@ -14231,10 +14236,10 @@ function bootApiMap(root, onNav, embed) {
             L(", praktyczne ", ", practical ") +
             pOk +
             " / " +
-            m.pr.length +
+            m.pr.length * SIM_PP +
             L(
-              " według Twojej oceny. Każde zadanie liczy się za 1 punkt.",
-              " by your own grade. Each task counts as 1 point."
+              " pkt według Twojej oceny. Każde zadanie daje 0, 1 albo 2 pkt.",
+              " pts by your own grade. Each task gives 0, 1 or 2 pts."
             ) +
             "</p>"
           : "<p><strong>" +
@@ -14335,16 +14340,25 @@ function bootApiMap(root, onNav, embed) {
               docLinks(f) +
               '<div class="row" role="group" aria-label="' +
               L("Ocena własna", "Self-grade") +
-              '"><button type="button" class="btn small self" data-v="1" aria-pressed="' +
-              (v === true) +
               '">' +
-              L("Zaliczam", "Pass") +
-              "</button>" +
-              '<button type="button" class="btn small self" data-v="0" aria-pressed="' +
-              (v === false) +
-              '">' +
-              L("Nie zaliczam", "Fail") +
-              "</button></div></article>"
+              [
+                [2, L("Zaliczam · 2 pkt", "Pass · 2 pts")],
+                [1, L("Częściowo · 1 pkt", "Partly · 1 pt")],
+                [0, L("Nie · 0 pkt", "Fail · 0 pts")]
+              ]
+                .map(function (o) {
+                  return (
+                    '<button type="button" class="btn small self" data-v="' +
+                    o[0] +
+                    '" aria-pressed="' +
+                    (v !== undefined && selfPts(v) === o[0]) +
+                    '">' +
+                    o[1] +
+                    "</button>"
+                  );
+                })
+                .join("") +
+              "</div></article>"
             );
           })
           .join("");
@@ -14519,7 +14533,7 @@ function bootApiMap(root, onNav, embed) {
     m.timeUp = !!timeUp;
     m.used = Math.min(Date.now(), m.endAt) - m.start;
     simCredit(m);
-    S.sims.unshift({ t: m.start, s: simScore(), n: m.ids.length, pn: m.pr.length });
+    S.sims.unshift({ t: m.start, s: simScore(), n: m.ids.length, pn: m.pr.length, pp: SIM_PP });
     S.sims = S.sims.slice(0, 10);
     ARM = null;
     stopTick();
@@ -14565,22 +14579,22 @@ function bootApiMap(root, onNav, embed) {
       b = t.closest(".self");
       if (b) {
         var fi = +b.closest(".prac").dataset.f,
-          v = b.dataset.v === "1";
-        if (m.self[fi] === v) delete m.self[fi];
+          v = +b.dataset.v;
+        if (m.self[fi] !== undefined && selfPts(m.self[fi]) === v) delete m.self[fi];
         else {
           m.self[fi] = v;
-          if (m.gx && recordAnswer("f" + (fi + 1), v, 0, true)) {
+          if (m.gx && recordAnswer("f" + (fi + 1), v === SIM_PP, 0, true)) {
             m.gx.n++;
-            if (!v) m.gx.w++;
+            if (v < SIM_PP) m.gx.w++;
           }
         }
         var h = S.sims.filter(function (x) {
           return x.t === m.start;
         })[0];
         if (h) {
-          h.p = m.pr.filter(function (x) {
-            return m.self[x] === true;
-          }).length;
+          h.p = m.pr.reduce(function (a, x) {
+            return a + selfPts(m.self[x]);
+          }, 0);
           h.pd = m.pr.every(function (x) {
             return m.self[x] !== undefined;
           });
@@ -15430,7 +15444,11 @@ function bootApiMap(root, onNav, embed) {
   /* Practical tasks join the score once all of them are self-graded; until then only the test part counts. */
   function simTot(x) {
     var n = x.n || SIM_Q;
-    return x.pn && x.pd ? { k: x.s + (x.p || 0), n: n + x.pn } : { k: x.s, n: n };
+    return x.pn && x.pd ? { k: x.s + (x.p || 0), n: n + x.pn * (x.pp || 1) } : { k: x.s, n: n };
+  }
+  /* Older sims stored a boolean self-grade; true was a full pass. */
+  function selfPts(v) {
+    return v === true ? SIM_PP : typeof v === "number" ? v : 0;
   }
   function simPassed(x) {
     var t = simTot(x);
@@ -16090,7 +16108,10 @@ function bootApiMap(root, onNav, embed) {
       "% · " +
       (ok ? L("zdane", "passed") : L("niezdane", "failed")) +
       "</span>" +
-      (x.pn ? L(" · praktyczne ", " · practical ") + (x.pd ? x.p + " / " + x.pn : L("bez oceny", "not graded")) : "") +
+      (x.pn
+        ? L(" · praktyczne ", " · practical ") +
+          (x.pd ? x.p + " / " + x.pn * (x.pp || 1) : L("bez oceny", "not graded"))
+        : "") +
       " · " +
       esc(
         d.toLocaleDateString(L("pl-PL", "en-GB")) +
