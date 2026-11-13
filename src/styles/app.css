@@ -5378,7 +5378,7 @@ div.setrow {
     padding-left: 0;
   }
   .cat:has(.lmeter) {
-    max-width: 220px;
+    max-width: 270px;
   }
   .lpt-a .check {
     min-height: 44px;
