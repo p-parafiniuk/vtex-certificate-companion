@@ -98,7 +98,7 @@
   "tpsite": ["https://help.vtex.com/en/docs/tutorials/how-the-relationship-between-websites-and-business-policies-works","Help Center: Websites and sales channels (binding, priority)"],
   "tpcreate": ["https://help.vtex.com/en/docs/tutorials/creating-a-trade-policy","Help Center: Creating a sales channel"],
   "tpadmin": ["https://help.vtex.com/en/announcements/2026-04-06-creating-sales-channels-via-vtex-admin","Help Center: Creating sales channels via VTEX Admin"],
-  "tpaff": ["https://help.vtex.com/en/docs/tutorials/what-is-the-difference-between-sales-policy-affiliate-and-seller","Help Center: Sales policy vs seller vs affiliate"],
+  "tpaff": ["https://help.vtex.com/en/tutorial/what-is-the-difference-between-sales-policy-affiliate-and-seller","Help Center: Sales policy vs seller vs affiliate"],
   "mskus": ["https://developers.vtex.com/docs/guides/managing-skus","Guide: Managing SKUs"],
   "mprod": ["https://developers.vtex.com/docs/guides/managing-products","Guide: Managing products"],
   "specs": ["https://developers.vtex.com/docs/guides/specifications","Guide: Specifications"],
@@ -162,7 +162,7 @@
   "is_v1mig": ["https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1","Guide: Migrating to Intelligent Search API v1"],
   "sessget": ["https://developers.vtex.com/docs/api-reference/session-manager-api#get-/api/sessions","Session Manager API: Get session"],
   "predroles": ["https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy","Help Center: Predefined roles"],
-  "lmroles": ["https://help.vtex.com/en/tutorial/roles--7HKK5Uau2H6wxE1rH5oRbc","Help Center: Roles"],
+  "lmroles": ["https://help.vtex.com/en/tutorial/predefined-roles--jGDurZKJHvHJS13LnO7Dy","Help Center: Roles"],
   "lmres": ["https://help.vtex.com/en/tutorial/license-manager-resources--3q6ztrC8YynQf6rdc6euk3","Help Center: License Manager resources"],
   "lmrolelist": ["https://developers.vtex.com/docs/api-reference/license-manager-api#get-/api/license-manager/site/pvt/roles/list/paged","License Manager API: Get list of roles"],
   "gqlio": ["https://developers.vtex.com/docs/guides/graphql-in-vtex-io","Guide: GraphQL in VTEX IO"],
@@ -197,5 +197,6 @@
   "rfcifmatch": ["https://www.rfc-editor.org/rfc/rfc9110#section-13.1.1","RFC 9110 §13.1.1: If-Match"],
   "rfccond": ["https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2","RFC 9110 §13.1.2: If-None-Match"],
   "rfcretry": ["https://www.rfc-editor.org/rfc/rfc9110#section-10.2.3","RFC 9110 §10.2.3: Retry-After"],
-  "rfccache": ["https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2","RFC 9111 §5.2.2: Cache-Control response directives"]
+  "rfccache": ["https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2","RFC 9111 §5.2.2: Cache-Control response directives"],
+  "roleslist": ["https://help.vtex.com/en/docs/tutorials/roles","Help Center: User roles"]
 }
