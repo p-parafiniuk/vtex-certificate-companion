@@ -68,6 +68,7 @@
           <button type="button" class="ctab" role="tab" id="ct-pytania" data-sec="pytania" aria-controls="cs-pytania" data-en="Questions">Pytania</button>
           <button type="button" class="ctab" role="tab" id="ct-katas" data-sec="katas" aria-controls="cs-katas" title="Kata to krótkie ćwiczenie do powtarzania: pytanie otwarte albo zadanie praktyczne. Najpierw odpowiadasz sam, potem porównujesz z wzorcem i sam się oceniasz." data-en-title="A kata is a short drill you repeat: an open question or a practical task. You answer on your own first, then compare with the model answer and grade yourself.">Katas</button>
           <button type="button" class="ctab" role="tab" id="ct-info" data-sec="info" aria-controls="cs-info" data-en="Notes">Notatki</button>
+          <button type="button" class="ctab" role="tab" id="ct-learn" data-sec="learn" aria-controls="cs-learn" hidden>Schematy</button>
           <button type="button" class="ctab" role="tab" id="ct-api" data-sec="api" aria-controls="cs-api"><span class="ctab-l" data-en="API paths">Ścieżki API</span><span class="ctab-s">API</span></button>
           <button type="button" class="ctab" role="tab" id="ct-docs" data-sec="docs" aria-controls="cs-docs">Dokumentacja</button>
         </div>
@@ -90,6 +91,7 @@
           <div class="list" id="flist"></div>
         </div>
         <div class="csec" id="cs-info" role="tabpanel" aria-labelledby="ct-info" hidden></div>
+        <div class="csec" id="cs-learn" role="tabpanel" aria-labelledby="ct-learn" hidden></div>
         <div class="csec" id="cs-api" role="tabpanel" aria-labelledby="ct-api" hidden>
           <p class="lead" id="api-lead"></p>
           <div id="catapi"></div>
@@ -303,6 +305,9 @@
 
 /* Labs: level-4 katas run step by step from a stated starting state. Keyed by id, not index: pre = [text, DOCS keys], s = steps {h, in?, do, ok?, keep?, warn?, l}, brk = break-it task, fix = what to check. Polish only. */
 /*@data LABS*/
+
+/* Deep knowledge loop: modules {id, d, t, kind, nodes, edges, ord?, acc: {must, prac, deep}}; acc points are [text, k, DOCS, ex?]. Polish only. */
+/*@data LEARN*/
 
 /*@data Q*/
 
