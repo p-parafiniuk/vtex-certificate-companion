@@ -27,7 +27,10 @@ const ok = (cond, name, detail) => {
 };
 
 /* Same rule as isRight() in app.js: exactly n options, all among the first n. */
-const isRight = (q, sel) => sel.length === (q.n || 1) && sel.every(o => o < (q.n || 1));
+const isRight = (q, sel) =>
+  q.c
+    ? sel.length === q.o.length && sel.every(v => q.a[v >> 4] === (v & 15))
+    : sel.length === (q.n || 1) && sel.every(o => o < (q.n || 1));
 const st = FX.state;
 for (const i of Object.keys(st.ans))
   ok(
@@ -121,8 +124,10 @@ let lastDraw;
 {
   const ans = {};
   lastDraw.forEach(i => {
-    const n = D.Q[i].n || 1;
-    ans[i] = D.Q[i].d === "orders" ? [n] : [...Array(n).keys()];
+    const q = D.Q[i],
+      n = q.n || 1;
+    if (q.c) ans[i] = q.d === "orders" ? [(q.a[0] + 1) % q.c.length] : q.a.map((c, r) => r * 16 + c);
+    else ans[i] = q.d === "orders" ? [n] : [...Array(n).keys()];
   });
   const nOrders = lastDraw.filter(i => D.Q[i].d === "orders").length;
   const now = Date.now();

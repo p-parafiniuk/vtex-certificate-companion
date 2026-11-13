@@ -44,7 +44,8 @@ function common(w, x, allowed) {
 
 D.Q.forEach((x, i) => {
   const w = "Q[" + i + "]";
-  common(w, x, ["d", "r", "q", "o", "e", "l", "n", "h"]);
+  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h"]);
+  if (x.c !== undefined) matrix(w, x);
   if (!Array.isArray(x.o) || x.o.length < 2) E(w, "needs at least 2 options");
   else {
     if (new Set(x.o).size !== x.o.length) E(w, "duplicate options");
@@ -53,13 +54,33 @@ D.Q.forEach((x, i) => {
       markup(w + ".o[" + j + "]", o);
     });
     const n = x.n === undefined ? 1 : x.n;
-    if (x.n !== undefined && x.n < 2) E(w, "n given but < 2 (omit n for single answer)");
-    if (!Number.isInteger(n) || n >= x.o.length) E(w, "n=" + n + " must be < options (" + x.o.length + ")");
-    if (x.o.length > 7) E(w, "more than 7 options (letters A-G)");
+    if (x.c === undefined) {
+      if (x.n !== undefined && x.n < 2) E(w, "n given but < 2 (omit n for single answer)");
+      if (!Number.isInteger(n) || n >= x.o.length) E(w, "n=" + n + " must be < options (" + x.o.length + ")");
+      if (x.o.length > 7) E(w, "more than 7 options (letters A-G)");
+    }
+    if (x.c === undefined && x.a !== undefined) E(w, "a is only for matrix questions (with c)");
   }
   if (!isStr(x.e)) E(w, "empty explanation e");
   else markup(w + ".e", x.e);
 });
+
+/* Matrix: o are rows, c the columns, a[row] the right column. Saved answers store row * 16 + column. */
+function matrix(w, x) {
+  if (x.n !== undefined) E(w, "matrix question takes no n");
+  if (!Array.isArray(x.c) || x.c.length < 2 || x.c.length > 5) return E(w, "c must list 2 to 5 columns");
+  if (new Set(x.c).size !== x.c.length) E(w, "duplicate columns");
+  x.c.forEach((c, j) => {
+    if (!isStr(c)) E(w, "empty column " + j);
+    markup(w + ".c[" + j + "]", c);
+  });
+  if (!Array.isArray(x.o) || x.o.length < 3 || x.o.length > 6) E(w, "matrix needs 3 to 6 rows in o");
+  if (!Array.isArray(x.a) || !Array.isArray(x.o) || x.a.length !== x.o.length)
+    return E(w, "a must give one column index per row");
+  x.a.forEach((v, j) => {
+    if (!Number.isInteger(v) || v < 0 || v >= x.c.length) E(w, "a[" + j + "] is not a column index");
+  });
+}
 
 D.F.forEach((x, i) => {
   const w = "F[" + i + "]";
@@ -436,6 +457,7 @@ const now = {
   F: D.F.map(x => hash(x.q))
 };
 function rightHash(x) {
+  if (x.c) return hash(JSON.stringify([x.c, x.a]));
   return hash((x.o || []).slice(0, x.n || 1).join("\n"));
 }
 function shape(old) {
@@ -467,7 +489,7 @@ function shape(old) {
 function quality(base) {
   const fresh = D.Q.slice(base);
   fresh.forEach((x, k) => {
-    if (!Array.isArray(x.o) || x.o.length < 2) return;
+    if (!Array.isArray(x.o) || x.o.length < 2 || x.c) return;
     const L = optLens(x);
     if (L.right > L.wrong * 1.5)
       W("Q[" + (base + k) + "]", "right option is much longer than every distractor; even out the lengths");

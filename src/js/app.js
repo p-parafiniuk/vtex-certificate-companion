@@ -1056,6 +1056,7 @@
   }
   /* An answer is right only when the selected set equals the correct set (the first n options). */
   function isRight(i, sel) {
+    if (Q[i].c) return mxHits(i, sel) === Q[i].o.length;
     var n = nRight(Q[i]);
     return (
       Array.isArray(sel) &&
@@ -1063,6 +1064,79 @@
       sel.every(function (o) {
         return o < n;
       })
+    );
+  }
+  /* Matrix answers store row * 16 + column, one entry per row. */
+  function mxHits(i, sel) {
+    var q = Q[i],
+      seen = {};
+    if (!Array.isArray(sel)) return 0;
+    return sel.filter(function (v) {
+      var r = v >> 4;
+      if (seen[r] || q.a[r] !== (v & 15)) return false;
+      return (seen[r] = true);
+    }).length;
+  }
+  function mxBody(i, sel, reveal) {
+    var q = Q[i],
+      k = q.c.length,
+      head = q.c
+        .map(function (c) {
+          return '<span class="mx-h">' + fmt(c) + "</span>";
+        })
+        .join("");
+    var rows = PERM[i]
+      .map(function (r, pos) {
+        var id = "mx-" + i + "-" + r,
+          row = "",
+          ok = true;
+        q.c.forEach(function (c, ci) {
+          var v = r * 16 + ci,
+            on = sel.indexOf(v) > -1,
+            good = q.a[r] === ci,
+            cls = "opt mx-c";
+          if (on && !good) ok = false;
+          if (good && !on) ok = false;
+          if (reveal) cls += good && on ? " is-right" : good ? " is-missed" : on ? " is-wrong" : "";
+          else if (on) cls += " is-picked";
+          row +=
+            '<button type="button" role="radio" class="' +
+            cls +
+            '" data-o="' +
+            v +
+            '"' +
+            (reveal ? " disabled" : "") +
+            ' aria-checked="' +
+            on +
+            '"><span class="mx-dot" aria-hidden="true"></span><span class="mx-l">' +
+            fmt(c) +
+            "</span></button>";
+        });
+        return (
+          '<div class="mx-r' +
+          (reveal ? (ok ? " is-ok" : " is-no") : "") +
+          '" role="radiogroup" aria-labelledby="' +
+          id +
+          '"><p class="mx-t" id="' +
+          id +
+          '"><span class="let">' +
+          LET.charAt(pos) +
+          "</span><span>" +
+          fmt(q.o[r]) +
+          '</span></p><div class="mx-cs">' +
+          row +
+          "</div></div>"
+        );
+      })
+      .join("");
+    return (
+      '<div class="mx" style="--k:' +
+      k +
+      '"><div class="mx-hd" aria-hidden="true"><span></span><span class="mx-cs">' +
+      head +
+      "</span></div>" +
+      rows +
+      "</div>"
     );
   }
   function inSet(x) {
@@ -1320,44 +1394,46 @@
     sel = sel || [];
     var rightLetters = [],
       opts = "";
-    PERM[i].forEach(function (oi, pos) {
-      var letter = LET.charAt(pos);
-      var on = sel.indexOf(oi) > -1,
-        good = oi < need;
-      var cls = "opt",
-        mark = "";
-      if (good) rightLetters.push(letter);
-      if (reveal) {
-        if (good && on) {
-          cls += " is-right";
-          mark = '<span class="mark">' + L("dobrze", "right") + "</span>";
-        } else if (good) {
-          cls += " is-missed";
-          mark = '<span class="mark">' + L("pominięta", "missed") + "</span>";
+    if (q.c) opts = mxBody(i, sel, reveal);
+    else
+      PERM[i].forEach(function (oi, pos) {
+        var letter = LET.charAt(pos);
+        var on = sel.indexOf(oi) > -1,
+          good = oi < need;
+        var cls = "opt",
+          mark = "";
+        if (good) rightLetters.push(letter);
+        if (reveal) {
+          if (good && on) {
+            cls += " is-right";
+            mark = '<span class="mark">' + L("dobrze", "right") + "</span>";
+          } else if (good) {
+            cls += " is-missed";
+            mark = '<span class="mark">' + L("pominięta", "missed") + "</span>";
+          } else if (on) {
+            cls += " is-wrong";
+            mark = '<span class="mark">' + L("błędna", "wrong") + "</span>";
+          }
         } else if (on) {
-          cls += " is-wrong";
-          mark = '<span class="mark">' + L("błędna", "wrong") + "</span>";
+          cls += " is-picked";
         }
-      } else if (on) {
-        cls += " is-picked";
-      }
-      opts +=
-        '<button type="button" role="checkbox" class="' +
-        cls +
-        '" data-o="' +
-        oi +
-        '"' +
-        (reveal ? " disabled" : "") +
-        ' aria-checked="' +
-        on +
-        '"><span class="let">' +
-        letter +
-        '</span><span class="otxt">' +
-        fmt(q.o[oi]) +
-        "</span>" +
-        mark +
-        "</button>";
-    });
+        opts +=
+          '<button type="button" role="checkbox" class="' +
+          cls +
+          '" data-o="' +
+          oi +
+          '"' +
+          (reveal ? " disabled" : "") +
+          ' aria-checked="' +
+          on +
+          '"><span class="let">' +
+          letter +
+          '</span><span class="otxt">' +
+          fmt(q.o[oi]) +
+          "</span>" +
+          mark +
+          "</button>";
+      });
 
     var tail = "";
     if (reveal) {
@@ -1365,11 +1441,19 @@
       var word = need > 1 ? L("Poprawne: ", "Right answers: ") : L("Poprawna: ", "Right answer: ");
       var verdict = ok
         ? '<span class="verdict ok">' + L("Dobrze.", "Right.") + "</span>"
-        : '<span class="verdict no">' +
-          (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-          word +
-          rightLetters.join(", ") +
-          ".</span>";
+        : q.c
+          ? '<span class="verdict no">' +
+            (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+            L("Trafione wiersze: ", "Rows right: ") +
+            mxHits(i, sel) +
+            " / " +
+            q.o.length +
+            ".</span>"
+          : '<span class="verdict no">' +
+            (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+            word +
+            rightLetters.join(", ") +
+            ".</span>";
       tail =
         '<div class="exp"><p>' +
         verdict +
@@ -1422,10 +1506,12 @@
           (mode === "learn" ? lcBadge(i) : "");
     var how = reveal
       ? ""
-      : '<p class="how">' +
-        L("Zaznacz wszystkie poprawne odpowiedzi", "Select all right answers") +
-        (S.hint ? " <strong>(" + L("poprawnych: ", "right: ") + need + ")</strong>" : "") +
-        ".</p>";
+      : q.c
+        ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
+        : '<p class="how">' +
+          L("Zaznacz wszystkie poprawne odpowiedzi", "Select all right answers") +
+          (S.hint ? " <strong>(" + L("poprawnych: ", "right: ") + need + ")</strong>" : "") +
+          ".</p>";
 
     return (
       '<article class="q' +
@@ -1491,6 +1577,15 @@
   function toggleOpt(btn, list) {
     var o = +btn.dataset.o,
       at = list.indexOf(o);
+    if (btn.classList.contains("mx-c")) {
+      for (var j = list.length - 1; j > -1; j--) if (list[j] >> 4 === o >> 4) list.splice(j, 1);
+      list.push(o);
+      btn.parentNode.querySelectorAll(".mx-c").forEach(function (b) {
+        b.classList.toggle("is-picked", b === btn);
+        b.setAttribute("aria-checked", b === btn);
+      });
+      return;
+    }
     if (at > -1) list.splice(at, 1);
     else list.push(o);
     btn.classList.toggle("is-picked", at < 0);
@@ -1980,6 +2075,20 @@
   /* Esc dismisses a badge tooltip, the hovered one too (WCAG 1.4.13), until another badge is hovered or focused.
      Focus stays where it is, so a keyboard user keeps their place. */
   var tipOff = null;
+  /* Arrow keys move along one matrix row, like a native radio group. */
+  document.addEventListener(
+    "keydown",
+    function (ev) {
+      var b = ev.target.closest && ev.target.closest(".mx-c");
+      if (!b || ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].indexOf(ev.key) < 0) return;
+      var all = [].slice.call(b.parentNode.querySelectorAll(".mx-c")),
+        at = all.indexOf(b) + (ev.key === "ArrowLeft" || ev.key === "ArrowUp" ? -1 : 1);
+      ev.preventDefault();
+      ev.stopPropagation();
+      all[(at + all.length) % all.length].focus();
+    },
+    true
+  );
   document.addEventListener("keydown", function (ev) {
     if (ev.key !== "Escape") return;
     var b = $("#gx-badges .badge:hover") || $("#gx-badges .badge:focus");
@@ -6096,7 +6205,7 @@
       var at = k.length === 1 ? "abcde".indexOf(k.toLowerCase()) : -1;
       if (at < 0 && k >= "1" && k <= "5") at = +k - 1;
       if (at > -1) {
-        var o = document.querySelectorAll("#fo-stage .opt")[at];
+        var o = document.querySelectorAll("#fo-stage .opt:not(.mx-c)")[at];
         if (o && !o.disabled) {
           ev.preventDefault();
           o.click();
