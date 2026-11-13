@@ -603,6 +603,7 @@ function quality(base) {
   fresh.forEach((x, k) => {
     if (!Array.isArray(x.o) || x.o.length < 2 || x.c) return;
     const L = optLens(x);
+    if (!x.k && !x.p) W("Q[" + (base + k) + "]", "no k and no p: link the item to a learn node or give it a priority");
     if (L.right > L.wrong * 1.5)
       W("Q[" + (base + k) + "]", "right option is much longer than every distractor; even out the lengths");
   });

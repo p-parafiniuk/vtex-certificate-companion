@@ -17,7 +17,8 @@ const HOOKS = [
   ["code", /\b[1-5]\d\d\b/],
   [
     "scenario",
-    /\b(your|you|a merchant|a store|an integration|a seller|a developer|the store)\b.*\b(gets?|receives?|needs?|wants?|calls?|sends?|returns?)\b/i
+    /* a second-person stem or an actor that does something: "You set…", "A shopper enters…" */
+    /^(you|your)\b|^(A|An|Two|Three|The)\s[^.?]{0,60}\b(is|are|has|have|gets?|needs?|wants?|calls?|sends?|returns?|receives?|decides?|places?|enters?|imports?|uses?|consumes?|configures?|moves?|asks?|does|shares?|stores?|adds?)\b|\byou\b|\b(your|you|a merchant|a store|an integration|a seller|a developer|the store)\b.*\b(gets?|receives?|needs?|wants?|calls?|sends?|returns?)\b/i
   ],
   ["task", /^Practical:/]
 ];
