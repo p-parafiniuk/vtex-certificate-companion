@@ -576,7 +576,8 @@ function shape(old) {
     const [, len, n, rh] = e.split("|"),
       x = D.Q[i];
     if (!x || len === undefined) return;
-    if (+len !== x.o.length || +n !== (x.n || 1))
+    /* Options appended at the end keep every saved index valid; fewer options or a new n do not. */
+    if (+len > x.o.length || +n !== (x.n || 1) || ((x.c || x.ord) && +len !== x.o.length))
       E(
         "Q[" + i + "]",
         "options or n changed since lock (" +
@@ -587,7 +588,7 @@ function shape(old) {
           x.o.length +
           "|" +
           (x.n || 1) +
-          "). Saved answers point at option indexes: keep the count, n and the right ones first, or append a new question."
+          "). Saved answers point at option indexes: keep n and the right ones first, only append options at the end, or append a new question."
       );
     else if (rh && rh !== rightHash(x))
       W(
