@@ -5651,8 +5651,8 @@ div.setrow {
   .lpop-a .btn {
     flex: 1;
   }
-  .lrow.many .lnode small {
-    display: none;
+  .lrow.many {
+    grid-template-columns: minmax(0, 1fr);
   }
   .lchk {
     justify-self: stretch;

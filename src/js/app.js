@@ -2119,7 +2119,11 @@
       '">' +
       esc(m.t) +
       "</h3>" +
-      '<div class="lmod-b"><div class="lmod-acc">' +
+      '<div class="lmod-b"><div class="ldia" id="ld-' +
+      esc(m.id) +
+      '">' +
+      lDiagram(m) +
+      '</div><div class="lmod-acc">' +
       LLV.map(function (f, i) {
         var pts = m.acc[f] || [];
         if (!pts.length) return "";
@@ -2153,10 +2157,6 @@
           "</ul></details>"
         );
       }).join("") +
-      '</div><div class="ldia" id="ld-' +
-      esc(m.id) +
-      '">' +
-      lDiagram(m) +
       "</div></div></section>"
     );
   }
@@ -2213,6 +2213,10 @@
   var LPOP = Object.create(null);
   function lSt(key) {
     return S.learn.n[key] || { lv: 0, miss: 0, seen: 0, ok: 0 };
+  }
+  /* One miss takes a mastered node back to "understood", not to the start: a slip is not forgetting. */
+  function lDrop(lv) {
+    return lv >= 3 ? 2 : Math.min(lv, 1);
   }
   function lWeak(st) {
     return st.miss > 0 && st.lv < 3;
@@ -2470,7 +2474,7 @@
         } else {
           st.miss++;
           st.ok = 0;
-          st.lv = Math.min(st.lv, 1);
+          st.lv = lDrop(st.lv);
         }
       });
     });
@@ -2523,7 +2527,7 @@
       lSet(key, function (x) {
         x.miss++;
         x.ok = 0;
-        x.lv = Math.min(x.lv, 1);
+        x.lv = lDrop(x.lv);
       });
       if (pop) pop.lv = Math.max(pop.lv, 2);
       return lRefresh(mid, '[data-lg="' + key + '"],[data-lx="' + key + '"]');
