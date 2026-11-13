@@ -2074,7 +2074,14 @@
       '"><div class="lpt-t">' +
       fmt(pt[0]) +
       (pt[3] ? '<code class="lpt-ex">' + esc(pt[3]) + "</code>" : "") +
-      docLinks({ l: pt[2] }) +
+      /* one quiet source line per point: the full docLinks row (with "Czytaj tutaj") doubled each point's height */
+      '<span class="lpt-doc">' +
+      pt[2]
+        .map(function (k) {
+          return '<a href="' + esc(DOCS[k][0]) + '" target="_blank" rel="noopener">' + esc(DOCS[k][1]) + " ↗</a>";
+        })
+        .join(" · ") +
+      "</span>" +
       '</div><div class="lpt-a">' +
       (n
         ? '<button type="button" class="btn small primary" data-lk="' +
@@ -2094,7 +2101,10 @@
       esc(key) +
       '"' +
       (on ? " checked" : "") +
-      "> " +
+      ' aria-label="' +
+      L("Umiem: ", "Known: ") +
+      esc(pt[0].replace(/[`*]/g, "")) +
+      '"> ' +
       L("Umiem", "Known") +
       "</label></div></li>"
     );
@@ -2169,8 +2179,8 @@
     el.innerHTML =
       '<p class="lead">' +
       L(
-        "Od najważniejszego: <strong>Must have</strong>, potem <strong>W praktyce</strong> i <strong>Głębiej</strong>. Każdy punkt ma <strong>Ćwicz to</strong>: od razu dostajesz pytania do niego w trybie Focus.",
-        "Most important first: <strong>Must have</strong>, then <strong>In practice</strong> and <strong>Deeper</strong>. Every point has <strong>Practise it</strong>: you get its questions in Focus mode right away."
+        "Od najważniejszego. <strong>Ćwicz to</strong> od razu daje pytania do punktu w trybie Focus.",
+        "Most important first. <strong>Practise it</strong> gives you the point's questions in Focus mode right away."
       ) +
       "</p>" +
       (mods.length
@@ -2198,13 +2208,17 @@
     var keys = b.dataset.lk.split(" "),
       list = lCards(keys);
     if (!list.length) return;
+    var w = b.dataset.lt.split(/\s+/);
     FOC.k = keys;
-    FOC.kt = b.dataset.lt;
+    FOC.kt = w.slice(0, 5).join(" ") + (w.length > 5 ? "…" : "");
     S.fo.deck = "all";
     S.fo.flt = "all";
     S.fo.dom = "all";
     save();
     go({ tab: "focus", id: list[0].id });
+    /* keyboard users land on the chip that names the deck, not on <body> */
+    var fk = $("#fo-k");
+    if (fk) fk.focus();
   });
   function renderCatApi(d) {
     var list = CATMAP[d].api;
@@ -6279,7 +6293,10 @@
   $("#focusroot").addEventListener("click", function (ev) {
     if (ev.target.closest("#fo-k")) {
       FOC.k = null;
-      return refocus();
+      refocus();
+      var dk = $("#fo-deck");
+      if (dk) dk.focus();
+      return;
     }
     var t = ev.target,
       b;
