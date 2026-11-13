@@ -5413,3 +5413,248 @@ div.setrow {
   background: none;
   opacity: 0.85;
 }
+
+/* Schematy: the diagram. Nodes are buttons in rows (one row per step, branches side by side); the L1 tooltip
+   is CSS only, the pinned popover sits in the flow under its row, so it never leaves a 375 px screen. */
+/* Two columns only when the module itself is wide: at 1280 the category column is ~630 px, too narrow for both. */
+.lmod {
+  container-type: inline-size;
+}
+.lmod-b {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+@container (min-width: 900px) {
+  .lmod-b {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.lmod-acc {
+  display: grid;
+  gap: 8px;
+}
+.ldia {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+.ldia-h {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.92rem;
+}
+.ldia-h span {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.ldia > .meter {
+  flex: none;
+  height: 6px;
+  margin-bottom: 6px;
+}
+.ldia > .meter i {
+  background: var(--ok);
+}
+.lrow {
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  gap: 6px;
+}
+.lwrap {
+  position: relative;
+  display: grid;
+}
+.lnode:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+.lnode {
+  min-height: 52px;
+  display: grid;
+  gap: 2px;
+  align-content: center;
+  text-align: left;
+  padding: 8px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.lnode b {
+  font-size: 0.92rem;
+}
+.lnode small {
+  font: 0.72rem var(--f-mono);
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.lnode:hover {
+  border-color: var(--muted);
+}
+.lnode.on {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.lnode.weak {
+  border: 2px solid var(--accent);
+  background: var(--accent-soft);
+}
+.lnode.done {
+  border-color: var(--ok);
+}
+.lbad,
+.lok {
+  justify-self: start;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 99px;
+  padding: 1px 7px;
+}
+.lbad {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.lok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+.ltip {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  top: calc(100% + 6px);
+  width: max(100%, 220px);
+  max-width: min(320px, calc(100vw - 48px));
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 8px 24px var(--kshadow);
+  font-size: 0.84rem;
+  font-weight: 400;
+  line-height: 1.45;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+.lrow .lwrap:last-child:not(:first-child) .ltip {
+  left: auto;
+  right: 0;
+}
+.lwrap:hover .ltip,
+.lnode:focus-visible + .ltip {
+  opacity: 1;
+  visibility: visible;
+}
+.lh-t {
+  display: none;
+}
+@media (hover: none) {
+  .lh-p {
+    display: none;
+  }
+  .lh-t {
+    display: inline;
+  }
+  .lwrap:hover .ltip {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+.larr {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.lel {
+  font: 0.75rem var(--f-mono);
+  background: var(--code);
+  border-radius: 4px;
+  padding: 0 5px;
+}
+.lpop {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 12px;
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px var(--kshadow);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.lpop p {
+  margin: 0;
+}
+.lpop p.cur {
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+}
+.llay {
+  display: flex;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.llay span {
+  border: 1px dashed var(--line);
+  border-radius: 99px;
+  padding: 2px 8px;
+  color: var(--muted);
+}
+.llay .past {
+  border-style: solid;
+  background: var(--code);
+  color: var(--ink);
+}
+.llay .cur {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.lpop-a {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.lpop-a .lu {
+  color: var(--ok);
+}
+.lpop-a .lx {
+  color: var(--bad);
+}
+.lpop-a .lc {
+  margin-left: auto;
+}
+@media (max-width: 760px) {
+  .lnode,
+  .lpop .btn {
+    min-height: 44px;
+  }
+  .lpop-a .btn {
+    align-self: stretch;
+  }
+  .lpop .icn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .lpop-a .btn {
+    flex: 1;
+  }
+  .lrow.many .lnode small {
+    display: none;
+  }
+  .lchk {
+    justify-self: stretch;
+  }
+}
