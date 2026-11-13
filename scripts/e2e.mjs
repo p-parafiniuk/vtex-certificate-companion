@@ -130,6 +130,7 @@ let lastDraw;
     const q = D.Q[i],
       n = q.n || 1;
     if (q.c) ans[i] = q.d === "orders" ? [(q.a[0] + 1) % q.c.length] : q.a.map((c, r) => r * 16 + c);
+    else if (q.ord) ans[i] = [...q.o.keys()].map((k, p, a) => (q.d === "orders" ? a[(p + 1) % a.length] : k));
     else ans[i] = q.d === "orders" ? [n] : [...Array(n).keys()];
   });
   const nOrders = lastDraw.filter(i => D.Q[i].d === "orders").length;
