@@ -35,7 +35,8 @@ export const BLOCKS = {
   GQL: { file: "data/graphql.json", keys: "json", layout: "inline" },
   PM: { file: "data/postman.json", keys: "json", layout: "inline" },
   EXAM: { file: "data/examday.json", keys: "json", layout: "inline" },
-  LABS: { file: "data/labs.json", keys: "json", layout: "lines", indent: " " }
+  LABS: { file: "data/labs.json", keys: "json", layout: "lines", indent: " " },
+  LEARN: { file: "data/learn.json", keys: "json", layout: "lines", indent: " " }
 };
 
 export const MARKER = /^\s*(?:<!--|\/\*)\s*@(include|data)\s+(\S+)\s*(?:-->|\*\/)\s*$/;
@@ -121,4 +122,18 @@ export function loadData() {
   const d = {};
   for (const k of Object.keys(BLOCKS)) if (!BLOCKS[k].images) d[k] = loadBlock(k);
   return d;
+}
+
+/* Deep knowledge loop: which Q/F practise each "mod.node" key (Q/F field k). Shared by validate and stats. */
+export const LEARN_DOMS = ["all", "http"];
+export const LEARN_WORDS = { L1: 25, L2: 40, L3: 30 };
+export function learnCoverage(D) {
+  const cov = {};
+  [
+    ["Q", D.Q],
+    ["F", D.F]
+  ].forEach(([n, arr]) =>
+    arr.forEach((x, i) => (Array.isArray(x.k) ? x.k : []).forEach(k => (cov[k] = cov[k] || []).push(n + i)))
+  );
+  return cov;
 }

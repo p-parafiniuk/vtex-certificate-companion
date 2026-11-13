@@ -23,6 +23,7 @@ Start the `drill` launch config. For each tab (Pytania, Symulacja, Fiszki, Post�
 
 ## 3. Report, then change
 - Before changing a screen, show it as a Claude Design mockup (`CLAUDE.md` › Always show it) and wait for the user's go.
+- **A/B, required for any UI change**: before code, build two variants (A and B) of the changed screens in Claude Design, each at 390 px dark and desktop light, with the key interaction state visible (open popover, open accordion). Name the variants by what differs, give your pick and why, then ask the user to choose. Save the choice in `design/<topic>/ab.json` as `{"pick": "B", "why": "…", "date": "YYYY-MM-DD"}`. No UI code before that file exists. `compare.json` entries take `variant`, so `npm run compare -- <topic>` can shoot both (without `hash` it shoots the mockup only).
 - First give a short prioritised list: issue, where it is (`src/...:line`), why it matters for studying, and the proposed fix. Group it into must, should and nice.
 - Implement what the user approves. Use tokens only, change dark mode alongside light, follow the existing ES5 style, and do not add libraries.
 - After the changes, run `npm run compare -- <topic>` against the mockup (`CLAUDE.md` › Always show it), list every difference, fix it or say why it stays, and send the compare images. Only then call it done.

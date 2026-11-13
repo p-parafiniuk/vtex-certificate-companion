@@ -31,6 +31,8 @@ for (const f of names) {
   if (/^src\/js\//.test(f)) files["ui-reviewer"].push(f);
 }
 if (files["fact-checker"].length) reasons["fact-checker"].push("content changed");
+if (names.has("src/data/learn.json"))
+  reasons["fact-checker"].push("learn modules changed: run /deepen (L1-L3 against their DOCS)");
 if (files["ui-reviewer"].length) reasons["ui-reviewer"].push("styles, markup or render code changed");
 
 /* security only when the change touches a sink, a source of untrusted input, or the page head */

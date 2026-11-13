@@ -9,6 +9,8 @@
    top: scrolled to the top of the viewport, then by dy.
    storage: an object put into localStorage before the app boots, { "<key>": <JSON value> }, for states no
    click reaches (a finished simulation, saved progress).
+   variant: an A/B entry ("A", "B"). Its artboard is <Variant>-<Board>.dc.html and its files are named
+   <variant>-<board>; without hash it is shot alone, the A/B step before any code (see /feature, /ux).
    Writes shots/design-<board>.png, shots/app-<board>.png and shots/compare-<topic>-<board>.png.
    Exits 1 on a missing board or a console error on either side. */
 import { execSync } from "node:child_process";
@@ -72,18 +74,23 @@ async function open(url, s, label, storage) {
 }
 
 for (const s of specs) {
-  const board = join(dir, s.board + ".dc.html");
+  const name = s.variant ? s.variant + "-" + s.board : s.board;
+  const board = join(dir, name + ".dc.html");
   if (!existsSync(board)) {
-    console.error(`compare: ${s.board}.dc.html not in design/${topic}`);
+    console.error(`compare: ${name}.dc.html not in design/${topic}`);
     errors++;
     continue;
   }
-  const d = await open(pathToFileURL(board).href, s, "design " + s.board);
-  const df = join(shots, `design-${s.board}.png`);
+  const d = await open(pathToFileURL(board).href, s, "design " + name);
+  const df = join(shots, `design-${name}.png`);
   await d.screenshot({ path: df });
   await d.close();
+  if (!s.hash) {
+    console.log("design", df.slice(ROOT.length + 1));
+    continue;
+  }
 
-  const a = await open(pathToFileURL(OUT).href + "#" + s.hash, s, "app " + s.board, s.storage);
+  const a = await open(pathToFileURL(OUT).href + "#" + s.hash, s, "app " + name, s.storage);
   for (const c of s.click || []) {
     await a.locator(c).first().click();
     await a.waitForTimeout(150);
@@ -103,7 +110,7 @@ for (const s of specs) {
       .evaluate(e => e.scrollIntoView({ block: "start" }));
   if (s.dy) await a.evaluate(dy => window.scrollBy(0, dy), s.dy);
   await a.waitForTimeout(200);
-  const af = join(shots, `app-${s.board}.png`);
+  const af = join(shots, `app-${name}.png`);
   await a.screenshot({ path: af });
   await a.close();
 
@@ -117,12 +124,12 @@ for (const s of specs) {
       ]
         .map(
           ([l, f]) =>
-            `<figure style="margin:0"><figcaption style="color:#fff;padding-bottom:6px">${l} · ${s.board} · ${s.w}px ${s.theme || "light"}</figcaption><img src="${img(f)}" style="display:block;width:${s.w}px"></figure>`
+            `<figure style="margin:0"><figcaption style="color:#fff;padding-bottom:6px">${l} · ${name} · ${s.w}px ${s.theme || "light"}</figcaption><img src="${img(f)}" style="display:block;width:${s.w}px"></figure>`
         )
         .join("") +
       "</body>"
   );
-  const cf = join(shots, `compare-${topic}-${s.board}.png`);
+  const cf = join(shots, `compare-${topic}-${name}.png`);
   await c.screenshot({ path: cf, fullPage: true });
   await c.close();
   console.log("compare", cf.slice(ROOT.length + 1));

@@ -21,7 +21,9 @@
     "shots": "node scripts/shots.mjs",
     "compare": "node scripts/compare.mjs",
     "prune": "node scripts/prune.mjs",
-    "e2e": "node scripts/e2e.mjs"
+    "e2e": "node scripts/e2e.mjs",
+    "audit": "node scripts/audit.mjs",
+    "qdiff": "node scripts/qdiff.mjs"
   },
   "engines": {
     "node": ">=18"
