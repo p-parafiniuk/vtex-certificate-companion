@@ -3120,6 +3120,8 @@
     if (ev.target.closest(".retry")) {
       delete S.ans[i];
       delete DRAFT[i];
+      /* a retry gets a new option order, so the answer is not remembered by position */
+      if (!Q[i].c) PERM[i] = shuffle(PERM[i].slice());
       save();
       swapCard(card, i, ".opt");
       header();
@@ -7073,6 +7075,8 @@
     if (t.closest(".retry")) {
       delete S.ans[i];
       delete DRAFT[i];
+      /* a retry gets a new option order, so the answer is not remembered by position */
+      if (!Q[i].c) PERM[i] = shuffle(PERM[i].slice());
       save();
       header();
       renderFocus();

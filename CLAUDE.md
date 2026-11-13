@@ -28,7 +28,7 @@ The user is on a tight plan. Spend few tokens:
 | `npm run branch` | check that the current branch is named `<type>/<topic>` (part of `check`) |
 | `npm run prune` | list branches merged into `origin/main` and the unmerged ones with their PR state; `-- --apply` deletes the merged ones (see `/maintenance`) |
 | `node scripts/apimap-import.mjs <key> "<name>" "<schema file>" <ref>` | add or refresh one API Map entry from vtex/openapi-schemas (keeps hand-set LEGACY/DEPR flags) |
-| `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json`. The lock pins each Q's text, option count, `n` and right options: `validate` fails when the count or `n` changes and warns when the right options change |
+| `npm run lock` | accept newly appended Q/F items into `tests/ids.lock.json`. The lock pins each Q's text, option count, `n` and right options: `validate` fails when the count shrinks or `n` changes (new options may only be appended at the end, and never for matrix or `ord` questions) and warns when the right options change |
 | `npm run e2e` | built page in a real browser (plus a copy with the test-only learn module `tests/fixtures/learn-e2e.json`, which never goes into `src/data`): saved progress from `tests/fixtures/progress-main.json` keeps its meaning, and every tab renders at 375/1280, light/dark, PL/EN with no console error or horizontal scroll. Run it before a `feat/*` or content PR. Never regenerate the fixture to make it pass |
 | `npm run serve` | static server on :8000. Open `/vtex-api-drill.html` (also launch config `drill` for the browser pane) |
 | `npm run compare -- <topic>` | mockup vs built page, side by side, into `shots/compare-<topic>-<board>.png`. Needs `design/<topic>/` (see Always show it). Exits 1 on a console error |
