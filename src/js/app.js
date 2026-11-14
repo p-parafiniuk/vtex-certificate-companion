@@ -1167,9 +1167,21 @@
         })
         .join("") +
       "</select>" +
-      (reveal && !good ? '<span class="gap-fix">' + esc(gsPlain(choices[q.a[r]])) + "</span>" : "") +
+      gapMark(reveal, good, gsPlain(choices[q.a[r]])) +
       "</span>"
     );
+  }
+  /* Right or wrong is said in text too, not by the border colour alone, and a screen reader hears it. */
+  function gapMark(reveal, good, fix) {
+    if (!reveal) return "";
+    return good
+      ? '<span class="gap-m ok" aria-hidden="true">✓</span><span class="sr">' + L("dobrze", "right") + "</span>"
+      : '<span class="gap-m no" aria-hidden="true">✗</span><span class="sr">' +
+          L("źle, poprawnie: ", "wrong, right: ") +
+          "</span>" +
+          '<span class="gap-fix">' +
+          esc(fix) +
+          "</span>";
   }
   function gapBody(i, sel, reveal) {
     var q = Q[i];
@@ -1188,7 +1200,7 @@
         '" spellcheck="false" autocapitalize="off" autocomplete="off"' +
         (reveal ? " disabled" : "") +
         ">" +
-        (reveal && !good ? '<span class="gap-fix">' + esc(q.o[0]) + "</span>" : "") +
+        gapMark(reveal, good, q.o[0]) +
         "</div>"
       );
     }
@@ -1245,6 +1257,16 @@
   });
   document.addEventListener("input", function (ev) {
     if (ev.target.matches && ev.target.matches("input.gap-t")) gapPick(ev.target);
+  });
+  /* Type, Enter, next: Enter checks a text answer like the Check button. */
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" || !ev.target.matches || !ev.target.matches("input.gap-t")) return;
+    var c = ev.target.closest(".q"),
+      b = c && c.querySelector(".chk");
+    if (b && !b.disabled) {
+      ev.preventDefault();
+      b.click();
+    }
   });
   /* Matrix answers store row * 16 + column, one entry per row. */
   function mxHits(i, sel) {
@@ -1571,7 +1593,7 @@
       n = i + 1,
       need = nRight(q);
     var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined && !qFresh(i));
-    sel = sel || [];
+    sel = Array.isArray(sel) ? sel : [];
     var rightLetters = [],
       opts = "";
     if (q.t) opts = gapBody(i, sel, reveal);

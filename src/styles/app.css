@@ -6009,9 +6009,9 @@ input.gap {
   font: 500 0.86rem var(--f-mono);
   color: var(--ink);
   background: var(--surface);
-  border: 1px solid var(--muted);
+  border: 2px solid var(--muted);
   border-radius: 6px;
-  padding: 4px 6px;
+  padding: 3px 5px;
   max-width: 100%;
 }
 input.gap {
@@ -6020,18 +6020,23 @@ input.gap {
   padding: 8px 10px;
 }
 .gap.is-right {
-  border: 2px solid var(--ok);
+  border-color: var(--ok);
 }
 .gap.is-wrong {
-  border: 2px solid var(--bad);
+  border-color: var(--bad);
+}
+.gap-m {
+  font-weight: 700;
+}
+.gap-m.ok {
+  color: var(--ok);
+}
+.gap-m.no {
+  color: var(--bad);
 }
 .gap-fix {
   font: 500 0.8rem var(--f-mono);
   color: var(--ok);
-}
-.gap-fix::before {
-  content: "→ ";
-  color: var(--muted);
 }
 .gap-mat {
   display: grid;
