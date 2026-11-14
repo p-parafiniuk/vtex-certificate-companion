@@ -1732,30 +1732,195 @@ h3 {
   background: var(--k3);
   border-color: var(--k3);
 }
+/* Inspera keeps the question numbers pinned to the bottom of the window: the mouse trip is part of the drill. */
 .simbar {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 6;
-  background: var(--bg);
+  background: var(--surface);
   border-top: 1px solid var(--line);
-  padding: 10px max(16px, calc((100% - 828px) / 2)) calc(10px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px 10px;
-  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.simnums {
+  display: flex;
+  gap: 3px;
+  margin: 0 auto;
+}
+.simbar .pc {
+  flex: 0 0 auto;
+  width: 27px;
+  height: 36px;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+.simbar .pc.is-ans {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: inset 0 -3px var(--ok);
+}
+.simbar .pc.is-flag::after {
+  top: -3px;
+  right: -3px;
+  width: 9px;
+  height: 9px;
+  border-color: var(--surface);
+}
+.simbar .pc.is-cur {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  outline-offset: 1px;
+}
+.simbar .pi {
+  font-weight: 700;
+}
+.simbar .pok {
+  width: 36px;
+  background: var(--ok-soft);
+  border-color: var(--ok);
+  color: var(--ok);
+  font-weight: 700;
 }
 #p-symulacja[data-state="run"] {
-  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
 }
-.timer {
-  margin-left: auto;
-  font: 700 1.15rem var(--f-mono);
+.simtop .timer {
+  font: 600 0.95rem var(--f-body);
   font-variant-numeric: tabular-nums;
+}
+.timer.warn {
+  color: var(--k3);
 }
 .timer.low {
   color: var(--bad);
+}
+.simf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.sf {
+  font: inherit;
+  font-size: 0.86rem;
+  padding: 6px 8px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.sf[aria-pressed="true"] {
+  color: var(--ink);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}
+#sim-flag {
+  margin-left: auto;
+}
+@media (max-width: 480px) {
+  .sf {
+    font-size: 0.78rem;
+    padding: 6px 4px;
+  }
+}
+.sscr {
+  display: grid;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  justify-items: start;
+}
+.sscr h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.sscr p {
+  margin: 0;
+}
+.tscroll {
+  width: 100%;
+  overflow-x: auto;
+}
+.stab {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.stab th,
+.stab td {
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 6px;
+  border-top: 1px solid var(--line);
+}
+.stab thead th {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+  border-top: 0;
+}
+.stab tbody th span {
+  display: block;
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+.stab td:last-child {
+  white-space: nowrap;
+}
+.pns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.pn {
+  font: 500 0.8rem var(--f-mono);
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--ink);
+  cursor: pointer;
+}
+.sw-row {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--bg);
+}
+.sw-row.is-bad {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+.sw-row.is-warn {
+  background: var(--k3-soft);
+  color: var(--k3);
+}
+.sw-row.is-bad + .pns .pn {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+.sw-row.is-warn + .pns .pn {
+  color: var(--k3);
+  border-color: var(--k3);
+}
+.sscr .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .cmp {
   display: grid;
@@ -1785,15 +1950,6 @@ h3 {
   padding: 10px 12px;
   line-height: 1.7;
   overflow-wrap: anywhere;
-}
-@media (max-width: 480px) {
-  .simbar .btn {
-    padding: 7px 9px;
-    font-size: 0.9rem;
-  }
-  .timer {
-    font-size: 1.05rem;
-  }
 }
 .result {
   background: var(--surface);
