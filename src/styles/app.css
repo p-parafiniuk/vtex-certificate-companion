@@ -1563,6 +1563,9 @@ h3 {
 .verdict.no {
   color: var(--bad);
 }
+.verdict.part {
+  color: var(--k3);
+}
 .btn {
   border: 1px solid var(--line);
   background: var(--surface);
@@ -5983,4 +5986,86 @@ div.setrow {
   background: var(--surface);
   color: inherit;
   border-color: var(--line);
+}
+/* Inline choice, matching and text entry: Inspera's practical item types. */
+.gap-tpl {
+  margin: 0;
+  padding: 12px;
+  background: var(--code);
+  border-radius: 8px;
+  overflow-x: auto;
+  font: 400 0.86rem/2.3 var(--f-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.gapw {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+select.gap,
+input.gap {
+  font: 500 0.86rem var(--f-mono);
+  color: var(--ink);
+  background: var(--surface);
+  border: 2px solid var(--muted);
+  border-radius: 6px;
+  padding: 3px 5px;
+  max-width: 100%;
+}
+input.gap {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 8px 10px;
+}
+.gap.is-right {
+  border-color: var(--ok);
+}
+.gap.is-wrong {
+  border-color: var(--bad);
+}
+.gap-m {
+  font-weight: 700;
+}
+.gap-m.ok {
+  color: var(--ok);
+}
+.gap-m.no {
+  color: var(--bad);
+}
+.gap-fix {
+  font: 500 0.8rem var(--f-mono);
+  color: var(--ok);
+}
+.gap-mat {
+  display: grid;
+  gap: 8px;
+}
+.gap-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 6px 12px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.gap-l {
+  overflow-wrap: anywhere;
+}
+.gap-txt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.gap-pre {
+  font: 700 0.86rem var(--f-mono);
+}
+@media (pointer: coarse) {
+  select.gap,
+  input.gap {
+    min-height: 44px;
+  }
 }

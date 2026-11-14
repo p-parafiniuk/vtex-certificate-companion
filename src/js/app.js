@@ -1096,6 +1096,7 @@
   }
   /* An answer is right only when the selected set equals the correct set (the first n options). */
   function isRight(i, sel) {
+    if (Q[i].t === "txt") return Array.isArray(sel) && typeof sel[0] === "string" && txtOk(Q[i], sel[0]);
     if (Q[i].c) return mxHits(i, sel) === Q[i].o.length;
     /* ord: the saved answer is the option order as shown, right only when it is the order of o */
     if (Q[i].ord)
@@ -1115,6 +1116,158 @@
       })
     );
   }
+  /* Text entry: case matters in VTEX paths, so only spaces, a host and a trailing slash are forgiven. */
+  function txtNorm(v) {
+    return String(v)
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/^https?:\/\/[^/]+/i, "")
+      .replace(/\/+$/, "");
+  }
+  function txtOk(q, v) {
+    var t = txtNorm(v);
+    return (
+      t !== "" &&
+      q.o.some(function (o) {
+        return txtNorm(o) === t;
+      })
+    );
+  }
+  /* Points for one answer: inline choice and matching score per field, like Inspera; the rest is 0 or 1. */
+  function qPts(i, sel) {
+    var q = Q[i];
+    if (q.t === "inl" || q.t === "mat") return mxHits(i, sel) / q.o.length;
+    return isRight(i, sel) ? 1 : 0;
+  }
+  /* Inline choice (a select per {n} gap in tpl), matching (a select per row) and text entry share one body.
+     Inline and matching answers store row * 16 + choice like a matrix, text entry stores [text]. */
+  function gapSel(i, r, choices, sel, reveal) {
+    var q = Q[i],
+      v = -1;
+    sel.forEach(function (x) {
+      if (typeof x === "number" && x >> 4 === r) v = x & 15;
+    });
+    var good = v === q.a[r],
+      cls = "gap" + (reveal ? (good ? " is-right" : " is-wrong") : "");
+    return (
+      '<span class="gapw"><select class="' +
+      cls +
+      '" data-r="' +
+      r +
+      '" aria-label="' +
+      esc(gsPlain(q.o[r])) +
+      '"' +
+      (reveal ? " disabled" : "") +
+      '><option value="">' +
+      L("Wybierz…", "Select…") +
+      "</option>" +
+      choices
+        .map(function (c, ci) {
+          return '<option value="' + ci + '"' + (ci === v ? " selected" : "") + ">" + esc(gsPlain(c)) + "</option>";
+        })
+        .join("") +
+      "</select>" +
+      gapMark(reveal, good, gsPlain(choices[q.a[r]])) +
+      "</span>"
+    );
+  }
+  /* Right or wrong is said in text too, not by the border colour alone, and a screen reader hears it. */
+  function gapMark(reveal, good, fix) {
+    if (!reveal) return "";
+    return good
+      ? '<span class="gap-m ok" aria-hidden="true">✓</span><span class="sr">' + L("dobrze", "right") + "</span>"
+      : '<span class="gap-m no" aria-hidden="true">✗</span><span class="sr">' +
+          L("źle, poprawnie: ", "wrong, right: ") +
+          "</span>" +
+          '<span class="gap-fix">' +
+          esc(fix) +
+          "</span>";
+  }
+  function gapBody(i, sel, reveal) {
+    var q = Q[i];
+    if (q.t === "txt") {
+      var v = typeof sel[0] === "string" ? sel[0] : "",
+        good = txtOk(q, v);
+      return (
+        '<div class="gap-txt">' +
+        (q.tpl ? '<span class="gap-pre">' + esc(q.tpl) + "</span>" : "") +
+        '<input type="text" class="gap gap-t' +
+        (reveal ? (good ? " is-right" : " is-wrong") : "") +
+        '" value="' +
+        esc(v) +
+        '" aria-label="' +
+        L("Twoja odpowiedź", "Your answer") +
+        '" spellcheck="false" autocapitalize="off" autocomplete="off"' +
+        (reveal ? " disabled" : "") +
+        ">" +
+        gapMark(reveal, good, q.o[0]) +
+        "</div>"
+      );
+    }
+    if (q.t === "mat")
+      return (
+        '<div class="gap-mat">' +
+        PERM[i]
+          .map(function (r) {
+            return (
+              '<div class="gap-row"><span class="gap-l">' +
+              fmt(q.o[r]) +
+              "</span>" +
+              gapSel(i, r, q.c, sel, reveal) +
+              "</div>"
+            );
+          })
+          .join("") +
+        "</div>"
+      );
+    return (
+      '<pre class="gap-tpl"><code>' +
+      esc(q.tpl).replace(/\{(\d)\}/g, function (_, d) {
+        return gapSel(i, d - 1, q.c[d - 1], sel, reveal);
+      }) +
+      "</code></pre>"
+    );
+  }
+  /* One listener for every select and text field of a gap question, in the list, Focus and the exam. */
+  function gapPick(el) {
+    var card = el.closest(".q");
+    if (!card || el.disabled) return;
+    var i = +card.dataset.i,
+      sim = !!el.closest("#simroot"),
+      list = sim ? S.sim.ans[i] || (S.sim.ans[i] = []) : DRAFT[i] || (DRAFT[i] = []);
+    if (el.classList.contains("gap-t")) {
+      list.length = 0;
+      if (el.value.trim()) list.push(el.value);
+    } else {
+      var r = +el.dataset.r;
+      for (var j = list.length - 1; j > -1; j--) if (list[j] >> 4 === r) list.splice(j, 1);
+      if (el.value !== "") list.push(r * 16 + +el.value);
+    }
+    if (sim) {
+      if (!list.length) delete S.sim.ans[i];
+      save();
+      paintPal();
+    } else {
+      var c = card.querySelector(".chk");
+      if (c) c.disabled = !list.length;
+    }
+  }
+  document.addEventListener("change", function (ev) {
+    if (ev.target.matches && ev.target.matches("select.gap")) gapPick(ev.target);
+  });
+  document.addEventListener("input", function (ev) {
+    if (ev.target.matches && ev.target.matches("input.gap-t")) gapPick(ev.target);
+  });
+  /* Type, Enter, next: Enter checks a text answer like the Check button. */
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" || !ev.target.matches || !ev.target.matches("input.gap-t")) return;
+    var c = ev.target.closest(".q"),
+      b = c && c.querySelector(".chk");
+    if (b && !b.disabled) {
+      ev.preventDefault();
+      b.click();
+    }
+  });
   /* Matrix answers store row * 16 + column, one entry per row. */
   function mxHits(i, sel) {
     var q = Q[i],
@@ -1440,10 +1593,11 @@
       n = i + 1,
       need = nRight(q);
     var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined && !qFresh(i));
-    sel = sel || [];
+    sel = Array.isArray(sel) ? sel : [];
     var rightLetters = [],
       opts = "";
-    if (q.c) opts = mxBody(i, sel, reveal);
+    if (q.t) opts = gapBody(i, sel, reveal);
+    else if (q.c) opts = mxBody(i, sel, reveal);
     else if (q.ord) opts = ordBody(i, sel, reveal, mode);
     else
       PERM[i].forEach(function (oi, pos) {
@@ -1499,30 +1653,49 @@
       var word = need > 1 ? L("Poprawne: ", "Right answers: ") : L("Poprawna: ", "Right answer: ");
       var verdict = ok
         ? '<span class="verdict ok">' + L("Dobrze.", "Right.") + "</span>"
-        : q.ord
+        : q.t === "txt"
           ? '<span class="verdict no">' +
             (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-            L("Poprawna kolejność:", "Right order:") +
-            '</span><ol class="ord-ok">' +
-            q.o
-              .map(function (o) {
-                return "<li>" + fmt(o) + "</li>";
-              })
-              .join("") +
-            "</ol>"
-          : q.c
-            ? '<span class="verdict no">' +
-              (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-              L("Trafione wiersze: ", "Rows right: ") +
+            L("Poprawnie: ", "Right: ") +
+            "<code>" +
+            esc(q.o[0]) +
+            "</code>.</span>"
+          : q.t
+            ? '<span class="verdict ' +
+              (mxHits(i, sel) ? "part" : "no") +
+              '">' +
+              L("Trafione pola: ", "Fields right: ") +
               mxHits(i, sel) +
               " / " +
               q.o.length +
-              ".</span>"
-            : '<span class="verdict no">' +
-              (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-              word +
-              rightLetters.join(", ") +
-              ".</span>";
+              " · " +
+              String(Math.round(qPts(i, sel) * 100) / 100) +
+              L(" pkt.", " pt.") +
+              "</span>"
+            : q.ord
+              ? '<span class="verdict no">' +
+                (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+                L("Poprawna kolejność:", "Right order:") +
+                '</span><ol class="ord-ok">' +
+                q.o
+                  .map(function (o) {
+                    return "<li>" + fmt(o) + "</li>";
+                  })
+                  .join("") +
+                "</ol>"
+              : q.c
+                ? '<span class="verdict no">' +
+                  (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+                  L("Trafione wiersze: ", "Rows right: ") +
+                  mxHits(i, sel) +
+                  " / " +
+                  q.o.length +
+                  ".</span>"
+                : '<span class="verdict no">' +
+                  (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+                  word +
+                  rightLetters.join(", ") +
+                  ".</span>";
       tail =
         '<div class="exp"><p>' +
         verdict +
@@ -1586,13 +1759,21 @@
           L("Ułóż kroki w kolejności przyciskami ↑ ↓.", "Put the steps in order with the ↑ ↓ buttons.") +
           "</span>" +
           "</p>"
-        : q.c
-          ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
-          : '<p class="how pick"><strong>' +
-            (need === 1
-              ? L("Wybierz 1 odpowiedź.", "Select 1 answer.")
-              : L("Zaznacz " + need + " odpowiedzi.", "Select " + need + " answers.")) +
-            "</strong></p>";
+        : q.t
+          ? '<p class="how">' +
+            (q.t === "txt"
+              ? L("Wpisz odpowiedź.", "Type your answer.")
+              : q.t === "mat"
+                ? L("Dopasuj każdy wiersz. Punkt za każdą parę.", "Match each row. One mark per pair.")
+                : L("Wybierz wartość w każdej luce. Punkt za każde pole.", "Fill each gap. One mark per field.")) +
+            "</p>"
+          : q.c
+            ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
+            : '<p class="how pick"><strong>' +
+              (need === 1
+                ? L("Wybierz 1 odpowiedź.", "Select 1 answer.")
+                : L("Zaznacz " + need + " odpowiedzi.", "Select " + need + " answers.")) +
+              "</strong></p>";
 
     return (
       '<article class="q' +
@@ -1617,7 +1798,7 @@
       how +
       /* radios need their group, so a screen reader says "1 of 6" and arrows move the choice */
       '<div class="opts"' +
-      (q.c || q.ord
+      (q.c || q.ord || q.t
         ? ""
         : ' role="' +
           (need === 1 ? "radiogroup" : "group") +
@@ -3245,9 +3426,11 @@
   }
   function simScore() {
     var m = S.sim;
-    return m.ids.filter(function (i) {
-      return isRight(i, m.ans[i]);
-    }).length;
+    var s = 0;
+    m.ids.forEach(function (i) {
+      s += qPts(i, m.ans[i]);
+    });
+    return Math.round(s * 100) / 100;
   }
   function clock(ms) {
     var s = Math.max(0, Math.ceil(ms / 1000)),
@@ -3643,10 +3826,10 @@
   /* The "i" screen: Inspera opens on an overview of question types and marks. */
   function simInfo() {
     var m = S.sim,
-      g = { mc: [], mr: [], mx: [], ord: [], pr: [] };
+      g = { mc: [], mr: [], mx: [], ord: [], inl: [], mat: [], txt: [], pr: [] };
     m.ids.forEach(function (i, p) {
       var q = Q[i];
-      g[q.ord ? "ord" : q.c ? "mx" : nRight(q) > 1 ? "mr" : "mc"].push(p);
+      g[q.t || (q.ord ? "ord" : q.c ? "mx" : nRight(q) > 1 ? "mr" : "mc")].push(p);
     });
     m.pr.forEach(function (_, k) {
       g.pr.push(m.ids.length + k);
@@ -3656,6 +3839,9 @@
       ["mr", "Multiple Response", "Select all that apply", 1],
       ["mx", "Matrix", "One answer per row", 1],
       ["ord", "Ordering", "Put the steps in order", 1],
+      ["inl", "Inline choice", "One mark per gap", "1 per gap"],
+      ["mat", "Matching", "One mark per pair", "1 per pair"],
+      ["txt", "Text entry", "Type the answer", 1],
       ["pr", "Practical", "Write the request", SIM_PP]
     ]
       .filter(function (r) {
