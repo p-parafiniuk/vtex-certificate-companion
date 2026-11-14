@@ -1320,7 +1320,7 @@ h3 {
   padding: 9px 11px;
   cursor: pointer;
 }
-.opt:hover:not(:disabled) {
+.opt:hover:not(:disabled):not(.is-capped) {
   border-color: var(--muted);
 }
 .opt:disabled {
@@ -5771,4 +5771,43 @@ div.setrow {
 .ord-keep {
   justify-self: start;
   margin-top: 8px;
+}
+
+/* Answer count: radios for one right answer, boxes for several. Extra picks are blocked, with no counter,
+   as in the exam. */
+.opt .tick {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: 2px solid var(--muted);
+  border-radius: 4px;
+}
+.opt.rad .tick {
+  border-radius: 50%;
+}
+.opt.is-picked .tick {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+.opt.rad.is-picked .tick {
+  background: none;
+  border-width: 6px;
+}
+.opt:disabled .tick {
+  visibility: hidden;
+}
+.opt.is-capped {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.how.pick strong {
+  color: var(--ink);
+}
+/* the tick carries the choice; the letter stays neutral so a pick is not shown twice */
+.opt.is-picked.rad .let,
+.opt.is-picked.chk .let {
+  background: var(--surface);
+  color: inherit;
+  border-color: var(--line);
 }

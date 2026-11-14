@@ -813,7 +813,6 @@
       }
       if (Array.isArray(raw.sims)) S.sims = raw.sims;
       S.hide = !!raw.hide;
-      S.hint = !!raw.hint;
       if (raw.dom === "all" || DOM_NAME[raw.dom]) S.dom = raw.dom;
       if (raw.set === "1" || raw.set === "2") S.set = raw.set;
       if (["1", "2", "3", "4"].indexOf(raw.flv) > -1) S.flv = raw.flv;
@@ -1463,17 +1462,25 @@
           }
         } else if (on) {
           cls += " is-picked";
+        } else if (need > 1 && sel.length >= need) {
+          cls += " is-capped";
         }
         opts +=
-          '<button type="button" role="checkbox" class="' +
+          '<button type="button" role="' +
+          (need === 1 ? "radio" : "checkbox") +
+          '" class="' +
           cls +
+          (need === 1 ? " rad" : " chk") +
           '" data-o="' +
           oi +
+          '" data-need="' +
+          need +
           '"' +
           (reveal ? " disabled" : "") +
+          (cls.indexOf("is-capped") > -1 ? ' aria-disabled="true"' : "") +
           ' aria-checked="' +
           on +
-          '"><span class="let">' +
+          '"><span class="tick" aria-hidden="true"></span><span class="let">' +
           letter +
           '</span><span class="otxt">' +
           fmt(q.o[oi]) +
@@ -1577,10 +1584,11 @@
           "</p>"
         : q.c
           ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
-          : '<p class="how">' +
-            L("Zaznacz wszystkie poprawne odpowiedzi", "Select all right answers") +
-            (S.hint ? " <strong>(" + L("poprawnych: ", "right: ") + need + ")</strong>" : "") +
-            ".</p>";
+          : '<p class="how pick"><strong>' +
+            (need === 1
+              ? L("Wybierz 1 odpowiedź.", "Select 1 answer.")
+              : L("Zaznacz " + need + " odpowiedzi.", "Select " + need + " answers.")) +
+            "</strong></p>";
 
     return (
       '<article class="q' +
@@ -1596,11 +1604,24 @@
       top +
       know +
       "</div>" +
-      '<p class="qt">' +
+      '<p class="qt" id="' +
+      (mode === "learn" ? "qt-" : "st-") +
+      n +
+      '">' +
       fmt(q.q) +
       "</p>" +
       how +
-      '<div class="opts">' +
+      /* radios need their group, so a screen reader says "1 of 6" and arrows move the choice */
+      '<div class="opts"' +
+      (q.c || q.ord
+        ? ""
+        : ' role="' +
+          (need === 1 ? "radiogroup" : "group") +
+          '" aria-labelledby="' +
+          (mode === "learn" ? "qt-" : "st-") +
+          n +
+          '"') +
+      ">" +
       opts +
       "</div>" +
       tail +
@@ -1655,10 +1676,48 @@
       });
       return;
     }
+    var need = +btn.dataset.need || 1;
+    if (need === 1) {
+      /* radio: a click moves the choice */
+      list.length = 0;
+      list.push(o);
+      btn.parentNode.querySelectorAll(".opt").forEach(function (b) {
+        b.classList.toggle("is-picked", b === btn);
+        b.setAttribute("aria-checked", b === btn);
+      });
+      return;
+    }
+    /* several right answers: the exam blocks extra picks without saying how many are left */
+    if (at < 0 && list.length >= need) return;
     if (at > -1) list.splice(at, 1);
     else list.push(o);
     btn.classList.toggle("is-picked", at < 0);
     btn.setAttribute("aria-checked", at < 0);
+    optCap(btn.parentNode, list.length >= need);
+  }
+  /* Arrow keys inside a radio group move and pick, as native radios do; they must not flip Focus cards. */
+  document.addEventListener(
+    "keydown",
+    function (ev) {
+      var b = ev.target.closest && ev.target.closest(".opt.rad");
+      if (!b || b.disabled || ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(ev.key) < 0) return;
+      var all = [].slice.call(b.parentNode.querySelectorAll(".opt.rad")),
+        to =
+          all[(all.indexOf(b) + (ev.key === "ArrowUp" || ev.key === "ArrowLeft" ? -1 : 1) + all.length) % all.length];
+      ev.preventDefault();
+      ev.stopPropagation();
+      to.click();
+      to.focus();
+    },
+    true
+  );
+  function optCap(box, full) {
+    box.querySelectorAll(".opt").forEach(function (b) {
+      var off = full && !b.classList.contains("is-picked");
+      b.classList.toggle("is-capped", off);
+      if (off) b.setAttribute("aria-disabled", "true");
+      else b.removeAttribute("aria-disabled");
+    });
   }
 
   /* ---------- Pytania ---------- */
@@ -1839,7 +1898,6 @@
             "</p>");
     $("#q-lead").hidden = S.dom !== "all";
     $("#hide-known").checked = S.hide;
-    $("#hint-on").checked = S.hint;
     renderChips();
   }
   /* ---------- Kategoria: questions, API paths from the OpenAPI schemas, documentation in a frame ---------- */
@@ -3160,11 +3218,6 @@
     save();
     renderQ();
   });
-  $("#hint-on").addEventListener("change", function (ev) {
-    S.hint = ev.target.checked;
-    save();
-    renderQ();
-  });
 
   /* ---------- Symulacja: one card at a time, countdown, 36 questions + 4 practical tasks ---------- */
   var TICK = null,
@@ -3419,11 +3472,6 @@
         "Dołącz " + SIM_P + " zadania praktyczne (pole tekstowe, ocena własna)",
         "Include " + SIM_P + " practical tasks (text field, self-graded)"
       ) +
-      "</label>" +
-      '<label class="check" for="sim-hint"><input type="checkbox" id="sim-hint"' +
-      (S.hint ? " checked" : "") +
-      "> " +
-      L("Pokazuj, ile odpowiedzi jest poprawnych", "Show how many answers are right") +
       "</label>" +
       '<div class="row"><button type="button" class="btn primary" id="sim-start">' +
       L("Rozpocznij symulację", "Start simulation") +
@@ -4024,7 +4072,6 @@
     }
     S.simMin = min;
     S.simPrac = $("#sim-prac").checked;
-    S.hint = $("#sim-hint").checked;
     var now = Date.now();
     S.sim = {
       ids: simDraw(),
@@ -5580,7 +5627,6 @@
         b.setAttribute("aria-pressed", b.dataset.langSet === S.lang);
       });
     $("#set-conf").checked = S.conf;
-    $("#set-hint").checked = S.hint;
     $("#set-hide").checked = S.hide;
     $("#set-min").value = S.simMin;
     $("#set-prac").checked = S.simPrac;
@@ -5607,8 +5653,7 @@
     if (t.id === "set-conf") {
       S.conf = t.checked;
       renderQ();
-    } else if (t.id === "set-hint") S.hint = t.checked;
-    else if (t.id === "set-hide") S.hide = t.checked;
+    } else if (t.id === "set-hide") S.hide = t.checked;
     else if (t.id === "set-prac") S.simPrac = t.checked;
     else if (t.id === "set-min") {
       var m = Math.round(+t.value);
@@ -6567,15 +6612,10 @@
         ? '<button type="button" class="btn small" id="fo-reshuffle">' + L("Przetasuj", "Reshuffle") + "</button>"
         : "") +
       "</div></div>" +
-      '<label class="check" for="fo-hint"><input type="checkbox" id="fo-hint"' +
-      (S.hint ? " checked" : "") +
-      "> " +
-      L("Pokazuj, ile odpowiedzi jest poprawnych", "Show how many answers are right") +
-      "</label>" +
       '<p class="how keys">' +
       L(
-        "<strong>Skróty:</strong> <kbd>←</kbd> <kbd>→</kbd> karta · <kbd>A</kbd>–<kbd>E</kbd> zaznacz · <kbd>Enter</kbd> sprawdź, potem dalej · <kbd>Spacja</kbd> odsłoń / ukryj · <kbd>U</kbd> umiem · <kbd>N</kbd> jeszcze nie · <kbd>Esc</kbd> lista",
-        "<strong>Shortcuts:</strong> <kbd>←</kbd> <kbd>→</kbd> card · <kbd>A</kbd>–<kbd>E</kbd> select · <kbd>Enter</kbd> check, then next · <kbd>Space</kbd> reveal / hide · <kbd>U</kbd> I know it · <kbd>N</kbd> not yet · <kbd>Esc</kbd> list"
+        "<strong>Skróty:</strong> <kbd>←</kbd> <kbd>→</kbd> karta · <kbd>A</kbd>–<kbd>F</kbd> zaznacz · <kbd>Enter</kbd> sprawdź, potem dalej · <kbd>Spacja</kbd> odsłoń / ukryj · <kbd>U</kbd> umiem · <kbd>N</kbd> jeszcze nie · <kbd>Esc</kbd> lista",
+        "<strong>Shortcuts:</strong> <kbd>←</kbd> <kbd>→</kbd> card · <kbd>A</kbd>–<kbd>F</kbd> select · <kbd>Enter</kbd> check, then next · <kbd>Space</kbd> reveal / hide · <kbd>U</kbd> I know it · <kbd>N</kbd> not yet · <kbd>Esc</kbd> list"
       ) +
       "</p>" +
       "</div>"
@@ -7103,13 +7143,6 @@
       if (first && first.id !== NAV.cur.id) goCard(first.id);
       return;
     }
-    if (t.id === "fo-hint") {
-      S.hint = t.checked;
-      save();
-      renderFocus();
-      $("#fo-hint").focus({ preventScroll: true });
-      return;
-    }
     if (t.classList.contains("kn")) {
       var i = +t.closest(".q").dataset.i;
       if (t.checked) S.known[i] = true;
@@ -7178,8 +7211,8 @@
     }
     if (!c) return;
     if (c.t === "q") {
-      var at = k.length === 1 ? "abcde".indexOf(k.toLowerCase()) : -1;
-      if (at < 0 && k >= "1" && k <= "5") at = +k - 1;
+      var at = k.length === 1 ? "abcdef".indexOf(k.toLowerCase()) : -1;
+      if (at < 0 && k >= "1" && k <= "6") at = +k - 1;
       if (at > -1) {
         var o = document.querySelectorAll("#fo-stage .opt:not(.mx-c)")[at];
         if (o && !o.disabled) {
