@@ -48,7 +48,8 @@ function common(w, x, allowed) {
 
 D.Q.forEach((x, i) => {
   const w = "Q[" + i + "]";
-  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h", "p", "k", "ord"]);
+  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h", "p", "k", "ord", "t", "tpl"]);
+  if (x.t !== undefined) return gaps(w, x);
   if (x.ord !== undefined) {
     /* ord: o is written in the right order, the runtime shuffles it; 0 or 1 point, no n, no matrix */
     if (x.ord !== true) E(w, "ord is true or left out");
@@ -74,6 +75,49 @@ D.Q.forEach((x, i) => {
   if (!isStr(x.e)) E(w, "empty explanation e");
   else markup(w + ".e", x.e);
 });
+
+/* Practical item types, scored per field: inl (a select per {n} gap of tpl, c[n-1] its choices, a the right ones),
+   mat (o rows, c shared choices, a the right one per row), txt (o the accepted answers, tpl an optional prefix).
+   inl and mat answers store row * 16 + choice like a matrix; txt stores [text]. */
+function gaps(w, x) {
+  if (!["inl", "mat", "txt"].includes(x.t)) E(w, "t is inl, mat or txt");
+  if (x.n !== undefined || x.ord !== undefined) E(w, "a t question takes no n and no ord");
+  const strs = (k, arr, lo, hi) => {
+    if (!Array.isArray(arr) || arr.length < lo || arr.length > hi)
+      return E(w, k + " needs " + lo + " to " + hi + " items");
+    if (new Set(arr).size !== arr.length) E(w, "duplicate items in " + k);
+    arr.forEach((o, j) => (isStr(o) ? markup(w + "." + k + "[" + j + "]", o) : E(w, "empty " + k + "[" + j + "]")));
+  };
+  if (x.tpl !== undefined && !isStr(x.tpl)) E(w, "tpl must be a string");
+  if (x.t === "txt") {
+    strs("o", x.o, 1, 6);
+    if (x.c !== undefined || x.a !== undefined) E(w, "txt takes no c and no a");
+  } else {
+    strs("o", x.o, x.t === "inl" ? 1 : 3, 8);
+    const rows = Array.isArray(x.o) ? x.o.length : 0;
+    const ch = r => (x.t === "mat" ? x.c : (x.c || [])[r]);
+    if (x.t === "mat") strs("c", x.c, rows, 8);
+    else {
+      if (!Array.isArray(x.c) || x.c.length !== rows) E(w, "inl: c gives one choice list per gap");
+      else x.c.forEach((cs, r) => strs("c[" + r + "]", cs, 2, 8));
+      if (!isStr(x.tpl)) E(w, "inl needs tpl");
+      else {
+        const m = (x.tpl.match(/\{\d\}/g) || []).map(t => +t[1]);
+        if (m.length !== rows || m.some((d, j) => d !== j + 1))
+          E(w, "tpl must hold {1}..{" + rows + "} once each, in order");
+      }
+    }
+    if (!Array.isArray(x.a) || x.a.length !== rows) E(w, "a must give one right choice per row");
+    else
+      x.a.forEach((v, r) => {
+        const cs = ch(r);
+        if (!Number.isInteger(v) || !Array.isArray(cs) || v < 0 || v >= cs.length)
+          E(w, "a[" + r + "] is not a choice index");
+      });
+  }
+  if (!isStr(x.e)) E(w, "empty explanation e");
+  else markup(w + ".e", x.e);
+}
 
 /* Matrix: o are rows, c the columns, a[row] the right column. Saved answers store row * 16 + column. */
 function matrix(w, x) {
@@ -577,7 +621,7 @@ function shape(old) {
       x = D.Q[i];
     if (!x || len === undefined) return;
     /* Options appended at the end keep every saved index valid; fewer options or a new n do not. */
-    if (+len > x.o.length || +n !== (x.n || 1) || ((x.c || x.ord) && +len !== x.o.length))
+    if (+len > x.o.length || +n !== (x.n || 1) || ((x.c || x.ord || x.t) && +len !== x.o.length))
       E(
         "Q[" + i + "]",
         "options or n changed since lock (" +

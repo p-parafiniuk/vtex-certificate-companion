@@ -29,11 +29,13 @@ const ok = (cond, name, detail) => {
 
 /* Same rule as isRight() in app.js: exactly n options, all among the first n; ord: the order of o. */
 const isRight = (q, sel) =>
-  q.ord
-    ? sel.length === q.o.length && sel.every((o, p) => o === p)
-    : q.c
-      ? sel.length === q.o.length && sel.every(v => q.a[v >> 4] === (v & 15))
-      : sel.length === (q.n || 1) && sel.every(o => o < (q.n || 1));
+  q.t === "txt"
+    ? typeof sel[0] === "string" && q.o.includes(sel[0].trim().replace(/\/+$/, ""))
+    : q.ord
+      ? sel.length === q.o.length && sel.every((o, p) => o === p)
+      : q.c
+        ? sel.length === q.o.length && sel.every(v => q.a[v >> 4] === (v & 15))
+        : sel.length === (q.n || 1) && sel.every(o => o < (q.n || 1));
 const st = FX.state;
 for (const i of Object.keys(st.ans))
   ok(
@@ -123,13 +125,52 @@ let lastDraw;
   await page.close();
 }
 
+/* Practical item types (t): inline choice and matching score per field, text entry 0 or 1. */
+{
+  const at = t => D.Q.findIndex(q => q.t === t);
+  for (const t of ["inl", "mat"]) {
+    const i = at(t);
+    if (i < 0) continue;
+    const q = D.Q[i];
+    const { page, errs } = await open("focus-q" + (i + 1), { w: 375, theme: "dark", state: { v: 2 } });
+    const sels = await page.$$("#fo-stage select.gap");
+    ok(sels.length === q.o.length, t + " renders one select per field", String(sels.length));
+    for (const s of sels) {
+      const r = +(await s.getAttribute("data-r")),
+        n = t === "mat" ? q.c.length : q.c[r].length;
+      await s.selectOption(String(r === 0 ? q.a[0] : (q.a[r] + 1) % n));
+    }
+    await page.click("#fo-stage .chk");
+    const v = (await page.textContent("#fo-stage .verdict")) || "";
+    ok(v.includes("1 / " + q.o.length), t + " scores per field", v);
+    const saved = await page.evaluate(([k, i]) => JSON.parse(localStorage.getItem(k)).ans[i], [KEY, i]);
+    ok(
+      Array.isArray(saved) && saved.length === q.o.length && saved.includes(q.a[0]),
+      t + " saves row * 16 + choice",
+      JSON.stringify(saved)
+    );
+    ok(!errs.length, "no console errors in " + t, errs.join(" | "));
+    await page.close();
+  }
+  const i = at("txt");
+  if (i > -1) {
+    const { page, errs } = await open("focus-q" + (i + 1), { w: 1280, theme: "light", state: { v: 2 } });
+    await page.fill("#fo-stage input.gap-t", "  " + D.Q[i].o[0] + "/ ");
+    await page.click("#fo-stage .chk");
+    ok(await page.isVisible("#fo-stage .verdict.ok"), "text entry forgives spaces and a trailing slash");
+    ok(!errs.length, "no console errors in txt", errs.join(" | "));
+    await page.close();
+  }
+}
+
 /* Score per area: every orders answer wrong, everything else right. */
 {
   const ans = {};
   lastDraw.forEach(i => {
     const q = D.Q[i],
       n = q.n || 1;
-    if (q.c) ans[i] = q.d === "orders" ? [(q.a[0] + 1) % q.c.length] : q.a.map((c, r) => r * 16 + c);
+    if (q.t === "txt") ans[i] = [q.d === "orders" ? "/wrong" : q.o[0]];
+    else if (q.c) ans[i] = q.d === "orders" ? [(q.a[0] + 1) % q.c.length] : q.a.map((c, r) => r * 16 + c);
     else if (q.ord) ans[i] = [...q.o.keys()].map((k, p, a) => (q.d === "orders" ? a[(p + 1) % a.length] : k));
     else ans[i] = q.d === "orders" ? [n] : [...Array(n).keys()];
   });

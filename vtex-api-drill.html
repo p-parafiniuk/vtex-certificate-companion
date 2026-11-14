@@ -1577,6 +1577,9 @@ h3 {
 .verdict.no {
   color: var(--bad);
 }
+.verdict.part {
+  color: var(--k3);
+}
 .btn {
   border: 1px solid var(--line);
   background: var(--surface);
@@ -5998,6 +6001,83 @@ div.setrow {
   color: inherit;
   border-color: var(--line);
 }
+/* Inline choice, matching and text entry: Inspera's practical item types. */
+.gap-tpl {
+  margin: 0;
+  padding: 12px;
+  background: var(--code);
+  border-radius: 8px;
+  overflow-x: auto;
+  font: 400 0.86rem/2.3 var(--f-mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.gapw {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+select.gap,
+input.gap {
+  font: 500 0.86rem var(--f-mono);
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  padding: 4px 6px;
+  max-width: 100%;
+}
+input.gap {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 8px 10px;
+}
+.gap.is-right {
+  border: 2px solid var(--ok);
+}
+.gap.is-wrong {
+  border: 2px solid var(--bad);
+}
+.gap-fix {
+  font: 500 0.8rem var(--f-mono);
+  color: var(--ok);
+}
+.gap-fix::before {
+  content: "→ ";
+  color: var(--muted);
+}
+.gap-mat {
+  display: grid;
+  gap: 8px;
+}
+.gap-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 6px 12px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.gap-l {
+  overflow-wrap: anywhere;
+}
+.gap-txt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.gap-pre {
+  font: 700 0.86rem var(--f-mono);
+}
+@media (pointer: coarse) {
+  select.gap,
+  input.gap {
+    min-height: 44px;
+  }
+}
 </style>
 
 <header class="bar">
@@ -10273,7 +10353,10 @@ const Q = [
  {"d":"md","r":2,"p":2,"k":["md-v2.trigger"],"q":"Your Master Data v2 trigger runs its action and the action fails. What does Master Data do by default?","o":["Makes three attempts in an interval of 10 minutes","Retries for up to seven days","Drops the action without retrying","Retries once after one hour","Makes five attempts, with 30 minutes between them","Retries every minute until the action succeeds"],"e":"Domyślnie Master Data robi trzy próby w interwale 10 minut. W praktyce: domyślne ponowienia zmieniasz w triggerze obiektem `retry`, np. `times: 5` i `delay` z `addMinutes: 30`.","l":["trig"]},
  {"d":"md","r":2,"p":2,"k":["md-v2.scroll"],"q":"How do you know that a Master Data scroll has reached the end?","o":["The response body is empty","`REST-Content-Total` drops to zero","The token header disappears","The API answers `204 No Content`","`REST-Content-Range` shows `y` equal to the total","The API answers `404 Not Found` for the token"],"e":"Scroll powtarzasz z tokenem, aż body odpowiedzi będzie puste. `REST-Content-Total` podaje łączną liczbę pasujących dokumentów.","l":["mdpag"]},
  {"d":"md","r":2,"p":2,"k":["md-v2.scroll"],"q":"Where do you set the page size of a Master Data scroll?","o":["In `_size` of the first request only","In `_size` of every request","In the `REST-Range` header","Nowhere: it is fixed at 100","In the `_pageSize` query parameter of each request","Nowhere: it is fixed at 1000"],"e":"Rozmiar strony ustawiasz tylko w pierwszym requeście scrolla, maksymalnie 1000.","l":["mdpag"]},
- {"d":"md","r":2,"p":2,"k":["md-v2.trigger"],"q":"You add a trigger to a Master Data v2 entity that already has a schema. How?","o":["Add it to `v-triggers` and save the schema again","Send it to a separate triggers endpoint","Configure it in the Master Data v1 Admin","Add a `_trigger` parameter to each save","Add it to `v-triggers` of one document and save that document","Send it in an `X-VTEX-Trigger` header with each save"],"e":"Trigger to element tablicy `v-triggers` w JSON Schema. Pobierasz schemat, dopisujesz trigger i wysyłasz schemat do Save schema by name.","l":["trig"]}
+ {"d":"md","r":2,"p":2,"k":["md-v2.trigger"],"q":"You add a trigger to a Master Data v2 entity that already has a schema. How?","o":["Add it to `v-triggers` and save the schema again","Send it to a separate triggers endpoint","Configure it in the Master Data v1 Admin","Add a `_trigger` parameter to each save","Add it to `v-triggers` of one document and save that document","Send it in an `X-VTEX-Trigger` header with each save"],"e":"Trigger to element tablicy `v-triggers` w JSON Schema. Pobierasz schemat, dopisujesz trigger i wysyłasz schemat do Save schema by name.","l":["trig"]},
+ {"d":"checkout","r":2,"p":1,"t":"inl","q":"Practical: add SKU 1 (quantity 2, seller 1) to an existing cart. Complete the request.","tpl":"{1} /api/checkout/pub/orderForm/{orderFormId}/{2}\n{\"orderItems\": [{\"id\": \"1\", \"quantity\": 2, \"{3}\": \"1\"}]}","o":["HTTP method","Path segment","Body field for the seller"],"c":[["GET","POST","PUT","PATCH"],["attachments/shippingData","items","items/update","transaction"],["sellerId","salesChannel","seller"]],"a":[1,1,2],"e":"Pozycje do koszyka dodajesz przez `POST …/orderForm/{orderFormId}/items` z tablicą `orderItems`. Każda pozycja ma `id` (SKU), `quantity` i `seller`.","l":["items"]},
+ {"d":"checkout","r":2,"p":1,"t":"mat","q":"Practical: match each Checkout API call on an existing cart to what it does.","o":["`POST /api/checkout/pub/orderForm/{orderFormId}/items`","`POST /api/checkout/pub/orderForm/{orderFormId}/attachments/shippingData`","`POST /api/checkout/pub/orderForm/{orderFormId}/attachments/clientProfileData`","`POST /api/checkout/pub/orderForm/{orderFormId}/items/removeAll`"],"c":["Remove all items from the cart","Add customer profile data","Add items to the cart","Add shipping address and delivery option"],"a":[2,3,1,0],"e":"`/items` dodaje pozycje, `/attachments/shippingData` zapisuje adres i opcję dostawy, `/attachments/clientProfileData` dane klienta, a `/items/removeAll` czyści koszyk.","l":["items","shipping","clientprof","removeall"]},
+ {"d":"checkout","r":2,"p":1,"t":"txt","q":"Practical: type the path that returns the current shopper's cart, or creates a new one if there is none.","tpl":"GET","o":["/api/checkout/pub/orderForm"],"e":"`GET /api/checkout/pub/orderForm` zwraca bieżący koszyk (orderForm) albo tworzy nowy, gdy go nie ma.","l":["cart"]}
 ];
 
 const F = [
@@ -13665,6 +13748,7 @@ function bootApiMap(root, onNav, embed) {
   }
   /* An answer is right only when the selected set equals the correct set (the first n options). */
   function isRight(i, sel) {
+    if (Q[i].t === "txt") return Array.isArray(sel) && typeof sel[0] === "string" && txtOk(Q[i], sel[0]);
     if (Q[i].c) return mxHits(i, sel) === Q[i].o.length;
     /* ord: the saved answer is the option order as shown, right only when it is the order of o */
     if (Q[i].ord)
@@ -13684,6 +13768,136 @@ function bootApiMap(root, onNav, embed) {
       })
     );
   }
+  /* Text entry: case matters in VTEX paths, so only spaces, a host and a trailing slash are forgiven. */
+  function txtNorm(v) {
+    return String(v)
+      .trim()
+      .replace(/\s+/g, " ")
+      .replace(/^https?:\/\/[^/]+/i, "")
+      .replace(/\/+$/, "");
+  }
+  function txtOk(q, v) {
+    var t = txtNorm(v);
+    return (
+      t !== "" &&
+      q.o.some(function (o) {
+        return txtNorm(o) === t;
+      })
+    );
+  }
+  /* Points for one answer: inline choice and matching score per field, like Inspera; the rest is 0 or 1. */
+  function qPts(i, sel) {
+    var q = Q[i];
+    if (q.t === "inl" || q.t === "mat") return mxHits(i, sel) / q.o.length;
+    return isRight(i, sel) ? 1 : 0;
+  }
+  /* Inline choice (a select per {n} gap in tpl), matching (a select per row) and text entry share one body.
+     Inline and matching answers store row * 16 + choice like a matrix, text entry stores [text]. */
+  function gapSel(i, r, choices, sel, reveal) {
+    var q = Q[i],
+      v = -1;
+    sel.forEach(function (x) {
+      if (typeof x === "number" && x >> 4 === r) v = x & 15;
+    });
+    var good = v === q.a[r],
+      cls = "gap" + (reveal ? (good ? " is-right" : " is-wrong") : "");
+    return (
+      '<span class="gapw"><select class="' +
+      cls +
+      '" data-r="' +
+      r +
+      '" aria-label="' +
+      esc(gsPlain(q.o[r])) +
+      '"' +
+      (reveal ? " disabled" : "") +
+      '><option value="">' +
+      L("Wybierz…", "Select…") +
+      "</option>" +
+      choices
+        .map(function (c, ci) {
+          return '<option value="' + ci + '"' + (ci === v ? " selected" : "") + ">" + esc(gsPlain(c)) + "</option>";
+        })
+        .join("") +
+      "</select>" +
+      (reveal && !good ? '<span class="gap-fix">' + esc(gsPlain(choices[q.a[r]])) + "</span>" : "") +
+      "</span>"
+    );
+  }
+  function gapBody(i, sel, reveal) {
+    var q = Q[i];
+    if (q.t === "txt") {
+      var v = typeof sel[0] === "string" ? sel[0] : "",
+        good = txtOk(q, v);
+      return (
+        '<div class="gap-txt">' +
+        (q.tpl ? '<span class="gap-pre">' + esc(q.tpl) + "</span>" : "") +
+        '<input type="text" class="gap gap-t' +
+        (reveal ? (good ? " is-right" : " is-wrong") : "") +
+        '" value="' +
+        esc(v) +
+        '" aria-label="' +
+        L("Twoja odpowiedź", "Your answer") +
+        '" spellcheck="false" autocapitalize="off" autocomplete="off"' +
+        (reveal ? " disabled" : "") +
+        ">" +
+        (reveal && !good ? '<span class="gap-fix">' + esc(q.o[0]) + "</span>" : "") +
+        "</div>"
+      );
+    }
+    if (q.t === "mat")
+      return (
+        '<div class="gap-mat">' +
+        PERM[i]
+          .map(function (r) {
+            return (
+              '<div class="gap-row"><span class="gap-l">' +
+              fmt(q.o[r]) +
+              "</span>" +
+              gapSel(i, r, q.c, sel, reveal) +
+              "</div>"
+            );
+          })
+          .join("") +
+        "</div>"
+      );
+    return (
+      '<pre class="gap-tpl"><code>' +
+      esc(q.tpl).replace(/\{(\d)\}/g, function (_, d) {
+        return gapSel(i, d - 1, q.c[d - 1], sel, reveal);
+      }) +
+      "</code></pre>"
+    );
+  }
+  /* One listener for every select and text field of a gap question, in the list, Focus and the exam. */
+  function gapPick(el) {
+    var card = el.closest(".q");
+    if (!card || el.disabled) return;
+    var i = +card.dataset.i,
+      sim = !!el.closest("#simroot"),
+      list = sim ? S.sim.ans[i] || (S.sim.ans[i] = []) : DRAFT[i] || (DRAFT[i] = []);
+    if (el.classList.contains("gap-t")) {
+      list.length = 0;
+      if (el.value.trim()) list.push(el.value);
+    } else {
+      var r = +el.dataset.r;
+      for (var j = list.length - 1; j > -1; j--) if (list[j] >> 4 === r) list.splice(j, 1);
+      if (el.value !== "") list.push(r * 16 + +el.value);
+    }
+    if (sim) {
+      if (!list.length) delete S.sim.ans[i];
+      save();
+      paintPal();
+    } else {
+      var c = card.querySelector(".chk");
+      if (c) c.disabled = !list.length;
+    }
+  }
+  document.addEventListener("change", function (ev) {
+    if (ev.target.matches && ev.target.matches("select.gap")) gapPick(ev.target);
+  });
+  document.addEventListener("input", function (ev) {
+    if (ev.target.matches && ev.target.matches("input.gap-t")) gapPick(ev.target);
+  });
   /* Matrix answers store row * 16 + column, one entry per row. */
   function mxHits(i, sel) {
     var q = Q[i],
@@ -14012,7 +14226,8 @@ function bootApiMap(root, onNav, embed) {
     sel = sel || [];
     var rightLetters = [],
       opts = "";
-    if (q.c) opts = mxBody(i, sel, reveal);
+    if (q.t) opts = gapBody(i, sel, reveal);
+    else if (q.c) opts = mxBody(i, sel, reveal);
     else if (q.ord) opts = ordBody(i, sel, reveal, mode);
     else
       PERM[i].forEach(function (oi, pos) {
@@ -14068,30 +14283,49 @@ function bootApiMap(root, onNav, embed) {
       var word = need > 1 ? L("Poprawne: ", "Right answers: ") : L("Poprawna: ", "Right answer: ");
       var verdict = ok
         ? '<span class="verdict ok">' + L("Dobrze.", "Right.") + "</span>"
-        : q.ord
+        : q.t === "txt"
           ? '<span class="verdict no">' +
             (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-            L("Poprawna kolejność:", "Right order:") +
-            '</span><ol class="ord-ok">' +
-            q.o
-              .map(function (o) {
-                return "<li>" + fmt(o) + "</li>";
-              })
-              .join("") +
-            "</ol>"
-          : q.c
-            ? '<span class="verdict no">' +
-              (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-              L("Trafione wiersze: ", "Rows right: ") +
+            L("Poprawnie: ", "Right: ") +
+            "<code>" +
+            esc(q.o[0]) +
+            "</code>.</span>"
+          : q.t
+            ? '<span class="verdict ' +
+              (mxHits(i, sel) ? "part" : "no") +
+              '">' +
+              L("Trafione pola: ", "Fields right: ") +
               mxHits(i, sel) +
               " / " +
               q.o.length +
-              ".</span>"
-            : '<span class="verdict no">' +
-              (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
-              word +
-              rightLetters.join(", ") +
-              ".</span>";
+              " · " +
+              String(Math.round(qPts(i, sel) * 100) / 100) +
+              L(" pkt.", " pt.") +
+              "</span>"
+            : q.ord
+              ? '<span class="verdict no">' +
+                (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+                L("Poprawna kolejność:", "Right order:") +
+                '</span><ol class="ord-ok">' +
+                q.o
+                  .map(function (o) {
+                    return "<li>" + fmt(o) + "</li>";
+                  })
+                  .join("") +
+                "</ol>"
+              : q.c
+                ? '<span class="verdict no">' +
+                  (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+                  L("Trafione wiersze: ", "Rows right: ") +
+                  mxHits(i, sel) +
+                  " / " +
+                  q.o.length +
+                  ".</span>"
+                : '<span class="verdict no">' +
+                  (sel.length ? L("Źle. ", "Wrong. ") : L("Brak odpowiedzi. ", "No answer. ")) +
+                  word +
+                  rightLetters.join(", ") +
+                  ".</span>";
       tail =
         '<div class="exp"><p>' +
         verdict +
@@ -14155,13 +14389,21 @@ function bootApiMap(root, onNav, embed) {
           L("Ułóż kroki w kolejności przyciskami ↑ ↓.", "Put the steps in order with the ↑ ↓ buttons.") +
           "</span>" +
           "</p>"
-        : q.c
-          ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
-          : '<p class="how pick"><strong>' +
-            (need === 1
-              ? L("Wybierz 1 odpowiedź.", "Select 1 answer.")
-              : L("Zaznacz " + need + " odpowiedzi.", "Select " + need + " answers.")) +
-            "</strong></p>";
+        : q.t
+          ? '<p class="how">' +
+            (q.t === "txt"
+              ? L("Wpisz odpowiedź.", "Type your answer.")
+              : q.t === "mat"
+                ? L("Dopasuj każdy wiersz. Punkt za każdą parę.", "Match each row. One mark per pair.")
+                : L("Wybierz wartość w każdej luce. Punkt za każde pole.", "Fill each gap. One mark per field.")) +
+            "</p>"
+          : q.c
+            ? '<p class="how">' + L("Wybierz jedną kolumnę w każdym wierszu.", "Pick one column in each row.") + "</p>"
+            : '<p class="how pick"><strong>' +
+              (need === 1
+                ? L("Wybierz 1 odpowiedź.", "Select 1 answer.")
+                : L("Zaznacz " + need + " odpowiedzi.", "Select " + need + " answers.")) +
+              "</strong></p>";
 
     return (
       '<article class="q' +
@@ -14186,7 +14428,7 @@ function bootApiMap(root, onNav, embed) {
       how +
       /* radios need their group, so a screen reader says "1 of 6" and arrows move the choice */
       '<div class="opts"' +
-      (q.c || q.ord
+      (q.c || q.ord || q.t
         ? ""
         : ' role="' +
           (need === 1 ? "radiogroup" : "group") +
@@ -15814,9 +16056,11 @@ function bootApiMap(root, onNav, embed) {
   }
   function simScore() {
     var m = S.sim;
-    return m.ids.filter(function (i) {
-      return isRight(i, m.ans[i]);
-    }).length;
+    var s = 0;
+    m.ids.forEach(function (i) {
+      s += qPts(i, m.ans[i]);
+    });
+    return Math.round(s * 100) / 100;
   }
   function clock(ms) {
     var s = Math.max(0, Math.ceil(ms / 1000)),
@@ -16212,10 +16456,10 @@ function bootApiMap(root, onNav, embed) {
   /* The "i" screen: Inspera opens on an overview of question types and marks. */
   function simInfo() {
     var m = S.sim,
-      g = { mc: [], mr: [], mx: [], ord: [], pr: [] };
+      g = { mc: [], mr: [], mx: [], ord: [], inl: [], mat: [], txt: [], pr: [] };
     m.ids.forEach(function (i, p) {
       var q = Q[i];
-      g[q.ord ? "ord" : q.c ? "mx" : nRight(q) > 1 ? "mr" : "mc"].push(p);
+      g[q.t || (q.ord ? "ord" : q.c ? "mx" : nRight(q) > 1 ? "mr" : "mc")].push(p);
     });
     m.pr.forEach(function (_, k) {
       g.pr.push(m.ids.length + k);
@@ -16225,6 +16469,9 @@ function bootApiMap(root, onNav, embed) {
       ["mr", "Multiple Response", "Select all that apply", 1],
       ["mx", "Matrix", "One answer per row", 1],
       ["ord", "Ordering", "Put the steps in order", 1],
+      ["inl", "Inline choice", "One mark per gap", "1 per gap"],
+      ["mat", "Matching", "One mark per pair", "1 per pair"],
+      ["txt", "Text entry", "Type the answer", 1],
       ["pr", "Practical", "Write the request", SIM_PP]
     ]
       .filter(function (r) {
