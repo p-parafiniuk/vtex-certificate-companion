@@ -950,7 +950,9 @@
           done: !!rs.done,
           used: rs.used | 0,
           timeUp: !!rs.timeUp,
-          only: /^(wrong|flag|both)$/.test(rs.only) ? rs.only : "all"
+          only: /^(wrong|flag|both)$/.test(rs.only) ? rs.only : "all",
+          scr: rs.scr === "i" || rs.scr === "s" ? rs.scr : "",
+          nf: /^(open|flag)$/.test(rs.nf) ? rs.nf : "all"
         };
         if (rs.gx && typeof rs.gx === "object")
           S.sim.gx = { n: Math.max(0, Math.min(rs.gx.n | 0, 999)), w: Math.max(0, Math.min(rs.gx.w | 0, 999)) };
@@ -976,11 +978,13 @@
 
   /* ---------- helpers ---------- */
   /* UI language: questions, explanations and flashcards stay as written. HTTP Koty translates its own content. */
+  /* A running exam is drawn in English whatever the UI language, like the real Inspera portal. */
+  var EN_ONLY = false;
   function L(pl, en) {
-    return S.lang === "en" ? en : pl;
+    return EN_ONLY || S.lang === "en" ? en : pl;
   }
   function T(pair) {
-    return pair[S.lang === "en" ? 1 : 0];
+    return pair[EN_ONLY || S.lang === "en" ? 1 : 0];
   }
   function dn(k) {
     return (S.lang === "en" && DOM_EN[k]) || DOM_NAME[k];
@@ -3252,6 +3256,17 @@
       se = s % 60;
     return (h ? h + ":" + (mi < 10 ? "0" : "") : "") + mi + ":" + (se < 10 ? "0" : "") + se;
   }
+  /* Inspera words the clock: "1 hour, 33 minutes remaining". */
+  function leftText(ms) {
+    var s = Math.max(0, Math.ceil(ms / 1000)),
+      h = Math.floor(s / 3600),
+      mi = Math.floor((s % 3600) / 60),
+      p = [];
+    if (s < 60) return s + (s === 1 ? " second" : " seconds") + " remaining";
+    if (h) p.push(h + (h === 1 ? " hour" : " hours"));
+    if (mi || !h) p.push(mi + (mi === 1 ? " minute" : " minutes"));
+    return p.join(", ") + " remaining";
+  }
   function tick() {
     var m = S.sim;
     if (!m || m.done) {
@@ -3262,8 +3277,9 @@
     paintCta(left);
     var el = $("#sim-timer");
     if (el) {
-      el.textContent = clock(left);
-      el.classList.toggle("low", left < 600000);
+      el.textContent = leftText(left);
+      el.classList.toggle("warn", left < 900000 && left >= 300000);
+      el.classList.toggle("low", left < 300000);
     }
     if (left <= 0) finishSim(true);
   }
@@ -3524,61 +3540,189 @@
     }
     var pal = "";
     for (var p = 0; p < total; p++) {
+      var cur = p === pos && !m.scr;
       pal +=
         '<button type="button" class="pc' +
-        (p === pos ? " is-cur" : "") +
+        (cur ? " is-cur" : "") +
         (simAnswered(p) ? " is-ans" : "") +
         (m.flag[p] ? " is-flag" : "") +
         '" data-pos="' +
         p +
         '" aria-label="' +
-        (p < nq ? L("Pytanie ", "Question ") + (p + 1) : L("Zadanie praktyczne ", "Practical task ") + (p - nq + 1)) +
-        (simAnswered(p) ? L(", z odpowiedzią", ", answered") : L(", bez odpowiedzi", ", not answered")) +
-        (m.flag[p] ? L(", oznaczone do powrotu", ", flagged to revisit") : "") +
+        (p < nq ? "Question " + (p + 1) : "Practical task " + (p - nq + 1)) +
+        (simAnswered(p) ? ", answered" : ", not attempted") +
+        (m.flag[p] ? ", flagged" : "") +
         '"' +
-        (p === pos ? ' aria-current="true"' : "") +
+        (cur ? ' aria-current="true"' : "") +
+        (simHidden(p) ? " hidden" : "") +
         ">" +
         (p < nq ? p + 1 : "P" + (p - nq + 1)) +
         "</button>";
     }
+    var body = m.scr === "i" ? simInfo() : m.scr === "s" ? simSubmit() : card;
     return (
-      '<div class="simtop"><button type="button" class="btn small" id="sim-flag" aria-pressed="' +
-      !!m.flag[pos] +
-      '">' +
-      (m.flag[pos] ? L("Oznaczone do powrotu", "Flagged to revisit") : L("Oznacz do powrotu", "Flag to revisit")) +
-      "</button>" +
-      '<span class="simleft" id="sim-count"></span></div>' +
-      card +
-      '<div class="pal" role="group" aria-label="' +
-      L("Nawigacja po kartach", "Card navigation") +
-      '">' +
-      pal +
-      "</div>" +
-      '<ul class="legend"><li><span class="sw k"></span>' +
-      L("z odpowiedzią", "answered") +
-      '</li><li><span class="sw f"></span>' +
-      L("do powrotu", "to revisit") +
-      '</li><li><span class="sw"></span>' +
-      L("bez odpowiedzi", "not answered") +
-      "</li></ul>" +
-      '<div class="simbar"><button type="button" class="btn" id="sim-prev"' +
-      (pos === 0 ? " disabled" : "") +
-      ">← " +
-      L("Poprzednia", "Previous") +
-      "</button>" +
-      '<button type="button" class="btn" id="sim-next"' +
-      (pos === total - 1 ? " disabled" : "") +
-      ">" +
-      L("Następna", "Next") +
-      " →</button>" +
-      '<span class="timer" id="sim-timer" role="timer" aria-label="' +
-      L("Pozostały czas", "Time left") +
-      '">' +
-      clock(m.endAt - Date.now()) +
+      '<div class="simtop"><span class="timer' +
+      simWarn() +
+      '" id="sim-timer" role="timer" aria-label="Time left">' +
+      leftText(m.endAt - Date.now()) +
       "</span>" +
-      '<button type="button" class="btn primary" id="sim-finish">' +
-      L("Zakończ i oceń", "Finish and grade") +
-      "</button></div>"
+      '<div class="simf" role="group" aria-label="Filter questions">' +
+      simFilters() +
+      "</div>" +
+      (m.scr
+        ? ""
+        : '<button type="button" class="btn small" id="sim-flag" aria-pressed="' +
+          !!m.flag[pos] +
+          '">' +
+          (m.flag[pos] ? "Flagged" : "Flag question") +
+          "</button>") +
+      "</div>" +
+      body +
+      '<nav class="simbar" aria-label="Question navigation"><div class="simnums">' +
+      '<button type="button" class="pc pi' +
+      (m.scr === "i" ? " is-cur" : "") +
+      '" id="sim-info" aria-label="Information"' +
+      (m.scr === "i" ? ' aria-current="true"' : "") +
+      ">i</button>" +
+      pal +
+      '<button type="button" class="pc pok' +
+      (m.scr === "s" ? " is-cur" : "") +
+      '" id="sim-submit" aria-label="Submit"' +
+      (m.scr === "s" ? ' aria-current="true"' : "") +
+      ">✓</button></div></nav>"
+    );
+  }
+  function simWarn() {
+    var left = S.sim.endAt - Date.now();
+    return left < 300000 ? " low" : left < 900000 ? " warn" : "";
+  }
+  function simFlagCount() {
+    var n = 0;
+    for (var p = 0; p < simLen(); p++) if (S.sim.flag[p]) n++;
+    return n;
+  }
+  function simHidden(p) {
+    var f = S.sim.nf;
+    return (f === "open" && simAnswered(p)) || (f === "flag" && !S.sim.flag[p]);
+  }
+  function simFilters() {
+    var c = { all: simLen(), open: simLen() - simDoneCount(), flag: simFlagCount() };
+    return [
+      ["all", "All questions"],
+      ["open", "Not attempted"],
+      ["flag", "Flagged"]
+    ]
+      .map(function (x) {
+        return (
+          '<button type="button" class="sf" data-nf="' +
+          x[0] +
+          '" aria-pressed="' +
+          (S.sim.nf === x[0]) +
+          '">' +
+          x[1] +
+          ' (<span class="n">' +
+          c[x[0]] +
+          "</span>)</button>"
+        );
+      })
+      .join("");
+  }
+  function simNums(list) {
+    return list.length
+      ? list
+          .map(function (p) {
+            return '<button type="button" class="pn" data-pos="' + p + '">' + simLabel(p) + "</button>";
+          })
+          .join("")
+      : '<span class="muted">None</span>';
+  }
+  function simLabel(p) {
+    var nq = S.sim.ids.length;
+    return p < nq ? String(p + 1) : "P" + (p - nq + 1);
+  }
+  /* The "i" screen: Inspera opens on an overview of question types and marks. */
+  function simInfo() {
+    var m = S.sim,
+      g = { mc: [], mr: [], mx: [], ord: [], pr: [] };
+    m.ids.forEach(function (i, p) {
+      var q = Q[i];
+      g[q.ord ? "ord" : q.c ? "mx" : nRight(q) > 1 ? "mr" : "mc"].push(p);
+    });
+    m.pr.forEach(function (_, k) {
+      g.pr.push(m.ids.length + k);
+    });
+    var rows = [
+      ["mc", "Multiple Choice", "Select one answer", 1],
+      ["mr", "Multiple Response", "Select all that apply", 1],
+      ["mx", "Matrix", "One answer per row", 1],
+      ["ord", "Ordering", "Put the steps in order", 1],
+      ["pr", "Practical", "Write the request", SIM_PP]
+    ]
+      .filter(function (r) {
+        return g[r[0]].length;
+      })
+      .map(function (r) {
+        var n = g[r[0]].length;
+        return (
+          '<tr><th scope="row">' +
+          r[1] +
+          '<span class="muted">' +
+          r[2] +
+          "</span></th><td>" +
+          '<div class="pns">' +
+          simNums(g[r[0]]) +
+          "</div></td><td>" +
+          n +
+          " × " +
+          r[3] +
+          "</td></tr>"
+        );
+      })
+      .join("");
+    return (
+      '<section class="sscr" aria-labelledby="sinfo-h"><h2 id="sinfo-h">Information</h2>' +
+      '<p class="muted">VTEX APIs practice exam · ' +
+      simLen() +
+      " items · " +
+      m.dur +
+      " minutes · pass mark 80%. Use the numbers at the bottom of the window to move between questions.</p>" +
+      '<div class="tscroll"><table class="stab"><thead><tr><th scope="col">Question type</th><th scope="col">Questions</th><th scope="col">Marks</th></tr></thead><tbody>' +
+      rows +
+      "</tbody></table></div>" +
+      '<button type="button" class="btn primary" data-pos="0">Go to question 1</button></section>'
+    );
+  }
+  /* The ✓ screen: what is still open or flagged, then the one real submit. */
+  function simSubmit() {
+    var open = [],
+      fl = [];
+    for (var p = 0; p < simLen(); p++) {
+      if (!simAnswered(p)) open.push(p);
+      if (S.sim.flag[p]) fl.push(p);
+    }
+    return (
+      '<section class="sscr" aria-labelledby="ssub-h"><h2 id="ssub-h">Submit your answers?</h2>' +
+      '<div class="sw-row' +
+      (open.length ? " is-bad" : "") +
+      '"><span>Not attempted</span><strong>' +
+      open.length +
+      "</strong></div>" +
+      '<div class="pns">' +
+      simNums(open) +
+      "</div>" +
+      '<div class="sw-row' +
+      (fl.length ? " is-warn" : "") +
+      '"><span>Flagged</span><strong>' +
+      fl.length +
+      "</strong></div>" +
+      '<div class="pns">' +
+      simNums(fl) +
+      "</div>" +
+      '<p class="muted">After you submit you cannot change your answers.</p>' +
+      '<div class="row"><button type="button" class="btn" data-pos="' +
+      S.sim.cur +
+      '">Back to questions</button>' +
+      '<button type="button" class="btn primary" id="sim-finish">Submit</button></div></section>'
     );
   }
   /* Confidence lives in the sim only, so an exam run never touches the calibration in Postęp. */
@@ -4036,13 +4180,20 @@
       root.innerHTML = simResult();
       return;
     }
-    root.innerHTML = simRun();
-    simCount();
+    EN_ONLY = true;
+    try {
+      root.innerHTML = simRun();
+    } finally {
+      EN_ONLY = false;
+    }
+    simBarScroll();
     if (!TICK) startTick();
   }
-  function simCount() {
-    var el = $("#sim-count");
-    if (el) el.textContent = L("Odpowiedzi: ", "Answered: ") + simDoneCount() + " / " + simLen();
+  /* On a phone the bar scrolls sideways: keep the current number in view. */
+  function simBarScroll() {
+    var bar = $("#simroot .simbar"),
+      c = bar && bar.querySelector(".is-cur");
+    if (c) bar.scrollLeft = c.offsetLeft - (bar.clientWidth - c.offsetWidth) / 2;
   }
   function paintPal() {
     var m = S.sim;
@@ -4050,11 +4201,14 @@
       var p = +b.dataset.pos;
       b.classList.toggle("is-ans", simAnswered(p));
       b.classList.toggle("is-flag", !!m.flag[p]);
+      b.hidden = simHidden(p);
     });
-    simCount();
+    var f = $("#simroot .simf");
+    if (f) f.innerHTML = simFilters();
   }
   function goTo(pos) {
     ARM = null;
+    S.sim.scr = "";
     go({ tab: "symulacja", pos: pos });
     var c = $("#simroot .q");
     if (c) {
@@ -4088,7 +4242,9 @@
       done: false,
       used: 0,
       timeUp: false,
-      only: "all"
+      only: "all",
+      scr: "i",
+      nf: "all"
     };
     save();
     go({ tab: "symulacja", pos: 0 }, true);
@@ -4228,42 +4384,41 @@
       paintPal();
       return;
     }
-    b = t.closest(".pc");
+    b = t.closest("#sim-info, #sim-submit");
+    if (b) {
+      m.scr = b.id === "sim-info" ? "i" : "s";
+      save();
+      renderSim();
+      var h = $("#simroot .sscr h2");
+      if (h) {
+        h.tabIndex = -1;
+        h.focus({ preventScroll: true });
+      }
+      return;
+    }
+    b = t.closest("[data-nf]");
+    if (b) {
+      m.nf = b.dataset.nf;
+      save();
+      paintPal();
+      var nb = $('#simroot [data-nf="' + m.nf + '"]');
+      if (nb) nb.focus();
+      return;
+    }
+    b = t.closest("[data-pos]");
     if (b) return goTo(+b.dataset.pos);
-    if (t.closest("#sim-prev")) return goTo(m.cur - 1);
-    if (t.closest("#sim-next")) return goTo(m.cur + 1);
     b = t.closest("#sim-flag");
     if (b) {
       if (m.flag[m.cur]) delete m.flag[m.cur];
       else m.flag[m.cur] = true;
       b.setAttribute("aria-pressed", !!m.flag[m.cur]);
-      b.textContent = m.flag[m.cur]
-        ? L("Oznaczone do powrotu", "Flagged to revisit")
-        : L("Oznacz do powrotu", "Flag to revisit");
+      b.textContent = m.flag[m.cur] ? "Flagged" : "Flag question";
       save();
       paintPal();
       return;
     }
-    b = t.closest("#sim-finish");
-    if (b) {
-      var open = simLen() - simDoneCount();
-      if (!ARM) {
-        b.textContent = open
-          ? L(
-              "Bez odpowiedzi: " + open + ". Kliknij ponownie, aby zakończyć",
-              "Not answered: " + open + ". Click again to finish"
-            )
-          : L("Na pewno? Kliknij ponownie", "Sure? Click again");
-        ARM = setTimeout(function () {
-          ARM = null;
-          var x = $("#sim-finish");
-          if (x) x.textContent = L("Zakończ i oceń", "Finish and grade");
-        }, 5000);
-        return;
-      }
-      clearTimeout(ARM);
-      finishSim(false);
-    }
+    /* The ✓ screen already lists what is open and flagged, so its Submit needs no second click. */
+    if (t.closest("#sim-finish")) finishSim(false);
   });
   $("#simroot").addEventListener("input", function (ev) {
     var t = ev.target,
