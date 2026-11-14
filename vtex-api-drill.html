@@ -1931,6 +1931,23 @@ h3 {
   color: var(--k3);
   border-color: var(--k3);
 }
+/* Touch screens get full-size targets; a mouse keeps the dense Inspera bar. */
+@media (pointer: coarse) {
+  .simbar .pc,
+  .pn {
+    min-width: 44px;
+    height: 44px;
+  }
+  .simbar .pok {
+    width: 48px;
+  }
+  .sf {
+    min-height: 44px;
+  }
+  #p-symulacja[data-state="run"] {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  }
+}
 .sscr .row {
   display: flex;
   flex-wrap: wrap;
