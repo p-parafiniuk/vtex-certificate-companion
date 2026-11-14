@@ -15187,7 +15187,9 @@ function bootApiMap(root, onNav, embed) {
       return lRefresh(mid, pop.lv < 4 ? '[data-lg="' + key + '"]' : '[data-lu="' + key + '"]');
     }
     if (d.lu) {
+      /* like a right answer, "Rozumiem" cancels one miss: otherwise a node marked "Nie łapię" stays weak for good */
       lSet(key, function (x) {
+        x.miss = Math.max(0, x.miss - 1);
         x.lv = Math.max(x.lv, pop && pop.lv >= 2 ? 2 : 1);
       });
       live(L("Zapisane: rozumiesz „", "Saved: you get “") + f.n.label + L("”.", "”."));
