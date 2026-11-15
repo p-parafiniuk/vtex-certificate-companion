@@ -44,6 +44,7 @@ A **lab** starts with its **starting state**: everything that must already exist
 ## Releases
 | Version | What's new |
 |---|---|
+| **1.6** | **Schematy** per category: a step diagram with L1–L3 layers and a Top-Bottom accordion, where **Ćwicz to** opens Focus on that point and ends on a **Gotowe** card (Umiem, next node, back to the schema). New item types: matrix, ordering, inline choice, matching and text entry. A Simulation that looks like the Inspera portal, an exam-day checklist in Ściągi, practical tasks scored 0–2, six options with no length cue across the bank, "pick N" hints, JSON bodies as copyable code blocks, and tighter wording throughout. |
 | **1.5** | Gift cards as a top-level category, a mini popover on Postęp cards (Zalicz, Pokaż treść, Open in Focus), 35 badges: Combo 5 and 15, Katas 20/40%, Notatki 20–80% and a new Pytania group (20–80% of the bank passed). |
 | **1.4** | Difficulty levels on katas, 5 step-by-step labs with a starting state, "Nie wyszło" and "Zepsuj to", lab badges, 44 px chips on touch screens, a fix for the rotated accuracy ring in Focus. |
 | **1.3** | Katas move into each category, a **Ściągi** tab with GraphQL, Postęp split into tabs, badge tiers and groups, search that lands on the hit, simulation answers counted toward today. |
