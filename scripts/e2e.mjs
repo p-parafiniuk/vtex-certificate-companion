@@ -161,6 +161,15 @@ let lastDraw;
     ok(!errs.length, "no console errors in txt", errs.join(" | "));
     await page.close();
   }
+  /* Multi-select options must not share the Check button's class, or picking never enables it. */
+  const m = D.Q.findIndex(q => q.n >= 2 && !q.t);
+  if (m > -1) {
+    const { page } = await open("focus-q" + (m + 1), { w: 375, theme: "dark", state: { v: 2 } });
+    const opts = await page.$$("#fo-stage .opt");
+    for (let k = 0; k < D.Q[m].n; k++) await opts[k].click();
+    ok(await page.isEnabled("#fo-stage .btn.chk"), "multi-select enables Check after n picks");
+    await page.close();
+  }
 }
 
 /* Score per area: every orders answer wrong, everything else right. */
