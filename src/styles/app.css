@@ -6112,3 +6112,68 @@ input.gap {
     min-height: 44px;
   }
 }
+/* End of a "Ćwicz to" subset: the card that takes the learner back to the schema. */
+.fstage .fdone {
+  gap: 18px;
+}
+.fdone-h {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.fdone-h h2 {
+  margin: 2px 0 0;
+  font-family: var(--f-display);
+  font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2rem);
+  line-height: 1.15;
+}
+.fdone-h h2:focus {
+  outline: none;
+}
+.fdone-k {
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.fdone-r {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: clamp(64px, 8vw, 88px);
+  aspect-ratio: 1;
+  border: 6px solid var(--line);
+  border-radius: 50%;
+  font-family: var(--f-display);
+  font-weight: 700;
+}
+.fdone-r.ok {
+  border-color: var(--ok);
+}
+.fdone > p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.fdone-a {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+}
+.fdone-a .btn {
+  justify-self: stretch;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+.fdone-a .btn svg {
+  width: 18px;
+  height: 18px;
+}
+.fdone-l {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+}
