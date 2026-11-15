@@ -6822,7 +6822,7 @@
     /* renderLearn skips a repaint for the same category and language; Focus answers changed node levels */
     $("#cs-learn").dataset.k = "";
     go({ tab: "pytania", cat: m.d === "all" ? undefined : m.d, sec: "learn" });
-    var el = document.querySelector('[data-ln="' + keys[0].replace(/"/g, "") + '"]');
+    var el = document.querySelector('[data-ln="' + CSS.escape(keys[0]) + '"]');
     if (el) {
       el.scrollIntoView({ block: "center" });
       el.focus({ preventScroll: true });
@@ -7136,17 +7136,17 @@
       ICON.target +
       "Focus</span>" +
       (FOC.k
-        ? '<button type="button" class="chip" id="fo-schema">‹ ' +
+        ? '<span class="fk-row"><button type="button" class="chip" id="fo-schema">‹ ' +
           L("Schemat", "Schema") +
           "</button>" +
           '<button type="button" class="chip on fk" id="fo-k" title="' +
           L("Pokaż całą talię", "Show the whole deck") +
           '"><span class="fk-t">' +
           L("Ćwiczysz: ", "Practising: ") +
-          esc(FOC.kt) +
+          esc(fName(fMod())) +
           '</span> <span aria-hidden="true">×</span><span class="sr">' +
           L(" (wyłącz)", " (turn off)") +
-          "</span></button>"
+          "</span></button></span>"
         : "") +
       '<span class="ftop-r">' +
       (S.gx.combo && S.combo >= 3
@@ -7249,7 +7249,7 @@
         : L("Zmień filtr, aby zobaczyć karty.", "Change the filter to see cards.")) +
       "</p></div>" +
       '<div class="fh-p"><div class="fh-pl"><span class="fh-k">' +
-      L("Postęp talii", "Deck progress") +
+      (FOC.k ? L("Postęp podzbioru", "Set progress") : L("Postęp talii", "Deck progress")) +
       '</span><span class="fh-v"><span><b class="g">' +
       right +
       "</b>" +
@@ -7380,8 +7380,7 @@
       '<div class="fstage" id="fo-stage" tabindex="-1">' +
       card +
       "</div>" +
-      (fin ? "" : nav) +
-      strip;
+      (fin ? "" : nav + strip);
   }
 
   function goCard(id) {
@@ -7495,6 +7494,8 @@
     if (t.closest("#fo-last")) {
       FOC.fin = null;
       renderFocus();
+      var ff = $("#fo-fin");
+      if (ff) ff.focus();
       return;
     }
     if (t.closest("#fo-again")) {

@@ -6177,3 +6177,18 @@ input.gap {
   flex-wrap: wrap;
   gap: 4px 24px;
 }
+/* The way back and the subset chip share one row, so the card stays on the first phone screen. */
+.fk-row {
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+.fk-row .chip {
+  flex: none;
+}
+.fk-row .fk {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: none;
+}
