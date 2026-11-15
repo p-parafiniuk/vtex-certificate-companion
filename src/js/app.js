@@ -1640,7 +1640,7 @@
           (need === 1 ? "radio" : "checkbox") +
           '" class="' +
           cls +
-          (need === 1 ? " rad" : " chk") +
+          (need === 1 ? " rad" : " cbx") +
           '" data-o="' +
           oi +
           '" data-need="' +

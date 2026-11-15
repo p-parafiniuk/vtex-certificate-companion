@@ -6039,7 +6039,7 @@ div.setrow {
 }
 /* the tick carries the choice; the letter stays neutral so a pick is not shown twice */
 .opt.is-picked.rad .let,
-.opt.is-picked.chk .let {
+.opt.is-picked.cbx .let {
   background: var(--surface);
   color: inherit;
   border-color: var(--line);
@@ -14340,7 +14340,7 @@ function bootApiMap(root, onNav, embed) {
           (need === 1 ? "radio" : "checkbox") +
           '" class="' +
           cls +
-          (need === 1 ? " rad" : " chk") +
+          (need === 1 ? " rad" : " cbx") +
           '" data-o="' +
           oi +
           '" data-need="' +
