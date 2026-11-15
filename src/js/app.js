@@ -921,6 +921,7 @@
         S.fo.shuf = rf.shuf >>> 0;
         if (typeof rf.id === "string") S.fo.id = rf.id;
         if (rf.dom === "all" || DOM_NAME[rf.dom]) S.fo.dom = rf.dom;
+        if (typeof rf.from === "string" && LNODE[rf.from]) S.fo.from = rf.from;
       }
       var rs = raw.sim;
       if (
@@ -3123,6 +3124,8 @@
     FOC.k = keys;
     FOC.kt = w.slice(0, 5).join(" ") + (w.length > 5 ? "…" : "");
     FOC.fin = null;
+    /* saved, so the way back survives the chip ×, "Cała talia" and a reload */
+    S.fo.from = keys[0];
     S.fo.deck = "all";
     S.fo.flt = "all";
     S.fo.dom = "all";
@@ -6712,7 +6715,7 @@
   }
   /* The learn module a "Ćwicz to" subset came from, and the next node in it still worth practising. */
   function fMod() {
-    var mid = FOC.k ? FOC.k[0].split(".")[0] : "";
+    var mid = (FOC.k ? FOC.k[0] : S.fo.from || "").split(".")[0];
     for (var i = 0; i < LEARN.length; i++) if (LEARN[i].id === mid) return LEARN[i];
     return null;
   }
@@ -6806,7 +6809,7 @@
   }
   function fSchema(mark) {
     var m = fMod(),
-      keys = FOC.k;
+      keys = FOC.k || [S.fo.from];
     if (!m) return;
     if (mark)
       keys.forEach(function (key) {
@@ -6819,6 +6822,8 @@
       });
     FOC.k = null;
     FOC.fin = null;
+    delete S.fo.from;
+    save();
     /* renderLearn skips a repaint for the same category and language; Focus answers changed node levels */
     $("#cs-learn").dataset.k = "";
     go({ tab: "pytania", cat: m.d === "all" ? undefined : m.d, sec: "learn" });
@@ -7135,18 +7140,21 @@
       '<span class="fmode">' +
       ICON.target +
       "Focus</span>" +
-      (FOC.k
+      (S.fo.from && fMod()
         ? '<span class="fk-row"><button type="button" class="chip" id="fo-schema">‹ ' +
           L("Schemat", "Schema") +
           "</button>" +
-          '<button type="button" class="chip on fk" id="fo-k" title="' +
-          L("Pokaż całą talię", "Show the whole deck") +
-          '"><span class="fk-t">' +
-          L("Ćwiczysz: ", "Practising: ") +
-          esc(fName(fMod())) +
-          '</span> <span aria-hidden="true">×</span><span class="sr">' +
-          L(" (wyłącz)", " (turn off)") +
-          "</span></button></span>"
+          (FOC.k
+            ? '<button type="button" class="chip on fk" id="fo-k" title="' +
+              L("Pokaż całą talię", "Show the whole deck") +
+              '"><span class="fk-t">' +
+              L("Ćwiczysz: ", "Practising: ") +
+              esc(fName(fMod())) +
+              '</span> <span aria-hidden="true">×</span><span class="sr">' +
+              L(" (wyłącz)", " (turn off)") +
+              "</span></button>"
+            : "") +
+          "</span>"
         : "") +
       '<span class="ftop-r">' +
       (S.gx.combo && S.combo >= 3
@@ -7168,7 +7176,7 @@
       ICON.gear +
       "</button>" +
       '<button type="button" class="icn" id="fo-close" aria-label="' +
-      (FOC.k
+      (S.fo.from
         ? L("Zamknij tryb Focus i wróć do schematu", "Close Focus mode and go back to the schema")
         : L("Zamknij tryb Focus i wróć do listy", "Close Focus mode and go back to the list")) +
       '" title="' +
@@ -7428,6 +7436,7 @@
   }
   function enterFocus(from) {
     FOC.k = null;
+    delete S.fo.from;
     var flash = from === "pytania" && NAV.cur.sec === "katas";
     /* The deck holds what the list showed: the open category, questions or katas. */
     S.fo.dom = S.dom;
@@ -7442,6 +7451,7 @@
   }
   function startDue() {
     FOC.k = null;
+    delete S.fo.from;
     S.fo.flt = "due";
     S.fo.deck = "all";
     S.fo.dom = "all";
@@ -7452,6 +7462,7 @@
   $("#gx-due").addEventListener("click", startDue);
   function startWeak(dom) {
     FOC.k = null;
+    delete S.fo.from;
     S.fo.flt = "weak";
     S.fo.deck = "q";
     S.fo.dom = dom;
@@ -7465,7 +7476,7 @@
   });
   function exitFocus() {
     /* A "Ćwicz to" subset came from a schema, so leaving Focus goes back to that schema, not to the list. */
-    if (FOC.k && fMod()) return fSchema(false);
+    if (S.fo.from && fMod()) return fSchema(false);
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
     go({ tab: "pytania", cat: S.fo.dom === "all" ? undefined : S.fo.dom, sec: flash ? "katas" : undefined });
@@ -7516,6 +7527,7 @@
     if ((b = t.closest("#fo-nextn"))) {
       FOC.k = [b.dataset.k];
       FOC.kt = b.dataset.t;
+      S.fo.from = b.dataset.k;
       FOC.fin = null;
       var nl = lCards(FOC.k);
       return goCard(nl[0].id);
