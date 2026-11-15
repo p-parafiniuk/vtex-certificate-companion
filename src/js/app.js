@@ -1019,11 +1019,23 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
     });
   }
+  /* A ```json fence becomes a block with a copy button (pmCopy); callers must not wrap fmt output in <p>. */
   function fmt(s) {
     return esc(s)
-      .replace(/`([^`]+)`/g, "<code>$1</code>")
-      .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-      .replace(/\n/g, "<br>");
+      .split(/\n?```json\n([\s\S]*?)\n?```\n?/)
+      .map(function (t, i) {
+        return i % 2
+          ? '<div class="cb"><div class="cbh"><span>JSON</span><button type="button" class="pm-copy" aria-live="polite">' +
+              L("Kopiuj", "Copy") +
+              "</button></div><pre><code>" +
+              t +
+              "</code></pre></div>"
+          : t
+              .replace(/`([^`]+)`/g, "<code>$1</code>")
+              .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+              .replace(/\n/g, "<br>");
+      })
+      .join("");
   }
   function shuffle(a) {
     for (var i = a.length - 1; i > 0; i--) {
@@ -1697,11 +1709,11 @@
                   rightLetters.join(", ") +
                   ".</span>";
       tail =
-        '<div class="exp"><p>' +
+        '<div class="exp"><div class="exp-t">' +
         verdict +
         " " +
         fmt(q.e) +
-        "</p>" +
+        "</div>" +
         docLinks(q) +
         httpChips(q) +
         (mode === "learn"
@@ -4871,9 +4883,9 @@
       if (cur) {
         h +=
           (s.in ? '<p class="lab-in"><strong>' + L("Masz: ", "You have: ") + "</strong>" + fmt(s.in) + "</p>" : "") +
-          '<p class="lab-do">' +
+          '<div class="lab-do">' +
           fmt(s.do) +
-          "</p>" +
+          "</div>" +
           (s.ok ? '<p class="lab-ok"><strong>' + L("Sukces: ", "Success: ") + "</strong>" + fmt(s.ok) + "</p>" : "") +
           (s.keep
             ? '<p class="lab-keep"><strong>' + L("Zapisz: ", "Keep: ") + "</strong>" + fmt(s.keep) + "</p>"
@@ -7891,7 +7903,7 @@
   });
   /* Clipboard needs a secure context; file:// usually is one, but fall back to selecting the text so Ctrl+C works. */
   function pmCopy(b) {
-    var pre = b.closest(".pm-code, .pm-reqw, .ex-tpl").querySelector("pre"),
+    var pre = b.closest(".pm-code, .pm-reqw, .ex-tpl, .cb").querySelector("pre"),
       text = b.dataset.url || pre.textContent,
       label = b.textContent;
     function said(ok) {

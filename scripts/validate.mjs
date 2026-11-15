@@ -19,7 +19,10 @@ D.DOMS.forEach((d, i) => {
 
 function markup(w, s) {
   if (typeof s !== "string") return;
-  if ((s.match(/`/g) || []).length % 2) E(w, "unbalanced backtick");
+  const fences = (s.match(/```/g) || []).length;
+  if (fences % 2 || (s.match(/```json\n[^`]*\n```/g) || []).length * 2 !== fences)
+    E(w, "code fence must be ```json\\n…\\n```");
+  if ((s.replace(/```/g, "").match(/`/g) || []).length % 2) E(w, "unbalanced backtick");
   if ((s.match(/\*\*/g) || []).length % 2) E(w, "unbalanced **");
 }
 function common(w, x, allowed) {

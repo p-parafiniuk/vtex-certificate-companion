@@ -176,6 +176,47 @@ code {
   border-radius: 4px;
   overflow-wrap: anywhere;
 }
+/* Fenced ```json block from fmt(): scrolls inside so a long line never widens the page. */
+.cb {
+  margin: 8px 0;
+  border-radius: 8px;
+  background: var(--code);
+  overflow: hidden;
+}
+.cbh {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
+  border-bottom: 1px solid var(--line);
+  font: 500 0.7rem/1 var(--f-mono);
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+.cb .pm-copy {
+  border-color: transparent;
+  background: none;
+  color: var(--accent);
+  font-family: var(--f-body);
+}
+.cb .pm-copy.on {
+  color: var(--ok);
+  background: var(--ok-soft);
+}
+.cb pre {
+  margin: 0;
+  padding: 10px 12px;
+  font: 400 0.82rem/1.5 var(--f-mono);
+  white-space: pre;
+  overflow-x: auto;
+}
+.cb pre code {
+  padding: 0;
+  background: none;
+  font: inherit;
+  overflow-wrap: normal;
+}
 strong {
   font-weight: 600;
 }
@@ -1190,6 +1231,7 @@ h3 {
   color: var(--muted);
 }
 .lab-do {
+  margin: 1em 0;
   background: var(--surface);
   border-radius: 8px;
   padding: 10px;
@@ -1550,7 +1592,8 @@ h3 {
   display: grid;
   gap: 8px;
 }
-.exp p {
+.exp p,
+.exp-t {
   margin: 0;
   max-width: 68ch;
 }
