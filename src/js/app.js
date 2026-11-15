@@ -6859,7 +6859,7 @@
           fmt(f.q) +
           '</span><span class="fhint">' +
           ICON.flip +
-          L("Kliknij, aby odsłonić odpowiedź", "Click to reveal the answer") +
+          L("Odsłoń odpowiedź", "Reveal the answer") +
           "</span></button>") +
       "</article>"
     );
