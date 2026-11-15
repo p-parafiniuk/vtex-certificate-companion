@@ -3122,6 +3122,7 @@
     var w = b.dataset.lt.split(/\s+/);
     FOC.k = keys;
     FOC.kt = w.slice(0, 5).join(" ") + (w.length > 5 ? "…" : "");
+    FOC.fin = null;
     S.fo.deck = "all";
     S.fo.flt = "all";
     S.fo.dom = "all";
@@ -6651,7 +6652,7 @@
     c.n = n;
     BY_ID[c.id] = c;
   });
-  var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0, k: null, kt: "" };
+  var FOC = { id: null, open: false, set: false, t: null, dirty: false, combo: 0, k: null, kt: "", fin: null };
   var DECKS = [
     ["all", ["Wszystko", "Everything"]],
     ["q", ["Pytania", "Questions"]],
@@ -6708,6 +6709,124 @@
         (S.fo.deck === "all" || c.t === S.fo.deck) && (S.fo.dom === "all" || c.d === S.fo.dom) && inSet(c) && lvPass(c)
       );
     });
+  }
+  /* The learn module a "Ćwicz to" subset came from, and the next node in it still worth practising. */
+  function fMod() {
+    var mid = FOC.k ? FOC.k[0].split(".")[0] : "";
+    for (var i = 0; i < LEARN.length; i++) if (LEARN[i].id === mid) return LEARN[i];
+    return null;
+  }
+  function fNextNode(m) {
+    var ids =
+        m.ord ||
+        m.nodes.map(function (n) {
+          return n.id;
+        }),
+      at = -1;
+    ids.forEach(function (id, i) {
+      if (FOC.k.indexOf(m.id + "." + id) > -1) at = i;
+    });
+    for (var j = 1; j < ids.length; j++) {
+      var id = ids[(at + j + ids.length) % ids.length],
+        key = m.id + "." + id;
+      if (FOC.k.indexOf(key) < 0 && lSt(key).lv < 3 && lCards([key]).length)
+        return m.nodes.filter(function (n) {
+          return n.id === id;
+        })[0];
+    }
+    return null;
+  }
+  /* One node: its label, as the schema shows it. Several (an accordion point): the point text from the chip. */
+  function fName(m) {
+    var id = m && FOC.k.length === 1 ? FOC.k[0].slice(m.id.length + 1) : "",
+      n = m
+        ? m.nodes.filter(function (x) {
+            return x.id === id;
+          })[0]
+        : null;
+    return n ? n.label : FOC.kt;
+  }
+  function fDone(m, right, total) {
+    var all = right === total,
+      nx = m && fNextNode(m),
+      dk = m && m.d !== "all" ? m.d : "";
+    return (
+      '<section class="q fdone" aria-labelledby="fo-dh">' +
+      '<div class="fdone-h"><span class="fdone-r' +
+      (all ? " ok" : "") +
+      '">' +
+      Math.round((right / (total || 1)) * 100) +
+      "%</span><div>" +
+      (m ? '<p class="fdone-k">' + esc(m.t) + "</p>" : "") +
+      '<h2 id="fo-dh" tabindex="-1">' +
+      esc(fName(m)) +
+      (all ? L(": przećwiczone", ": practised") : "") +
+      "</h2></div></div><p>" +
+      (all
+        ? L(
+            "Wszystkie karty tego punktu zaliczone. Oznacz go jako opanowany, a w schemacie zaświeci się na zielono.",
+            "Every card for this point is right. Mark it as mastered and it turns green in the schema."
+          )
+        : L(
+            right + " z " + total + " dobrze. Powtórz błędne, zanim oznaczysz węzeł.",
+            right + " of " + total + " right. Go over the misses before you mark the node."
+          )) +
+      '</p><div class="fdone-a">' +
+      (all
+        ? '<button type="button" class="btn primary big" id="fo-umiem">' +
+          ICON.check +
+          L("Umiem — wróć do schematu", "I know it — back to the schema") +
+          "</button>"
+        : '<button type="button" class="btn primary big" id="fo-again">' +
+          L("Powtórz błędne", "Go over the misses") +
+          "</button>") +
+      (nx
+        ? '<button type="button" class="btn big" id="fo-nextn" data-k="' +
+          esc(m.id + "." + nx.id) +
+          '" data-t="' +
+          esc(nx.label) +
+          '">' +
+          L("Ćwicz następny: ", "Practise next: ") +
+          "<b>" +
+          esc(nx.label) +
+          "</b> ›</button>"
+        : "") +
+      '</div><p class="fdone-l">' +
+      (all
+        ? '<button type="button" class="linkbtn" id="fo-again">' +
+          L("Powtórz podzbiór", "Repeat this set") +
+          "</button>"
+        : "") +
+      '<button type="button" class="linkbtn" id="fo-whole">' +
+      (dk ? L("Cała talia ", "Whole deck: ") + esc(dn(dk)) : L("Cała talia", "Whole deck")) +
+      '</button><button type="button" class="linkbtn" id="fo-last">' +
+      L("Zobacz ostatnie pytanie", "See the last question") +
+      "</button></p></section>"
+    );
+  }
+  function fSchema(mark) {
+    var m = fMod(),
+      keys = FOC.k;
+    if (!m) return;
+    if (mark)
+      keys.forEach(function (key) {
+        if (LNODE[key])
+          lSet(key, function (st) {
+            st.lv = 3;
+            st.ok = 2;
+            st.miss = 0;
+          });
+      });
+    FOC.k = null;
+    FOC.fin = null;
+    /* renderLearn skips a repaint for the same category and language; Focus answers changed node levels */
+    $("#cs-learn").dataset.k = "";
+    go({ tab: "pytania", cat: m.d === "all" ? undefined : m.d, sec: "learn" });
+    var el = document.querySelector('[data-ln="' + CSS.escape(keys[0]) + '"]');
+    if (el) {
+      el.scrollIntoView({ block: "center" });
+      el.focus({ preventScroll: true });
+    }
   }
   function fPass(c) {
     if (S.fo.flt === "todo") return !cKnown(c) && cState(c) !== 1;
@@ -7017,14 +7136,17 @@
       ICON.target +
       "Focus</span>" +
       (FOC.k
-        ? '<button type="button" class="chip on fk" id="fo-k" title="' +
+        ? '<span class="fk-row"><button type="button" class="chip" id="fo-schema">‹ ' +
+          L("Schemat", "Schema") +
+          "</button>" +
+          '<button type="button" class="chip on fk" id="fo-k" title="' +
           L("Pokaż całą talię", "Show the whole deck") +
           '"><span class="fk-t">' +
           L("Ćwiczysz: ", "Practising: ") +
-          esc(FOC.kt) +
+          esc(fName(fMod())) +
           '</span> <span aria-hidden="true">×</span><span class="sr">' +
           L(" (wyłącz)", " (turn off)") +
-          "</span></button>"
+          "</span></button></span>"
         : "") +
       '<span class="ftop-r">' +
       (S.gx.combo && S.combo >= 3
@@ -7127,7 +7249,7 @@
         : L("Zmień filtr, aby zobaczyć karty.", "Change the filter to see cards.")) +
       "</p></div>" +
       '<div class="fh-p"><div class="fh-pl"><span class="fh-k">' +
-      L("Postęp talii", "Deck progress") +
+      (FOC.k ? L("Postęp podzbioru", "Set progress") : L("Postęp talii", "Deck progress")) +
       '</span><span class="fh-v"><span><b class="g">' +
       right +
       "</b>" +
@@ -7187,6 +7309,8 @@
       : c.t === "q"
         ? qCard(c.i, "learn", learnSel(c.i))
         : fFlash(c);
+    var fin = FOC.k && c && FOC.fin === c.id;
+    if (fin) card = fDone(fMod(), right, total);
 
     var strip = "";
     if (c && sec.length <= 60) {
@@ -7239,11 +7363,14 @@
       '<span class="fpos">' +
       (c ? pos + 1 + " / " + deck.length : "") +
       "</span>" +
-      '<button type="button" class="btn primary big" id="fo-next"' +
-      (pos > -1 && pos < deck.length - 1 ? "" : " disabled") +
-      ">" +
-      L("Następna", "Next") +
-      " ›</button></div>";
+      (FOC.k && c && pos === deck.length - 1
+        ? '<button type="button" class="btn primary big" id="fo-fin">' + L("Zakończ", "Finish") + " ›</button>"
+        : '<button type="button" class="btn primary big" id="fo-next"' +
+          (pos > -1 && pos < deck.length - 1 ? "" : " disabled") +
+          ">" +
+          L("Następna", "Next") +
+          " ›</button>") +
+      "</div>";
 
     FOC.combo = S.combo;
     $("#focusroot").innerHTML =
@@ -7253,8 +7380,7 @@
       '<div class="fstage" id="fo-stage" tabindex="-1">' +
       card +
       "</div>" +
-      nav +
-      strip;
+      (fin ? "" : nav + strip);
   }
 
   function goCard(id) {
@@ -7356,6 +7482,47 @@
     }
     var t = ev.target,
       b;
+    if (t.closest("#fo-schema")) return fSchema(false);
+    if (t.closest("#fo-umiem")) return fSchema(true);
+    if (t.closest("#fo-fin")) {
+      FOC.fin = NAV.cur.id;
+      renderFocus();
+      var dh = $("#fo-dh");
+      if (dh) dh.focus();
+      return;
+    }
+    if (t.closest("#fo-last")) {
+      FOC.fin = null;
+      renderFocus();
+      var ff = $("#fo-fin");
+      if (ff) ff.focus();
+      return;
+    }
+    if (t.closest("#fo-again")) {
+      var dq = fDeck(null);
+      FOC.fin = null;
+      return goCard(
+        (
+          dq.filter(function (x) {
+            return cState(x) !== 1;
+          })[0] || dq[0]
+        ).id
+      );
+    }
+    if ((b = t.closest("#fo-nextn"))) {
+      FOC.k = [b.dataset.k];
+      FOC.kt = b.dataset.t;
+      FOC.fin = null;
+      var nl = lCards(FOC.k);
+      return goCard(nl[0].id);
+    }
+    if (t.closest("#fo-whole")) {
+      var wm = fMod();
+      FOC.k = null;
+      FOC.fin = null;
+      if (wm && wm.d !== "all" && DOM_NAME[wm.d]) S.fo.dom = wm.d;
+      return refocus();
+    }
     if (t.closest("#fo-close")) return exitFocus();
     b = t.closest("#fo-gear");
     if (b) {
