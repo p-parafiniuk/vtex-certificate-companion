@@ -19948,7 +19948,9 @@ function bootApiMap(root, onNav, embed) {
       ICON.gear +
       "</button>" +
       '<button type="button" class="icn" id="fo-close" aria-label="' +
-      L("Zamknij tryb Focus i wróć do listy", "Close Focus mode and go back to the list") +
+      (FOC.k
+        ? L("Zamknij tryb Focus i wróć do schematu", "Close Focus mode and go back to the schema")
+        : L("Zamknij tryb Focus i wróć do listy", "Close Focus mode and go back to the list")) +
       '" title="' +
       L("Wróć do listy (Esc)", "Back to the list (Esc)") +
       '">' +
@@ -20242,6 +20244,8 @@ function bootApiMap(root, onNav, embed) {
     if (b && DOM_NAME[b.dataset.weakDom]) startWeak(b.dataset.weakDom);
   });
   function exitFocus() {
+    /* A "Ćwicz to" subset came from a schema, so leaving Focus goes back to that schema, not to the list. */
+    if (FOC.k && fMod()) return fSchema(false);
     var c = BY_ID[NAV.cur.id];
     var flash = c ? c.t !== "q" : S.fo.deck === "f" || S.fo.deck === "p";
     go({ tab: "pytania", cat: S.fo.dom === "all" ? undefined : S.fo.dom, sec: flash ? "katas" : undefined });
