@@ -1,0 +1,200 @@
+{
+  "8": {
+    "ok": true,
+    "issue": "learn.vtex.com page sourced only for /pvt/ = private route authenticated with AppKey/AppToken; no official page found stating /pub/ = public.",
+    "fix": {},
+    "x": null,
+    "src": ["https://learn.vtex.com/docs/course-calling-commerce-apis-step02references-lang-en#authentication"]
+  },
+  "70": {
+    "ok": true,
+    "issue": "Sourced: guide says for FromWorkflow do not include expression nor disableSingleFire; schema says status 'only used if type is FromWorkflow'.",
+    "fix": {},
+    "x": null,
+    "src": ["https://developers.vtex.com/docs/guides/orders-feed#disablesinglefire"]
+  },
+  "73": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Manifest zawiera metody płatności (`paymentMethods`).",
+      "Manifest zawiera konfigurację splitu (`allowsSplit`).",
+      "Manifest zawiera pola niestandardowe (custom fields).",
+      "Manifest to metadane providera, nie lista transakcji do rozliczenia.",
+      "Wynik antyfraudu nie jest metadaną manifestu; dotyczy konkretnej transakcji.",
+      "Credentials `appKey` i `appToken` powstają w Configuration Flow, nie w manifeście."
+    ],
+    "src": [
+      "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider#1-get-manifest"
+    ]
+  },
+  "74": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`approved`: provider zwraca go w odpowiedzi na `POST /payments`.",
+      "`denied`: provider zwraca go w odpowiedzi na `POST /payments`.",
+      "`undefined`: metody asynchroniczne, status końcowy przychodzi na `callbackUrl`.",
+      "`pending` nie jest statusem odpowiedzi providera; VTEX tak nazywa płatność w trakcie ponowień.",
+      "`captured` nie jest statusem tej odpowiedzi; przejęcie środków to osobne wywołanie settlements.",
+      "`authorized` nie jest dozwoloną wartością; provider zwraca `approved`, `denied` albo `undefined`."
+    ],
+    "src": ["https://developers.vtex.com/docs/guides/payments-integration-purchase-flows (Transparent payment flow)"]
+  },
+  "79": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Capture to `POST /payments/{paymentId}/settlements`.",
+      "Nie ma ścieżki `capture`; protokół używa `settlements`.",
+      "Protokół nie ma ścieżki `/transactions/.../settle`; wywołania są pod `/payments/{paymentId}/`.",
+      "`/refunds` służy do zwrotu, nie do rozliczenia.",
+      "Ścieżka `captures` nie istnieje; poprawna to `settlements`.",
+      "`/cancellations` służy do anulowania płatności."
+    ],
+    "src": [
+      "https://raw.githubusercontent.com/vtex/openapi-schemas/master/VTEX%20-%20Payment%20Provider%20Protocol.json paths: /payments, /cancellations, /settlements, /refunds"
+    ]
+  },
+  "81": {
+    "ok": true,
+    "issue": "e: 'VTEX zapisuje je i aktywuje' - docs only say credentials are stored by VTEX so the merchant can enable the connector without copying them; 'aktywuje' unsourced.",
+    "fix": {
+      "e": "Configuration Flow jest **opcjonalny** i nie wpływa na integrację z VTEX. Daje `appKey`, `appToken`, `applicationId`; VTEX je zapisuje, a merchant włącza konektor bez ręcznego kopiowania danych."
+    },
+    "x": [
+      "Poprawne: docs piszą, że flow jest opcjonalny i nie wpływa na integrację.",
+      "Poprawne: endpointy generują `appKey`, `appToken` i `applicationId`.",
+      "Flow nie jest obowiązkowy; można go pominąć i przejść do homologacji.",
+      "Nie zastępuje manifestu; `GET /manifest` należy do Payment Flow.",
+      "Flow dotyczy providerów płatności, nie tylko antyfraudu.",
+      "Poświadczenia generują endpointy Configuration Flow; merchant nie kopiuje ich mailem."
+    ],
+    "src": [
+      "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider#configuration-flow"
+    ]
+  },
+  "98": {
+    "ok": true,
+    "issue": "Sourced: seller guide says Invoiced order can be cancelled only after return invoice via Order Invoice Notification with type value input; schema enum Output (selling) / Input (return). Case differs (docs 'Input'); options lowercase. Authorize Fulfillment / feed commit / delete invoice distractors: docs state no such prerequisite.",
+    "fix": {},
+    "x": [
+      "Poprawne: zamówienie `Invoiced` anulujesz dopiero po wysłaniu faktury zwrotnej.",
+      "Poprawne: fakturę zwrotną oznacza wartość `Input` w polu `type`.",
+      "Docs nie wymagają ponownego Authorize Fulfillment przed anulowaniem.",
+      "Docs nie wymagają zatwierdzenia zdarzenia feedu przed anulowaniem.",
+      "Docs nie każą usuwać faktury; wysyła się fakturę zwrotną.",
+      "`Output` oznacza fakturę sprzedaży, nie zwrotną."
+    ],
+    "src": [
+      "https://developers.vtex.com/docs/guides/external-seller-integration-connector",
+      "https://raw.githubusercontent.com/vtex/openapi-schemas/master/VTEX%20-%20Orders%20API.json (invoice type enum Output/Input)"
+    ]
+  },
+  "110": {
+    "ok": true,
+    "issue": "Sourced in Catalog API schema: max 250 records, _to-_from must not exceed 250; example _from=1,_to=500 invalid. No source for 50 as any limit, so x avoids Search API claim.",
+    "fix": {},
+    "x": [
+      "Poprawne: endpoint zwraca maksymalnie 250 rekordów na odpowiedź.",
+      "Docs podają limit 250, nie 50.",
+      "Docs podają limit 250, nie 100.",
+      "Limit 1 000 jest za duży; docs: różnica `_to` i `_from` nie może przekroczyć 250.",
+      "Za dużo: docs podają przykład `_from=1`, `_to=500` jako niepoprawny.",
+      "Docs podają limit 250, nie 10."
+    ],
+    "src": [
+      "https://raw.githubusercontent.com/vtex/openapi-schemas/master/VTEX%20-%20Catalog%20API.json GetProductAndSkuIds"
+    ]
+  },
+  "251": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "RFC 9110 §9.2.2: PUT jest idempotentny, więc powtórzenie ma ten sam zamierzony skutek.",
+      "Nie tylko `GET`: §9.2.2 wymienia też `PUT`, `DELETE` i metody bezpieczne.",
+      "`Retry-After` nie jest warunkiem; §9.2.2 opiera się na idempotencji metody.",
+      "`PUT` jest idempotentny według §9.2.2; zamiana na `PATCH` nie jest potrzebna.",
+      "`Idempotency-Key` nie występuje w §9.2.2; to idempotentna metoda pozwala powtórzyć żądanie.",
+      "Nie tylko metody bezpieczne: §9.2.2 mówi też o `PUT` i `DELETE`."
+    ],
+    "src": ["https://www.rfc-editor.org/rfc/rfc9110#section-9.2.2"]
+  },
+  "252": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "RFC 9110 §15.5.2: serwer generujący `401` MUST wysłać `WWW-Authenticate`.",
+      "`Allow` jest wymagany przy `405` (§15.5.6), nie przy `401`.",
+      "`Retry-After` dotyczy m.in. `503` i `3xx` (§10.2.3), nie `401`.",
+      "`Location` dotyczy przekierowań, nie `401`.",
+      "`Proxy-Authenticate` należy do `407`, nie `401`.",
+      "`Authorization` to nagłówek żądania, nie odpowiedzi."
+    ],
+    "src": ["https://www.rfc-editor.org/rfc/rfc9110#section-15.5.2", "#section-15.5.6", "#section-10.2.3"]
+  },
+  "253": {
+    "ok": true,
+    "issue": "407 for Proxy-Authenticate and 'Location' not verified here by fetched text; reasons kept to sourced claims.",
+    "fix": {},
+    "x": [
+      "VTEX: żądanie jest poprawne, ale serwer odmawia; sprawdź role (RFC 9110 §15.5.4).",
+      "Brak albo błędne poświadczenia to `401`, nie `403`.",
+      "Nieistniejący zasób to `404`.",
+      "Niedozwolona metoda HTTP to `405`.",
+      "Niepoprawna składnia treści żądania to `400`.",
+      "Przekroczenie limitu żądań to `429`."
+    ],
+    "src": [
+      "https://developers.vtex.com/docs/guides/api-response-codes",
+      "https://www.rfc-editor.org/rfc/rfc9110#section-15.5.4"
+    ]
+  },
+  "254": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "RFC 9110 §13.1.2: dla GET lub HEAD pasujący znacznik daje `304 Not Modified`.",
+      "`412` dotyczy metod innych niż GET i HEAD (§13.1.2).",
+      "Pełne `200 OK` z treścią to nie wynik spełnionego `If-None-Match` przy GET.",
+      "`204` nie jest odpowiedzią wskazaną w §13.1.2.",
+      "`202` nie jest odpowiedzią wskazaną w §13.1.2.",
+      "`409` nie jest odpowiedzią wskazaną w §13.1.2."
+    ],
+    "src": ["https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2"]
+  },
+  "255": {
+    "ok": true,
+    "issue": "Note RFC 9110 §13.1.1 also lets server MAY answer 2xx if the change was already applied; but it MUST NOT perform the method when If-Match is false. Option 'performs the method anyway' stays wrong.",
+    "fix": {},
+    "x": [
+      "RFC 9110 §13.1.1: serwer nie wykonuje metody i MAY zwrócić `412`.",
+      "§13.1.1: serwer nie wykonuje metody, więc nie zastosuje zmiany.",
+      "`304` dotyczy `If-None-Match` przy GET lub HEAD, nie `If-Match`.",
+      "§13.1.1 mówi, że przy fałszywym warunku metody się nie wykonuje.",
+      "`428` nie pochodzi z §13.1.1; RFC 9110 wskazuje tam `412`.",
+      "§13.1.1: przy fałszywym `If-Match` serwer MUST NOT wykonać metody."
+    ],
+    "src": ["https://www.rfc-editor.org/rfc/rfc9110#section-13.1.1"]
+  },
+  "256": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "RFC 9110 §10.2.3: wartość może być liczbą sekund opóźnienia.",
+      "RFC 9110 §10.2.3: wartość może być datą HTTP.",
+      "§10.2.3 nie definiuje liczby pozostałych prób.",
+      "§10.2.3 definiuje sekundy, nie milisekundy.",
+      "§10.2.3 definiuje datę HTTP, nie znacznik Unix w milisekundach.",
+      "§10.2.3 definiuje sekundy, nie minuty."
+    ],
+    "src": ["https://www.rfc-editor.org/rfc/rfc9110#section-10.2.3"]
+  }
+}
