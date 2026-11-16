@@ -10,7 +10,7 @@
   /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
   var REFS = ["http", "api", "graphql", "postman", "egzamin"];
   /* Sections of a category; "all" shows only the first two. */
-  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn"];
+  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn", "overview"];
   /* Sections of Postęp; the first one has no hash suffix. */
   var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
@@ -2106,7 +2106,7 @@
       sec = NAV.cur.sec || "pytania";
     CSECS.forEach(function (k, i) {
       $("#cs-" + k).hidden = k !== sec;
-      $("#ct-" + k).hidden = k === "learn" ? !LMOD[S.dom] : all && i > 1;
+      $("#ct-" + k).hidden = k === "learn" ? !LMOD[S.dom] : k === "overview" ? !OVERVIEW[S.dom] : all && i > 1;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
@@ -2127,8 +2127,140 @@
     if (sec === "api") renderCatApi(S.dom);
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
     if (sec === "info") renderInfo(S.dom);
+    if (sec === "overview") renderOverview(S.dom);
     if (sec === "katas") renderF();
     if (sec === "learn") renderLearn(S.dom);
+  }
+  /* ---------- Przegląd: one bird's-eye page per category (OVERVIEW), modelled on the IS v1 overview ---------- */
+  function renderOverview(d) {
+    var el = $("#cs-overview"),
+      o = OVERVIEW[d],
+      k = d + " " + S.lang;
+    if (!o || el.dataset.k === k) return;
+    el.dataset.k = k;
+    function li(a) {
+      return (a || [])
+        .map(function (t) {
+          return "<li>" + fmt(t) + "</li>";
+        })
+        .join("");
+    }
+    function ps(a) {
+      return (a || [])
+        .map(function (t) {
+          return "<p>" + fmt(t) + "</p>";
+        })
+        .join("");
+    }
+    function src(l) {
+      return (
+        '<p class="ov-src">' +
+        L("Źródła: ", "Sources: ") +
+        (l || [])
+          .map(function (x) {
+            return DOCS[x]
+              ? '<a href="' + esc(DOCS[x][0]) + '" target="_blank" rel="noopener">' + esc(DOCS[x][1]) + "</a>"
+              : "";
+          })
+          .join(" · ") +
+        "</p>"
+      );
+    }
+    function body(x) {
+      if (x.ty === "flow")
+        return (
+          '<ol class="ov-flow">' +
+          x.g
+            .map(function (g) {
+              return '<li class="ov-box"><b>' + fmt(g[0]) + "</b><ul>" + li(g[1]) + "</ul></li>";
+            })
+            .join("") +
+          "</ol>" +
+          ps(x.p)
+        );
+      if (x.ty === "tbl")
+        return (
+          '<div class="ov-tw"><table class="ov-t"><thead><tr>' +
+          x.c
+            .map(function (c) {
+              return "<th>" + fmt(c) + "</th>";
+            })
+            .join("") +
+          "</tr></thead><tbody>" +
+          x.r
+            .map(function (r) {
+              return (
+                "<tr>" +
+                r
+                  .map(function (c, i) {
+                    return (i ? "<td>" : '<th scope="row">') + fmt(c) + (i ? "</td>" : "</th>");
+                  })
+                  .join("") +
+                "</tr>"
+              );
+            })
+            .join("") +
+          "</tbody></table></div>"
+        );
+      if (x.ty === "task")
+        return (
+          ps(x.q) +
+          "<details><summary>" +
+          L("Wzorcowa odpowiedź", "Model answer") +
+          "</summary>" +
+          (x.c ? '<pre class="ov-c"><code>' + esc(x.c) + "</code></pre>" : "") +
+          "<ul>" +
+          li(x.a) +
+          "</ul></details>"
+        );
+      return "<ol>" + li(x.i) + "</ol>" + ps(x.p);
+    }
+    el.innerHTML =
+      '<aside class="ov-isl"><strong>TL;DR</strong><ul>' +
+      li(o.t) +
+      '</ul><p class="ov-meta">⏱ ~' +
+      (+o.min | 0) +
+      " min · " +
+      o.s.length +
+      L(" sekcji", " sections") +
+      "</p></aside>" +
+      '<nav class="ov-map" aria-label="' +
+      L("Mapa sekcji", "Section map") +
+      '">' +
+      o.s
+        .map(function (x, i) {
+          return '<a href="#" data-ov="' + i + '"><b>' + (i + 1) + ".</b> " + fmt(x.h) + "</a>";
+        })
+        .join("") +
+      "</nav>" +
+      o.s
+        .map(function (x, i) {
+          return (
+            '<section class="ov-s' +
+            (x.ty === "warn" ? " is-warn" : x.ty === "task" ? " is-task" : "") +
+            '" id="ov-' +
+            i +
+            '"><h3>' +
+            (i + 1) +
+            ". " +
+            fmt(x.h) +
+            (x.tag ? ' <span class="ov-tag">' + esc(x.tag) + "</span>" : "") +
+            "</h3>" +
+            body(x) +
+            src(x.l) +
+            "</section>"
+          );
+        })
+        .join("") +
+      (o.skip
+        ? '<p class="ov-skip"><strong>' + L("Pominięte: ", "Left out: ") + "</strong>" + fmt(o.skip) + "</p>"
+        : "");
+    el.querySelector(".ov-map").onclick = function (e) {
+      var a = e.target.closest("[data-ov]");
+      if (!a) return;
+      e.preventDefault();
+      $("#ov-" + a.dataset.ov).scrollIntoView({ behavior: "smooth", block: "start" });
+    };
   }
   /* ---------- Notatki: TL;DR above the sections, full notes in their own section ---------- */
   /* Collapse rule (CLAUDE.md › NOTES): a block of at most 4 bullets and 60 words stays open, a longer one starts closed.

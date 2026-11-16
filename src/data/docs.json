@@ -198,5 +198,12 @@
   "rfccond": ["https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2","RFC 9110 §13.1.2: If-None-Match"],
   "rfcretry": ["https://www.rfc-editor.org/rfc/rfc9110#section-10.2.3","RFC 9110 §10.2.3: Retry-After"],
   "rfccache": ["https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2","RFC 9111 §5.2.2: Cache-Control response directives"],
-  "roleslist": ["https://help.vtex.com/en/docs/tutorials/roles","Help Center: User roles"]
+  "roleslist": ["https://help.vtex.com/en/docs/tutorials/roles","Help Center: User roles"],
+  "is_v1": ["https://developers.vtex.com/docs/api-reference/intelligent-search-api-v1","API Reference: Intelligent Search API v1"],
+  "is_v1rn": ["https://developers.vtex.com/updates/release-notes/2026-07-08-new-intelligent-search-api-v1","Release note: Intelligent Search API v1"],
+  "is_not": ["https://developers.vtex.com/updates/release-notes/2026-05-14-intelligent-search-negative-filters-not-operator","Release note: negative filters with not:"],
+  "is_rel": ["https://help.vtex.com/en/docs/tutorials/intelligent-search-how-search-result-relevance-works","Help Center: How search result relevance works"],
+  "hl_cat": ["https://developers.vtex.com/docs/guides/headless-catalog","Guide: Headless catalog"],
+  "s_params": ["https://developers.vtex.com/docs/guides/how-search-parameters-work","Guide: How search parameters work"],
+  "is_ev": ["https://developers.vtex.com/docs/api-reference/intelligent-search-events-api-headless","API Reference: Intelligent Search Events API (headless)"]
 }

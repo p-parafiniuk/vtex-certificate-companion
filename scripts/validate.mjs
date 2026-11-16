@@ -167,6 +167,7 @@ const used = new Set(
     .flatMap(x => x.l || [])
     .concat(Object.values(D.NOTES).flatMap(n => (n.s || []).flatMap(s => s[2] || [])))
     .concat(Object.values(D.APIOV).flatMap(cs => (Array.isArray(cs) ? cs : []).flatMap(c => c.l || [])))
+    .concat(Object.values(D.OVERVIEW || {}).flatMap(o => (o.s || []).flatMap(x => x.l || [])))
     .concat((Array.isArray(D.ROLETRAPS) ? D.ROLETRAPS : []).flatMap(x => x.l || []))
     .concat(
       [D.GQL, D.PM]
@@ -237,6 +238,16 @@ D.APIMAP.forEach(a =>
 
 /* Notes: one entry per category plus "all". The TL;DR sits above the questions, so it stays short; app.js folds long blocks itself. */
 for (const d of [...doms, "all"]) if (!D.NOTES[d]) W("NOTES", "no notes for " + d);
+for (const [k, o] of Object.entries(D.OVERVIEW || {})) {
+  if (![...doms].includes(k)) E("OVERVIEW." + k, "unknown domain");
+  if (!Array.isArray(o.t) || !o.t.length || !Array.isArray(o.s)) E("OVERVIEW." + k, "needs t and s arrays");
+  (o.s || []).forEach((x, i) => {
+    const w = "OVERVIEW." + k + ".s[" + i + "]";
+    if (!x.h || !["flow", "ol", "warn", "tbl", "task"].includes(x.ty)) E(w, "needs h and a known ty");
+    if (!(x.l || []).length) E(w, "no DOCS keys");
+    for (const l of x.l || []) if (!D.DOCS[l]) E(w, "unknown DOCS key " + l);
+  });
+}
 for (const [k, n] of Object.entries(D.NOTES)) {
   const w = "NOTES." + k,
     txt = (x, ww) => {
