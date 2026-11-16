@@ -1035,11 +1035,29 @@
               t +
               "</code></pre></div>"
           : t
-              .replace(/`([^`]+)`/g, "<code>$1</code>")
+              .replace(/`([^`]+)`/g, function (_, c) {
+                return codeUri(c);
+              })
               .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
               .replace(/\n/g, "<br>");
       })
       .join("");
+  }
+  /* An endpoint in `code` splits into method, path segments and {params}, so the parts read apart at a glance. */
+  function codeUri(c) {
+    var m = /^(?:(GET|POST|PUT|PATCH|DELETE|HEAD) )?((?:\/|\.\.\.\/|…\/)\S*)$/.exec(c);
+    if (!m || !/\//.test(m[2])) return "<code>" + c + "</code>";
+    return (
+      '<code class="uri">' +
+      (m[1] ? '<span class="um um-' + m[1].toLowerCase() + '">' + m[1] + "</span> " : "") +
+      m[2]
+        .split("/")
+        .map(function (s) {
+          return !s ? "" : /^\{[^}]+\}$/.test(s) ? '<span class="up">' + s + "</span>" : "<span>" + s + "</span>";
+        })
+        .join("<i>/</i>") +
+      "</code>"
+    );
   }
   function shuffle(a) {
     for (var i = a.length - 1; i > 0; i--) {
@@ -2138,7 +2156,8 @@
   function renderOverview(d) {
     var el = $("#cs-overview"),
       o = OVERVIEW[d],
-      k = d + " " + S.lang;
+      c = counts().per[d] || {},
+      k = [d, S.lang, c.t - c.a, c.ft - c.fk, c.nt - c.nk].join(" ");
     if (!o || el.dataset.k === k) return;
     el.dataset.k = k;
     function li(a) {
@@ -2218,21 +2237,67 @@
         );
       return "<ol>" + li(x.i) + "</ol>" + ps(x.p);
     }
+    /* The row's anchor is the bullet's first bold phrase (else its first code), so the left column reads as an index. */
+    function row(t) {
+      var a = /\*\*([^*]+)\*\*/.exec(t) || /`([^`]+)`/.exec(t);
+      return '<li><span class="ov-k">' + (a ? esc(a[1]) : "") + "</span><span>" + fmt(t) + "</span></li>";
+    }
+    function go(i) {
+      return '<a href="#" data-ov="' + i + '">' + (i + 1) + ". " + fmt(o.s[i].h) + "</a>";
+    }
+    function todo(n, href, pl, en, done) {
+      return (
+        '<li class="' +
+        (n ? "" : "is-done") +
+        '"><a data-nav href="' +
+        href +
+        '">' +
+        (n ? "☐ " + L(pl, en) + ": <b>" + n + "</b>" : "✓ " + L(done[0], done[1])) +
+        "</a></li>"
+      );
+    }
+    var warn = -1;
+    o.s.forEach(function (x, i) {
+      if (warn < 0 && x.ty === "warn") warn = i;
+    });
     el.innerHTML =
-      '<aside class="ov-isl"><strong>TL;DR</strong><ul>' +
-      li(o.t) +
-      '</ul><p class="ov-meta">⏱ ~' +
+      '<section class="ov-isl" aria-label="TL;DR"><div class="ov-bar"><b>TL;DR</b><span>⏱ 30 s · ' +
+      L("całość", "all of it") +
+      " ~" +
       (+o.min | 0) +
       " min · " +
       o.s.length +
       L(" sekcji", " sections") +
-      "</p></aside>" +
+      '</span></div><ul class="ov-rows">' +
+      (o.t || []).map(row).join("") +
+      '</ul><p class="ov-go">' +
+      L("Zacznij tu → ", "Start here → ") +
+      go(0) +
+      (warn > 0 ? " · " + L("potem ", "then ") + go(warn) : "") +
+      "</p></section>" +
+      '<p class="ov-lg"><span class="ov-lw">' +
+      L("pułapki", "traps") +
+      '</span><span class="ov-lt">' +
+      L("zadanie", "task") +
+      "</span>" +
+      fmt(L("`PUT /segment/{parametr}`", "`PUT /segment/{param}`")) +
+      "</p>" +
       '<nav class="ov-map" aria-label="' +
       L("Mapa sekcji", "Section map") +
       '">' +
       o.s
         .map(function (x, i) {
-          return '<a href="#" data-ov="' + i + '"><b>' + (i + 1) + ".</b> " + fmt(x.h) + "</a>";
+          return (
+            '<a href="#" data-ov="' +
+            i +
+            '"' +
+            (x.ty === "warn" ? ' class="is-warn"' : x.ty === "task" ? ' class="is-task"' : "") +
+            "><b>" +
+            (i + 1) +
+            ".</b> " +
+            fmt(x.h) +
+            "</a>"
+          );
         })
         .join("") +
       "</nav>" +
@@ -2255,10 +2320,31 @@
           );
         })
         .join("") +
+      '<section class="ov-s ov-next"><h3>' +
+      L("Co dalej", "What next") +
+      '</h3><ul class="ov-todo">' +
+      todo(c.t - c.a, catHref(d), "Pytania bez odpowiedzi", "Unanswered questions", [
+        "Wszystkie pytania z odpowiedzią",
+        "Every question answered"
+      ]) +
+      todo(c.ft - c.fk, catHref(d, "katas"), "Katas bez Umiem", "Katas not yet Known", [
+        "Wszystkie katas umiesz",
+        "Every kata Known"
+      ]) +
+      (c.nt
+        ? todo(c.nt - c.nk, catHref(d, "info"), "Bloki notatek bez Umiem", "Note blocks not yet Known", [
+            "Wszystkie notatki umiesz",
+            "Every note block Known"
+          ])
+        : "") +
+      "</ul>" +
       (o.skip
         ? '<p class="ov-skip"><strong>' + L("Pominięte: ", "Left out: ") + "</strong>" + fmt(o.skip) + "</p>"
-        : "");
-    el.querySelector(".ov-map").onclick = function (e) {
+        : "") +
+      '<p class="ov-skip">' +
+      L("Nic więcej w tej kategorii.", "Nothing else in this category.") +
+      "</p></section>";
+    el.onclick = function (e) {
       var a = e.target.closest("[data-ov]");
       if (!a) return;
       e.preventDefault();

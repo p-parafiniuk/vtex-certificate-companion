@@ -6193,14 +6193,143 @@ input.gap {
   max-width: none;
 }
 /* Przegląd: bird's-eye page per category */
+/* TL;DR is information, not a warning: info blue, so the accent stays reserved for Pułapki. */
 .ov-isl {
-  border-left: 4px solid var(--accent);
-  background: var(--accent-soft);
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin: 0 0 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 0 0 10px;
 }
-.ov-isl ul,
+.ov-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--t4);
+  color: var(--surface);
+  padding: 8px 16px;
+  font-size: 13px;
+}
+.ov-bar b {
+  font-size: 15px;
+  letter-spacing: 0.05em;
+}
+.ov-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ov-rows li {
+  display: grid;
+  grid-template-columns: minmax(0, 130px) minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+  line-height: 1.5;
+}
+.ov-rows li:first-child {
+  border-top: 0;
+}
+.ov-k {
+  font-weight: 800;
+  color: var(--t4);
+  overflow-wrap: anywhere;
+}
+.ov-go {
+  margin: 0;
+  padding: 10px 16px;
+  background: var(--t4-soft);
+  font-size: 14px;
+}
+.ov-go a {
+  color: var(--t4);
+  font-weight: 700;
+}
+.ov-lg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 8px;
+}
+.ov-lw::before,
+.ov-lt::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 3px;
+  margin-right: 5px;
+  vertical-align: middle;
+  background: var(--accent);
+}
+.ov-lt::before {
+  background: var(--t4);
+}
+.ov-map a.is-warn {
+  border-top: 3px solid var(--accent);
+}
+.ov-map a.is-task {
+  border-top: 3px solid var(--t4);
+}
+.ov-todo {
+  list-style: none;
+  padding: 0 !important;
+}
+.ov-todo li {
+  padding: 4px 0;
+}
+.ov-todo a {
+  color: var(--ink);
+}
+.ov-todo .is-done a {
+  color: var(--ok);
+}
+/* Endpoint in `code` (codeUri): method, segments and {params} as separate pills. */
+code.uri {
+  background: none;
+  padding: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 1px;
+}
+code.uri span {
+  padding: 0.05em 0.35em;
+  border-radius: 4px;
+  background: var(--code);
+}
+code.uri i {
+  font-style: normal;
+  color: var(--muted);
+}
+code.uri .um {
+  font-weight: 700;
+  margin-right: 4px;
+  background: var(--t4-soft);
+  color: var(--t4);
+}
+code.uri .um-post {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+code.uri .um-put,
+code.uri .um-patch {
+  background: var(--k3-soft);
+  color: var(--k3);
+}
+code.uri .um-delete {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+code.uri .up {
+  background: var(--k5-soft);
+  color: var(--k5);
+  font-weight: 600;
+}
 .ov-s ul,
 .ov-s ol {
   margin: 6px 0;
@@ -6313,6 +6442,10 @@ input.gap {
   font-size: 13px;
 }
 @media (max-width: 520px) {
+  .ov-rows li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
   .ov-box + .ov-box::before {
     content: "↓";
     left: 10px;
