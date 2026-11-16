@@ -1,0 +1,400 @@
+{
+  "171": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Dokumentacja: nie używaj app keys w kodzie klienta, bo to naraża sklep na ataki.",
+      "Dokumentacja nie opisuje takiego odrzucania; problemem jest ujawnienie klucza w kodzie klienta.",
+      "Docs nie wspominają o usuwaniu nagłówków; powód to podatność sklepu na ataki.",
+      "Klucze uwierzytelniają trasy prywatne w integracjach; nie są ograniczone do `/pub`.",
+      "Klucze służą integracjom i backendom ogólnie, nie tylko aplikacjom VTEX IO.",
+      "Docs nie mówią o cache przeglądarki; frontend ma używać user tokenów."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-api-keys"
+  },
+  "172": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Zasada najmniejszych uprawnień: tylko niezbędne role, np. rola tylko do odczytu zamówień.",
+      "Docs każą nadawać tylko niezbędne role, nie Owner na zapas.",
+      "Integracja czytająca zamówienia ma dostać tylko rolę odczytu zamówień, nie administrację użytkownikami.",
+      "Klucz musi mieć przypisane role, by mieć dostęp do zasobów.",
+      "Docs zalecają rolę tylko do odczytu zamówień, nie pełny dostęp OMS.",
+      "Role klucza nadajesz niezależnie od użytkownika; docs każą wybrać tylko niezbędne."
+    ],
+    "src": "https://help.vtex.com/en/docs/tracks/api-keys-for-integrations"
+  },
+  "173": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Token jest wyświetlany tylko raz, przy tworzeniu klucza.",
+      "Docs: token pokazuje się tylko raz, przy tworzeniu; później go nie zobaczysz.",
+      "Docs nie opisują takiego endpointu; token pokazuje się tylko przy tworzeniu klucza.",
+      "Audit loguje operacje i autorów, a token jest widoczny tylko raz przy tworzeniu.",
+      "Docs nie przewidują potwierdzenia hasłem; token jest widoczny tylko raz.",
+      "Docs nie podają limitu 24 godzin; token pokazuje się tylko raz."
+    ],
+    "src": "https://help.vtex.com/en/docs/tracks/api-keys-for-integrations"
+  },
+  "174": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Chroń parę klucz i token jak login i hasło; nie udostępniaj ich mailem, ticketami ani czatem.",
+      "Docs każą unikać udostępniania w ticketach; rotacja nie czyni tego bezpiecznym.",
+      "Docs nie dopuszczają żadnego kanału, także szyfrowanego załącznika w tickecie.",
+      "Token razem z kluczem to poświadczenie; sam token nie jest bezużyteczny.",
+      "Docs wymieniają tickety wprost jako kanał, którego należy unikać.",
+      "Docs wymieniają e-mail wprost jako kanał, którego należy unikać."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/best-practices-api-keys--7b6nD1VMHa49aI5brlOvJm"
+  },
+  "175": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Serwery VTEX wymagają HTTPS z TLS 1.2 na wszystkich trasach.",
+      "Wcześniej dozwolone były TLS 1.0 i 1.1, ale teraz wymagany jest TLS 1.2.",
+      "HTTP dostaje `301 Moved Permanently` do HTTPS; secure jest wymagane na wszystkich trasach.",
+      "Docs nie wymagają mTLS; wymagają HTTPS z TLS 1.2.",
+      "TLS 1.1 już nie wystarcza; wymagany jest TLS 1.2.",
+      "Docs wymagają TLS 1.2; TLS 1.3 nie jest wymieniony."
+    ],
+    "src": "https://help.vtex.com/en/announcements/2020-07-10-transitioning-api-integrations-to-https-tls-1-2"
+  },
+  "176": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Przekraczanie limitów może prowadzić do czasowego zawieszenia dostępu do VTEX Core Commerce APIs.",
+      "Docs mówią o czasowym zawieszeniu dostępu, nie o usunięciu klucza.",
+      "Docs nie opisują kolejkowania na następny dzień; mówią o zawieszeniu dostępu.",
+      "Docs nie opisują poziomów limitów; mówią o czasowym zawieszeniu dostępu.",
+      "Docs nie wspominają o zmianie ról klucza; mówią o zawieszeniu dostępu.",
+      "Docs nie opisują opłat za wywołania; mówią o czasowym zawieszeniu dostępu."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors"
+  },
+  "177": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Audit zapisuje operacje, ich autorów i czas oraz pozwala filtrować historię.",
+      "Docs opisują historię zmian w module Audit, nie w License Manager.",
+      "Docs opisują historię w Audit; VTEX ID Session history nie jest tam wymieniona.",
+      "Docs wskazują Audit; takiej sekcji aktywności kluczy nie opisują.",
+      "Docs wskazują Audit do badania zmian; ekran Usage kluczy nie jest tam opisany.",
+      "Docs wskazują Audit; Master Data Logs nie służą do śledzenia zmian promocji."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/audit"
+  },
+  "178": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Owner (Admin Super) daje nieograniczony dostęp; docs: liczba takich użytkowników ma być jak najmniejsza.",
+      "Docs ostrzegają przed rolą Owner, nie przed tą rolą.",
+      "Docs ostrzegają przed rolą Owner, nie przed tą rolą.",
+      "Docs ostrzegają przed rolą Owner, nie przed OMS.",
+      "Docs dają jasną wskazówkę: ogranicz liczbę użytkowników z rolą Owner.",
+      "Docs mówią o roli Owner z nieograniczonym dostępem, nie o rolach tylko do odczytu."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/roles"
+  },
+  "179": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "VTEX zaleca odnowienie co 90 lub 180 dni; tokeny nie wygasają automatycznie.",
+      "24 godziny dotyczą user tokenów, nie API tokenów; docs zalecają 90 lub 180 dni.",
+      "Tokeny nie wygasają same; zalecany odstęp to 90 lub 180 dni.",
+      "Docs zalecają regularną rotację; renew nie dezaktywuje klucza, stary token działa dalej.",
+      "Docs nie wymagają odnawiania co 7 dni; zalecają 90 lub 180 dni.",
+      "Docs: tokeny nie wygasają automatycznie."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens"
+  },
+  "180": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: odznacz `Make readable without credentials`.",
+      "Docs: odznacz `Allow editing without credentials`.",
+      "Docs: odznacz `Allow filtering without credentials`.",
+      "Docs wymieniają tylko odczyt, edycję i filtrowanie; indeksowania tam nie ma.",
+      "Docs nie wymieniają tej opcji wśród tych do odznaczenia.",
+      "Docs nie wymieniają opcji null wśród tych do odznaczenia."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/restrict-public-access-to-master-data-fields"
+  },
+  "181": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs wymagają zasobu z Generic resources w Master Data i zasobu Dynamic Storage.",
+      "Samo uprawnienie Master Data nie wystarcza; potrzebny jest też zasób Dynamic Storage.",
+      "Docs wymagają roli z zasobami; samo ciasteczko lub klucz nie wystarczy.",
+      "Docs nie wymieniają zasobu Save user; wymagają zasobów Master Data i Dynamic Storage.",
+      "Sam zasób Dynamic Storage nie wystarcza; potrzebny jest też zasób Master Data.",
+      "Docs wymagają roli z zasobami; sam klucz i token nie wystarczą."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/restrict-public-access-to-master-data-fields"
+  },
+  "182": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: przeszukiwać można tylko rekordy z ostatnich 3 miesięcy.",
+      "Docs podają 3 miesiące, nie 30 dni.",
+      "Docs podają 3 miesiące, nie 12.",
+      "Docs podają 3 miesiące; starsze dane zgłaszasz do supportu.",
+      "Docs podają 3 miesiące, nie 6.",
+      "Docs podają 3 miesiące, nie 7 dni."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/audit"
+  },
+  "183": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Checklista: usuń stary token z sejfów i zmiennych środowiskowych.",
+      "Checklista: monitoruj logi pod kątem nieudanych prób uwierzytelnienia.",
+      "Checklista nie każe usuwać klucza; to rotacja tokenu, klucz zostaje.",
+      "Stary token wyłącza `finish-renewal`, nie czas.",
+      "Checklista nie każe ponawiać `renew`; po rotacji sprzątasz i monitorujesz.",
+      "Checklista nie każe usuwać ról; nakazuje zaktualizować środowiska i powiadomić zespoły."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens"
+  },
+  "266": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens"
+  },
+  "267": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: renew tworzy nowy token bez dezaktywacji starego; oba działają do `finish-renewal`.",
+      "Stary token jest dezaktywowany dopiero przez `finish-renewal`.",
+      "Docs nie podają 24 godzin; stary token wyłącza dopiero `finish-renewal`.",
+      "Docs nie ograniczają starego tokenu do odczytu; oba tokeny działają w pełni.",
+      "Docs nie podają 7 dni; stary token działa do `finish-renewal`.",
+      "Renew nie usuwa klucza; tylko tworzy nowy token."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens"
+  },
+  "268": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: użyj ważnego klucza, nie odnawianego, z zasobem Renew API Token.",
+      "Docs: to nie może być klucz, który odnawiasz.",
+      "Docs wymagają klucza API, nie przeglądarkowego tokenu administratora.",
+      "Endpointy wymagają autoryzacji kluczem z zasobem Renew API Token.",
+      "Klucz musi mieć zasób Renew API Token, nie dowolną rolę.",
+      "Docs nie wymagają hasła Admina; wymagają innego klucza z zasobem Renew API Token."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens"
+  },
+  "269": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: `null` w `creationDateNewToken` potwierdza dezaktywację starego tokenu i koniec rotacji.",
+      "Docs opisują odpowiedź z polem `creationDateNewToken`, nie status 204.",
+      "Odpowiedź nie zawiera starego tokenu; sygnałem jest `null` w `creationDateNewToken`.",
+      "Klucz `apiKey` się nie zmienia; liczy się `null` w `creationDateNewToken`.",
+      "Wartość `null` oznacza koniec, a nie datę zakończenia.",
+      "Nowy token zwraca `renew` w `newToken`, nie `finish-renewal`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens"
+  },
+  "270": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: akcja nie może zostać cofnięta, więc sprawdź integracje przed `finish-renewal`.",
+      "Docs nie dają okna 24 godzin; zakończenia nie cofniesz.",
+      "Docs nie opisują takiej możliwości; zakończenia nie cofniesz.",
+      "Docs nie opisują cofania na stronie kluczy; zakończenia nie cofniesz.",
+      "Docs nie opisują flagi `revert`; zakończenia nie cofniesz.",
+      "Docs nie opisują cofania przez support; zakończenia nie cofniesz."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/rotating-vtex-api-tokens"
+  },
+  "271": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: nie używaj kodu po stronie klienta w integracjach, bo często zawiera klucze API.",
+      "Docs nie dopuszczają tego po minifikacji; kod w przeglądarce jest widoczny dla innych.",
+      "Docs zakazują tego bez wyjątku dla endpointów tylko do odczytu.",
+      "Klucze ukryte w komentarzach nadal są w kodzie widocznym dla innych.",
+      "Docs zakazują użycia kodu klienta w integracjach, niezależnie od miejsca kluczy.",
+      "Docs nie przewidują takiej zgody; nie używaj kodu klienta do integracji."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/best-practices-api-keys--7b6nD1VMHa49aI5brlOvJm"
+  },
+  "272": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: cache'uj dane czytane często i względnie statyczne, ustaw czas wygaśnięcia i unieważniaj cache.",
+      "Docs każą ustawić czas wygaśnięcia i unieważniać cache.",
+      "Docs radzą cache'ować dane często czytane i rzadko zmieniane, nie błędy.",
+      "Docs nie ograniczają cache'owania do `POST`; chodzi o dane rzadko zmieniane.",
+      "Docs nie wspominają o cache'owaniu tokenów; chodzi o dane rzadko zmieniane.",
+      "Dane zmieniane wiele razy dziennie nie są względnie statyczne; docs radzą cache'ować dane rzadko zmieniane."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors"
+  },
+  "273": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: połączenia HTTP dostają `301 Moved Permanently` z przekierowaniem na HTTPS.",
+      "Docs mówią o `301`, nie `403`.",
+      "Docs mówią o `301`, nie `400`.",
+      "Docs wycofują wsparcie HTTP; dostajesz przekierowanie na HTTPS.",
+      "Docs mówią o `301`, nie `426`.",
+      "Docs mówią o `301`, nie `505`."
+    ],
+    "src": "https://help.vtex.com/en/announcements/2020-07-10-transitioning-api-integrations-to-https-tls-1-2"
+  },
+  "274": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: priorytetyzuj kluczowe żądania, np. procesy checkout i interakcje użytkownika.",
+      "Docs nie ustawiają kolejności według wieku; liczy się znaczenie dla biznesu.",
+      "Docs nie ustawiają kolejności według rozmiaru; liczy się znaczenie dla biznesu.",
+      "Docs nie wymieniają katalogu jako priorytetu; kluczowe procesy, jak checkout, mają pierwszeństwo.",
+      "Docs nie ustawiają kolejności według opóźnienia; liczy się znaczenie dla biznesu.",
+      "Raporty to zadania w tle; docs dają pierwszeństwo interakcjom użytkownika."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors"
+  },
+  "275": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: exponential backoff stopniowo zwiększa opóźnienie między próbami.",
+      "Stały interwał nie jest wykładniczy; docs zalecają rosnące opóźnienie.",
+      "Równoległe żądania zwiększają obciążenie; docs zalecają rosnące opóźnienia.",
+      "Docs zalecają ponawianie z rosnącym opóźnieniem, nie jedną próbę.",
+      "Stałe opóźnienie nie jest exponential backoff; docs zalecają rosnące opóźnienie.",
+      "Docs nie podają czekania na reset; zalecają rosnące opóźnienie."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors"
+  },
+  "276": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: w VTEX IO używaj dedykowanych Clients z cache, retry i timeout.",
+      "Docs nie opisują takiego ustawienia w manifeście; zalecają Clients.",
+      "Docs nie zalecają przenoszenia wywołań do przeglądarki; zalecają Clients.",
+      "Docs nie wspominają o zmianie tokenu; zalecają Clients.",
+      "Docs nie wspominają o trasach `/pub`; zalecają Clients.",
+      "Docs zalecają Clients zamiast bezpośrednich wywołań; Clients mają cache i retry."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors"
+  },
+  "277": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: GraphQL łączy wiele potrzeb danych w jedno żądanie, co zmniejsza liczbę żądań.",
+      "Docs mówią o zmniejszaniu liczby żądań, nie o braku limitów.",
+      "Docs nie opisują cache'owania odpowiedzi GraphQL na 24 godziny.",
+      "Docs nie mówią o braku uwierzytelniania; chodzi o łączenie żądań.",
+      "Docs nie opisują takiego zachowania; zaletą jest mniej żądań.",
+      "Docs wskazują dokładne dane i mniej żądań, nie zawsze mniejsze odpowiedzi."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/best-practices-for-avoiding-rate-limit-errors"
+  },
+  "278": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: `200 OK` z trasy testowej oznacza, że klient obsługuje wymagane protokoły: HTTPS i TLS 1.2.",
+      "Docs nie mówią o weryfikacji klucza; trasa testuje protokoły.",
+      "Docs nie mówią o limitach; trasa testuje protokoły.",
+      "Trasa testuje klienta, nie składanie zamówień.",
+      "Docs nie opisują allowlisty; trasa testuje protokoły.",
+      "Docs wymagają TLS 1.2; `200 OK` oznacza zgodność z tym wymogiem."
+    ],
+    "src": "https://help.vtex.com/en/announcements/2020-07-10-transitioning-api-integrations-to-https-tls-1-2"
+  },
+  "279": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "RFC 9110: POST nie jest idempotentny, więc klient nie powinien automatycznie go powtarzać.",
+      "RFC 9110 ogranicza automatyczne ponawianie do metod idempotentnych.",
+      "RFC nie nakazuje `412` przy powtórzeniu POST.",
+      "`If-None-Match` nie zmienia semantyki POST jako nieidempotentnego.",
+      "W RFC 9110 idempotentne są PUT, DELETE i metody bezpieczne, nie POST.",
+      "RFC 9110 dopuszcza ponawianie metod idempotentnych, a POST nie jest idempotentny."
+    ],
+    "src": "https://www.rfc-editor.org/rfc/rfc9110#section-9.2.2"
+  },
+  "280": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: alerty w API Keys > Settings przypominają co 3 lub 6 miesięcy.",
+      "Docs podają 3 lub 6 miesięcy, nie co miesiąc.",
+      "Docs podają 3 lub 6 miesięcy, nie raz w roku.",
+      "Docs podają alerty cykliczne co 3 lub 6 miesięcy, nie po wycieku.",
+      "Docs podają 3 lub 6 miesięcy, nie 2 lub 4.",
+      "Docs podają 3 lub 6 miesięcy, nie 12."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/best-practices-api-keys--7b6nD1VMHa49aI5brlOvJm"
+  },
+  "281": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: regularny przegląd dostępu daje każdej integracji tylko potrzebne zasoby.",
+      "Tokeny nie wygasają automatycznie.",
+      "Docs nie wiążą przeglądu z limitami API.",
+      "Przegląd nie odnawia tokenów; rotację wykonujesz osobno.",
+      "Docs nie opisują blokowania kluczy bez przeglądu.",
+      "Przegląd nie zastępuje rotacji; docs zalecają obie praktyki."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/best-practices-api-keys--7b6nD1VMHa49aI5brlOvJm"
+  }
+}

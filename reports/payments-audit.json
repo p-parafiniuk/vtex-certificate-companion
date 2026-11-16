@@ -1,0 +1,336 @@
+{
+  "72": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Protokół ma dziewięć endpointów: sześć w Payment Flow i trzy w Configuration Flow.",
+      "Endpointy dzielą się na dwie sekcje: Payment Flow i Configuration Flow.",
+      "Endpointów jest dziewięć, nie trzy. Authorize, Capture i Refund to tylko część Payment Flow.",
+      "Podział na Seller i Marketplace nie istnieje. Docs wymieniają Payment Flow i Configuration Flow.",
+      "To nie jeden webhook, tylko dziewięć endpointów w dwóch flow.",
+      "Docs nie mówią o Authorization Flow ani Settlement Flow. Sekcje to Payment Flow i Configuration Flow."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider"
+  },
+  "73": {
+    "ok": true,
+    "issue": "custom fields not on fetched page (general API knowledge)",
+    "fix": {},
+    "x": [
+      "Manifest wymienia `paymentMethods` obsługiwane przez providera.",
+      "Manifest zawiera konfigurację splitu: `allowsSplit` przy każdej metodzie płatności.",
+      "Manifest może zawierać custom fields providera.",
+      "Manifest to metadane providera, nie lista transakcji do rozliczenia.",
+      "Wynik anti-fraud nie należy do manifestu. Manifest opisuje metody płatności i split.",
+      "Dane `appKey` i `appToken` daje Configuration Flow (Credentials), nie manifest."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider"
+  },
+  "74": {
+    "ok": true,
+    "issue": "status value list not on fetched pages; sample shows undefined, flows page shows approved/denied",
+    "fix": {},
+    "x": [
+      "`approved` to poprawny status odpowiedzi Create Payment (metody synchroniczne).",
+      "`denied` to poprawny status odpowiedzi Create Payment.",
+      "`undefined` oznacza, że provider jeszcze ocenia płatność. Gateway ponawia wywołanie.",
+      "`pending` nie jest statusem odpowiedzi providera. Dozwolone to `approved`, `denied`, `undefined`.",
+      "`captured` to nie status Create Payment. Capture to osobne wywołanie settlements.",
+      "`authorized` to status w Gateway po callbacku, nie wartość odpowiedzi providera."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "75": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Przy `undefined` Gateway ponawia wywołanie asynchronicznie do siedmiu dni, aż płatność zostanie przetworzona.",
+      "Provider może zgłosić status końcowy przez `callbackUrl`.",
+      "Docs nie podają anulowania po pięciu minutach. Gateway ponawia do siedmiu dni.",
+      "Zatwierdzenie po `delayToAutoSettle` nie wynika z `undefined`. To opóźnienie settlementu, nie decyzja o płatności.",
+      "Ponowienia trwają do siedmiu dni, nie jedno po 24 godzinach.",
+      "Gateway nie anuluje od razu. Płatność zostaje pending, a ponowienia trwają do siedmiu dni."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "76": {
+    "ok": true,
+    "issue": "idempotency explicitly described for Cancel only; Capture/Refund show requestId",
+    "fix": {},
+    "x": [
+      "`requestId` w body zapewnia idempotencję: to samo żądanie wielokrotnie daje ten sam wynik.",
+      "`transactionId` identyfikuje transakcję, a idempotencję zapewnia `requestId`.",
+      "`nsu` to numer z acquirera, nie klucz idempotencji.",
+      "`authorizationId` to identyfikator autoryzacji zwracany przez providera, nie klucz idempotencji.",
+      "`tid` to identyfikator transakcji providera, nie klucz idempotencji.",
+      "`orderId` identyfikuje zamówienie, a idempotencję daje `requestId`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider"
+  },
+  "77": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`delayToAutoSettle` mówi, jak długo system czeka, zanim sam uruchomi settlement.",
+      "Opóźnienia ustala provider i podaje je w sekundach.",
+      "To nie czas na redirect klienta. Opóźnienie dotyczy startu settlementu.",
+      "Ponawianie `undefined` trwa do siedmiu dni i nie zależy od tego pola.",
+      "Wartość ustala provider w odpowiedzi, nie merchant w Admin, i w sekundach, nie dniach.",
+      "To provider zwraca wartość w odpowiedzi Create Payment, a jednostką są sekundy, nie godziny."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider"
+  },
+  "78": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Endpoint musi działać po HTTPS na porcie 443 z TLS 1.2.",
+      "Endpoint musi mieć domenę lub subdomenę. Adresy IP nie są akceptowane.",
+      "Endpoint musi być publiczny. Ograniczone API nie przejdzie homologacji.",
+      "Endpoint ma być publiczny, nie ograniczony do zakresów IP VTEX.",
+      "Wymagany jest port 443, nie 8443.",
+      "Wymagany jest TLS 1.2 na porcie 443, nie dowolna wersja i port."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider"
+  },
+  "79": {
+    "ok": true,
+    "issue": "endpoint list not shown in fetched overview; general API knowledge",
+    "fix": {},
+    "x": [
+      "Capture to `POST /payments/{paymentId}/settlements`.",
+      "Ścieżka `PUT .../capture` nie istnieje. Capture idzie przez `settlements`.",
+      "Settlement wywołujesz pod `/payments/{paymentId}/`, nie pod `/transactions/`.",
+      "`/refunds` to zwrot przechwyconej płatności, nie capture.",
+      "Ścieżka `/captures` nie istnieje. Poprawna to `/settlements`.",
+      "`/cancellations` anuluje płatność nieprzechwyconą, nie przechwytuje jej."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/payment-provider-protocol"
+  },
+  "80": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Rozliczona płatność: VTEX wywołuje Refund Payment.",
+      "Zatwierdzona, ale nierozliczona płatność: VTEX wywołuje Cancel Payment.",
+      "VTEX nie wysyła Create Payment z ujemną wartością. Używa Cancel albo Refund.",
+      "Dla rozliczonej płatności VTEX wywołuje refund, nie cancellation.",
+      "Inbound Request to inny endpoint (proxy do providera), nie mechanizm anulowania.",
+      "Dla nierozliczonej płatności VTEX wywołuje cancellation, nie refund."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "81": {
+    "ok": true,
+    "issue": "appKey/appToken/applicationId not on fetched page",
+    "fix": {},
+    "x": [
+      "Configuration Flow jest opcjonalny i nie wpływa na integrację z VTEX.",
+      "Configuration Flow daje `appKey`, `appToken` i `applicationId` przez Credentials.",
+      "Flow nie jest obowiązkowy ani nie biegnie przed każdą płatnością.",
+      "Manifest pozostaje osobnym endpointem w Payment Flow. Configuration Flow go nie zastępuje.",
+      "Configuration Flow dotyczy providerów płatności, nie tylko anti-fraud.",
+      "Dane dostępowe przekazuje Credentials, nie e-mail merchanta."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-implementing-a-payment-provider"
+  },
+  "144": {
+    "ok": true,
+    "issue": "docs spell field paymentURL",
+    "fix": {},
+    "x": [
+      "Redirect: provider zwraca status `undefined` razem z URL płatności.",
+      "Provider zwraca `paymentUrl`, na który przekierowywany jest klient.",
+      "Redirect zwraca `undefined`, nie `approved`. `returnUrl` przychodzi w żądaniu od VTEX.",
+      "Redirect zwraca `undefined`, nie `denied`. `callbackUrl` przychodzi w żądaniu.",
+      "`paymentAppData` należy do flow Payment App, nie Redirect.",
+      "`pending` nie jest statusem odpowiedzi. Redirect zwraca `undefined` i `paymentUrl`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "145": {
+    "ok": true,
+    "issue": "QR/3DS2 scenario is from guide general text",
+    "fix": {},
+    "x": [
+      "Payment App: provider zwraca `undefined` i `paymentAppData` z aplikacją renderowaną w checkoucie.",
+      "Transparent używa standardowego szablonu checkoutu, a `paymentUrl` należy do Redirect.",
+      "Redirect wyprowadza klienta ze sklepu na `paymentUrl`.",
+      "Configuration flow dotyczy poświadczeń providera, nie doświadczenia zakupowego.",
+      "`pending` nie jest statusem odpowiedzi, a Redirect wyprowadza klienta ze sklepu.",
+      "Transparent kończy się w standardowym szablonie. Samo `delayToAutoSettle` nie pokazuje QR ani 3DS2."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "146": {
+    "ok": true,
+    "issue": "header names AppKey/AppToken in e not on fetched page",
+    "fix": {},
+    "x": [
+      "Poza VTEX IO provider wysyła notyfikację POST na `callbackUrl` z nowym statusem.",
+      "Endpoint retry dotyczy VTEX IO. Poza nim używa się notyfikacji.",
+      "Wskazany endpoint authorization-request to nie mechanizm callbacku.",
+      "Gateway nie odpytuje `GET /payments/{paymentId}`. Provider sam zgłasza status.",
+      "Status nie wraca w odpowiedzi na Cancel Payment. Służy do tego `callbackUrl`.",
+      "`start-handling` to endpoint OMS zamówień, bez związku z callbackiem płatności."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "147": {
+    "ok": true,
+    "issue": "e comparison to Fulfillment Simulation/Hook not verified",
+    "fix": {},
+    "x": [
+      "Endpoint musi odpowiedzieć w mniej niż 5 sekund podczas testów homologacyjnych.",
+      "Limit na produkcji to 20 sekund, nie 10.",
+      "Limit nie wynosi 2,5 s w każdym środowisku. Testy 5 s, produkcja 20 s.",
+      "5000 ms to limit testów, nie produkcji. Produkcja to 20 sekund.",
+      "45 sekund to nie limit PPP. Produkcja to poniżej 20 sekund.",
+      "Produkcja to poniżej 20 sekund, nie 10."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/payment-provider-protocol"
+  },
+  "148": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Secure Proxy jest wymagany, gdy środowisko konektora nie ma AOC dla PCI DSS.",
+      "Konektory na VTEX IO muszą go używać, bo IO nie jest zgodne z PCI DSS.",
+      "Wymóg nie zależy od flow redirect, tylko od braku PCI DSS.",
+      "Integracja zgodna z PCI DSS nie potrzebuje Secure Proxy.",
+      "Wymóg dotyczy kart kredytowych, debetowych i co-branded, nie tylko gift card.",
+      "Dotyczy kart kredytowych i debetowych, nie tylko debetowych."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-secure-proxy"
+  },
+  "149": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Create Payment jest idempotentny. Provider zwraca aktualny status istniejącej płatności.",
+      "Provider nie tworzy drugiej płatności. Zwraca status istniejącej.",
+      "Docs nie każą zwracać `409`. Provider zwraca status istniejącej transakcji.",
+      "Powtórzone żądanie nie oznacza `denied`. Provider zwraca aktualny status.",
+      "Powtórzenie `paymentId` jest oczekiwane, więc nie jest błędem `400`.",
+      "Provider nie przetwarza ponownie. Zwraca status istniejącej płatności."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/payment-provider-protocol"
+  },
+  "151": {
+    "ok": true,
+    "issue": "pre-analysis optional confirmed; POST /transactions timing not stated on fetched page",
+    "fix": {},
+    "x": [
+      "Pełna analiza `POST /transactions` idzie po autoryzacji wszystkich płatności transakcji.",
+      "`POST /pre-analysis` jest opcjonalnym krokiem przed autoryzacją płatności.",
+      "`POST /transactions` nie idzie przed autoryzacją. Przed nią jest tylko opcjonalne pre-analysis.",
+      "`POST /transactions` nie zależy od faktury zamówienia.",
+      "`pre-analysis` nie zależy od odrzucenia przez acquirera. Jest opcjonalne i wysyłane przed autoryzacją.",
+      "`pre-analysis` jest opcjonalne i nie powtarza się po każdej autoryzacji."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/antifraud-provider-protocol"
+  },
+  "210": {
+    "ok": true,
+    "issue": "audit only: order/matrix consistent with flows page (undefined then callback; settled->refund, unsettled->cancel)",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "211": {
+    "ok": true,
+    "issue": "audit only: order/matrix consistent with flows page (undefined then callback; settled->refund, unsettled->cancel)",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "212": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Przy `undefined` VTEX ponawia wywołanie asynchronicznie do siedmiu dni.",
+      "24 godziny to domyślne `delayToAutoSettle`, nie okres ponowień.",
+      "30 dni to maksimum `delayToCancel`, nie okres ponowień.",
+      "Pięć minut nie wynika z docs. Ponowienia trwają do siedmiu dni.",
+      "48 godzin nie występuje w docs. Ponowienia trwają do siedmiu dni.",
+      "Godzina nie występuje w docs. Ponowienia trwają do siedmiu dni."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  },
+  "213": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Na VTEX IO `callbackUrl` to endpoint retry. Wołasz go bez payloadu, a Gateway ponawia Create Payment.",
+      "To retry, nie notyfikacja z body. Status końcowy zwracasz w odpowiedzi na Create Payment.",
+      "Callback wołasz po poznaniu statusu, nie po `delayToAutoSettle`.",
+      "URL trzeba użyć dokładnie w otrzymanej postaci, bez podmiany parametrów.",
+      "Wywołanie to nie `GET` ze statusem w odpowiedzi. Status wraca w kolejnym Create Payment.",
+      "Callback nie anuluje płatności ani nie przyjmuje `paymentId` w query. Użyj URL jak otrzymany."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/payment-provider-protocol"
+  },
+  "214": {
+    "ok": true,
+    "issue": "claim that callback values override Create Payment values not verified",
+    "fix": {},
+    "x": [
+      "Gdy callback nie zawiera opóźnień auto-settle, VTEX ustawia je na 24 godziny.",
+      "Siedem dni to okres ponowień `undefined`, nie domyślne opóźnienie settlementu.",
+      "Domyślnie nie jest to zero. Docs podają 24 godziny.",
+      "30 dni to maksimum `delayToCancel`, nie domyślne auto-settle.",
+      "Docs podają 24 godziny, nie godzinę.",
+      "Docs podają 24 godziny, nie pięć minut."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/payment-provider-protocol"
+  },
+  "215": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Provider musi odpowiedzieć tym samym settlementem przy powtórzonym wywołaniu.",
+      "Nie rozlicza ponownie ani nie tworzy nowego `settleId`. Zwraca tę samą odpowiedź.",
+      "Docs nie każą zwracać `409`. Provider zwraca tę samą odpowiedź settlement.",
+      "Pusta odpowiedź nie spełnia wymogu. Provider zwraca ten sam wynik.",
+      "Docs nie każą zwracać `404`. Provider zwraca tę samą odpowiedź.",
+      "Zwrot nie jest częścią idempotencji. Provider zwraca ten sam wynik settlement."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/payment-provider-protocol"
+  },
+  "216": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Maksimum `delayToCancel` to 30 dni, czyli 2592000 sekund.",
+      "Siedem dni to okres ponowień `undefined`, nie maksimum `delayToCancel`.",
+      "24 godziny to domyślne auto-settle, nie maksimum `delayToCancel`.",
+      "60 minut to górna granica dla Pix, nie maksimum ogólne.",
+      "90 dni przekracza limit. Maksimum to 30 dni.",
+      "15 dni to nie limit. Maksimum to 30 dni."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/payment-provider-protocol"
+  },
+  "217": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Po capture VTEX wysyła `POST .../refunds` z częściową wartością. Protokół wspiera zwroty częściowe.",
+      "`cancellations` dotyczy płatności zatwierdzonej, ale nieprzechwyconej.",
+      "Zwrot idzie przez `refunds`, nie `settlements` z ujemną wartością.",
+      "VTEX obsługuje zwroty częściowe.",
+      "Refund to `POST`, nie `PUT` z `refundId`.",
+      "VTEX nie wysyła Create Payment z ujemną wartością. Zwrot to `refunds`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/payments-integration-purchase-flows"
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "41": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: orderForm to główny obiekt koszyka z pozycjami, klientem, dostawą i płatnością.",
+      "Faktura nie ma związku z orderForm. To obiekt koszyka, nie dokument po wysyłce.",
+      "Adresy klientów w Master Data to osobna encja. orderForm jest strukturą koszyka w Checkout.",
+      "Rejestracja sellera nie ma związku z orderForm. To obiekt przetwarzany przez Checkout.",
+      "orderForm nie jest tokenem uwierzytelniającym. To struktura danych koszyka z `orderFormId`.",
+      "orderForm nie jest schematem walidacji. To obiekt koszyka, a zamówienie składa się osobnym requestem."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/headless-cart-and-checkout"
+  },
+  "42": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: symulację koszyka wykonuje `POST /api/checkout/pub/orderForms/simulation`.",
+      "Taki endpoint `pvt/orders/simulate` nie istnieje. Symulacja jest pod `pub/orderForms/simulation`.",
+      "OMS zarządza zamówieniami, nie symuluje koszyka. Symulacja należy do Checkout API.",
+      "Logistics nie ma takiego endpointu symulacji koszyka. Używasz Checkout API.",
+      "Symulacja to `POST`, nie `GET`. Przyjmuje `items` w body.",
+      "Symulacja nie zawiera `orderFormId` w ścieżce. Działa na koszyku z body, bez istniejącego orderForm."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "43": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `items` z `id`, `quantity` i `seller` to podstawa body symulacji.",
+      "Poprawnie: `country` to trzyliterowy kod ISO kraju wysyłki.",
+      "Poprawnie: lokalizację dostawy podajesz przez `postalCode` albo `geoCoordinates`.",
+      "`orderGroup` powstaje dopiero po złożeniu zamówienia, więc nie jest częścią symulacji.",
+      "Dane płatności wysyłasz później do gateway, nie w symulacji. Symulacja zwraca opcje płatności.",
+      "`transactionId` dostajesz po złożeniu zamówienia. Symulacja go nie przyjmuje."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "44": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: zamówienie bez koszyka składa `PUT /api/checkout/pub/orders`.",
+      "Poprawnie: Place order zwraca `201 Created`.",
+      "`POST /api/oms/pvt/orders` to nie Checkout. Zamówienie składa `PUT /api/checkout/pub/orders`.",
+      "`204 No Content` zwraca dopiero Process order (`gatewayCallback`), nie składanie zamówienia.",
+      "`PATCH` na orderForm nie składa zamówienia. Służy do innych zmian, zamówienie składa `PUT .../pub/orders`.",
+      "Place order zwraca `201 Created` z danymi zamówienia, a nie pustą odpowiedź `204`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "45": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: na wysłanie płatności i process order masz 5 minut.",
+      "Poprawnie: po 5 minutach zamówienie zostaje automatycznie anulowane.",
+      "Okno wynosi 5 minut, nie 30. Przepływ opisuje 5 minut.",
+      "Zamówienie nie czeka na wygaśnięcie tokenu. Po 5 minutach jest anulowane automatycznie.",
+      "Limit istnieje: 5 minut na płatność i przetworzenie zamówienia.",
+      "Brak ręcznej akceptacji w OMS. Dokumentacja mówi o automatycznym anulowaniu po 5 minutach."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "46": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: płatność idzie na osobny host `{accountName}.vtexpayments.com.br`.",
+      "`vtexcommercestable` obsługuje Checkout i OMS. Płatności mają host `vtexpayments`.",
+      "Taki adres `api.vtex.com/{accountName}` nie jest hostem płatności. Użyj `vtexpayments.com.br`.",
+      "`myvtex.com` to host storefrontu, nie bramki płatności.",
+      "`vtexcommercebeta` nie jest hostem płatności. Płatności wysyłasz na `vtexpayments.com.br`.",
+      "`payments.vtex.com` to nie host z przewodnika. Użyj `{accountName}.vtexpayments.com.br`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "47": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: Process order to `POST /api/checkout/pub/gatewayCallback/{orderGroup}`.",
+      "Poprawnie: sukces zwraca `204 No Content`.",
+      "`start-handling` to krok OMS po płatności, nie Process order. Użyj `gatewayCallback`.",
+      "Process order zwraca `204 No Content`, bez zamówienia w body. `201` dotyczy Place order.",
+      "Host `vtexpayments.com.br` służy do wysłania płatności. Process order idzie na host sklepu.",
+      "Zwracane jest `204 No Content`, a nie `202`. Przetwarzanie nie jest odroczone w tym kroku."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "48": {
+    "ok": false,
+    "issue": "e: claims orderGroup is passed as `orderId` when sending payment. Source says: \"orderId: found in each object in orders. Used as the orderId query parameter\" (new-order guide); only the existing-cart guide uses orderId={orderGroup}.",
+    "fix": {
+      "e": "Zakup od kilku sellerów daje kilka `orderId` (`...-01`, `...-02`) i **jeden `orderGroup`**. Podajesz go w `gatewayCallback/{orderGroup}`. Przy wysyłce płatności `orderId` bierzesz z `orders` (w przepływie z koszyka jest to `orderGroup`)."
+    },
+    "x": [
+      "Poprawnie: `orderGroup` grupuje wszystkie zamówienia z jednego zakupu.",
+      "Seller nie jest identyfikowany przez `orderGroup`. Jeden zakup od wielu sellerów ma jeden `orderGroup`.",
+      "Trade policy to osobna wartość (kanał sprzedaży), nie `orderGroup`.",
+      "Batche eventów feedu to inny mechanizm. `orderGroup` grupuje zamówienia z zakupu.",
+      "`orderGroup` nie jest identyfikatorem koszyka. Koszyk to `orderFormId`.",
+      "Status OMS nie ma związku z `orderGroup`. To identyfikator grupy zamówień."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "49": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: żądania modyfikujące nie mogą iść równolegle, trzeba je kolejkować.",
+      "Dokumentacja nie wymaga batchy po dziesięć. Wymaga kolejkowania, bez równoległości.",
+      "Rodzaj uwierzytelnienia nie jest tą regułą. Reguła dotyczy sekwencyjności modyfikacji.",
+      "Reguła nie ogranicza się do `/pvt/`. Dotyczy także tras `pub` Checkout API.",
+      "Dokumentacja nie wspomina o nagłówku `If-Match`. Mówi o niewykonywaniu modyfikacji równolegle.",
+      "Dokumentacja nie wymaga tego `Content-Type`. Mówi tylko o zakazie równoległych modyfikacji."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "50": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: kwoty to liczby całkowite w centach, np. `10390` to 103,90.",
+      "Kwoty nie mają przecinka dziesiętnego. Są liczbami całkowitymi w centach.",
+      "Kwoty nie mają prefiksu waluty. To liczby całkowite w centach.",
+      "Kwoty nie są floatami. To liczby całkowite bez separatora dziesiętnego.",
+      "Kwoty nie są stringami z kropką. To liczby całkowite w centach.",
+      "Jednostką są centy, nie tysięczne. `10000` to 100,00, nie `100000`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/orderform-fields"
+  },
+  "51": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `transactionId` trafia do ścieżki requestu wysyłającego płatność.",
+      "Poprawnie: `orderGroup` jest potrzebny w kroku Process order.",
+      "Poprawnie: cookie `Vtex_CHKO_Auth` z odpowiedzi wysyłasz w nagłówku `Cookie` przy Process order.",
+      "`X-VTEX-MD-TOKEN` dotyczy Master Data i nie pochodzi z odpowiedzi Place order.",
+      "`REST-Content-Range` to nagłówek paginacji Master Data, nie część odpowiedzi Place order.",
+      "`X-VTEX-API-AppToken` to twoje dane uwierzytelniające, a nie wartość z odpowiedzi."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "128": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: żądanie zwraca bieżący koszyk albo tworzy nowy.",
+      "Poprawnie: nowy pusty koszyk tworzy się z `forceNewCart=true`.",
+      "`orderFormId` nie jest parametrem ścieżki. Dostajesz go w odpowiedzi.",
+      "`forceNewCart=true` tworzy pusty koszyk, nie składa zamówienia.",
+      "Żądanie nie wymaga symulacji. Zwraca bieżący koszyk albo tworzy nowy.",
+      "Brak koszyka nie daje `404`. Żądanie tworzy nowy koszyk."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "129": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: pozycje dodajesz przez `POST .../orderForm/{orderFormId}/items`.",
+      "Poprawnie: body zawiera tablicę `orderItems`.",
+      "Dodawanie to `POST .../items`, a nie `PUT .../items/{skuId}`.",
+      "`attachments/items` nie istnieje. Ścieżka to `.../items`.",
+      "Modyfikacje koszyka nie mogą iść równolegle. Kolejkuj je sekwencyjnie.",
+      "`skuName` nie jest wymagane. Wymagane są `id`, `quantity` i `seller`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "130": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: wybierana jest opcja realizująca największą liczbę sztuk za najniższą cenę.",
+      "Poprawnie: pickup i dostawy planowane są pomijane przy automatycznym wyborze.",
+      "Wybór nie patrzy na czas dostawy: \"This selection does not consider delivery time.\"",
+      "Brak `selectedSla` nie zostawia koszyka bez opcji. API wybiera najlepszą z `slas`.",
+      "Brak `selectedSla` nie powoduje `400`. API wybiera opcję samo.",
+      "Wybierana jest opcja realizująca największą liczbę sztuk, nie samo najtańsza ignorująca niedostępne."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "131": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: ręczna cena wymaga aktywnej funkcji, czyli `allowManualPrice: true`.",
+      "Poprawnie: zmiana obejmuje wszystkie pozycje koszyka z tym samym SKU.",
+      "`canEditData` dotyczy edycji danych klienta, nie ręcznej ceny.",
+      "`allowMultipleDeliveries` dotyczy dostaw, nie ręcznej ceny.",
+      "Zmiana dotyczy tylko ceny w koszyku, nie ceny bazowej SKU w Pricing.",
+      "Funkcja ręcznej ceny musi być aktywna. Sam appKey tego nie zastępuje."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "132": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `apps` rejestrujesz przez `POST` konfiguracji, po odczycie bieżącej.",
+      "`PATCH` z `apps` zwraca `400` z kodem `CHK0288`. Pola `apps` nie zmienisz tym endpointem.",
+      "`customData` w koszyku ustawia wartości, nie rejestruje grup pól w konfiguracji.",
+      "Taki `attachments/customData` nie rejestruje `apps`. Konfiguracja jest pod `pvt/configuration/orderForm`.",
+      "Taka ścieżka `.../orderForm/apps` nie istnieje. Konfigurację zapisuje `POST .../configuration/orderForm`.",
+      "Taka ścieżka `.../apps/{appId}` nie istnieje. Używasz `POST .../configuration/orderForm`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "133": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `PUT` z `appId` i `appFieldName` w ścieżce ustawia jedno pole.",
+      "`openTextField` to inny attachment, nie pole z konfiguracji `apps`.",
+      "`PATCH` konfiguracji zmienia ustawienia konta, nie wartość pola w koszyku.",
+      "Wartość pola ustawiasz `PUT` ze ścieżką `{appId}/{appFieldName}`, nie `POST .../customData`.",
+      "Pole ustawiasz metodą `PUT`, nie `PATCH`.",
+      "Taki endpoint `pvt/.../customFields` nie istnieje. Użyj `PUT .../customData/{appId}/{appFieldName}`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "134": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: z istniejącego koszyka zamówienie składa `POST .../orderForm/{orderFormId}/transaction`.",
+      "Poprawnie: po złożeniu masz 5 minut na wysłanie płatności i przetworzenie zamówienia.",
+      "`gatewayCallback` przetwarza zamówienie po płatności, nie składa go.",
+      "Taki endpoint `.../orderForm/{orderFormId}/orders` nie istnieje. Użyj `.../transaction`.",
+      "Zamówienie jest anulowane po 5 minutach bez płatności i przetworzenia, nie bez fakturowania.",
+      "Okno to 5 minut, nie 30. Tyle masz na wysłanie płatności."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart"
+  },
+  "202": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart"
+  },
+  "203": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "204": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart"
+  },
+  "205": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: po 5 minutach zamówienie jest anulowane automatycznie, płatność i przetworzenie muszą zmieścić się w tym czasie.",
+      "Dokumentacja Checkout nie podaje 7 dni. Limit to 5 minut.",
+      "`CHK0016` dotyczy niezgodności `value` z `referenceValue`, nie spóźnionej płatności.",
+      "Zamówienie nie czeka na płatność z jego strony. Po 5 minutach jest anulowane.",
+      "Okno wynosi 5 minut, więc po sześciu zamówienie nie przechodzi dalej.",
+      "Dokumentacja nie opisuje takiego przejścia. Po 5 minutach zamówienie jest anulowane."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart"
+  },
+  "206": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: gdy płatność nie jest jeszcze zatwierdzona, `gatewayCallback` zwraca `500`.",
+      "Dokumentacja jako przyczynę `500` podaje niezatwierdzoną płatność, nie brak nagłówka.",
+      "Dokumentacja jako przyczynę `500` podaje niezatwierdzoną płatność, nie ponowne wywołanie.",
+      "`selectedSla` nie jest przyczyną `500` z dokumentacji. Przyczyna to niezatwierdzona płatność.",
+      "Obcy `orderGroup` nie jest przyczyną podaną w dokumentacji. Podana jest niezatwierdzona płatność.",
+      "Process order idzie na host sklepu. Dokumentacja jako przyczynę `500` podaje niezatwierdzoną płatność."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/headless-cart-and-checkout"
+  },
+  "207": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: bez cookie dane osobowe w `clientProfileData` i `shippingData` są zamaskowane.",
+      "Brak cookie nie daje `403`. Dane osobowe zostają zamaskowane.",
+      "Brak cookie nie tworzy nowego koszyka. Zwracany jest ten sam orderForm z zamaskowanymi danymi.",
+      "Samo cookie `checkout.vtex.com` nie daje pełnych danych. Potrzebne jest `CheckoutOrderFormOwnership`.",
+      "Brak cookie nie daje `401`. Dane osobowe są maskowane.",
+      "Pola nie są usuwane, tylko zamaskowane."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/headless-cart-and-checkout"
+  },
+  "208": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: konto klienta musi być zalogowane w sklepie, inaczej proces się nie uda.",
+      "Dokumentacja nie wymaga `document` ani `documentType`. Wymaga zalogowanego konta klienta.",
+      "Dla istniejącego klienta e-mail wiąże zamówienie z kontem. Nowy profil nie jest tworzony.",
+      "Dokumentacja nie wymaga potwierdzenia e-maila linkiem. Wymaga zalogowanego konta.",
+      "Dokumentacja nie wymaga `userProfileId` w nagłówku. Wymaga zalogowanego konta.",
+      "Dokumentacja nie stawia warunku wieku profilu. Wymaga zalogowanego konta."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "209": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: kwoty są w centach, więc $24.99 to `2499`.",
+      "`24.99` to kwota z kropką. `value` jest liczbą całkowitą w centach.",
+      "Kwota nie jest stringiem z kropką. Przykład z dokumentacji to `2499`.",
+      "`249900` to sto razy za dużo. $24.99 to `2499` centów.",
+      "`24990` to zła wartość. $24.99 to `2499` centów.",
+      "`2499.00` nie jest liczbą całkowitą. `value` to `2499`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-from-an-existing-cart"
+  },
+  "314": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "315": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  },
+  "316": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/checkout-api"
+  }
+}

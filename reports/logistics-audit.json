@@ -1,0 +1,266 @@
+{
+  "33": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: dostępność SKU jest zapisana na poziomie magazynu.",
+      "Dok łączy magazyn z polityką wysyłki, nie przechowuje stanu SKU.",
+      "Polityka handlowa nie przechowuje stanu. Stan leży w magazynie.",
+      "Kategoria to element katalogu, nie ma stanu magazynowego.",
+      "Produkt nie ma stanu. Stan ustawia się dla SKU w magazynie.",
+      "Punkt odbioru nie przechowuje stanu. Stan leży na poziomie magazynu."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-inventory"
+  },
+  "34": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: Logistics API, `PUT` z `skuId` i `warehouseId` w ścieżce.",
+      "Stanu nie aktualizuje się przez Catalog API, tylko przez Logistics API.",
+      "Dokumentacja podaje `PUT` pod `/inventory/skus/...`, a nie `PATCH` pod `/pub/`.",
+      "OMS API nie służy do aktualizacji stanu. Robi to Logistics API.",
+      "Brakuje `warehouses/{warehouseId}`. Stan jest zapisywany osobno dla każdego magazynu.",
+      "Stan nie leży w Catalog API. Właściwa trasa to `/api/logistics/pvt/inventory/...`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-"
+  },
+  "35": {
+    "ok": true,
+    "issue": "Chain verified on the import-inventory page; e claim \"Bez pełnej trasy SKU jest niedostępny\" is only implied (\"path connecting your store to the customer\").",
+    "fix": {},
+    "x": [
+      "Poprawnie: SKU musi mieć stan w magazynie połączonym przez dok z przewoźnikiem, który dowozi pod adres klienta.",
+      "Dok nie poprzedza magazynu. Trasa zaczyna się od magazynu ze stanem.",
+      "Cennik nie jest elementem trasy logistycznej magazyn–dok–przewoźnik.",
+      "Kategoria nie należy do trasy logistycznej. Liczą się magazyn, dok i przewoźnik.",
+      "Przewoźnik jest po doku: magazyn łączy się z przewoźnikiem przez dok.",
+      "Punkt odbioru nie otwiera trasy dostawy pod adres. Zaczyna ją magazyn ze stanem."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-inventory"
+  },
+  "36": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: przed aktualizacją stanu trzeba utworzyć magazyny, które będą go trzymać.",
+      "Cena nie jest wymagana do ustawienia stanu SKU.",
+      "Zamówienie nie jest potrzebne. Rezerwacja powstaje dopiero po złożeniu zamówienia.",
+      "Hook nie jest wymagany. Stan ustawia się zwykłym `PUT` w Logistics API.",
+      "Tabela cen nie jest wymagana. Wymagany jest magazyn.",
+      "Kolekcja nie jest warunkiem. Najpierw musi istnieć magazyn."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-inventory"
+  },
+  "37": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `unlimitedQuantity: true` czyni SKU stale dostępnym i nadpisuje `quantity`.",
+      "Takie pole nie istnieje w body. Nieskończony stan włącza `unlimitedQuantity`.",
+      "`quantity` ustawia ilość, a brakujący lub `null` daje 0. Nieskończony stan to `unlimitedQuantity`.",
+      "Takiego pola nie ma. Dokumentacja opisuje `unlimitedQuantity`.",
+      "Takiego pola nie ma w body. Właściwe to `unlimitedQuantity`.",
+      "Takiego pola nie ma w body. Właściwe to `unlimitedQuantity`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-"
+  },
+  "38": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: ERP wysyła łączną ilość SKU w magazynie, nie deltę.",
+      "Poprawnie: to endpoint Logistics API do aktualizacji stanu SKU w magazynie.",
+      "Wysyłasz stan całkowity, nie różnicę od ostatniej aktualizacji.",
+      "Rezerwacje tworzy VTEX po złożeniu zamówienia. `quantity` to stan, nie rezerwacje.",
+      "Stan nie leży w Catalog API. Aktualizujesz go przez Logistics API.",
+      "Taka trasa nie istnieje. Właściwa to `.../inventory/skus/{skuId}/warehouses/{warehouseId}`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-inventory"
+  },
+  "39": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: warehouse tworzy `POST` w `/api/logistics/pvt/configuration/warehouses`.",
+      "Trasa `/inventory/` służy do stanów, a magazyn jest w `/configuration/`.",
+      "Magazyn nie jest w Catalog API. Tworzy się go w Logistics API.",
+      "OMS API nie zarządza dokami ani magazynami. Konfiguracja leży w Logistics API.",
+      "Ta trasa tworzy dok, nie magazyn.",
+      "Trasa `/inventory/` nie tworzy magazynu. Stany i konfiguracja to osobne ścieżki."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/fulfillment"
+  },
+  "40": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: dla punktu odbioru używasz wartości `pickup-in-point`.",
+      "Taka wartość nie występuje w dokumentacji. Właściwa to `pickup-in-point`.",
+      "Takiej wartości dla punktu odbioru nie opisano. Właściwa to `pickup-in-point`.",
+      "Skrócona forma nie jest opisana. Dokumentacja podaje `pickup-in-point`.",
+      "Wartość nieprawidłowa. Dokumentacja wymaga dokładnie `pickup-in-point`.",
+      "Taka wartość nie istnieje. Użyj `pickup-in-point`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api"
+  },
+  "124": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `PATCH .../quantity` zmienia tylko ilość.",
+      "Poprawnie: `PATCH .../lead-time` zmienia tylko lead time.",
+      "Taka trasa nie istnieje. Są `PATCH` na `.../warehouses/{warehouseId}/quantity` i `/lead-time`.",
+      "Nie ma ścieżki `/items/` dla zmiany ilości. Trasa zawiera `skus` i `warehouses`.",
+      "`PUT` ustawia ilość i lead time naraz, a nie pojedynczy atrybut.",
+      "`/configuration/` to konfiguracja magazynów. Stan zmienia się pod `/inventory/skus/...`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/logistics-api#patch-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-/quantity"
+  },
+  "125": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `unlimitedQuantity: true` nadpisuje `quantity`, SKU jest zawsze dostępne.",
+      "Poprawnie: bez pola `leadTime` lead time SKU spada do `0`.",
+      "Ilość nie jest wtedy ograniczona do 10. `true` nadpisuje `quantity`.",
+      "Żądanie przechodzi z `200`. Pola nie wykluczają się, `true` nadpisuje `quantity`.",
+      "Dokumentacja nie opisuje rezerwowania. Domyślne 1000000 sztuk nie maleje przy sprzedaży.",
+      "`unlimitedQuantity` nie jest ignorowane. Wartość `true` nadpisuje `quantity`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/inventory/skus/-skuId-/warehouses/-warehouseId-"
+  },
+  "126": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: lead time to czas przygotowania, np. kompletacji lub produkcji, przed wysyłką.",
+      "Czas przewoźnika to osobny składnik. Lead time dolicza się do łącznego czasu wysyłki.",
+      "Lead time nie dotyczy rezerwacji. Okres rezerwacji zależy od płatności.",
+      "Czas doku to osobne, wymagane ustawienie. Lead time jest na poziomie SKU.",
+      "Lead time nie dezaktywuje SKU. Wydłuża czas wysyłki.",
+      "Lead time nie opóźnia odświeżenia stanu w sklepie. Dolicza się do czasu dostawy."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/lead-time-shipping-time-at-sku-level--16yv5Mkj6bTyWR1hCN2f4B"
+  },
+  "127": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `PUT` z `pickupPointId` w ścieżce tworzy lub aktualizuje punkt odbioru.",
+      "Brakuje `pickupPointId` w ścieżce. Dokumentacja opisuje `PUT` z ID.",
+      "Checkout API nie tworzy punktów odbioru. Konfiguracja jest w Logistics API.",
+      "Taka trasa nie istnieje. Punkt konfigurujesz pod `/configuration/pickuppoints/{pickupPointId}`.",
+      "Dokumentacja podaje `PUT`, nie `PATCH`, do utworzenia lub aktualizacji punktu.",
+      "Taka trasa nie istnieje. Właściwa to `PUT .../configuration/pickuppoints/{pickupPointId}`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/logistics-api#put-/api/logistics/pvt/configuration/pickuppoints/-pickupPointId-"
+  },
+  "242": {
+    "ok": true,
+    "issue": "Order policy, dock, warehouse, inventory matches fulfillment guide.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/fulfillment"
+  },
+  "243": {
+    "ok": true,
+    "issue": "Minor: guide says dock \"Links your products to a shipping policy\"; option 1 says it connects the warehouse to the policy. Warehouse link not stated on the linked page.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/fulfillment"
+  },
+  "244": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: dodanie do koszyka nie tworzy rezerwacji ani pierwszeństwa.",
+      "Rezerwacja nie powstaje po dodaniu do koszyka, a po złożeniu zamówienia.",
+      "Koszyk nie tworzy rezerwacji, więc wygaśnięcie koszyka nie ma znaczenia.",
+      "Rezerwacja nie zależy od niskiego stanu. Powstaje po złożeniu zamówienia.",
+      "Sesja nie tworzy rezerwacji. Koszyk jej nie generuje.",
+      "Logowanie nie ma wpływu. Rezerwacja startuje po złożeniu zamówienia."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92"
+  },
+  "245": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: VTEX nie odejmuje sztuk automatycznie, robi to sprzedawca lub ERP.",
+      "VTEX nie odejmuje stanu po zatwierdzeniu płatności. Aktualizuje go sprzedawca lub ERP.",
+      "Faktura nie odejmuje stanu automatycznie. Dokumentacja zaleca aktualizację po fakturze.",
+      "`start-handling` nie odejmuje stanu. Po rozpoczęciu obsługi VTEX nie kontroluje już sztuk.",
+      "Złożenie zamówienia tworzy rezerwację, nie odejmuje stanu automatycznie.",
+      "Odejmowanie nie zależy od magazynu domyślnego. VTEX nie robi tego automatycznie."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92"
+  },
+  "246": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: lead time dolicza się do łącznego czasu wysyłki zamówienia.",
+      "Poprawnie: lead time działa tylko z wartościami dodatnimi.",
+      "Domyślnie lead time to zero dni.",
+      "Czas doku to osobne ustawienie. Lead time jest dodawany do niego.",
+      "Lead time dotyczy zamówień dostawy i odbioru, bo jest składnikiem czasu wysyłki.",
+      "Lead time ustawia się dla SKU w magazynie, nie dla przewoźnika w polityce."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/lead-time-shipping-time-at-sku-level--16yv5Mkj6bTyWR1hCN2f4B"
+  },
+  "247": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: limit lead time to 365 dni.",
+      "Limit wynosi 365 dni, nie 30.",
+      "Limit wynosi 365 dni, nie 90.",
+      "Limit istnieje i wynosi 365 dni.",
+      "Limit wynosi 365 dni, nie 180.",
+      "Limit wynosi 365 dni, nie 999."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/lead-time-shipping-time-at-sku-level--16yv5Mkj6bTyWR1hCN2f4B"
+  },
+  "248": {
+    "ok": true,
+    "issue": "Last distractor is partly arguable: res page says updating a SKU quantity clears recognized reservations, so it ends them, though not by confirming.",
+    "fix": {},
+    "x": [
+      "Poprawnie: po zatwierdzeniu płatności rezerwacja jest potwierdzona i nie wygasa.",
+      "`start-handling` nie jest warunkiem. Potwierdza ją zatwierdzona płatność.",
+      "Faktura nie zmienia statusu wygasania. Rezerwację potwierdza płatność.",
+      "Po zatwierdzeniu płatności rezerwacja przestaje wygasać. 4 dni to tylko część okresu dla niezapłaconych.",
+      "Po złożeniu zamówienia rezerwacja nadal podlega wygaśnięciu, do zatwierdzenia płatności.",
+      "Nowa ilość z ERP zeruje rezerwacje, ale to nie ona potwierdza rezerwację."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/how-does-reservation-work--tutorials_92"
+  },
+  "249": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: SKU jest ważne do sprzedaży, dopóki stan jest nieograniczony.",
+      "Dopóki stan jest nieograniczony, SKU jest dostępne bez względu na `quantity`.",
+      "Lead time może być dowolny. Nieograniczony stan nadal działa z lead time.",
+      "Nieograniczony stan dotyczy SKU w danym magazynie, nie tylko domyślnego.",
+      "Rezerwacja nie jest potrzebna. Warunkiem jest nieograniczony stan.",
+      "Nieograniczony stan nie dotyczy tylko zestawów. Dokumentacja nie podaje takiego ograniczenia."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/lead-time-shipping-time-at-sku-level--16yv5Mkj6bTyWR1hCN2f4B"
+  }
+}

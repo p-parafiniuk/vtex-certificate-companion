@@ -1,0 +1,506 @@
+{
+  "52": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Feed działa przed indeksowaniem i nie zależy od niego, więc jest szybszy i pewniejszy niż List orders.",
+      "List orders zwraca tylko zamówienia już zaindeksowane, co trwa około czterech minut.",
+      "Zdarzenie feedu niesie identyfikator zamówienia i status. Szczegóły pobierasz osobnym żądaniem po `orderId`.",
+      "Docs nie obiecują braku limitów. Przy `429` należy zatrzymać żądania i poczekać przed ponowieniem.",
+      "Feed nie jest ograniczony do 24 godzin. Zdarzenia żyją przez okres retencji, co najmniej 4 dni.",
+      "Odwrotnie: to List orders opiera się na indeksie i opóźnia dane, a feed daje bieżące zdarzenia."
+    ]
+  },
+  "53": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Feed jest pull: integracja sama pobiera zdarzenia, przetwarza je i commituje.",
+      "Hook jest push: VTEX wysyła każde pasujące zdarzenie na URL z konfiguracji.",
+      "Odwrotnie: to feed jest kolejką do odpytywania, a hook jest wywoływany przez VTEX.",
+      "Hook nie jest ograniczony do płatności. Obsługuje zdarzenia zamówień, tak samo jak feed.",
+      "Podział nie zależy od roli sprzedawcy. Obie metody służą integracjom zamówień.",
+      "Commit dotyczy tylko feedu. Hook dostaje powiadomienie i odpowiada `200`."
+    ]
+  },
+  "54": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "`FromWorkflow` filtruje po tablicy `status`. To typ używany, gdy filtr nie jest ustawiony.",
+      "`FromOrders` filtruje wyrażeniem JSONata w `expression`, po dowolnym polu dokumentu zamówienia.",
+      "Docs znają tylko `FromWorkflow` i `FromOrders`. Taka wartość nie istnieje.",
+      "Docs znają tylko `FromWorkflow` i `FromOrders`. Taka wartość nie istnieje.",
+      "Docs znają tylko `FromWorkflow` i `FromOrders`. Taka wartość nie istnieje.",
+      "Docs znają tylko `FromWorkflow` i `FromOrders`. Taka wartość nie istnieje."
+    ]
+  },
+  "55": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Mieszanie pól dwóch typów filtra zwraca `409 Conflict`.",
+      "Docs mówią o błędzie `409`, a nie o cichym zignorowaniu wyrażenia.",
+      "`400` jest kodem nieudanego pingu hooka, a nie konfliktu typów filtra feedu.",
+      "Konfiguracja nie powstaje: mieszanka typów kończy się `409`, a nie `201`.",
+      "Docs podają dla tego przypadku `409`, nie `422`.",
+      "Docs mówią o błędzie `409`, a nie o cichym zignorowaniu filtra statusów."
+    ]
+  },
+  "56": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Jeden appKey konfiguruje lub czyta tylko jeden feed. Kto dzieli klucz, dzieli kolejkę.",
+      "Jeden appKey konfiguruje lub czyta tylko jeden hook.",
+      "Limit jest na appKey, a nie na politykę handlową.",
+      "Docs nie przewidują dziesięciu feedów. Jest jeden na appKey.",
+      "Hooków też nie jest nieograniczenie wiele. Jest jeden na appKey.",
+      "Limit dotyczy appKey, a nie sprzedawcy."
+    ]
+  },
+  "57": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "`GET /api/orders/feed` pobiera elementy feedu.",
+      "`POST /api/orders/feed` commituje elementy listą `handles`.",
+      "`POST /api/orders/feed/config` tworzy lub aktualizuje konfigurację feedu.",
+      "Taki endpoint nie istnieje. Commit to `POST /api/orders/feed`.",
+      "`/api/orders/hook/...` służy do konfiguracji hooka, a nie do commitu feedu.",
+      "Konfigurację zapisuje się przez `POST`, a nie `PUT`."
+    ]
+  },
+  "58": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Pobrane elementy są ukryte przez ten czas. Bez commita wracają do feedu.",
+      "Za czas życia zdarzenia odpowiada `messageRetentionPeriodInSeconds`, a nie ten parametr.",
+      "Dotyczy feedu, nie hooka. Hook ma limit 5000 ms na odpowiedź endpointu.",
+      "Parametr nie ma związku z oknem anulowania zamówienia.",
+      "Parametr nie opisuje ponawiania commita, tylko ukrycie pobranych elementów.",
+      "Feed niczego nie wysyła na endpoint hooka. Parametr dotyczy ukrycia pobranych elementów."
+    ]
+  },
+  "59": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Minimum to `345600` sekund, czyli 4 dni.",
+      "Maksimum to `1209600` sekund, czyli 14 dni.",
+      "Minimum to 4 dni, a nie minuta.",
+      "Maksimum to 14 dni, czyli `1209600`, a nie 7 dni.",
+      "`345600` to minimum, a nie maksimum.",
+      "Minimum to 4 dni, a nie godzina."
+    ]
+  },
+  "60": {
+    "ok": true,
+    "issue": "Core claim fine. The e sentence about the 2.5 s Fulfillment Simulation limit is not on the linked page (unverifiable).",
+    "fix": { "e": "Endpoint hooka zawsze odpowiada **HTTP 200 w ciągu 5000 ms**." },
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Powiadomienie wymaga odpowiedzi `200`.",
+      "Odpowiedź `200` musi dojść w ciągu 5000 ms.",
+      "Oczekiwany status to `200`, a nie `202`.",
+      "Limit to 5000 ms, a nie 2,5 s.",
+      "Docs nie wymagają identyfikatora w odpowiedzi. Liczy się status `200`.",
+      "Limit to 5000 ms, a nie 30 sekund."
+    ]
+  },
+  "61": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Przy konfiguracji VTEX wysyła `POST` z ciałem `{\"hookConfig\": \"ping\"}`.",
+      "Brak odpowiedzi `200` na ping daje `400 Bad Request` i konfiguracja nie jest zapisana.",
+      "Ping to `POST` z ciałem, a nie `GET`, i wymaga `200`, nie `204`.",
+      "Wysyłany jest ping, a nie przykładowe zamówienie do odesłania.",
+      "Ping idzie już przy konfiguracji, nie przy pierwszym zdarzeniu.",
+      "Konfiguracja nie zostaje zapisana w stanie wyłączonym. API zwraca `400`."
+    ]
+  },
+  "62": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Hook bez powiadomień przez trzy dni traci konfigurację. Trzeba ją utworzyć od nowa.",
+      "Docs nie mówią o pauzie. Konfiguracja jest usuwana.",
+      "Hook i feed są niezależne. Zdarzenia nie są przekierowywane.",
+      "Hooki wygasają: po trzech dniach bez powiadomień konfiguracja jest usuwana.",
+      "Konfiguracja nie zostaje. Po trzech dniach ciszy jest usuwana.",
+      "Docs nie opisują żadnej konwersji hooka na feed."
+    ]
+  },
+  "63": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration",
+    "x": [
+      "Feed gwarantuje dostarczenie, ale nie unikalność ani kolejność. Middleware musi znosić duplikaty.",
+      "Zdarzenie niesie dane o zmianie statusu. Szczegóły pobierasz osobno po `orderId`.",
+      "Feed nie gwarantuje ani dokładnie jednej dostawy, ani kolejności.",
+      "5000 ms to limit odpowiedzi hooka. Zdarzenia feedu żyją co najmniej 4 dni.",
+      "Docs nie gwarantują kolejności ani po dacie utworzenia.",
+      "Feed obejmuje zmiany zamówień niezależnie od kanału utworzenia."
+    ]
+  },
+  "64": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration",
+    "x": [
+      "Po przekazaniu szczegółów do ERP wywołuje się `POST .../start-handling`.",
+      "Zmianę statusu na handling wykonuje się tylko raz na zamówienie.",
+      "`invoice` służy do powiadomienia o fakturze, a nie do rozpoczęcia obsługi.",
+      "Taki endpoint nie istnieje. Start handling to `POST /api/oms/pvt/orders/{orderId}/start-handling`.",
+      "Wywołujesz je raz. Commit feedu to osobny krok.",
+      "Nie zależy od metody płatności. Dotyczy każdego zamówienia."
+    ]
+  },
+  "65": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing",
+    "x": [
+      "Order Invoice Notification to `POST /api/oms/pvt/orders/{orderId}/invoice`.",
+      "Taki endpoint statusu nie istnieje. Fakturę zgłasza się przez `POST .../invoice`.",
+      "Faktury zgłasza się w Orders API (`/api/oms/pvt/...`), a nie w Logistics.",
+      "Faktury zgłasza się przez `POST` w OMS, a nie `PATCH` w Checkout.",
+      "Nazwa endpointu to `invoice`, a nie `invoiced`.",
+      "Taki endpoint nie istnieje. Faktura idzie do `/api/oms/pvt/orders/{orderId}/invoice`."
+    ]
+  },
+  "66": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/invoice",
+    "x": [
+      "`Output` to faktura sprzedaży zamówienia.",
+      "`Input` to faktura zwrotna. Sama tworzy refund.",
+      "Dozwolone są tylko `Output` i `Input`. `Return` nie istnieje.",
+      "Dozwolone są tylko `Output` i `Input`. `Refund` nie istnieje.",
+      "`Input` to faktura zwrotna, a nie pierwsza faktura zamówienia.",
+      "`Output` to faktura sprzedaży, a nie zwrotna."
+    ]
+  },
+  "67": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#patch-/api/oms/pvt/orders/-orderId-/invoice/-invoiceNumber-",
+    "x": [
+      "Numer śledzenia dodaje `PATCH .../invoice/{invoiceNumber}` (Update order's partial invoice).",
+      "Taki endpoint nie istnieje. Tracking dodaje się do faktury.",
+      "Śledzenie dodaje się w Orders API, a nie w Logistics.",
+      "`start-handling` zmienia status na handling i nie dodaje trackingu.",
+      "Taki endpoint nie istnieje. Tracking dołącza się do konkretnej faktury.",
+      "Taki endpoint nie istnieje. Ścieżka `.../tracking` z `PUT` wysyła zdarzenia przesyłki."
+    ]
+  },
+  "68": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration",
+    "x": [
+      "Docs: `ready-for-handling` jest prawdopodobnie najważniejszym statusem do monitorowania w integracji ERP.",
+      "`payment-pending` to jeszcze etap przed zatwierdzeniem płatności, więc nie ma czego obsługiwać.",
+      "To nie jest status, na który reaguje ERP. Kluczowy jest `ready-for-handling`.",
+      "`invoiced` to koniec przepływu, gdy faktura już jest. ERP musi zareagować wcześniej.",
+      "`handling` ustawia sam ERP wywołaniem Start handling po `ready-for-handling`.",
+      "Docs wskazują `ready-for-handling`, a nie `window-to-cancel`."
+    ]
+  },
+  "69": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration",
+    "x": [
+      "Docs: commituj każdą zmianę statusu, nawet bez akcji. Pominięcie blokuje pozostałe zdarzenia w feedzie.",
+      "Commit nie ma wpływu na samo zamówienie. Zdarzenie nie anuluje zamówienia.",
+      "Status zamówienia zmienia Start handling, a nie commit feedu.",
+      "Commit nie dotyczy tokenu aplikacji.",
+      "Docs nie wiążą commita z limitem żądań appKey.",
+      "Feed niczego nie wysyła na endpoint hooka."
+    ]
+  },
+  "70": {
+    "ok": true,
+    "issue": "The e claim that disableSingleFire is not allowed in FromWorkflow is not on the linked page.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Przy `false` zamówienie trafia do feedu tylko raz.",
+      "Przy `true` zamówienie może pojawić się wielokrotnie, nawet setki razy. Docs zalecają `false`.",
+      "Parametr nie wyłącza filtra. `false` oznacza tylko jedno zdarzenie na zamówienie.",
+      "Parametr nie zmienia feedu w hook. Feed i hook są niezależne.",
+      "Odwrotnie: wielokrotne zdarzenia daje `true`, a `false` tylko jedno.",
+      "Parametr dotyczy powtarzania zdarzeń zamówienia, nie zatrzymania po pierwszej zmianie statusu."
+    ]
+  },
+  "71": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-order-processing",
+    "x": [
+      "Docs: przepływ OMS nie pozwala anulować zamówienia po zafakturowaniu.",
+      "Anulowania nie ma. Do zwrotu służy faktura zwrotna.",
+      "Zamówienie `invoiced` nie zmienia statusu. Po fakturze nie wraca do `ready-for-handling`.",
+      "Docs nie opisują wstrzymania. Anulowanie po fakturze jest niedozwolone.",
+      "Nic nie jest anulowane. Zwrot wymaga ręcznie wysłanej faktury zwrotnej.",
+      "Numer śledzenia nie ma znaczenia. Zamówienie zafakturowane nie podlega anulowaniu."
+    ]
+  },
+  "135": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#get-/api/oms/pvt/orders",
+    "x": [
+      "Limit pobierania to 30 stron.",
+      "Domyślnie 15 zamówień na stronę.",
+      "Przez `per_page` można ustawić do 100 zamówień na stronę.",
+      "Limit istnieje: 30 stron.",
+      "Stronicowanie idzie parametrem `page`. Docs nie wspominają o nagłówku `REST-Range`.",
+      "Maksimum `per_page` to 100, a nie 1000."
+    ]
+  },
+  "136": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196",
+    "x": [
+      "Po zatwierdzeniu płatności: okno anulowania, `ready-for-handling`, `handling`, `invoiced`.",
+      "Okno anulowania poprzedza `ready-for-handling`. Status zmienia się dopiero po jego upływie.",
+      "`handling` następuje po `ready-for-handling` i Start handling, a nie przed nimi.",
+      "`ready-for-handling` poprzedza `handling`. Seller zaczyna obsługę po tym statusie.",
+      "`window-to-cancel` jest pierwsze, a `handling` ostatnie przed fakturą.",
+      "`invoiced` kończy przepływ, więc `handling` musi być przed nim."
+    ]
+  },
+  "137": {
+    "ok": true,
+    "issue": "e says 5 minutes for payment in Checkout API; not on the linked page (unverifiable).",
+    "fix": {
+      "e": "`window-to-cancel` trwa domyślnie **30 minut** od zatwierdzenia płatności. Sklep może zmienić ten czas w ustawieniach. Klient anuluje sam, a platforma zwraca mu środki."
+    },
+    "src": "https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196",
+    "x": [
+      "Po zatwierdzeniu płatności klient ma domyślnie 30 minut na anulowanie bez zgody sklepu.",
+      "Okno liczy się od zatwierdzenia płatności, a nie od złożenia zamówienia, i trwa 30 minut.",
+      "Domyślnie to 30 minut, a nie 24 godziny.",
+      "Okno zamyka się wcześniej: po upływie czasu zamówienie przechodzi do `ready-for-handling`.",
+      "Okno liczy się od zatwierdzenia płatności, a domyślnie trwa 30 minut.",
+      "Po fakturze nie ma okna anulowania. Zamówienie `invoiced` nie jest anulowane."
+    ]
+  },
+  "138": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/start-handling",
+    "x": [
+      "Sukces to `204` bez treści.",
+      "Sklep ma zweryfikować odpowiedź i ponowić wywołanie, gdy kod jest inny niż `204`.",
+      "Sukces zwraca `204` bez treści, a nie `200` z zamówieniem.",
+      "Sukces zwraca `204`, a nie `201`.",
+      "Sukces zwraca `204`, a nie `202`.",
+      "Docs mówią o ponowieniu przez sklep. Zamówienie nie jest anulowane."
+    ]
+  },
+  "139": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/invoice",
+    "x": [
+      "`type` jest wymagane, `Output` lub `Input`.",
+      "`issuanceDate` jest wymagane.",
+      "`invoiceValue` jest wymagane, w centach.",
+      "Tracking jest opcjonalny i można go dosłać później.",
+      "`courier` jest opcjonalny.",
+      "`invoiceUrl` jest opcjonalny."
+    ]
+  },
+  "140": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/invoice",
+    "x": [
+      "Faktura zwrotna `Input` automatycznie tworzy refund, bez dodatkowych żądań API.",
+      "Zwrot powstaje tylko wtedy, gdy wcześniej zafakturowano całą kwotę zamówienia.",
+      "Docs nie mówią o zmianie statusu na `handling`. Faktura zwrotna służy do zwrotu.",
+      "Docs nie opisują anulowania zamówienia ani przywracania stanów magazynowych.",
+      "Refund powstaje automatycznie, bez osobnego wywołania.",
+      "Numer śledzenia nie jest wymagany do faktury zwrotnej."
+    ]
+  },
+  "141": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#put-/api/oms/pvt/orders/-orderId-/invoice/-invoiceNumber-/tracking",
+    "x": [
+      "Endpoint wysyła zdarzenia przesyłki dla faktury, która ma już numer śledzenia.",
+      "Wymagane pola ciała to `isDelivered`, `deliveredDate` i `events`.",
+      "Numer i URL dodaje `PATCH .../invoice/{invoiceNumber}`, a nie ten endpoint.",
+      "Faktury nie tworzy ten endpoint. Służy do `POST .../invoice`.",
+      "Docs nie opisują zmiany przewoźnika. Endpoint dodaje zdarzenia śledzenia.",
+      "Te pola wysyła `PATCH` faktury. Ten endpoint nie służy do wysyłania numeru i URL."
+    ]
+  },
+  "142": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/change-order",
+    "x": [
+      "Change v2 to `PATCH /api/order-system/orders/{changeOrderId}/changes`.",
+      "`POST /api/oms/pvt/orders/{orderId}/changes` to Change v1, wycofywane i bez aktualizacji.",
+      "Docs nie opisują takiego endpointu. Zmiany idą przez Change order.",
+      "Docs nie opisują takiego endpointu w Checkout API.",
+      "Dozwolone statusy to `handling`, `waiting-for-fulfillment` i `ready-for-invoicing`.",
+      "Zmiany są dozwolone też w `handling`, `waiting-for-fulfillment` i `ready-for-invoicing`."
+    ]
+  },
+  "143": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/cancel",
+    "x": [
+      "Zamówienie w `handling` bez faktury można anulować.",
+      "Zamówień częściowo zafakturowanych nie można anulować. Zamiast tego służy Change order.",
+      "Zamówień ze statusem `invoiced` nie można anulować. Użyj faktury zwrotnej.",
+      "Niekompletnych zamówień nie można anulować.",
+      "Wysłanie faktury sprzedaży oznacza zafakturowanie, więc anulowanie nie jest możliwe.",
+      "Zamówienie z fakturą, także z trackingiem, nie podlega anulowaniu."
+    ]
+  },
+  "200": {
+    "ok": true,
+    "issue": "Matching item; mapping verified against API paths.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/cancel"
+  },
+  "234": {
+    "ok": true,
+    "issue": "Order consistent with ERP guide; the guide commits before start-handling, e covers commit generally.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-order-integration"
+  },
+  "235": {
+    "ok": true,
+    "issue": "Matching item; a = [Feed, Hook, Hook, Feed] matches the guide.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed"
+  },
+  "236": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Pobrane zdarzenia są ukryte przez `visibilityTimeoutInSeconds`, a bez commita wracają do feedu.",
+      "Zdarzenia nie ginął. Wracają do feedu i żyją do końca okresu retencji.",
+      "Ukrycie trwa określony czas, nie do ponownego połączenia.",
+      "Feed i hook są niezależne. Zdarzenia nie przechodzą do hooka.",
+      "Retencja usuwa zdarzenia po czasie, a nie commituje ich.",
+      "Nic nie commituje się automatycznie. Commit musi wysłać integracja."
+    ]
+  },
+  "237": {
+    "ok": false,
+    "issue": "e: Start handling does not reserve items; page says \"the seller takes responsibility for reserving the order items\". Main answer correct.",
+    "fix": {
+      "e": "Start handling wołasz raz, gdy ERP ma już szczegóły zamówienia. Od tej chwili to sprzedawca odpowiada za rezerwację pozycji."
+    },
+    "src": "https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196",
+    "x": [
+      "Po przekazaniu szczegółów do ERP wołasz Start handling tylko raz.",
+      "To jedno wywołanie na zamówienie, a nie na każde zdarzenie.",
+      "Najpierw ERP musi dostać szczegóły zamówienia, a dopiero potem wywołuje Start handling.",
+      "Faktura przychodzi po rozpoczęciu obsługi, więc Start handling jest wcześniej.",
+      "To jedno wywołanie na zamówienie, a nie na pozycję.",
+      "W `window-to-cancel` klient może jeszcze anulować. Start handling wołasz od `ready-for-handling`."
+    ]
+  },
+  "238": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Brak `200` na ping daje `400 Bad Request` i konfiguracja nie jest zapisana.",
+      "Konfiguracja nie jest zapisana, a ping nie jest ponawiany przez trzy dni.",
+      "Hook i feed są niezależne. VTEX nie przełącza na feed.",
+      "Konfiguracja nie jest zapisana w stanie wstrzymanym, bo API zwraca `400`.",
+      "Konfiguracja nie jest zapisana, więc nie ma pierwszego zdarzenia.",
+      "Docs podają `400 Bad Request`, a nie `503`."
+    ]
+  },
+  "239": {
+    "ok": true,
+    "issue": "Ordering item; sequence matches the order flow tutorial.",
+    "fix": {},
+    "src": "https://help.vtex.com/en/tutorial/order-flow-and-status--tutorials_196"
+  },
+  "240": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/orders-api#post-/api/oms/pvt/orders/-orderId-/cancel",
+    "x": [
+      "Zamówień częściowo zafakturowanych nie można anulować. Można je zmienić przez Change order.",
+      "Częściowa faktura już blokuje anulowanie, nie trzeba czekać na pełną.",
+      "Docs wskazują Change order, a nie fakturę zwrotną, dla zamówienia z częściową fakturą.",
+      "Okno 30 minut dotyczy samoobsługowego anulowania przez klienta, a nie zamówień z częściową fakturą.",
+      "Cancel order z `reason` nie działa dla częściowo zafakturowanych zamówień. Próba daje `400`.",
+      "Numer śledzenia nie ma znaczenia. Częściowa faktura blokuje anulowanie."
+    ]
+  },
+  "241": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/orders-feed",
+    "x": [
+      "Feed bez nowych zdarzeń w okresie retencji traci konfigurację i trzeba ją utworzyć ponownie.",
+      "Konfiguracja nie zostaje. Jest usuwana.",
+      "Docs nie opisują zamiany feedu w hook.",
+      "Okres retencji nie podwaja się. Konfiguracja jest usuwana.",
+      "Zdarzenia wygasają po okresie retencji, a nie czekają do kolejnego pobrania.",
+      "Docs nie opisują pauzy. Konfiguracja jest usuwana."
+    ]
+  }
+}

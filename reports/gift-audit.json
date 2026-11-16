@@ -1,0 +1,336 @@
+{
+  "150": {
+    "ok": true,
+    "issue": "e: 'redemptionCode generuje się sam' not stated on fetched pages (page only says min 6 chars, shopper enters it); unverified.",
+    "fix": {},
+    "x": [
+      "Karty tworzone przez API nie mają salda, startują z wartością 0.",
+      "`profileId` jest wymagany, bo karta jest przypisana do jednego klienta.",
+      "Saldo nie przychodzi w `POST /giftcards`, dodajesz je transakcją kredytu lub w Admin.",
+      "Kod nie jest obowiązkowy w body, to klient wpisuje go przy zakupie.",
+      "Gift card to metoda płatności, nie promocja stosowana automatycznie.",
+      "Karta nie jest powiązana z zamówieniem w body, tylko z klientem przez `profileId`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/managing-vtex-gift-cards"
+  },
+  "184": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Gift Card Hub to warstwa łącząca providerów gift cardów ze sklepem, zarządza wieloma z jednego miejsca.",
+      "`VtexGiftCard` to natywny provider, a Hub zarządza nim razem z zewnętrznymi.",
+      "Protokół to Gift Card Provider Protocol, a Hub jest systemem go używającym.",
+      "Gift Card Hub nie jest konektorem Payment Provider Protocol.",
+      "Gift cardy tworzysz przez API lub w Admin, Hub tylko łączy providerów.",
+      "Saldo i historię trzyma provider, nie Master Data Hub."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/gift-card-integration-guide-system-architecture"
+  },
+  "185": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Provider rejestrujesz przez `PUT` na ścieżce z `giftCardProviderId`.",
+      "Docs opisują rejestrację jako `PUT`, nie `POST` na kolekcji.",
+      "`POST /api/giftcards` tworzy kartę, nie rejestruje providera.",
+      "Afiliacje płatności dotyczą bramki płatności, nie providerów gift cardów.",
+      "Ta ścieżka dotyczy kart już zarejestrowanego providera, nie jego rejestracji.",
+      "Docs nie opisują `PATCH`, rejestracja to `PUT`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "186": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "VTEX wysyła `appKey` i `appToken` providera w nagłówkach `X-PROVIDER-API-AppKey` i `-AppToken`.",
+      "`X-VTEX-API-*` to poświadczenia konta, używane tylko w `PUT` rejestrującym providera.",
+      "Cookie VtexIdclientAutCookie nie jest używane w wywołaniach protokołu.",
+      "Docs nie opisują OAuth w wywołaniach protokołu.",
+      "Nagłówki `X-VTEX-Provider-*` nie istnieją, są `X-PROVIDER-API-*`.",
+      "Nazwy to `AppKey` i `AppToken`, nie `Key` i `Secret`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "187": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Brak nagłówków poświadczeń daje `401 Unauthorized` z pustym body.",
+      "`403` jest dla nieprawidłowych poświadczeń, nie dla ich braku.",
+      "`400` z komunikatem nie jest opisany dla braku nagłówków, ma być `401` z pustym body.",
+      "`200` z pustą tablicą to odpowiedź `_search`, nie błąd autoryzacji.",
+      "`404` nie dotyczy uwierzytelniania, brak nagłówków to `401`.",
+      "`422` nie jest opisany, brak nagłówków to `401` z pustym body."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "188": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Przy braku kart lub saldzie 0 provider zwraca pustą tablicę `[]`.",
+      "Obiekt z saldem 0 może zepsuć flow gift carda.",
+      "`404` nie jest właściwą odpowiedzią, ma być pusta tablica.",
+      "`204` nie jest opisany, oczekiwana jest tablica `[]`.",
+      "`null` nie jest tablicą, docs wymagają `[]`.",
+      "Brak kart to nie błąd, więc nie zwracaj `400`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "189": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`serviceUrl` musi mieć co najmniej jeden segment ścieżki, samo główne domeny nie wolno.",
+      "Końcowy slash jest zabroniony, bo może powstać podwójny `/`.",
+      "Ścieżki protokołu VTEX dokleja sam, np. `/giftcards/_search`, więc nie dodajesz `/giftcards`.",
+      "Adres to host providera, nie host konta VTEX.",
+      "VTEX dokleja ścieżki bez separatora, więc końcowy slash robi podwójny.",
+      "`giftCardProviderId` jest w ścieżce `PUT`, nie w `serviceUrl`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "190": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Provider musi odpowiedzieć w ciągu 15 sekund.",
+      "5 sekund to za mało, docs podają 15.",
+      "30 sekund to za dużo, limit to 15.",
+      "60 sekund to za dużo, limit to 15.",
+      "2 minuty to za dużo, limit to 15 sekund.",
+      "10 sekund to nie ta wartość, docs podają 15."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "191": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "VTEX zawsze woła najpierw `GET`, sumuje rozliczone kwoty i dopiero wysyła `POST`.",
+      "`_search` służy do wyszukiwania kart, nie do kontroli przed `POST` settlement.",
+      "`GET /manifest` jest z Payment Provider Protocol, nie z gift cardów.",
+      "VTEX nie czeka na callback, najpierw woła `GET`.",
+      "VTEX nie wysyła `POST` od razu, najpierw woła `GET`.",
+      "Powtórne tworzenie transakcji nie jest krokiem kontrolnym, jest nim `GET`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "192": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Nowy `requestId` nie może się powtórzyć na tej karcie, inaczej transakcja się nie wykona.",
+      "Docs nie wiążą `requestId` z ID zamówienia.",
+      "Docs nie wiążą `requestId` z `redemptionCode`.",
+      "`requestId` podajesz sam, to nie jest generowane.",
+      "Powtórzony `requestId` powoduje niewykonanie transakcji.",
+      "Docs nie wiążą `requestId` z `transactionId` debetu."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/managing-vtex-gift-cards"
+  },
+  "193": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Saldo zmieniasz transakcją `Credit`, która dodaje wartość.",
+      "Docs nie opisują `PATCH` do zmiany salda, robisz to transakcją.",
+      "Docs nie opisują `PUT` do zmiany salda, robisz to transakcją.",
+      "`Debit` odejmuje saldo, a `value` jest dodatnie.",
+      "Settlements to endpoint providera zewnętrznego, nie dopisuje salda natywnej karty.",
+      "`POST /giftcards` tworzy kartę z saldem 0, nie zmienia istniejącej."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/managing-vtex-gift-cards"
+  },
+  "194": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`multipleRedemptions` pozwala użyć karty w wielu zakupach, aż saldo się skończy.",
+      "`multipleCredits` pozwala zmieniać saldo transakcjami kredytu i debetu.",
+      "`restrictedToOwner` ogranicza użycie do klienta z `profileId`.",
+      "`relationName` nie steruje wielokrotnym użyciem.",
+      "`isReusable` nie jest polem opisanym w docs.",
+      "`allowPartialRedemption` nie jest polem opisanym w docs."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/managing-vtex-gift-cards"
+  },
+  "195": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: do 500 równoległych requestów i 5000 na minutę.",
+      "100 i 1000 to nie wartości z docs.",
+      "Limity to 500 równoległych i 5000 na minutę, nie odwrotnie.",
+      "Docs nie podają limitu na sekundę.",
+      "Limit istnieje: 500 równoległych i 5000 na minutę.",
+      "1000 i 10000 to nie wartości z docs."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/giftcard-api"
+  },
+  "196": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Anulowanie debetu zwraca anulowaną kwotę na saldo.",
+      "Saldo zmienia się od razu, nie czeka na rozliczenie.",
+      "Anulowanie debetu zwiększa saldo, nie odejmuje drugi raz.",
+      "Docs nie mówią o dezaktywacji karty.",
+      "Docs nie mówią o wydawaniu nowej karty.",
+      "Kwota wraca na saldo automatycznie, bez ręcznego kredytu."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/managing-vtex-gift-cards"
+  },
+  "197": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`VtexGiftCard` powstał z systemu legacy i nie jest wzorcem implementacji protokołu.",
+      "To nie wzorzec, docs wprost to wykluczają.",
+      "Sklep może aktywować kilku providerów naraz, nie tylko ten.",
+      "Gift card to metoda płatności, nie promocja.",
+      "`VtexGiftCard` jest natywny, nie rejestruje się go przez `serviceUrl`.",
+      "Sklep może mieć natywnego i zewnętrznych providerów jednocześnie."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/gift-card-integration-guide-system-architecture"
+  },
+  "198": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Wszystkie endpointy protokołu muszą przyjmować `application/vnd.vtex.giftcards.v1+json`.",
+      "`vnd.vtex.ds` to Master Data, nie gift cardy.",
+      "`vnd.vtex.payments` to nie typ protokołu gift cardów.",
+      "Form-urlencoded nie jest typem protokołu.",
+      "`text/plain` nie jest typem protokołu.",
+      "Nazwa to `giftcards.v1`, nie `giftcardhub.v1`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "199": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "W warunku płatności wybierasz konektor Vale, potem providera w Process with provider.",
+      "GiftCard HUB to provider tworzony w zakładce Providers, nie konektor.",
+      "`VtexGiftCard` to natywny provider, nie konektor warunku.",
+      "Promissory to inny konektor, nie dla gift cardów.",
+      "Custom Payment to inny konektor, nie dla gift cardów.",
+      "Customer Credit to inny konektor, nie dla gift cardów."
+    ],
+    "src": "https://help.vtex.com/en/tutorial/gift-card--tutorials_995"
+  },
+  "218": {
+    "ok": true,
+    "issue": "Ord question, not drafted. Call order not stated on the fetched gcprov page; unverified here.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "219": {
+    "ok": true,
+    "issue": "Matrix question, not drafted. Hub vs provider split consistent with docs (Hub layer, provider middleware) but search/settle forwarding not quoted; unverified.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "220": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Provider zwraca ten sam `giftCardId` ze ścieżki i bieżące `balance`.",
+      "Nowe ID dotyczy transakcji, nie odpowiedzi `GET` karty.",
+      "Saldo jest wymagane w odpowiedzi.",
+      "Lista transakcji to href, nie główna zawartość odpowiedzi.",
+      "Odpowiedź ma zawierać saldo, a nie tylko kod i historię.",
+      "Wymagane jest `balance`, a nie samo `relationName`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "221": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "VTEX bierze `id` zwrócone przy tworzeniu transakcji jako `{transactionId}`.",
+      "`giftCardId` jest osobnym segmentem ścieżki, nie `transactionId`.",
+      "`orderGroup` nie jest źródłem `transactionId`.",
+      "To VTEX używa wartości zwróconej przez providera, provider nie tworzy nowej przy settlement.",
+      "Docs nie wiążą `transactionId` z `paymentId`.",
+      "`requestId` jest polem żądania transakcji, nie `transactionId`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "222": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Sklepy mogą aktywować wielu providerów naraz, np. natywnego i dwóch zewnętrznych.",
+      "Nie trzeba wyłączać natywnego.",
+      "Docs nie wymagają wspólnego `serviceUrl`.",
+      "Docs nie ograniczają tego do Admin.",
+      "`GET /manifest` należy do Payment Provider Protocol, nie jest tu wymagany.",
+      "Docs nie wymagają ustawienia domyślnego."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/gift-card-integration-guide"
+  },
+  "223": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Gdy rozliczona suma pokrywa kwotę, VTEX nie wysyła nowego `POST` settlement.",
+      "Docs nie opisują `POST` z wartością 0.",
+      "Brak kwoty do rozliczenia nie powoduje anulowania.",
+      "Docs nie opisują ponawiania `GET` przez 7 dni.",
+      "Anulowanie to osobny flow, nie zastępuje settlement.",
+      "Docs nie opisują callbacku Gift Card Hub w tym flow."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "224": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Rejestracja używa poświadczeń konta VTEX, nie providera.",
+      "`X-PROVIDER-API-*` VTEX wysyła później do providera w wywołaniach protokołu.",
+      "Docs nie opisują OAuth przy rejestracji.",
+      "Endpoint wymaga kluczy konta VTEX.",
+      "Docs nie opisują kluczy wydawanych przez Hub.",
+      "Docs nie opisują Basic auth do `serviceUrl`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  },
+  "225": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Provider odpowiada za endpointy protokołu pod `serviceUrl`, a VTEX orkiestruje resztę.",
+      "Orkiestracja flow Checkout należy do VTEX.",
+      "Settlement zleca Gateway, nie provider.",
+      "Gift Card Hub API prowadzi VTEX.",
+      "Zniżek w koszyku i order form nie liczy provider, to rola VTEX.",
+      "Docs nie dają providerowi roli Secure Proxy."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/configuring-an-external-gift-card-provider"
+  }
+}
