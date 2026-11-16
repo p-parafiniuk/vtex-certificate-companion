@@ -4087,6 +4087,21 @@ body[data-view="pytania"] .wrap {
   box-shadow: inset 3px 0 0 var(--accent);
   font-weight: 600;
 }
+/* Score fill (scoreAttr): width = answered share, colour = score band; no answers stays neutral. */
+.cat[data-sc] {
+  --sc: var(--ok);
+  --sc-soft: var(--ok-soft);
+  border-left: 3px solid var(--sc);
+  background-image: linear-gradient(90deg, var(--sc-soft) var(--fill), transparent var(--fill));
+}
+.cat[data-sc="y"] {
+  --sc: var(--k3);
+  --sc-soft: var(--k3-soft);
+}
+.cat[data-sc="r"] {
+  --sc: var(--bad);
+  --sc-soft: var(--bad-soft);
+}
 .cat-i {
   flex: none;
   width: 1.5em;
@@ -4448,6 +4463,7 @@ body[data-view="pytania"] .wrap {
     border-radius: 99px;
   }
   .cat[aria-current="page"] {
+    background-image: none;
     background: var(--ink);
     color: var(--bg);
     border-color: var(--ink);
