@@ -1,0 +1,330 @@
+{
+  "112": {
+    "ok": true,
+    "issue": "Claim 'GetProductAndSkuIds 250', 'REST-Range=Master Data', 'per_page=List orders' in e not on linked page (unverifiable, low).",
+    "fix": {},
+    "x": [
+      "Różnica między `_from` a `_to` nie może przekroczyć 50, więc strona zwraca maks. 50 produktów.",
+      "`_from` musi być mniejsze lub równe 2500, inaczej zapytanie nie zadziała.",
+      "250 to nie limit tego endpointu. Docs podają maks. 50 elementów na stronę.",
+      "`REST-Range` nie służy tu do stronicowania. Używasz parametrów `_from` i `_to`.",
+      "Search API nie ma `per_page`. Zakres ustawiasz przez `_from` i `_to`, maks. 50.",
+      "24 to domyślny `count` Intelligent Search, nie limit legacy Search API."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/search-api"
+  },
+  "113": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`fq=C:/{id}/{id}/` filtruje po drzewie kategorii, tak jak w docs.",
+      "`ft={searchWord}` to filtr pełnotekstowy.",
+      "Docs nie znają `fq=categoryId:`. Kategorię podajesz jako `fq=C:/id/id/`.",
+      "`_where` to składnia Master Data, nie Search API.",
+      "`ft` to tylko pełny tekst. Kategorię podaje `fq=C:`.",
+      "`ft` nie filtruje po ID. Produkt wybierasz przez `fq=productId:{id}`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/search-api"
+  },
+  "114": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`O=OrderByPriceASC` sortuje po cenie rosnąco, od najtańszych.",
+      "`_sort=pole ASC` to składnia Master Data. Search API używa parametru `O`.",
+      "`orderBy=pole,asc` to składnia List orders, nie Search API.",
+      "`sort=price:asc` to Intelligent Search. Legacy Search API sortuje parametrem `O`.",
+      "`O` przyjmuje nazwane wartości jak `OrderByPriceASC`, nie `price:asc`.",
+      "Parametr nazywa się `O`, nie `orderBy`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/search-api"
+  },
+  "115": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: wszystkie nowe integracje headless muszą używać Intelligent Search API v1.",
+      "Legacy Search API ma etykietę Legacy. Nowe integracje headless mają używać v1.",
+      "Catalog API zarządza katalogiem, nie jest wymaganym API wyszukiwania dla headless.",
+      "Master Data to nie wyszukiwarka sklepu. Docs wskazują Intelligent Search API v1.",
+      "Poprzednie Intelligent Search API ma zostać wycofane. Nowe integracje mają używać v1.",
+      "Session Manager zarządza sesjami, nie wyszukiwaniem produktów."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/intelligent-search-api"
+  },
+  "116": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`vtex_session` identyfikuje sesję przeglądania konkretnego użytkownika.",
+      "`vtex_segment` trzyma warunki handlowe zastosowane do sesji.",
+      "`VtexIdclientAutCookie` to token uwierzytelnienia, nie ciasteczko Sessions System.",
+      "`Vtex_CHKO_Auth` dotyczy uwierzytelnienia w checkout, nie sesji ani segmentu.",
+      "`checkout.vtex.com` przechowuje `orderFormId`, nie sesję ani segment.",
+      "`VtexWorkspace` wskazuje workspace, nie sesję ani segment."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/sessions-system-overview"
+  },
+  "117": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: parametry body spoza namespace `public` są ignorowane.",
+      "Docs: elementy query string są automatycznie dodawane do namespace `public`.",
+      "Tylko `public` jest zapisywany. Pozostałe namespace w body są ignorowane.",
+      "`profile` i `store` wypełnia platforma. Z body zapisuje się tylko `public`.",
+      "Zapis nie wymaga logowania. Endpoint nie wymaga uwierzytelnienia.",
+      "`checkout` wypełnia platforma, np. `regionId`. Z body liczy się tylko `public`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/session-manager-api"
+  },
+  "161": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: tylko facet `trade-policy` jest wymagany, np. `trade-policy/1`.",
+      "`category-1` jest opcjonalnym filtrem. Wymagany jest tylko `trade-policy`.",
+      "`brand` jest opcjonalny. Bez niego dostajesz produkty całej polityki handlowej.",
+      "`productClusterIds` filtruje po kolekcji i jest opcjonalny.",
+      "`category-2` jest opcjonalny, a bez `category-1` w ścieżce w ogóle niepoprawny.",
+      "`price` to opcjonalny zakres cen `min:max`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/intelligent-search-api"
+  },
+  "162": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: domyślnie `count` = 24 i `page` = 1.",
+      "Strony liczy się od 1, a domyślny `count` to 24, nie 50.",
+      "50 to limit legacy Search API. Intelligent Search domyślnie zwraca 24.",
+      "Domyślny `count` to 24, nie 100.",
+      "Domyślna `page` to 1, nie 0, a `count` to 24.",
+      "Domyślny `count` to 24, nie 10."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/intelligent-search-api"
+  },
+  "163": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: wiele wartości tego samego facetu to OR, czyli suma produktów.",
+      "Docs: różne typy facetów łączą się przez AND, czyli część wspólna.",
+      "Tylko różne facety łączą się przez AND. Ten sam facet daje OR.",
+      "Docs: kolejność terminów w ścieżce nie ma znaczenia dla wyszukiwania.",
+      "Docs pozwalają powtarzać ten sam `facetKey`, a wartości się sumują.",
+      "Ten sam facet daje OR, więc wystarczy dopasować jedną wartość."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/intelligent-search-api"
+  },
+  "164": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: `price:asc` sortuje po cenie rosnąco, od najniższej.",
+      "`OrderByPriceASC` to parametr `O` legacy Search API, nie wartość `sort`.",
+      "`price:desc` sortuje od najwyższej ceny.",
+      "`price,asc` to składnia List orders. Intelligent Search używa `price:asc`.",
+      "`name:asc` sortuje alfabetycznie po nazwie, nie po cenie.",
+      "`discount:desc` sortuje po rabacie malejąco, nie po cenie."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/intelligent-search-api"
+  },
+  "165": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: różnica między `_from` a `_to` nie może przekroczyć 50, a tu wynosi 99.",
+      "Pagination w `_from` i `_to` idzie w query string, nie w body.",
+      "Nagłówek `resources` do stronicowania jest wycofany. Używa się `_from` i `_to`.",
+      "Docs nie podają limitu 25. Limit to różnica 50 i `_to` ≤ 2500.",
+      "`_to` idzie w URL. Nagłówek `resources` jest wycofany.",
+      "Search API nie używa `page` i `count`. To parametry Intelligent Search."
+    ],
+    "src": "https://help.vtex.com/en/announcements/2018-01-24-requests-with-pagination-will-change-in-the-search-api"
+  },
+  "166": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: `vtex_segment` trzyma warunki handlowe, może być współdzielone i steruje kluczem cache stron.",
+      "`vtex_session` jest indywidualna dla jednego użytkownika.",
+      "`VtexIdclientAutCookie` to token uwierzytelnienia, nie ciasteczko segmentu.",
+      "`checkout.vtex.com` przechowuje `orderFormId`, nie warunki handlowe.",
+      "`Vtex_CHKO_Auth` dotyczy uwierzytelnienia w checkout, nie segmentu.",
+      "`VtexWorkspace` wskazuje workspace, nie warunki handlowe."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/sessions-system-overview"
+  },
+  "167": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: `regionId` powstaje, gdy do sesji dodasz `postalCode` lub `geoCoordinates` oraz `country`.",
+      "Logowanie nie generuje `regionId`. Potrzebny jest kod pocztowy lub współrzędne i kraj.",
+      "Utworzenie orderForm samo nie tworzy `regionId`. Powstaje z adresu i kraju.",
+      "`regionId` generuje Checkout z kodu pocztowego lub współrzędnych i kraju, nie z body.",
+      "Wybór kanału sprzedaży nie generuje `regionId`.",
+      "Sam `country` nie wystarcza. Potrzebny jest też `postalCode` lub `geoCoordinates`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/sessions-system-overview"
+  },
+  "168": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: w v1 `regionId` podajesz jawnie jako parametr query, np. `?regionId=...`.",
+      "V1 nie czyta ciasteczka segmentu. Kontekst podajesz jawnie.",
+      "Region nie jest facetem w ścieżce. Przekazujesz go parametrem `regionId`.",
+      "Docs nie opisują takiego nagłówka. Region idzie w query.",
+      "V1 nie czyta też `vtex_session`. `regionId` podajesz w query.",
+      "Zapytania v1 to GET, więc `regionId` idzie w query, nie w body."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1"
+  },
+  "169": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: v1 używa bazy `/api/intelligent-search/v1`.",
+      "To ścieżka legacy z prefiksem IO. V1 jej nie używa.",
+      "To legacy Search API, nie Intelligent Search.",
+      "Docs podają `/api/intelligent-search/v1`, bez `pub`.",
+      "V1 to aktualna wersja w ścieżce `/api/intelligent-search/v1`.",
+      "Prefiks IO znika w v1. Baza to `/api/intelligent-search/v1`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1"
+  },
+  "170": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: `items` ma format `namespace.klucz`, więc `public.storeId`.",
+      "Parametr nazywa się `items`, nie `fields`.",
+      "`_fields` nie dotyczy Session Manager. Używasz `items` z `namespace.klucz`.",
+      "Docs nie znają `namespace` i `key`. Jest jeden parametr `items`.",
+      "Brakuje namespace. Format to `namespace.klucz`, czyli `public.storeId`.",
+      "`public` nie jest parametrem. Klucze podajesz w `items`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/session-manager-api"
+  },
+  "290": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: podkreślenia zamieniają się w myślniki, znika prefiks IO, dochodzi `/v1`.",
+      "V1 używa `product-search` z myślnikiem, nie `product_search`.",
+      "Prefiks IO `/api/io/_v/` znika w v1.",
+      "Docs nie podają endpointu `search`. Jest `product-search/{facets}`.",
+      "`/v1` stoi zaraz po `intelligent-search`, przed nazwą endpointu.",
+      "Facety idą w ścieżce `/product-search/{facets}`, nie w query `facets`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1"
+  },
+  "291": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: v1 nie czyta ciasteczka segmentu, kontekst podajesz jawnie, np. `sc`.",
+      "V1 nie czyta ciasteczka, więc kanał z niego nie jest użyty.",
+      "Docs nie opisują odrzucenia. V1 po prostu ignoruje ciasteczko.",
+      "V1 nie czyta ciasteczka, więc nic nie scala.",
+      "V1 nie czyta z ciasteczka niczego, także kanału.",
+      "V1 nie ma fallbacku do ciasteczka. Podajesz `sc` jawnie."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1"
+  },
+  "292": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: `GET /products` z `field=ean` i `value` pobiera jeden produkt z pominięciem pipeline'u.",
+      "Docs wskazują `/products` dla znanego identyfikatora. `product-search` służy do wyszukiwania.",
+      "V1 ma własny endpoint `/products`. Legacy nie jest potrzebny.",
+      "Intelligent Search v1 ma endpoint `/products` z `field=ean`.",
+      "`facets` zwraca filtry wyszukiwania, nie pojedynczy produkt.",
+      "`/products` przyjmuje `field` i `value` w query, nie w body."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1"
+  },
+  "293": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: klucze `zip-code`, `coordinates`, `country` itd. stają się parametrami query o tych samych nazwach.",
+      "Facety dostawy nie idą w ścieżce. Mapujesz je na parametry query.",
+      "Segment nie jest czytany przez v1. Wartości podajesz jawnie.",
+      "Zapytania v1 to GET, więc wartości idą w query, nie w body.",
+      "V1 nie czyta też `vtex_session`. Podajesz parametry jawnie.",
+      "Docs nie opisują takiego nagłówka. Facety dostawy idą w query."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/migrating-to-intelligent-search-api-v1"
+  },
+  "294": {
+    "ok": true,
+    "issue": "Matrix matches guide: session individual; segment holds commercial conditions, shareable, cache key.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/sessions-system-overview"
+  },
+  "295": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: namespace `profile` zawiera dane zalogowanego klienta i dostępne tabele cen.",
+      "`public` to UTM, kod pocztowy lub współrzędne i kraj, nie tabele cen.",
+      "`checkout` trzyma identyfikator koszyka i `regionId`.",
+      "`store` zawiera kanał sprzedaży sesji.",
+      "`authentication` to dane uwierzytelnienia użytkownika w sesji.",
+      "`impersonate` mówi, czy użytkownik może działać w imieniu innego."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/sessions-system-overview"
+  },
+  "296": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Docs: endpointy Session Manager nie wymagają uwierzytelnienia ani uprawnień.",
+      "Docs nie wymagają zasobu w roli. Endpointy nie wymagają uprawnień.",
+      "`POST /api/sessions` też nie wymaga uwierzytelnienia.",
+      "Regionalizacja nie zmienia tego. Uwierzytelnienie nie jest wymagane.",
+      "`GET /api/sessions` też nie wymaga uwierzytelnienia.",
+      "Token użytkownika nie jest potrzebny. Docs: brak wymaganego uwierzytelnienia."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/session-manager-api"
+  },
+  "297": {
+    "ok": true,
+    "issue": "e: 'Dane osobowe i koszyk tam nie trafiają' is inferred from the listed contents, not stated verbatim (low).",
+    "fix": {},
+    "x": [
+      "Docs: segment zawiera m.in. kanał sprzedaży (`channel`).",
+      "Docs: segment zawiera tabele cen (`priceTables`).",
+      "Segment nie zawiera e-maila. Docs listują kampanie, kanał, tabele cen, `regionId` i UTM.",
+      "Koszyk jest w namespace `checkout` sesji, nie w segmencie.",
+      "Metoda płatności nie jest w segmencie.",
+      "Numer dokumentu nie jest w segmencie."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/sessions-system-overview"
+  }
+}

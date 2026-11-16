@@ -1,0 +1,274 @@
+{
+  "24": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices",
+    "x": [
+      "Dokładnie ten wzór z przewodnika: `costPrice * (1 + markup)`.",
+      "Dokumentacja podaje mnożenie przez `(1 + markup)`, nie dodawanie.",
+      "`listPrice` to cena sugerowana i nie bierze udziału we wzorze.",
+      "Mnożnik `(1 + markup)`, a nie dzielenie przez `(1 - markup)`.",
+      "Samo `costPrice * markup` pomija koszt bazowy; wzór to `costPrice * (1 + markup)`.",
+      "Wzór nie odejmuje i nie używa `listPrice`; to `costPrice * (1 + markup)`."
+    ]
+  },
+  "25": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices",
+    "x": [
+      "Fixed price to wartość nadpisująca cenę obliczoną SKU w price table.",
+      "Cena sugerowana to list price, nie fixed price.",
+      "Fixed price nadpisuje cenę obliczoną, a nie jest ceną po promocjach.",
+      "Fixed price można zmieniać przez Create / Edit Fixed Prices.",
+      "Cena dziedziczona przez tabele to base price; fixed price ją nadpisuje.",
+      "Cost price to osobna wartość; fixed price nadpisuje cenę obliczoną."
+    ]
+  },
+  "26": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/prices/-itemId-",
+    "x": [
+      "`PUT /pricing/prices/{itemId}` tworzy lub aktualizuje base price albo fixed price.",
+      "Endpoint Catalog nie ustawia ceny; cenami zajmuje się Pricing API.",
+      "Price table tworzysz przez `PUT /pricing/tables/{priceTableId}`, a nie ceny SKU.",
+      "Checkout API nie służy do zapisu cen SKU.",
+      "Taka ścieżka `/api/pricing/pvt/...` nie istnieje; Pricing używa `/pricing/prices/{itemId}`.",
+      "Ścieżka `catalog_system` nie obsługuje cen; użyj Pricing API."
+    ]
+  },
+  "27": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api",
+    "x": [
+      "Dokumentacja: POST i PUT mają 2000 żądań na minutę i 500 burst credits.",
+      "Dokumentacja: DELETE ma 1000 żądań na minutę i 300 burst credits.",
+      "POST i PUT mają 2000 na minutę, nie 100, i mają burst credits.",
+      "DELETE ma 1000 na minutę i 300 burst credits, nie 5000 i 1000.",
+      "Pricing API ma udokumentowane limity także dla uwierzytelnionych kluczy.",
+      "Wartości są odwrócone: POST/PUT to 2000 na minutę i 500 burst credits."
+    ]
+  },
+  "28": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api",
+    "x": [
+      "Gdy burst credits spadną do 0, usługa blokuje żądania i zwraca HTTP 429.",
+      "Burst credits odnawiają się w czasie, gdy trasa jest bezczynna.",
+      "Dokumentacja mówi o blokowaniu i 429, nie o kolejkowaniu żądań.",
+      "Klucz nie jest wyłączany; usługa zwraca 429 i `Retry-After`.",
+      "Burst credits dotyczą trasy Pricing API, nie wszystkich API konta.",
+      "Limity dotyczą tras POST, PUT i DELETE; GET ma limit w przeglądzie."
+    ]
+  },
+  "29": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices",
+    "x": [
+      "Computed price to cena detaliczna po regułach cenowych danego kontekstu.",
+      "Dokumentacja nie wiąże ceny obliczonej z podatkiem.",
+      "Cena obliczona wynika z reguł; fixed price nadpisuje ją, a nie definiuje.",
+      "Cena obliczona nie jest średnią base i list price.",
+      "List price to cena sugerowana; cena obliczona to cena po regułach.",
+      "To opis odwrotny: base price jest punktem odniesienia dla ceny obliczonej."
+    ]
+  },
+  "30": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices",
+    "x": [
+      "List price to wartość wyświetlana jako sugerowana cena detaliczna od dostawcy.",
+      "Cena zakupu to cost price, nie list price.",
+      "Nadpisuje cenę obliczoną fixed price, nie list price.",
+      "List price nie dotyczy kosztów wysyłki.",
+      "Cena po marży to base price; list price jest tylko sugerowana.",
+      "Dokumentacja nie definiuje list price jako ceny minimalnej."
+    ]
+  },
+  "31": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices",
+    "x": [
+      "Przewodnik: ERP wysyła jedną base price na SKU.",
+      "Różnice między trade policies ustawiasz fixed prices, tam gdzie trzeba.",
+      "Różnice robisz fixed prices, nie osobnymi cenami bazowymi na trade policy.",
+      "Base price wysyłasz wprost; VTEX nie wylicza jej z samej list price.",
+      "Cena idzie do Pricing API, nie do Create SKU w Catalogu.",
+      "Fixed price ustawiasz tylko tam, gdzie wartość ma się różnić od bazowej."
+    ]
+  },
+  "32": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api",
+    "x": [
+      "Pricing API używa hosta `api.vtex.com/{accountName}`, ścieżki zaczynają się od `/pricing`.",
+      "Domena vtexpayments należy do płatności, nie do Pricing.",
+      "Pricing nie jest pod `vtexcommercestable` i `/api/pricing/pvt`.",
+      "Nie istnieje host `pricing.vtex.com`; użyj `api.vtex.com/{accountName}/pricing`.",
+      "Pricing nie ma ścieżki `/api/pricing/pub` na `vtexcommercestable`.",
+      "Konto jest w ścieżce `api.vtex.com/{accountName}`, nie w domenie portal."
+    ]
+  },
+  "118": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/prices/-itemId-",
+    "x": [
+      "PUT nadpisuje wszystkie fixed prices SKU; czego nie ma w body, jest usuwane.",
+      "Trzeba podać dokładnie dwie z trzech: `basePrice`, `costPrice`, `markup`.",
+      "PUT nie dodaje pojedynczych cen, tylko nadpisuje wszystkie fixed prices.",
+      "Dokumentacja opisuje nadpisanie, a nie `409`; błąd jest przy trzech wartościach naraz.",
+      "Fixed prices w body są zapisywane i nadpisują poprzednie.",
+      "Brak pominiętych cen nie daje błędu; zostaną usunięte."
+    ]
+  },
+  "119": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/prices/-itemId-",
+    "x": [
+      "`tradePolicyId` jest wymagane: ID polityki albo nazwa price table.",
+      "`value` jest wymagane: wartość ceny stałej.",
+      "`minQuantity` jest wymagane: minimalna ilość aktywująca cenę.",
+      "`dateRange` jest opcjonalne i służy do cen zaplanowanych.",
+      "`listPrice` jest opcjonalne, a wymagane są tylko trzy pola.",
+      "Nazwę price table podajesz w `tradePolicyId`; osobnego pola nie ma."
+    ]
+  },
+  "120": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api#get-/pricing/prices/-itemId-/computed/-priceTableId-",
+    "x": [
+      "Ten endpoint GET zwraca cenę obliczoną dla SKU w danej price table.",
+      "Computed price to cena po wszystkich krokach pipeline'u Pricing.",
+      "`/pipeline/catalog/{priceTableId}` dotyczy reguł tabeli, nie ceny obliczonej.",
+      "Dokumentacja nie wiąże ceny obliczonej z podatkiem konta.",
+      "`listPrice` to cena sugerowana, nie obliczona.",
+      "`GET /pricing/prices/{itemId}` zwraca ceny bazowe i stałe, nie obliczone."
+    ]
+  },
+  "121": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/pipeline/catalog/-priceTableId-",
+    "x": [
+      "PUT usuwa wszystkie reguły tabeli i tworzy nowe z treści żądania.",
+      "Stare reguły są usuwane, nie dopisywane.",
+      "Zastępuje cały zestaw reguł, a nie tylko pasujące `id`.",
+      "Tabelę tworzysz przez `PUT /pricing/tables/{priceTableId}`.",
+      "Endpoint zmienia reguły tabeli; nie usuwa jej ani cen.",
+      "Reguły niewysłane też są usuwane, bez scalania po `name`."
+    ]
+  },
+  "122": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api#post-/api/rnb/pvt/coupon",
+    "x": [
+      "Zmieniony `couponCode` tworzy nowy kupon zamiast aktualizować stary.",
+      "Ten sam POST tworzy nowy kupon albo aktualizuje istniejący.",
+      "Dokumentacja: zmiana kodu tworzy nowy kupon, nie zmienia nazwy starego.",
+      "Dokumentacja nie opisuje `400`; zmiana kodu tworzy nowy kupon.",
+      "Zmiana kodu nie archiwizuje; archiwizacja to osobny endpoint.",
+      "Endpoint tworzy pojedynczy kupon lub aktualizuje istniejący."
+    ]
+  },
+  "123": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/promotions-and-taxes-api#post-/api/rnb/pvt/calculatorconfiguration",
+    "x": [
+      "`POST /api/rnb/pvt/calculatorconfiguration` tworzy lub aktualizuje promocję albo podatek.",
+      "Taka ścieżka `/benefits/.../{id}` z PUT nie jest endpointem tworzenia i aktualizacji.",
+      "Nie ma `/api/rnb/pvt/promotions`; promocje idą przez `calculatorconfiguration`.",
+      "Ścieżka z `{id}` i PATCH nie istnieje jako create/update promocji.",
+      "Endpoint jest `POST`, nie `PUT`, i dotyczy `calculatorconfiguration`.",
+      "Nie ma `/benefits/promotion`; użyj `POST /api/rnb/pvt/calculatorconfiguration`."
+    ]
+  },
+  "298": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices"
+  },
+  "299": {
+    "ok": false,
+    "issue": "e says 'koszt albo marżę, druga wartość jest wyliczana', but docs: 'If you provide both `costPrice` and `markup` and omit the `basePrice`, the `basePrice` will be automatically calculated'. Base price is computed from cost and markup together.",
+    "fix": {
+      "e": "Gdy podasz `costPrice` i `markup`, a pominiesz `basePrice`, VTEX wylicza cenę bazową: `basePrice = costPrice * (1 + markup)`."
+    },
+    "x": [
+      "Cena bazowa jest wyliczana wzorem `costPrice * (1 + markup)`.",
+      "Przy podanych koszcie i marży cena bazowa jest wyliczana automatycznie.",
+      "List price to cena sugerowana i nie jest kopiowana do ceny bazowej.",
+      "Fixed price nie wpływa na wyliczenie ceny bazowej.",
+      "Wzór mnoży przez `(1 + markup)`, nie dodaje marży do kosztu.",
+      "Marża jest używana we wzorze, cena bazowa nie równa się kosztowi."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api#put-/pricing/prices/-itemId-"
+  },
+  "300": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/pricing-overview",
+    "x": [
+      "Bez własnej ceny w tabeli SKU dziedziczy cenę bazową.",
+      "Dokumentacja mówi o dziedziczeniu ceny bazowej, nie o braku sprzedaży.",
+      "List price to cena sugerowana, nie cena dziedziczona przez tabelę.",
+      "Tabele nie dziedziczą fixed price z tabeli głównej, tylko base price.",
+      "Dokumentacja nie opisuje wyboru najniższej ceny; tabela dziedziczy cenę bazową.",
+      "Cost price to koszt, nie cena sprzedaży; dziedziczona jest cena bazowa."
+    ]
+  },
+  "301": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices",
+    "x": [
+      "Fixed price nadpisuje cenę obliczoną SKU w danej price table.",
+      "Zmiana base price dotyczy wszystkich tabel i nie nadpisuje obliczonej ceny w jednej.",
+      "List price to cena sugerowana, nie wymusza ceny w tabeli.",
+      "Kupon to promocja, a nie sposób na stałą cenę w tabeli.",
+      "Cost price to koszt zakupu i nie ustawia ceny sprzedaży.",
+      "Markup służy do wyliczenia ceny bazowej, nie do nadpisania ceny w tabeli."
+    ]
+  },
+  "302": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api#get-/pricing/prices/-itemId-/computed/-priceTableId-",
+    "x": [
+      "Ten endpoint zwraca cenę obliczoną SKU dla price table lub trade policy.",
+      "`GET /pricing/prices/{itemId}` zwraca ceny bazowe i stałe SKU.",
+      "`GET /pricing/tables/...` dotyczy tabeli cen, nie ceny SKU.",
+      "`/pipeline/catalog/...` zwraca reguły tabeli, nie cenę obliczoną.",
+      "Ścieżka `/fixed/` dotyczy cen stałych, nie obliczonych.",
+      "Endpoint ceny obliczonej to `GET`, nie `POST`."
+    ]
+  },
+  "303": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/pricing-overview",
+    "x": [
+      "Tabelę usuwasz, kasując wszystkie jej ceny i prosząc o to VTEX Support.",
+      "Dokumentacja nie opisuje endpointu `DELETE` dla tabeli cen.",
+      "Dokumentacja nie opisuje dezaktywacji tabeli w Admin.",
+      "Usunięcie trade policy nie usuwa price table.",
+      "`DELETE /pricing/pipeline/catalog/...` dotyczy reguł, nie usuwa tabeli.",
+      "Dokumentacja wymaga usunięcia cen i prośby do supportu, a nie ustawień trade policy."
+    ]
+  },
+  "304": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/pricing-overview",
+    "x": [
+      "Fixed price waży więcej niż inne typy cen i jest nadrzędna.",
+      "Cena obliczona jest nadpisywana przez fixed price.",
+      "Pricing ignoruje base price, gdy SKU ma fixed price.",
+      "List price jest tylko ceną sugerowaną i nie ma nadrzędnej wagi.",
+      "Markup nie jest typem ceny z nadrzędną wagą; wygrywa fixed price.",
+      "Cost price nie przeważa; wagę nadrzędną ma fixed price."
+    ]
+  },
+  "305": {
+    "ok": true,
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-prices",
+    "x": [
+      "Dla własnej price table bez trade policy wpisujesz jej nazwę.",
+      "`1` to ID głównej polityki; dla własnej tabeli podajesz jej nazwę.",
+      "Pole `tradePolicyId` jest wymagane i musi zawierać nazwę tabeli.",
+      "Nazwa konta nie jest wartością tego pola; podaj nazwę tabeli.",
+      "ID magazynu nie jest używane; pole przyjmuje nazwę price table.",
+      "Wartość `0` nie jest opisana; dla własnej tabeli wpisz jej nazwę."
+    ]
+  }
+}

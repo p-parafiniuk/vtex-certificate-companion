@@ -1,0 +1,266 @@
+{
+  "92": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: Fulfillment Simulation wystawia seller, a marketplace go wywołuje.",
+      "Poprawnie: marketplace czeka na odpowiedź najwyżej 2,5 sekundy.",
+      "Błąd: to seller implementuje endpoint, a marketplace tylko go wywołuje.",
+      "Błąd: limit wynosi 2,5 sekundy, nie 20.",
+      "Błąd: endpoint hostuje seller, a limit czasu istnieje (2,5 s).",
+      "Błąd: docs nie opisują cache 20 minut. Marketplace odpytuje seller na bieżąco."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "93": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: 404 oznacza, że SKU nie istnieje jeszcze w marketplace, więc seller wysyła SKU suggestion.",
+      "Poprawnie: 200 oznacza, że SKU już istnieje, więc seller aktualizuje jego dane.",
+      "Błąd: 404 dotyczy SKU, nie rejestracji sellera.",
+      "Błąd: po 404 seller wysyła SKU suggestion, nie wywołuje Fulfillment Simulation.",
+      "Błąd: 200 dotyczy istnienia SKU. Cena idzie osobnym powiadomieniem o cenie.",
+      "Błąd: docs opisują tylko 200 i 404. Kolejka do przeglądu nie jest tu opisana."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "94": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: SKU suggestion musi zaakceptować marketplace, by stało się zarejestrowanym SKU.",
+      "Poprawnie: po akceptacji rejestrację SKU może edytować tylko marketplace.",
+      "Błąd: to oferta, którą marketplace musi zaakceptować, nie publikuje się sama.",
+      "Błąd: po akceptacji sellera nie ma już edycji. Robi to tylko marketplace.",
+      "Błąd: powiadomienia o cenie i stanie to osobne wywołania, suggestion ich nie zastępuje.",
+      "Błąd: docs nie podają 24-godzinnego terminu ani wygasania sugestii."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "95": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: po zatwierdzeniu płatności to marketplace wysyła Authorize Fulfillment do sellera.",
+      "Poprawnie: body zawiera tylko `marketplaceOrderId`.",
+      "Błąd: seller nie wysyła tego żądania, odbiera je od marketplace.",
+      "Błąd: body ma tylko `marketplaceOrderId`, nie cały koszyk.",
+      "Błąd: żądanie idzie dopiero po zatwierdzeniu płatności.",
+      "Błąd: `sellerOrderId` jest w ścieżce URL, a body ma tylko `marketplaceOrderId`. Faktury nie ma."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "96": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: po powiadomieniu marketplace pobiera aktualne dane przez Fulfillment Simulation sellera.",
+      "Błąd: powiadomienie nie niesie wartości, marketplace pobiera ją od sellera.",
+      "Błąd: sugestia SKU jest osobnym krokiem i nie służy do odświeżania ceny.",
+      "Błąd: marketplace pobiera dane po powiadomieniu, nie czeka na zamówienie.",
+      "Błąd: marketplace nie odsyła sugestii. Pyta o dane Fulfillment Simulation.",
+      "Błąd: Change Notification dotyczy danych katalogowych. Cena i stan mają własne powiadomienia."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "97": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: seller wystawia Order Placement, `POST /pvt/orders`, i tam marketplace wysyła zamówienie.",
+      "Błąd: to endpoint Checkout po stronie marketplace, nie seller.",
+      "Błąd: start-handling to krok realizacji, nie odbiór nowego zamówienia.",
+      "Błąd: Send SKU Suggestion to wywołanie sellera do marketplace dla katalogu.",
+      "Błąd: Order Invoice Notification to wywołanie sellera do marketplace, nie odbiór zamówień.",
+      "Błąd: Change Notification to wywołanie sellera do marketplace dla zmian SKU."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "98": {
+    "ok": true,
+    "issue": "unverifiable: guide says return invoice flagged via `type` field, but not the value input/output (OMS invoice knowledge).",
+    "fix": {},
+    "x": [
+      "Poprawnie: dla zamówienia `Invoiced` seller najpierw wysyła fakturę zwrotną, potem Cancel Order.",
+      "Poprawnie: fakturę zwrotną oznacza pole `type` o wartości `input`.",
+      "Błąd: docs wymagają faktury zwrotnej, nie ponownego Authorize Fulfillment.",
+      "Błąd: docs nie wspominają o commicie zdarzenia feedu przed anulowaniem.",
+      "Błąd: oryginalnej faktury się nie usuwa, wysyła się fakturę zwrotną.",
+      "Błąd: `output` oznacza fakturę sprzedaży, zwrot to `input`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "99": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `merchantName` z nazwą konta sellera sygnalizuje, że płatność obsługuje seller.",
+      "Błąd: docs wskazują `merchantName`, nie `affiliateId`.",
+      "Błąd: docs nie opisują `paymentSystem` równego zero jako potwierdzenia płatności sellera.",
+      "Błąd: `isCheckedIn` nie służy do tego, wskazuje je `merchantName`.",
+      "Błąd: docs wskazują `merchantName` z nazwą konta, nie `sellerId`.",
+      "Błąd: `salesChannel` to kanał sprzedaży, a płatność sellera sygnalizuje `merchantName`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "157": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: zewnętrzny marketplace składa zamówienie przez `POST /api/fulfillment/pvt/orders`.",
+      "Poprawnie: `affiliateId` identyfikuje marketplace, z którego pochodzi zamówienie.",
+      "Błąd: `PUT /api/checkout/pub/orders` to Checkout, nie Place fulfillment order.",
+      "Błąd: `POST /pvt/orders` to kierunek odwrotny: marketplace VTEX do zewnętrznego sellera.",
+      "Błąd: docs podają `/api/fulfillment/pvt/orders`, nie OMS.",
+      "Błąd: `sc` to kanał sprzedaży, marketplace wskazuje `affiliateId`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders"
+  },
+  "158": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: `orderId` to `affiliateId` i `marketplaceOrderId` połączone myślnikiem, czyli `MKP-123`.",
+      "Błąd: samo `marketplaceOrderId` idzie w body, a `orderId` w ścieżce ma prefiks `affiliateId`.",
+      "Błąd: kolejność jest odwrotna, najpierw `affiliateId`.",
+      "Błąd: docs nie dodają sufiksu `-01`, to format orderId OMS.",
+      "Błąd: brakuje łącznika `-` między `affiliateId` a `marketplaceOrderId`.",
+      "Błąd: separatorem jest `-`, nie dwukropek."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders"
+  },
+  "159": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: to wywołanie nie ma request body.",
+      "Poprawnie: marketplace wywołuje endpoint fulfillment sellera, by pobrać nową cenę.",
+      "Błąd: body nie ma ceny, jest puste.",
+      "Błąd: body nie niesie tabeli cen ani kanału, jest puste.",
+      "Błąd: pełny payload SKU dotyczy sugestii SKU, nie powiadomienia o cenie.",
+      "Błąd: body nie niesie ceny. Odpowiedź tego endpointu to 202, nie 200."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/marketplace-apis#post-/notificator/-sellerId-/changenotification/-skuId-/price"
+  },
+  "160": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: płatność obsługuje marketplace, więc `paymentData` idzie jako `null`.",
+      "Błąd: tokeny z Secure Proxy nie trafiają do sellera, `paymentData` to `null`.",
+      "Błąd: `transactionId` nie jest wysyłany, `paymentData` to `null`.",
+      "Błąd: seller nie dostaje wyboru płatności klienta, `paymentData` to `null`.",
+      "Błąd: `merchantName` dotyczy płatności obsługiwanej przez sellera, tu płaci marketplace.",
+      "Błąd: `paymentSystem` nie jest wypełniany, `paymentData` to `null`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/marketplace-protocol-external-marketplace-orders"
+  },
+  "226": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "227": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "228": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: 404 oznacza, że marketplace nie ma SKU, więc seller wysyła SKU suggestion.",
+      "Błąd: 404 nie oznacza indeksowania, tylko brak SKU w marketplace.",
+      "Błąd: 404 dotyczy SKU, nie ceny.",
+      "Błąd: 404 dotyczy SKU, nie rejestracji sellera.",
+      "Błąd: 404 nie dotyczy cache ceny. Seller wysyła SKU suggestion.",
+      "Błąd: powiadomienia o cenie i stanie nie rejestrują SKU, potrzebna jest sugestia SKU."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "229": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: marketplace czeka najwyżej 2,5 sekundy.",
+      "Błąd: limit wynosi 2,5 sekundy, nie 5.",
+      "Błąd: limit wynosi 2,5 sekundy, nie 20.",
+      "Błąd: limit wynosi 2,5 sekundy, nie 60.",
+      "Błąd: limit wynosi 2,5 sekundy, nie 1,5.",
+      "Błąd: limit wynosi 2,5 sekundy, nie 10."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "230": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: body zawiera tylko `marketplaceOrderId`.",
+      "Błąd: body nie ma pełnego zamówienia ani danych płatności, tylko `marketplaceOrderId`.",
+      "Błąd: faktura to osobny krok sellera, body ma tylko `marketplaceOrderId`.",
+      "Błąd: `sellerOrderId` jest w ścieżce, w body tylko `marketplaceOrderId`.",
+      "Błąd: tracking wysyła seller przy fakturze, body ma tylko `marketplaceOrderId`.",
+      "Błąd: body nie niesie statusu, tylko `marketplaceOrderId`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "231": {
+    "ok": true,
+    "issue": "low: guide notes API reference lists separate tracking endpoints; guide itself says tracking goes through invoice endpoint.",
+    "fix": {},
+    "x": [
+      "Poprawnie: tracking (przewoźnik, identyfikator, URL) idzie tym samym endpointem co faktura.",
+      "Błąd: `/fulfill` to autoryzacja wysyłki od marketplace, tracking idzie endpointem faktury.",
+      "Błąd: Change Notification dotyczy danych katalogowych SKU, nie trackingu.",
+      "Błąd: Fulfillment Simulation to wywołanie marketplace do sellera, nie kanał trackingu.",
+      "Błąd: docs wskazują endpoint faktury, a nie osobny `PUT` przed fakturowaniem.",
+      "Błąd: powiadomienie o stanie nie niesie trackingu, tylko sygnalizuje zmianę."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "232": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: endpoint anulowania sellera jest wywoływany dwa razy: ocena, potem potwierdzenie lub odmowa.",
+      "Błąd: endpoint jest wywoływany dwa razy, a seller może odmówić.",
+      "Błąd: to marketplace woła endpoint cancel sellera, seller nie woła `/fulfill`.",
+      "Błąd: fakturę zwrotną wysyła seller przy anulowaniu zamówienia zafakturowanego.",
+      "Błąd: docs nie opisują 48-godzinnego automatycznego anulowania.",
+      "Błąd: anulowanie ma własny endpoint cancel sellera, nie Authorize Fulfillment."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  },
+  "233": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Poprawnie: katalog należy do marketplace, a oferty sellera musi on zaakceptować.",
+      "Błąd: seller nie ma bezpośredniego dostępu do katalogu marketplace.",
+      "Błąd: powiadomienie o cenie nie zmienia nazwy SKU, a seller nie ma dostępu do katalogu.",
+      "Błąd: seller nie edytuje bezpośrednio także własnych SKU, to oferty do akceptacji.",
+      "Błąd: po akceptacji rejestrację SKU edytuje tylko marketplace.",
+      "Błąd: Change Notification tylko sygnalizuje zmianę, nie niesie nazwy w body."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/external-seller-integration-connector"
+  }
+}

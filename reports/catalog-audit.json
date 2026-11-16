@@ -1,0 +1,364 @@
+{
+  "11": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/catalog-integration",
+    "x": [
+      "Zgodne z przewodnikiem: departamenty i kategorie, pola specyfikacji, marka, produkty, SKU, specyfikacje produktu/SKU.",
+      "Przewodnik zaczyna od kategorii. Marka i produkt nie mogą poprzedzać kategorii ani pól specyfikacji.",
+      "Produkt nie istnieje bez kategorii i marki, więc nie można go tworzyć jako pierwszego.",
+      "SKU powstaje dopiero po produkcie, bo jest jego wariantem. Nie otwiera przepływu.",
+      "Przewodnik stawia kategorie przed polami specyfikacji, a nie odwrotnie.",
+      "Marka i pola specyfikacji idą przed produktami. Produkt przed nimi łamie kolejność."
+    ]
+  },
+  "12": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/catalog-integration",
+    "x": [
+      "Dokumentacja: produkt musi należeć do marki i kategorii.",
+      "Dokumentacja wymaga kategorii i marki oraz przynajmniej jednego aktywnego SKU.",
+      "Wymagany jest co najmniej jeden aktywny SKU. To warunek udostępnienia produktu.",
+      "Cena nie jest warunkiem udostępnienia produktu w tej liście. Wymagane są marka, kategoria i aktywny SKU.",
+      "Wystarczy jeden aktywny SKU, nie trzy.",
+      "Kolekcja nie jest wymagana. Produkt wymaga marki, kategorii i aktywnego SKU."
+    ]
+  },
+  "13": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/skus",
+    "x": [
+      "Dokumentacja: wysłanie `IsActive` jako true przy tworzeniu daje błąd `400 Bad Request`.",
+      "Aktywacja przy tworzeniu nie działa. SKU aktywuje się później, po spełnieniu wymagań.",
+      "API nie tworzy aktywnego SKU. Zamiast tego zwraca błąd.",
+      "Dokumentacja wskazuje `400 Bad Request`, nie `409`.",
+      "Dokumentacja wskazuje `400 Bad Request`, nie `403`.",
+      "Flaga nie jest po cichu ignorowana. Dokumentacja mówi o błędzie `400`."
+    ]
+  },
+  "14": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/skus",
+    "x": [
+      "Wymóg aktywacji: co najmniej jeden obrazek powiązany z SKU.",
+      "Wymóg aktywacji: co najmniej jedno alternatywne ID, `RefId` lub `EAN`.",
+      "Cena jest potrzebna do widoczności w sklepie, nie do aktywacji SKU.",
+      "Stan magazynowy jest potrzebny do widoczności w sklepie, nie do aktywacji.",
+      "Polityka wysyłki nie jest wymogiem aktywacji SKU w dokumentacji.",
+      "Cena katalogowa nie jest wymogiem aktywacji. Cena dotyczy widoczności w sklepie."
+    ]
+  },
+  "15": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/skus",
+    "x": [
+      "Dokumentacja: z `ActivateIfPossible: true` SKU aktywuje się po powiązaniu z obrazem lub aktywnym komponentem.",
+      "Aktywacja w żądaniu tworzenia (`IsActive: true`) kończy się błędem `400 Bad Request`.",
+      "Bez obrazka SKU się nie aktywuje. Flaga czeka na spełnienie wymagań.",
+      "Flaga dotyczy SKU, nie aktywuje produktu we wszystkich trade policy.",
+      "Flaga nie włącza cen. Cenę rejestruje się osobno w Pricing.",
+      "Przy `false` SKU trzeba aktywować ręcznie, aktualizując je z `IsActive: true`."
+    ]
+  },
+  "16": {
+    "ok": true,
+    "issue": "Source for the abstract/concrete wording is the ERP import page, not the linked onboarding guide. Source says: \"Product is the abstract catalog unit\" (https://developers.vtex.com/docs/guides/erp-integration-import-products)",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-products",
+    "x": [
+      "Produkt to abstrakcyjna jednostka katalogu, SKU to konkretna jednostka trzymana w magazynie, czyli wariant.",
+      "To odwrotnie. W magazynie jest SKU, a SKU nie jest słowem kluczowym wyszukiwania.",
+      "Przynależność do sprzedawcy lub marketplace nie odróżnia produktu od SKU.",
+      "Produkt nie jest zawsze zestawem. Zestaw (kit) to osobny rodzaj SKU.",
+      "Cena nie jest tym, co odróżnia produkt od SKU. SKU to wariant, np. rozmiar.",
+      "To odwrotnie. SKU jest jednostką w magazynie i wariantem jednego produktu, nie grupą produktów."
+    ]
+  },
+  "17": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/product",
+    "x": [
+      "Create Product: `POST /api/catalog/pvt/product`.",
+      "`/pub/` to ścieżka publiczna, a tworzenie produktu to `POST` na `/api/catalog/pvt/product`.",
+      "`stockkeepingunit` tworzy SKU, nie produkt.",
+      "Produkt należy do Catalog, a nie Checkout.",
+      "Tworzenie produktu to ścieżka `/api/catalog/pvt/product`, nie `catalog_system/pvt/products`.",
+      "`PUT` z `{productId}` aktualizuje istniejący produkt, nie tworzy nowego."
+    ]
+  },
+  "18": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/stockkeepingunit/-skuId-/file",
+    "x": [
+      "Create SKU file: `POST /api/catalog/pvt/stockkeepingunit/{skuId}/file`.",
+      "Obraz dodaje się do SKU endpointem `.../file`, nie do produktu przez `/image`.",
+      "Taka ścieżka `/sku/{skuId}/media` nie istnieje. Jest `stockkeepingunit/{skuId}/file`.",
+      "Logistics nie przyjmuje plików SKU. Obrazy obsługuje Catalog.",
+      "Plik dodaje się do SKU, nie do produktu.",
+      "Ścieżka `catalog_system/.../images` nie jest endpointem Create SKU file."
+    ]
+  },
+  "19": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-products",
+    "x": [
+      "Dokumentacja: ID głównej trade policy to zawsze 1.",
+      "Dokumentacja: wszystkie produkty muszą być powiązane z główną trade policy, by były widoczne w sklepie.",
+      "ID głównej trade policy to 1, a nie nazwa konta.",
+      "ID głównej trade policy to 1, nie 0.",
+      "Do trade policy łączy się produkty przez Catalog API, nie SKU przez Pricing.",
+      "Produkt musi być powiązany z główną trade policy. Nie wyświetla się tam domyślnie."
+    ]
+  },
+  "20": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/product/-productId-/salespolicy/-tradepolicyId-",
+    "x": [
+      "Associate Product with Trade Policy: `POST /api/catalog/pvt/product/{productId}/salespolicy/{tradepolicyId}`.",
+      "Tabele cen w Pricing nie łączą produktu z trade policy. Robi to Catalog API.",
+      "Trade policy łączy się z produktem, nie z SKU, i ścieżką `salespolicy`.",
+      "Checkout nie zarządza powiązaniem produktu z trade policy.",
+      "Ścieżka wymaga `salespolicy/{tradepolicyId}`, a metoda to `POST`.",
+      "Dodatkowy segment `/activate` nie istnieje. Ścieżka kończy się na `{tradepolicyId}`."
+    ]
+  },
+  "21": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-products",
+    "x": [
+      "Dokumentacja: Timeout jest przewidziany w przepływie integracji.",
+      "Dokumentacja: kod powinien przewidywać ponowienia żądania.",
+      "Przy Timeout należy powtórzyć rejestrację produktu. Nowy klucz aplikacji nie jest potrzebny.",
+      "Dokumentacja każe powtórzyć rejestrację, nie usuwać produktu ani zaczynać importu od nowa.",
+      "Trasa `/pub/` nie rozwiązuje Timeout. Należy ponowić to samo żądanie.",
+      "Timeout oznacza, że operacja trwała dłużej niż oczekiwano, nie limit żądań konta."
+    ]
+  },
+  "22": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/catalog-integration",
+    "x": [
+      "Specyfikacje to zarejestrowane właściwości kategorii, stosowane do powiązanych produktów i SKU.",
+      "Specyfikacje należą do kategorii, nie do marki.",
+      "Magazyn nie przechowuje specyfikacji. To właściwości kategorii.",
+      "Trade policy dotyczy katalogu, cen i logistyki kanału, nie specyfikacji.",
+      "Kolekcja nie definiuje specyfikacji. Robi to kategoria.",
+      "Tabela cen dotyczy cen, nie specyfikacji produktu."
+    ]
+  },
+  "23": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/skus",
+    "x": [
+      "Dokumentacja: trzeba podać co najmniej jedno z alternatywnych ID, `RefId` lub `EAN`.",
+      "`LinkId` i `TaxCode` nie są wymaganymi identyfikatorami SKU.",
+      "`BrandId` i `CategoryId` dotyczą produktu, a nie są alternatywnymi ID SKU.",
+      "`ManufacturerCode` i `Slug` nie są wymaganymi alternatywnymi ID.",
+      "Alternatywne ID to `RefId` lub `EAN`. `Name` i `ProductId` nimi nie są.",
+      "Jednostka miary i mnożnik to nie alternatywne ID SKU."
+    ]
+  },
+  "106": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog",
+    "x": [
+      "Dokumentacja: pola zawsze należą do grup, a wartości dodaje się do pól.",
+      "Pole musi należeć do grupy, więc grupa powstaje przed polem.",
+      "Wartość należy do istniejącego pola, więc nie powstaje pierwsza.",
+      "Wartości dodaje się do pola, więc pole poprzedza wartość. Grupa jest pierwsza.",
+      "Pole trafia do grupy, więc grupa poprzedza pole. Wartość jest ostatnia.",
+      "Wartości nie można utworzyć przed polem ani grupą."
+    ]
+  },
+  "107": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog",
+    "x": [
+      "Combo to typ wyliczeniowy: wymaga utworzenia wartości specyfikacji.",
+      "Radio to typ wyliczeniowy: wymaga wartości dla każdej opcji.",
+      "Checkbox to typ wyliczeniowy: wymaga wartości dla każdej opcji.",
+      "Text nie ma listy opcji, więc wartości nie tworzy się osobno.",
+      "Number nie jest typem wyliczeniowym. Wartości nie tworzy się wywołaniem.",
+      "Multi-Line Text nie jest typem wyliczeniowym i nie wymaga wartości."
+    ]
+  },
+  "108": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog_system/pvt/specification/field",
+    "x": [
+      "Dokumentacja: `true` dodaje pole jako specyfikację SKU.",
+      "Dokumentacja: `false` dodaje pole jako specyfikację produktu.",
+      "Obowiązkowość ustawia osobne pole `IsRequired`, nie `IsStockKeepingUnit`.",
+      "Flaga wybiera typ specyfikacji (SKU lub produkt). Filtry wyszukiwania ustawia inne pole.",
+      "Flaga nie kopiuje pola. `false` oznacza specyfikację produktu.",
+      "Flaga nie ukrywa pola. `false` oznacza specyfikację produktu."
+    ]
+  },
+  "109": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/catalog-api#post-/api/catalog/pvt/product",
+    "x": [
+      "Typ 1: `CategoryPath` tworzy nową ścieżkę kategorii razem z podkategoriami.",
+      "Typ 1: `BrandName` tworzy nową markę razem z produktem.",
+      "`CategoryId` wskazuje istniejącą kategorię (typ 2), nie tworzy nowej.",
+      "`BrandId` wskazuje istniejącą markę (typ 2), nie tworzy nowej.",
+      "`DepartmentId` nie służy do tworzenia ścieżki kategorii przy produkcie.",
+      "`CategoryName` nie jest tym polem. Ścieżkę tworzy `CategoryPath`."
+    ]
+  },
+  "110": {
+    "ok": true,
+    "issue": "Search API limit of 50 in e is not stated on the linked page (unverifiable). Source says: \"returns a maximum of 250 records per response\" (https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pvt/products/GetProductAndSkuIds)",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/api-reference/catalog-api#get-/api/catalog_system/pvt/products/GetProductAndSkuIds",
+    "x": [
+      "Dokumentacja: maksymalnie 250 rekordów na odpowiedź, różnica `_to` i `_from` nie przekroczy 250.",
+      "50 to limit innego API (Search), nie tego endpointu. Tu limit to 250.",
+      "Limit to 250, nie 100.",
+      "Limit to 250, nie 1000. Zakres większy niż 250 zwraca błąd.",
+      "Limit to 250, nie 500. Przykład `_from=1`, `_to=500` jest niepoprawny.",
+      "Limit to 250 rekordów, a nie 10."
+    ]
+  },
+  "111": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog",
+    "x": [
+      "Dokumentacja zaleca nieaktywną kategorię-atrapę, np. Integration, na import wszystkich produktów.",
+      "Po imporcie produkty ręcznie przenosi się do właściwych kategorii, w Admin lub arkuszem.",
+      "Produkty wysyła się do kategorii-atrapy. VTEX nie klasyfikuje ich sam.",
+      "Dokumentacja zaleca jedną nieaktywną kategorię-atrapę, a nie aktywną kategorię na produkt.",
+      "Dokumentacja każe importować do kategorii-atrapy, nie czekać na zmianę ERP.",
+      "Produkt wymaga kategorii. Dokumentacja zaleca nieaktywną kategorię-atrapę, nie jej brak."
+    ]
+  },
+  "282": {
+    "ok": true,
+    "issue": "Ordering matches the guide (categories, brand, product, SKU; image needed to activate).",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/catalog-integration"
+  },
+  "283": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/skus",
+    "x": [
+      "Dokumentacja: do widoczności potrzebna jest zarejestrowana cena SKU w powiązanej trade policy.",
+      "Dokumentacja: do widoczności potrzebna jest co najmniej jedna sztuka na stanie.",
+      "Cena katalogowa nie jest wymieniona. Potrzebna jest cena w trade policy.",
+      "Druga grupa specyfikacji nie jest warunkiem widoczności aktywnego SKU.",
+      "Kolekcja nie jest wymagana. Brakuje zwykle ceny lub stanu.",
+      "Dodatkowy obrazek nie jest warunkiem. Wystarczy jeden obrazek do aktywacji."
+    ]
+  },
+  "284": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-products",
+    "x": [
+      "Dokumentacja: ID głównej trade policy to zawsze 1.",
+      "ID głównej trade policy to 1, nie 0.",
+      "Główna trade policy ma ID 1, a nie tekst `default`.",
+      "ID jest liczbą 1, nie nazwą konta.",
+      "ID jest liczbą 1, nie tekstem `main`.",
+      "ID głównej trade policy to stałe 1 i nie zależy od magazynu."
+    ]
+  },
+  "285": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-import-products",
+    "x": [
+      "Dokumentacja: zapisz `id` zwrócone przez VTEX i powiąż je z RefId w swojej bazie.",
+      "Dokumentacja każe zapisać zwrócone `id`, bo jest potrzebne do zmian. RefId samo nie wystarcza.",
+      "Do zmian potrzebne jest zwrócone `id` produktu, nie slug.",
+      "VTEX nie rozwiązuje RefId przy każdym wywołaniu. Zapisz zwrócone `id`.",
+      "Zapisujesz `id` produktu, nie SKU pierwszego wariantu.",
+      "VTEX nie generuje `id` od nowa przy aktualizacji. Dokumentacja każe zapisać zwrócone `id`."
+    ]
+  },
+  "286": {
+    "ok": true,
+    "issue": "Matrix matches the guide: automatic = ActivateIfPossible true, manual = both false then update with IsActive true.",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/skus"
+  },
+  "287": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog",
+    "x": [
+      "Dokumentacja: grupy specyfikacji stosuje się rekurencyjnie do wszystkich potomków w drzewie kategorii.",
+      "Grupa obejmuje też potomków, nie tylko kategorię, w której ją utworzono.",
+      "Grupa dotyczy też samej kategorii, nie tylko podkategorii.",
+      "Grupa działa w dół drzewa, nie we wszystkich kategoriach katalogu.",
+      "Grupa działa na potomków, nie na kategorie nadrzędne.",
+      "Zasięg grupy wynika z drzewa kategorii, nie z trade policy."
+    ]
+  },
+  "288": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/erp-integration-set-up-catalog",
+    "x": [
+      "Dokumentacja: dla Combo, Radio i Checkbox trzeba utworzyć wartości (Create Specification Field Value).",
+      "Wartości domyślnej na kategorii dokumentacja nie wymienia. Pole wymaga wartości opcji.",
+      "Indeksu wyszukiwania nie tworzy się ręcznie. Pole wyliczeniowe wymaga wartości.",
+      "Powiązanie z główną trade policy dotyczy produktów, nie pól specyfikacji.",
+      "`IsStockKeepingUnit` wybiera SKU lub produkt, a nie zastępuje wartości.",
+      "Pole należy do grupy swojej kategorii. Grupa w innej kategorii nie jest potrzebna."
+    ]
+  },
+  "289": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/skus",
+    "x": [
+      "Dokumentacja: podaj `Id` (liczba całkowita) w żądaniu, a VTEX użyje go jako ID SKU.",
+      "Własne `Id` można podać. Tylko bez niego VTEX generuje je automatycznie.",
+      "RefId to alternatywne ID, a nie główne `Id` SKU.",
+      "Własne `Id` dotyczy każdego SKU, nie tylko zestawów.",
+      "`Id` jest liczbą całkowitą, nie GUID-em.",
+      "Własne `Id` podaje się w treści żądania tworzenia, nie w query string."
+    ]
+  }
+}

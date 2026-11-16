@@ -1,0 +1,371 @@
+{
+  "0": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc podaje nagłówek `X-VTEX-API-AppKey` dla appKey.",
+      "Poprawne: doc podaje nagłówek `X-VTEX-API-AppToken` dla appToken.",
+      "Doc nie opisuje `Authorization: Bearer`; para kluczy idzie w dwóch nagłówkach `X-VTEX-API-*`.",
+      "Taki nagłówek nie istnieje; doc podaje `X-VTEX-API-AppKey` i `X-VTEX-API-AppToken`.",
+      "`X-VTEX-Account` nie uwierzytelnia; konto wynika z hosta URL, a klucze idą w `X-VTEX-API-*`.",
+      "Nagłówek `X-VTEX-API-Key` nie istnieje; właściwy to `X-VTEX-API-AppKey`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-api-keys"
+  },
+  "1": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że uprawnienia klucza wynikają z ról License Managera i ich resources.",
+      "Trade policy nie nadaje uprawnień kluczowi; o dostępie decydują role License Managera.",
+      "Doc nie opisuje allowlisty IP w Catalogu jako źródła uprawnień klucza; liczą się role.",
+      "Data ważności tokena nie określa zakresu dostępu; zakres daje rola z resources.",
+      "Konto w URL wskazuje, gdzie działa request, a nie jakie zasoby klucz może wywołać.",
+      "Uprawnienia klucza nie dziedziczą profilu twórcy; doc wskazuje role przypisane do klucza."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-api-keys"
+  },
+  "2": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc zaleca dla frontendu user token, czyli cookie `VtexIdclientAutCookie`.",
+      "Doc: „Do not use application keys in your client-side code”; bundle JS jest widoczny dla każdego.",
+      "Klucz w `localStorage` to nadal kod po stronie klienta; doc zabrania kluczy aplikacji w przeglądarce.",
+      "Trasy `/pvt/` są prywatne i wymagają uwierzytelnienia; doc nie zwalnia z niego kupujących.",
+      "Klucze w URL to nadal klucze po stronie klienta, niedozwolone; frontend używa user tokena.",
+      "Doc nie zna takiego mechanizmu; frontend używa user tokena z VTEX ID."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/authentication-overview"
+  },
+  "3": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że user token uwierzytelnia requesty przez 24 godziny od utworzenia.",
+      "Poprawne: dla sklepu cookie to `VtexIdclientAutCookie_{accountName}` lub z `accountId`.",
+      "Ważność user tokena to 24 godziny od utworzenia, a nie czas życia appToken.",
+      "Token idzie jako cookie `VtexIdclientAutCookie`; `X-VTEX-API-AppToken` jest dla kluczy aplikacji.",
+      "Doc podaje 24 godziny i nie opisuje odnawiania przy każdym requeście.",
+      "Doc: konto w hoście API musi być kontem, dla którego wydano token."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens"
+  },
+  "4": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc opisuje `403` jako poprawny request, który serwer odmawia wykonać, więc sprawdź role.",
+      "Poprawne: naprawa to rola z wymaganym resource w License Managerze.",
+      "`401` oznacza brak albo błędne dane uwierzytelniające, a tu klucz jest poprawny.",
+      "Nowy appToken tego samego klucza nie zmienia jego ról, więc `403` zostaje.",
+      "`404` dotyczy zasobu, którego nie da się znaleźć, a nie braku uprawnień.",
+      "`429` oznacza przekroczenie limitu requestów, a nie brak roli."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-response-codes"
+  },
+  "5": {
+    "ok": false,
+    "issue": "e claims 'Orders zaleca ok. 1 minuty' but linked pages do not say it. Pricing page: \"await the time in seconds specified in `Retry-After`\".",
+    "fix": {
+      "e": "429 to throttling. **Przestań wysyłać, odczekaj i zmniejsz tempo.** Pricing podaje czas oczekiwania w sekundach w nagłówku `Retry-After`."
+    },
+    "x": [
+      "Poprawne: doc każe wstrzymać requesty, odczekać czas z `Retry-After` i zmniejszyć tempo.",
+      "Równoległe ponawianie zwiększa tempo; doc każe po `429` zmniejszyć liczbę requestów na sekundę.",
+      "Limity dotyczą trasy i konta, więc drugi klucz ich nie omija; doc każe czekać.",
+      "Throttlowany request nie jest przetwarzany; doc: z `Retry-After` request nie został obsłużony.",
+      "Krótszy timeout nie zmniejsza tempa; doc każe odczekać i zmniejszyć rate.",
+      "Doc nie opisuje kolejkowania; po wyczerpaniu burst credits nowe requesty dostają `429`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/pricing-api"
+  },
+  "6": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że `x-vtex-api-appkey` i każda inna wariacja działają tak samo.",
+      "Doc dopuszcza dowolną wielkość liter w nazwie nagłówka.",
+      "Wielkość liter nie ma znaczenia; wariacje nazwy działają tak samo.",
+      "Doc nie robi wyjątku dla `/pvt/`; nazwy nagłówków są case-insensitive.",
+      "Wielkie litery nie są wymagane; doc przyjmuje dowolną wariację.",
+      "Nie trzeba zachować camelCase; doc przyjmuje dowolną wariację. "
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-api-keys"
+  },
+  "7": {
+    "ok": true,
+    "x": [
+      "Poprawne: Help Center zaleca osobny klucz dla każdej funkcji i integracji.",
+      "Poprawne: Help Center zaleca ograniczyć dostęp klucza do zasobów potrzebnych jego funkcji.",
+      "Poprawne: Help Center ostrzega przed kluczami w kodzie wykonywanym po stronie klienta.",
+      "Wspólny klucz z szerokimi uprawnieniami łamie zasadę najmniejszych uprawnień.",
+      "Klucz w `localStorage` to klucz po stronie przeglądarki, czego Help Center zakazuje.",
+      "Wspólny klucz dla staging i produkcji nie jest zalecany; zalecany jest osobny klucz na integrację."
+    ],
+    "src": "https://help.vtex.com/en/docs/tutorials/best-practices-api-keys"
+  },
+  "8": {
+    "ok": true,
+    "x": [
+      "Poprawne: `/pvt/` to trasa prywatna wymagająca uwierzytelnienia, `/pub/` jest publiczna.",
+      "Trasy `/pvt/` wywołujesz też poza Adminem, np. kluczami aplikacji z backendu.",
+      "Prefiks `/pvt/` nie ogranicza metody HTTP; dotyczy uwierzytelniania.",
+      "Prefiks nie zmienia hosta; trasa prywatna używa tego samego hosta konta.",
+      "`/pvt/` nie oznacza wycofania; oznacza trasę prywatną.",
+      "`/pvt/` nie dotyczy cache ani CDN; oznacza trasę prywatną z uwierzytelnianiem."
+    ],
+    "src": "https://learn.vtex.com/docs/course-calling-commerce-apis-step02references-lang-en"
+  },
+  "9": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc podaje host `https://{accountName}.{environment}.com.br`, domyślnie `vtexcommercestable`.",
+      "`api.vtex.com/{environment}/{accountName}` nie jest standardem; tak działa wyjątek, np. Pricing.",
+      "`vtex.io` to host aplikacji VTEX IO, a nie standardowych API Checkout i Catalog.",
+      "`myvtex.com` to adres sklepu, a nie wzorzec API; doc używa `{accountName}.{environment}.com.br`.",
+      "Kolejność jest odwrócona; doc podaje `{accountName}.{environment}.com.br`.",
+      "Doc nie zna hosta `portal.vtex.com.br`; konto jest w subdomenie hosta."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/creating-a-regular-order-with-the-checkout-api",
+    "note": "Pricing/Payments host exceptions in e not stated on linked pages (unverifiable)."
+  },
+  "10": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że uprawnienia tokena są takie same jak pary kluczy.",
+      "Poprawne: doc każe wysłać token w nagłówku `VtexIdclientAutCookie`.",
+      "Token nie jest powiązany z użytkownikiem; doc wiąże go z kluczem API.",
+      "Doc nie ogranicza tokena do uprawnień kupującego; ma uprawnienia klucza.",
+      "Token nie dostaje ról osobno; ma uprawnienia pary kluczy, z której powstał.",
+      "Doc nie obiecuje nieskończonej ważności tokena; uprawnienia pochodzą z klucza."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/vtex-id-api#post-/api/vtexid/apptoken/login"
+  },
+  "100": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc opisuje `400` jako body, którego serwer nie umiał zdekodować, zwykle przez zły zapis.",
+      "Poprawne: doc wymienia niewłaściwy nagłówek `Content-Type` jako przyczynę `400`.",
+      "Brak lub błędne dane uwierzytelniające to według doc `401`.",
+      "Brak roli z wymaganym resource daje `403`, a nie `400`.",
+      "Zła metoda HTTP to według doc `405`.",
+      "Zasób, którego nie da się znaleźć, to `404`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-response-codes"
+  },
+  "101": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc opisuje `405` jako użycie niewłaściwej metody HTTP dla endpointu.",
+      "Wygasły token to `401`, a `405` dotyczy metody HTTP.",
+      "Przekroczenie limitu to `429`, a nie `405`.",
+      "Błędna ścieżka daje `404`, a `405` oznacza, że endpoint istnieje, ale nie przyjmuje tej metody.",
+      "Nieprawidłowe body to `400`; `405` dotyczy metody.",
+      "Brak roli to `403`; `405` dotyczy metody."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-response-codes"
+  },
+  "102": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc opisuje `202` jako request przyjęty, ale z nieukończonym jeszcze przetwarzaniem.",
+      "Utworzenie nowego zasobu opisuje `201`.",
+      "Przetworzenie bez treści do zwrócenia opisuje `204`.",
+      "`202` to nie odrzucenie; request został przyjęty.",
+      "`202` to nie przekierowanie; to klasa 2xx, czyli sukces.",
+      "Konflikt ze stanem zasobu to `409`, a nie `202`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-response-codes"
+  },
+  "103": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że poprzedni i nowy token są ważne do dokończenia odnowienia.",
+      "Poprawne: `finish-renewal` kończy odnowienie i dezaktywuje stary token.",
+      "Stary token działa dalej, aż wywołasz `finish-renewal`.",
+      "Doc nie opisuje 24-godzinnego opóźnienia; nowy token jest ważny od razu, obok starego.",
+      "Doc nie wymaga zatwierdzenia admina; oba tokeny działają do `finish-renewal`.",
+      "Renew generuje nowy token dla tego samego klucza API, a nie nowy appKey."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/vtex-id-api#patch-/api/vtexid/apikey/-apiKey-/apitoken/renew"
+  },
+  "104": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc podaje SAML 2.0 jako protokół integracji dla Admina.",
+      "Poprawne: doc podaje OAuth 2.0 jako protokół integracji dla Webstore.",
+      "Dla Admina doc podaje SAML 2.0, nie OAuth 2.0.",
+      "Dla Webstore doc podaje OAuth 2.0, nie SAML 2.0.",
+      "Doc nie wymienia LDAP wśród protokołów VTEX ID.",
+      "Doc nie wymienia Kerberos wśród protokołów VTEX ID."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/login-integration-guide"
+  },
+  "105": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc podaje 45 000 requestów na minutę na konto.",
+      "Poprawne: doc podaje 15 000 requestów na minutę na endpoint.",
+      "To limit zapisu w Pricing (POST i PUT), a nie Catalog.",
+      "Doc nie podaje limitu 5 000 na klucz aplikacji; limity są na konto i endpoint.",
+      "Doc podaje limity Catalog API; trasy nie są wyłączone z limitów.",
+      "Limity Catalog są na konto i endpoint, a nie na adres IP."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/catalog-api"
+  },
+  "251": {
+    "ok": true,
+    "x": [
+      "Poprawne: RFC 9110 mówi, że klient może automatycznie powtórzyć idempotentne żądanie, a `PUT` jest idempotentny.",
+      "Automatycznie można powtarzać każdą metodę idempotentną, nie tylko `GET`.",
+      "`Retry-After` nie jest warunkiem; powtarzalność wynika z idempotencji metody.",
+      "`PUT` jest idempotentny według RFC 9110, więc nie trzeba zmieniać go na `PATCH`.",
+      "RFC 9110 nie wymaga nagłówka `Idempotency-Key`; wystarcza idempotentna metoda.",
+      "Powtarzać można też metody idempotentne niebezpieczne, jak `PUT` i `DELETE`."
+    ],
+    "src": "https://www.rfc-editor.org/rfc/rfc9110#section-9.2.2"
+  },
+  "252": {
+    "ok": true,
+    "x": [
+      "Poprawne: RFC 9110 każe serwerowi w odpowiedzi `401` wysłać `WWW-Authenticate` z wyzwaniem.",
+      "`Allow` jest wymagany przy `405`, a nie `401`.",
+      "`Retry-After` dotyczy m.in. `429` i `503`, a nie `401`.",
+      "`Location` dotyczy przekierowań i `201`, a nie `401`.",
+      "`Proxy-Authenticate` jest dla `407`, czyli uwierzytelniania na proxy.",
+      "`Authorization` to nagłówek requestu, a nie odpowiedzi serwera."
+    ],
+    "src": "https://www.rfc-editor.org/rfc/rfc9110#section-15.5.2"
+  },
+  "253": {
+    "ok": true,
+    "x": [
+      "Poprawne: RFC 9110 opisuje `403` jako zrozumiany request, który serwer odmawia wykonać; w VTEX sprawdź role.",
+      "Brak lub złe poświadczenia to `401`, a tu klucz i token są poprawne.",
+      "Brak zasobu pod ścieżką to `404`.",
+      "Niedozwolona metoda to `405`.",
+      "Zła składnia body to `400`.",
+      "Limit requestów to `429`, a nie `403`."
+    ],
+    "src": "https://www.rfc-editor.org/rfc/rfc9110#section-15.5.4"
+  },
+  "254": {
+    "ok": true,
+    "x": [
+      "Poprawne: RFC 9110 mówi, że pasujący `If-None-Match` przy `GET` daje `304 Not Modified`.",
+      "`412` jest dla innych metod niż `GET` i `HEAD`, gdy warunek nie jest spełniony.",
+      "Przy pasującym ETagu serwer nie wysyła pełnej treści; odpowiada `304`.",
+      "`204` oznacza sukces bez treści, a nie niezmieniony zasób.",
+      "`202` oznacza przyjęcie bez ukończonego przetwarzania.",
+      "`409` opisuje konflikt ze stanem zasobu, a nie warunkowy `GET`."
+    ],
+    "src": "https://www.rfc-editor.org/rfc/rfc9110#section-13.1.2"
+  },
+  "255": {
+    "ok": true,
+    "x": [
+      "Poprawne: RFC 9110 mówi, że serwer nie wykonuje metody i może zwrócić `412`.",
+      "RFC 9110: gdy `If-Match` nie pasuje, serwer nie wykonuje zmiany.",
+      "`304` dotyczy warunkowego `GET` lub `HEAD`, a nie `PUT` z `If-Match`.",
+      "Serwer nie ignoruje `If-Match`; jego niespełnienie blokuje metodę.",
+      "`428` pochodzi z RFC 6585, a RFC 9110 wskazuje przy tym warunku `412`.",
+      "Serwer nie wykonuje metody, gdy `If-Match` nie pasuje."
+    ],
+    "src": "https://www.rfc-editor.org/rfc/rfc9110#section-13.1.1"
+  },
+  "256": {
+    "ok": true,
+    "x": [
+      "Poprawne: RFC 9110 dopuszcza nieujemną liczbę sekund opóźnienia.",
+      "Poprawne: RFC 9110 dopuszcza datę HTTP.",
+      "`Retry-After` nie podaje liczby pozostałych prób.",
+      "RFC 9110 nie przewiduje milisekund; wartość to sekundy albo data HTTP.",
+      "RFC 9110 nie przewiduje znacznika Unix w milisekundach; to data HTTP.",
+      "RFC 9110 podaje opóźnienie w sekundach, a nie minutach."
+    ],
+    "src": "https://www.rfc-editor.org/rfc/rfc9110#section-10.2.3"
+  },
+  "258": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc zaleca klucze aplikacji dla integracji i requestów z własnego backendu.",
+      "User token jest dla frontendu; backend z kluczami nie loguje użytkownika.",
+      "Token aplikacji VTEX IO jest dla aplikacji IO, a nie dla własnego backendu.",
+      "Cookie Admina to token użytkownika, który ważny jest 24 godziny i nie nadaje się do jobów.",
+      "Doc zabrania kluczy aplikacji w kodzie po stronie klienta.",
+      "Doc nie opisuje Basic auth z hasłem; używa się kluczy aplikacji."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/authentication-overview"
+  },
+  "259": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc podaje `VtexIdclientAutCookie_{accountName}` dla sesji sklepu.",
+      "Doc przypisuje `VtexIdclientAutCookie` bez sufiksu do Admina.",
+      "`X-VTEX-API-AppToken` to nagłówek klucza aplikacji, a nie cookie kupującego.",
+      "`checkout.vtex.com` to cookie koszyka, a nie token użytkownika.",
+      "Sufiks to `accountName` lub `accountId`, a nie `storeId`.",
+      "Sufiks to `accountName` lub `accountId`, a nie `userId`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens"
+  },
+  "260": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że user token uwierzytelnia requesty przez 24 godziny od utworzenia.",
+      "Doc podaje 24 godziny, a nie 1 godzinę.",
+      "Doc podaje 24 godziny, a nie 7 dni.",
+      "Token ma limit czasu 24 godziny, niezależnie od wylogowania.",
+      "Doc nie opisuje wygasania po bezczynności; liczy się czas od utworzenia.",
+      "Doc podaje 24 godziny, a nie 12."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens"
+  },
+  "261": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że konto w hoście API musi być kontem, dla którego wydano token.",
+      "Role w obu kontach nie są wymagane; token jest po prostu ważny tylko dla swojego konta.",
+      "Doc nie robi wyjątku dla `/pub/`; token jest związany z kontem.",
+      "Doc nie opisuje wymiany tokena na inne konto.",
+      "Doc nie opisuje listy zaufanych kont w License Managerze.",
+      "Sam adres e-mail nie wystarcza; token jest ważny tylko dla konta, dla którego go wydano."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-authentication-using-user-tokens"
+  },
+  "262": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc każe wygenerować token z `/api/vtexid/apptoken/login` i wysłać go w `VtexIdclientAutCookie`.",
+      "Doc nie opisuje `Authorization: Basic` dla pary kluczy.",
+      "Cookie kupującego ma inne uprawnienia niż klucz i nie zastępuje tokena z klucza.",
+      "Doc nie dopuszcza kluczy w parametrach URL.",
+      "Doc nie opisuje wysyłania kluczy w body requestów; body trafia tylko do endpointu login.",
+      "Doc nie opisuje `Authorization: Bearer` dla appToken; używa się tokena z login."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/vtex-id-api#post-/api/vtexid/apptoken/login"
+  },
+  "263": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc mówi, że uprawnienia tokena są takie same jak pary kluczy.",
+      "Token nie jest powiązany z użytkownikiem; doc wiąże go z kluczem API.",
+      "Doc nie opisuje pełnego dostępu do konta; uprawnienia pochodzą z ról klucza.",
+      "Token nie ma uprawnień kupującego, tylko uprawnienia klucza.",
+      "Doc nie wymaga osobnych ról dla tokena; dziedziczy uprawnienia klucza.",
+      "Doc nie opisuje dostępu tylko do odczytu; zakres zależy od ról klucza."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/vtex-id-api#post-/api/vtexid/apptoken/login"
+  },
+  "265": {
+    "ok": true,
+    "x": [
+      "Poprawne: doc opisuje `401` jako brak lub błędne dane uwierzytelniające, czyli nagłówki `X-VTEX-API-*`.",
+      "Brak roli z resource daje `403`, a nie `401`.",
+      "Przekroczenie limitu to `429`.",
+      "Brak zamówień nie powoduje `401`.",
+      "Zły `Content-Type` powoduje `400`, a nie `401`.",
+      "Użycie `POST` zamiast `GET` dałoby `405`, a nie `401`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/api-response-codes"
+  },
+  "201": { "ok": true, "src": "https://developers.vtex.com/docs/guides/app-authentication-using-auth-tokens" },
+  "250": { "ok": true, "src": "https://www.rfc-editor.org/rfc/rfc9110#section-9.2.1" },
+  "257": { "ok": true, "src": "https://www.rfc-editor.org/rfc/rfc9111#section-5.2.2" },
+  "264": { "ok": true, "src": "https://developers.vtex.com/docs/guides/authentication-overview" }
+}
