@@ -51,7 +51,14 @@ function common(w, x, allowed) {
 
 D.Q.forEach((x, i) => {
   const w = "Q[" + i + "]";
-  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h", "p", "k", "ord", "t", "tpl"]);
+  common(w, x, ["d", "r", "q", "o", "c", "a", "e", "l", "n", "h", "p", "k", "ord", "t", "tpl", "x"]);
+  if (x.x !== undefined) {
+    /* x: one Polish reason per option, in the order of o; shown on a wrong answer for the misjudged options */
+    if (x.t !== undefined || x.ord !== undefined || x.c !== undefined) E(w, "x is only for plain choice questions");
+    else if (!Array.isArray(x.x) || !Array.isArray(x.o) || x.x.length !== x.o.length)
+      E(w, "x needs one reason per option");
+    else x.x.forEach((r, j) => (isStr(r) ? markup(w + ".x[" + j + "]", r) : E(w, "empty reason x[" + j + "]")));
+  }
   if (x.t !== undefined) return gaps(w, x);
   if (x.ord !== undefined) {
     /* ord: o is written in the right order, the runtime shuffles it; 0 or 1 point, no n, no matrix */

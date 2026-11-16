@@ -1629,6 +1629,7 @@
     var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined && !qFresh(i));
     sel = Array.isArray(sel) ? sel : [];
     var rightLetters = [],
+      why = "",
       opts = "";
     if (q.t) opts = gapBody(i, sel, reveal);
     else if (q.c) opts = mxBody(i, sel, reveal);
@@ -1641,6 +1642,21 @@
         var cls = "opt",
           mark = "";
         if (good) rightLetters.push(letter);
+        if (reveal && q.x && good !== on)
+          why +=
+            '<li><span class="why-l ' +
+            (good ? "ok" : "no") +
+            '">' +
+            letter +
+            " " +
+            (good ? "✓" : "✗") +
+            '</span> <span class="why-tag ' +
+            (good ? "ok" : "no") +
+            '">' +
+            (good ? L("Pominięta", "Missed") : L("Zaznaczona", "Picked")) +
+            "</span> " +
+            fmt(q.x[oi]) +
+            "</li>";
         if (reveal) {
           if (good && on) {
             cls += " is-right";
@@ -1736,6 +1752,13 @@
         " " +
         fmt(q.e) +
         "</div>" +
+        (why && !ok
+          ? '<p class="why-h">' +
+            L("Gdzie się pomyliłeś", "Where you went wrong") +
+            '</p><ul class="why">' +
+            why +
+            "</ul>"
+          : "") +
         docLinks(q) +
         httpChips(q) +
         (mode === "learn"
