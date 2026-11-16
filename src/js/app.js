@@ -1986,7 +1986,28 @@
       .join("");
     /* Switching category keeps the open section, so API paths can be compared across areas. */
     var sec = S.dom === "all" ? undefined : NAV.cur.sec;
-    var lall = lProgAll();
+    var lall = lProgAll(),
+      cc = counts();
+    cc.per.all = { t: Q.length, a: cc.ans, r: cc.right };
+    /* Fill = share of the category answered; colour = score on those answers (green ≥80, yellow 60–79, red <60). */
+    function scoreAttr(d) {
+      var c = cc.per[d];
+      if (!c || !c.a) return "";
+      var sc = Math.round((c.r / c.a) * 100);
+      return (
+        ' data-sc="' +
+        (sc >= 80 ? "g" : sc >= 60 ? "y" : "r") +
+        '" style="--fill:' +
+        Math.round((c.a / c.t) * 100) +
+        '%"'
+      );
+    }
+    function scoreTxt(d) {
+      var c = cc.per[d];
+      return c && c.a
+        ? L(" · wynik ", " · score ") + Math.round((c.r / c.a) * 100) + "% (" + c.a + L(" odpowiedzi)", " answered)")
+        : "";
+    }
     $("#cats").innerHTML =
       (lall.t ? lSum(lall) : "") +
       [["all", L("Wszystkie pytania", "All questions"), "📚"]]
@@ -1999,11 +2020,13 @@
             catHref(d[0], d[0] === "all" ? undefined : sec) +
             '"' +
             (S.dom === d[0] ? ' aria-current="page"' : "") +
+            scoreAttr(d[0]) +
             ' title="' +
             L("Opanowane w tej kategorii: ", "Mastered in this category: ") +
             p[0] +
             L(" z ", " of ") +
             p[1] +
+            scoreTxt(d[0]) +
             '"><span class="cat-i" aria-hidden="true">' +
             esc(d[2]) +
             '</span><span class="cat-n">' +
