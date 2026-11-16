@@ -1,0 +1,310 @@
+{
+  "82": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Search stronicujesz nagłówkiem `REST-Range`, a nie parametrami w query.",
+      "Wartość `REST-Range` ma format `resources={x}-{y}`, np. `resources=0-100`.",
+      "`_page` i `_pageSize` nie istnieją. Zakres podajesz w nagłówku `REST-Range`.",
+      "`X-VTEX-MD-TOKEN` to token scrolla w odpowiedzi, nie sposób stronicowania search.",
+      "`REST-Range` przyjmuje `resources={x}-{y}`, a nie `Range: bytes=...`.",
+      "Parametry `page` i `size` nie istnieją. Używasz `REST-Range: resources={x}-{y}`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "83": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Search zwraca maksymalnie 100 dokumentów na zapytanie.",
+      "50 to za mało. Limit jednego zapytania search to 100.",
+      "1000 to limit scrolla, nie search.",
+      "10000 to rozmiar kolekcji, od którego zaleca się scroll, nie limit strony.",
+      "200 nie jest limitem. Search zwraca do 100 dokumentów.",
+      "500 nie jest limitem. Search zwraca do 100 dokumentów."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "84": {
+    "ok": true,
+    "issue": "low: the 10,000 figure is only stated indirectly: 'If you need to query the entire database, or your collection is over 10000 documents, use this endpoint' (scroll description); pagination guide does not state it. Consider adding the search reference page key to l.",
+    "fix": {},
+    "x": [
+      "Przy kolekcji powyżej 10 000 dokumentów docs każą użyć scrolla zamiast search.",
+      "1000 to maks. dokumentów na żądanie scrolla, nie łączny limit search.",
+      "100 000 nie występuje w docs. Powyżej 10 000 używasz scrolla.",
+      "Limit istnieje: przy kolekcji ponad 10 000 dokumentów trzeba użyć scrolla.",
+      "5000 nie występuje w docs. Granica, od której zalecany jest scroll, to 10 000.",
+      "50 000 nie występuje w docs. Granica, od której zalecany jest scroll, to 10 000."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/master-data-api-v2#get-/api/dataentities/-dataEntityName-/scroll"
+  },
+  "85": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Scroll służy do przeglądania całej bazy lub kolekcji powyżej 10 000 dokumentów.",
+      "Scroll zwraca do 1000 dokumentów na żądanie (`_size` ma max 1000).",
+      "Limit 100 dokumentów dotyczy search, nie scrolla.",
+      "`REST-Range` służy do stronicowania search. Scroll używa tokenu `_token`.",
+      "Token wygasa po 20 minutach bezczynności, więc scrolla nie wznowisz później.",
+      "Scroll przyjmuje `_where`, ale go nie wymaga. Bez filtra czyta całą bazę."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "86": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Token przychodzi w nagłówku odpowiedzi `X-VTEX-MD-TOKEN` pierwszego żądania.",
+      "Token wygasa po 20 minutach bezczynności.",
+      "Odpowiedź nie ma pola `nextToken`. Token jest w nagłówku `X-VTEX-MD-TOKEN`.",
+      "Token nie działa 24 godziny. Wygasa po 20 minutach bezczynności.",
+      "Token wysyłasz w parametrze `_token`, a nie w nagłówku `REST-Range`.",
+      "`REST-Content-Range` to nagłówek search. Scroll podaje sumę w `REST-Content-Total`, token w `X-VTEX-MD-TOKEN`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "87": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Schematy JSON obsługuje tylko Master Data v2.",
+      "Master Data v1 nie obsługuje schematów. Są tylko w v2.",
+      "Schematy nie działają w v1, więc nie są dostępne w obu wersjach.",
+      "Schematy należą do Master Data v2, nie do Catalog.",
+      "Schemat nie jest ograniczony do `CL` i `AD`. To encje v1, niezgodne z v2.",
+      "v1 nie obsługuje schematów w ogóle, także przy search."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/master-data-schema-lifecycle"
+  },
+  "88": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Z `_schema={schemaName}` dokument jest walidowany w trakcie żądania.",
+      "Niepoprawny dokument dostaje błąd `400 Bad Request`.",
+      "Schemat wskazujesz parametrem `_schema`. Encja go nie wybiera sama.",
+      "Nie ma nagłówka `X-VTEX-Schema`. Schemat podajesz w query jako `_schema`.",
+      "ID dokumentu nie zależy od nazwy schematu.",
+      "Z `_schema` walidacja jest w trakcie żądania i zwraca `400`, nie `202`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/master-data-schema-lifecycle"
+  },
+  "89": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`REST-Content-Range` w odpowiedzi podaje zakres i sumę, np. `resources=0-100/250`.",
+      "`REST-Range` to nagłówek żądania, w którym ustawiasz zakres.",
+      "`X-Total-Count` nie jest nagłówkiem Master Data. Sumę podaje `REST-Content-Range`.",
+      "`Content-Length` to rozmiar ciała odpowiedzi, nie liczba dokumentów.",
+      "`REST-Content-Count` nie istnieje. Użyj `REST-Content-Range`.",
+      "`X-VTEX-MD-TOKEN` to token scrolla, nie zakres search."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "90": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "API nie gwarantuje domyślnej kolejności, więc bez `_sort` strony mogą mieć duplikaty.",
+      "Bez `_sort` limit to nadal 100 dokumentów, zakres ustawia `REST-Range`.",
+      "Brak `_sort` nie powoduje błędu `400`. Problemem jest niegwarantowana kolejność.",
+      "Brak `_sort` nie usuwa `id`. Wpływa tylko na kolejność wyników.",
+      "Brak `_sort` nie wyłącza `_where`. Wpływa tylko na kolejność wyników.",
+      "`REST-Content-Range` wraca niezależnie od `_sort`. Sort wpływa tylko na kolejność."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "91": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Bez schematu `id` jest polem wewnętrznym i da się po nim szukać.",
+      "`createdIn` jest polem wewnętrznym, więc działa w filtrze bez schematu.",
+      "`updatedIn` jest polem wewnętrznym, więc działa w filtrze bez schematu.",
+      "`email` to pole własne. Bez schematu przeszukiwalne są tylko `id`, `createdIn`, `updatedIn`.",
+      "Typ liczbowy nie wystarcza. Pola własne wymagają schematu, bez niego działają tylko pola wewnętrzne.",
+      "`firstName` to pole własne. Bez schematu nie da się po nim filtrować."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/master-data-schema-lifecycle"
+  },
+  "152": {
+    "ok": false,
+    "issue": "e says 'Adres wiążesz z klientem polem `userId`' but the page does not mention userId: 'CL stores customer-related data like name, email, and document.' Rest of e is supported.",
+    "fix": {
+      "e": "**`CL`** = klienci, **`AD`** = adresy, oba w **Master Data v1**. Imię, e-mail i dokument czytasz z `CL`, ulicę, miasto i odbiorcę z `AD`."
+    },
+    "x": [
+      "`CL` przechowuje dane klientów, jak imię, e-mail i dokument.",
+      "`AD` przechowuje adresy klientów, jak ulica, miasto i odbiorca.",
+      "`CU` nie jest encją profilu. Profile klientów trzymasz w `CL`.",
+      "`SH` nie jest encją adresów. Adresy klientów trzymasz w `AD`.",
+      "`CL` i `AD` to encje Master Data v1, niezgodne z v2.",
+      "`CL` trzyma dane profilu, nie historię zamówień."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/master-data-components"
+  },
+  "153": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`PUT` tworzy dokument z własnym ID albo zastępuje cały istniejący.",
+      "`PATCH` aktualizuje częściowo, czyli tylko wysłane pola.",
+      "`PUT` zastępuje cały dokument. Częściową aktualizację robi `PATCH`.",
+      "`PATCH` to częściowa aktualizacja, nie zastąpienie całego dokumentu.",
+      "Oba działają w v2 na `/documents/{id}`. Nie ma podziału `PUT` v1, `PATCH` v2.",
+      "`PUT` z istniejącym ID aktualizuje cały dokument, nie zwraca `409`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/master-data-api-v2#put-/api/dataentities/-dataEntityName-/documents/-id-"
+  },
+  "154": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Złożony filtr z `OR` idzie w `_where`, np. `(firstName=Jon OR lastName=Smith)`.",
+      "Parametr `fq` nie należy do Master Data. Filtry składasz w `_where`.",
+      "`/documents` z parametrami nie wykona filtra `OR`. Użyj `search` z `_where`.",
+      "Search to `GET` z `_where`, nie `POST` z wyrażeniem JSONata.",
+      "`AND` wymaga obu warunków naraz, a pytanie chce `OR`.",
+      "Parametr `q` nie istnieje w search. Złożone filtry idą w `_where`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/master-data-api-v2#get-/api/dataentities/-dataEntityName-/search"
+  },
+  "155": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`_schema` jest wymagany razem z `_where` lub `_fields`, wskazuje schemat dokumentów.",
+      "`_keyword` jest opcjonalny i nadużywany może zablokować endpoint (503).",
+      "`_token` służy do scrolla, nie do search.",
+      "`_size` to parametr scrolla. Search stronicuje nagłówkiem `REST-Range`.",
+      "`_sort` jest opcjonalny, tylko porządkuje wyniki.",
+      "Parametr `_v` nie istnieje. Wymagany jest `_schema`."
+    ],
+    "src": "https://developers.vtex.com/docs/api-reference/master-data-api-v2#get-/api/dataentities/-dataEntityName-/search"
+  },
+  "156": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Trigger to element tablicy `v-triggers` w schemacie JSON encji.",
+      "Osobnego endpointu `/triggers` nie ma. Trigger dopisujesz do schematu.",
+      "Pole `hook` w dokumencie nie istnieje. Triggery definiuje schemat.",
+      "Konfiguracja orderForm nie dotyczy triggerów Master Data.",
+      "Triggery v2 definiujesz w schemacie, nie w formularzu Master Data v1.",
+      "Nagłówek `triggers` nie istnieje. Trigger leży w `v-triggers` schematu."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2"
+  },
+  "306": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/master-data-schema-lifecycle"
+  },
+  "307": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "308": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Z `_schema` walidacja idzie w trakcie żądania, a niepoprawny dokument dostaje `400`.",
+      "Niepoprawny dokument nie jest zapisywany. API zwraca `400`.",
+      "Późniejsza walidacja w tle dotyczy zapisu bez `_schema`, nie z nim.",
+      "API nie zapisuje dokumentu bez pól. Zwraca `400`.",
+      "Docs podają `400 Bad Request`, nie `422`.",
+      "Docs podają `400 Bad Request`, nie `409`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/master-data-schema-lifecycle"
+  },
+  "309": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Zmiana schematu uruchamia rewalidację w tle, a wyszukiwanie jest niespójne do jej końca.",
+      "Wyszukiwanie nie jest blokowane. Staje się niespójne, ale działa.",
+      "Zmiana schematu wpływa na wyszukiwanie: staje się niespójne do końca rewalidacji.",
+      "Niezgodne dokumenty nie są usuwane. Zostają w bazie bez aktualizacji pola `schema`.",
+      "`503` nie jest opisane dla zmiany schematu. Docs mówią o niespójnym wyszukiwaniu.",
+      "Rewalidacja startuje automatycznie po zmianie schematu, bez ręcznego reindeksu."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/master-data-schema-lifecycle"
+  },
+  "310": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Domyślnie Master Data robi trzy próby w odstępach 10 minut.",
+      "Docs nie podają siedmiu dni. Domyślnie są trzy próby co 10 minut.",
+      "Akcja jest ponawiana. Domyślnie trzy próby co 10 minut.",
+      "Domyślnie nie jedna próba po godzinie, tylko trzy co 10 minut.",
+      "Pięć prób co 30 minut to ustawienie z `retry`, nie domyślne.",
+      "Nie ponawia w nieskończoność. Domyślnie są trzy próby co 10 minut."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2"
+  },
+  "311": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Scrolla powtarzasz z tokenem, aż ciało odpowiedzi będzie puste.",
+      "`REST-Content-Total` to łączna liczba pasujących dokumentów, nie spada do zera.",
+      "Token nadal wraca w nagłówku. Koniec poznasz po pustym ciele.",
+      "Docs nie opisują `204`. Koniec to puste ciało odpowiedzi.",
+      "`REST-Content-Range` dotyczy search. W scrollu koniec to puste ciało.",
+      "Docs nie opisują `404` dla tokenu. Koniec to puste ciało odpowiedzi."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "312": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "`_size` ustawiasz tylko w pierwszym żądaniu, potem nie można go zmienić.",
+      "Rozmiar strony ustawiasz w pierwszym żądaniu, nie w każdym.",
+      "Scroll nie używa `REST-Range`. To nagłówek search.",
+      "Rozmiar nie jest stały. `_size` domyślnie 100, maks. 1000.",
+      "`_pageSize` nie istnieje. Parametr nazywa się `_size`.",
+      "Rozmiar nie jest stały na 1000. To tylko maksimum `_size`."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/pagination-in-the-master-data-api"
+  },
+  "313": {
+    "ok": true,
+    "issue": "",
+    "fix": {},
+    "x": [
+      "Pobierasz schemat, dopisujesz trigger do `v-triggers` i zapisujesz przez Save schema by name.",
+      "Osobnego endpointu triggerów nie ma. Trigger jest częścią schematu.",
+      "Triggery v2 są w schemacie, nie w panelu Master Data v1.",
+      "Parametr `_trigger` nie istnieje. Trigger dopisujesz do schematu.",
+      "`v-triggers` jest w schemacie encji, nie w pojedynczym dokumencie.",
+      "Nagłówek `X-VTEX-Trigger` nie istnieje. Trigger leży w schemacie."
+    ],
+    "src": "https://developers.vtex.com/docs/guides/setting-up-triggers-in-master-data-v2"
+  }
+}
