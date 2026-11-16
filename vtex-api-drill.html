@@ -1623,6 +1623,41 @@ h3 {
 .verdict.part {
   color: var(--k3);
 }
+.why-h {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.why {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  max-width: 68ch;
+}
+.why-l {
+  font-weight: 600;
+  margin-right: 4px;
+}
+.why-tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 1px 6px;
+  border: 1px solid;
+  border-radius: 999px;
+}
+.why-l.ok,
+.why-tag.ok {
+  color: var(--ok);
+}
+.why-l.no,
+.why-tag.no {
+  color: var(--bad);
+}
 .btn {
   border: 1px solid var(--line);
   background: var(--surface);
@@ -10531,7 +10566,7 @@ const Q = [
  {"d":"payments","r":1,"q":"Which request does VTEX send to capture (settle) a payment?","o":["`POST /payments/{paymentId}/settlements`","`PUT /payments/{paymentId}/capture`","`POST /transactions/{transactionId}/settle`","`POST /payments/{paymentId}/refunds`","`POST /payments/{paymentId}/captures`","`POST /payments/{paymentId}/cancellations`"],"e":"Capture: `/settlements`. Anulowanie: `/cancellations`. Zwrot: `/refunds`. Wszystkie `POST` pod `/payments/{paymentId}/`.","l":["settle"],"k":["ppp-flow.settle"],"p":1},
  {"d":"payments","r":1,"q":"A store cancels an order whose payment was approved. Which statements about the request VTEX sends to the provider are correct?","o":["If the payment was already settled, the provider receives a refund request","If the payment was not yet settled, the provider receives a cancellation request","In both cases the provider receives a new Create Payment with a negative value","If the payment was already settled, the provider receives a cancellation request","In both cases the provider receives an Inbound Request","If the payment was not yet settled, the provider receives a refund request"],"e":"**Rozliczona** płatność → **refund** (także częściowy). **Autoryzowana, nierozliczona** → **cancellation**. Provider musi obsłużyć oba `POST`: Refund Payment i Cancel Payment.","l":["flows"],"n":2,"k":["ppp-flow.cancel","ppp-flow.refund"],"p":1},
  {"d":"payments","r":1,"q":"A payment provider decides whether to implement the PPP Configuration Flow. What is true about it?","o":["It is optional for the provider","It yields `appKey`, `appToken` and `applicationId`","It is mandatory and runs before every payment","It replaces the manifest endpoint of the provider","It is used only by anti-fraud providers, not payment ones","It requires the merchant to send the provider's credentials by email"],"e":"Configuration Flow jest **opcjonalny**. Daje `appKey`, `appToken`, `applicationId`. Endpoint GET Credentials je zwraca, a VTEX zapisuje je i aktywuje, gdy merchant włączy konektor.","l":["ppp"],"n":2,"k":["ppp-flow.manifest"],"p":3},
- {"d":"md","r":1,"q":"How is pagination defined in the Master Data search endpoint?","o":["With the `REST-Range` request header","In the format `resources={x}-{y}`, for example `resources=0-100`","With the `_page` and `_pageSize` query parameters","With the `X-VTEX-MD-TOKEN` header","With the `Range: bytes=0-100` header","In the format `page={x}&size={y}`, for example `page=1&size=100` in the query"],"e":"Search stronicujesz nagłówkiem **`REST-Range: resources={x}-{y}`**. Następna strona: `resources=100-200`.","l":["mdpag"],"n":2,"k":["md-v2.search"],"p":1},
+ {"d":"md","r":1,"q":"How is pagination defined in the Master Data search endpoint?","o":["With the `REST-Range` request header","In the format `resources={x}-{y}`, for example `resources=0-100`","With the `_page` and `_pageSize` query parameters","With the `X-VTEX-MD-TOKEN` header","With the `Range: bytes=0-100` header","In the format `page={x}&size={y}`, for example `page=1&size=100` in the query"],"e":"Search stronicujesz nagłówkiem **`REST-Range: resources={x}-{y}`**. Następna strona: `resources=100-200`.","l":["mdpag"],"n":2,"k":["md-v2.search"],"p":1,"x":["Search stronicujesz nagłówkiem `REST-Range`.","Wartość `REST-Range` ma format `resources={x}-{y}`, np. `resources=0-100`.","Stron nie wybierasz parametrami w query, tylko nagłówkiem `REST-Range`.","Ten nagłówek nie ustala strony. Zakres podajesz w `REST-Range`.","`REST-Range` przyjmuje `resources={x}-{y}`, nie `bytes`.","Stron nie wybierasz parametrami w query, tylko nagłówkiem `REST-Range`."]},
  {"d":"md","r":1,"q":"What is the maximum number of documents returned by one search request?","o":["100","50","1000","10000","200","500"],"e":"Search zwraca max **100 dokumentów na żądanie**. Scroll zwraca do 1000.","l":["mdpag"],"k":["md-v2.search"],"p":1},
  {"d":"md","r":1,"q":"How many documents in total can be retrieved by paginating the search endpoint?","o":["Up to 10,000","Up to 1,000","Up to 100,000","There is no limit","Up to 5,000","Up to 50,000"],"e":"Search kończy się na **10 000 dokumentów**. Powyżej tego używasz scrolla.","l":["scroll"],"k":["md-v2.search"],"p":2},
  {"d":"md","r":1,"q":"Which statements about the Master Data scroll endpoint are correct?","o":["It is for querying the whole database or over 10,000 documents","It returns up to 1000 documents per request","It caps each page at 100 documents, the same as search","It paginates with the `REST-Range` header, like search","Its token never expires, so a scroll can resume later","It requires a `_where` filter in every request, so the whole database cannot be read"],"e":"**Scroll** pobiera całą bazę: do **1000** dokumentów na żądanie, token w `X-VTEX-MD-TOKEN` ważny 20 minut. Limit 100 i `REST-Range` dotyczą search.","l":["scroll","mdpag"],"n":2,"k":["md-v2.scroll"],"p":1},
@@ -14690,6 +14725,7 @@ function bootApiMap(root, onNav, embed) {
     var reveal = mode === "review" || (mode === "learn" && S.ans[i] !== undefined && !qFresh(i));
     sel = Array.isArray(sel) ? sel : [];
     var rightLetters = [],
+      why = "",
       opts = "";
     if (q.t) opts = gapBody(i, sel, reveal);
     else if (q.c) opts = mxBody(i, sel, reveal);
@@ -14702,6 +14738,21 @@ function bootApiMap(root, onNav, embed) {
         var cls = "opt",
           mark = "";
         if (good) rightLetters.push(letter);
+        if (reveal && q.x && good !== on)
+          why +=
+            '<li><span class="why-l ' +
+            (good ? "ok" : "no") +
+            '">' +
+            letter +
+            " " +
+            (good ? "✓" : "✗") +
+            '</span> <span class="why-tag ' +
+            (good ? "ok" : "no") +
+            '">' +
+            (good ? L("Pominięta", "Missed") : L("Zaznaczona", "Picked")) +
+            "</span> " +
+            fmt(q.x[oi]) +
+            "</li>";
         if (reveal) {
           if (good && on) {
             cls += " is-right";
@@ -14797,6 +14848,13 @@ function bootApiMap(root, onNav, embed) {
         " " +
         fmt(q.e) +
         "</div>" +
+        (why && !ok
+          ? '<p class="why-h">' +
+            L("Gdzie się pomyliłeś", "Where you went wrong") +
+            '</p><ul class="why">' +
+            why +
+            "</ul>"
+          : "") +
         docLinks(q) +
         httpChips(q) +
         (mode === "learn"

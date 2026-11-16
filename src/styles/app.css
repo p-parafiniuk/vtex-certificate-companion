@@ -1609,6 +1609,41 @@ h3 {
 .verdict.part {
   color: var(--k3);
 }
+.why-h {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.why {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+  max-width: 68ch;
+}
+.why-l {
+  font-weight: 600;
+  margin-right: 4px;
+}
+.why-tag {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 1px 6px;
+  border: 1px solid;
+  border-radius: 999px;
+}
+.why-l.ok,
+.why-tag.ok {
+  color: var(--ok);
+}
+.why-l.no,
+.why-tag.no {
+  color: var(--bad);
+}
 .btn {
   border: 1px solid var(--line);
   background: var(--surface);
