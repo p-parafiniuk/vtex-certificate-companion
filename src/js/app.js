@@ -963,7 +963,10 @@
     /* start empty */
   }
 
+  /* Set once an import has written the stores: the pagehide saves of the reload must not overwrite them with the old S. */
+  var IMPORTED = false;
   function save() {
+    if (IMPORTED) return;
     try {
       localStorage.setItem(KEY, JSON.stringify(S));
     } catch (e) {
@@ -6756,6 +6759,7 @@
         true
       );
     }
+    IMPORTED = true;
     location.reload();
   });
   try {
