@@ -205,5 +205,12 @@
   "is_rel": ["https://help.vtex.com/en/docs/tutorials/intelligent-search-how-search-result-relevance-works","Help Center: How search result relevance works"],
   "hl_cat": ["https://developers.vtex.com/docs/guides/headless-catalog","Guide: Headless catalog"],
   "s_params": ["https://developers.vtex.com/docs/guides/how-search-parameters-work","Guide: How search parameters work"],
-  "is_ev": ["https://developers.vtex.com/docs/api-reference/intelligent-search-events-api-headless","API Reference: Intelligent Search Events API (headless)"]
+  "is_ev": ["https://developers.vtex.com/docs/api-reference/intelligent-search-events-api-headless","API Reference: Intelligent Search Events API (headless)"],
+  "ov_idspec": ["https://github.com/vtex/openapi-schemas/blob/master/VTEX%20-%20VTEX%20ID%20API.json","OpenAPI: VTEX ID API (apptoken/login, OAuth exchange)"],
+  "ov_pricespec": ["https://github.com/vtex/openapi-schemas/blob/master/VTEX%20-%20Pricing%20API.json","OpenAPI: Pricing API (PUT, PATCH, POST fixed, computed)"],
+  "ov_promo": ["https://developers.vtex.com/docs/guides/promotions-overview","Guide: Promotions overview"],
+  "ov_logres": ["https://developers.vtex.com/docs/api-reference/logistics-api#post-/api/logistics/pvt/inventory/reservations","Logistics API: Create reservation"],
+  "o_logistics": ["https://developers.vtex.com/docs/api-reference/logistics-api","Logistics API: overview and endpoint list"],
+  "ov_md1": ["https://developers.vtex.com/docs/api-reference/masterdata-api","Master Data API v1: overview"],
+  "ov_md2": ["https://developers.vtex.com/docs/api-reference/master-data-api-v2","Master Data API v2: overview"]
 }
