@@ -31,6 +31,7 @@ export const BLOCKS = {
   CATMAP: { file: "data/categories.json", keys: "json", layout: "inline" },
   NOTES: { file: "data/notes.json", keys: "json", layout: "inline" },
   APIOV: { file: "data/apioverview.json", keys: "json", layout: "inline" },
+  OVERVIEW: { file: "data/overview.json", keys: "json", layout: "inline" },
   ROLETRAPS: { file: "data/roletraps.json", keys: "json", layout: "inline" },
   GQL: { file: "data/graphql.json", keys: "json", layout: "inline" },
   PM: { file: "data/postman.json", keys: "json", layout: "inline" },

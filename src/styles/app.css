@@ -6192,3 +6192,130 @@ input.gap {
   min-width: 0;
   max-width: none;
 }
+/* Przegląd: bird's-eye page per category */
+.ov-isl {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 0 0 14px;
+}
+.ov-isl ul,
+.ov-s ul,
+.ov-s ol {
+  margin: 6px 0;
+  padding-left: 20px;
+}
+.ov-meta,
+.ov-src,
+.ov-skip {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+.ov-src a {
+  color: inherit;
+}
+.ov-map {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 6px;
+  margin: 0 0 16px;
+}
+.ov-map a {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+}
+.ov-s {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 0 0 12px;
+  scroll-margin-top: 70px;
+}
+.ov-s h3 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+.ov-s.is-warn {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+}
+.ov-tag {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--code);
+  color: var(--muted);
+}
+.ov-flow {
+  list-style: none;
+  padding: 0 !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 8px 0;
+  counter-reset: none;
+}
+.ov-box {
+  position: relative;
+  flex: 1 1 180px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--bg);
+  font-size: 14px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ov-box + .ov-box::before {
+  content: "→";
+  position: absolute;
+  left: -19px;
+  top: 8px;
+  color: var(--muted);
+}
+.ov-tw {
+  overflow-x: auto;
+}
+.ov-t {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+.ov-t th,
+.ov-t td {
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+.ov-t thead th {
+  background: var(--code);
+}
+.ov-s details summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 8px;
+}
+.ov-c {
+  background: var(--code);
+  padding: 10px 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 13px;
+}
+@media (max-width: 520px) {
+  .ov-box + .ov-box::before {
+    content: "↓";
+    left: 10px;
+    top: -21px;
+  }
+}
