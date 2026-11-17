@@ -2012,6 +2012,9 @@
     var lall = lProgAll(),
       cc = counts();
     cc.per.all = { t: Q.length, a: cc.ans, r: cc.right };
+    var qc = cc.per[S.dom];
+    $("#ct-pytania").innerHTML =
+      L("Pytania", "Questions") + (qc && qc.t ? ' <span class="num">' + qc.a + "/" + qc.t + "</span>" : "");
     /* Fill = share of the category answered; colour: green only when ≥90% of ALL its questions are right, else yellow (score ≥60) or red. */
     function scoreAttr(d) {
       var c = cc.per[d];
