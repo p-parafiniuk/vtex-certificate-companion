@@ -15369,9 +15369,25 @@ function bootApiMap(root, onNav, embed) {
         if (ok) lim[0]++;
       }
     });
-    var docs = catDocs(d, {}).length,
-      nc = noteCount(d) || { k: 0, t: 0 },
-      sc = t ? Math.round((r / t) * 100) : 0,
+    /* Scope = concepts (learn nodes) understood to L2+, rules = "must have" points marked known: what you grasp, not page counts. */
+    var cn = [],
+      cm = [],
+      cnt = 0,
+      mt = 0;
+    (LMOD[d] || []).forEach(function (m) {
+      m.nodes.forEach(function (n) {
+        cnt++;
+        if ((S.learn.n[m.id + "." + n.id] || {}).lv < 2 || !S.learn.n[m.id + "." + n.id]) cn.push(n.label);
+      });
+      (m.acc.must || []).forEach(function (pt) {
+        mt++;
+        if (!S.learn.a[m.id + "|must|" + pt[0]]) cm.push(pt[0]);
+      });
+    });
+    function miss(a) {
+      return a.length ? " · " + L("brakuje: ", "missing: ") + a.slice(0, 2).join("; ") + (a.length > 2 ? "…" : "") : "";
+    }
+    var sc = t ? Math.round((r / t) * 100) : 0,
       now = Date.now(),
       f = typeof first[d] === "number" ? first[d] : 0;
     if (sc >= 80 && !f) {
@@ -15380,7 +15396,7 @@ function bootApiMap(root, onNav, embed) {
         localStorage.setItem("status.v1", JSON.stringify(first));
       } catch (e) {}
     }
-    var lv = sc >= 80 ? (now - f >= 48 * 3600e3 ? 3 : 2) : nc.k || r ? 1 : 0,
+    var lv = sc >= 80 ? (now - f >= 48 * 3600e3 ? 3 : 2) : cnt > cn.length || mt > cm.length || r ? 1 : 0,
       calc = d === "pricing" || d === "checkout";
     function row(n, name, ok, info) {
       return (
@@ -15393,7 +15409,7 @@ function bootApiMap(root, onNav, embed) {
         ". " +
         esc(name) +
         "</strong> " +
-        esc(info) +
+        fmt(info) +
         "</span></li>"
       );
     }
@@ -15411,12 +15427,21 @@ function bootApiMap(root, onNav, embed) {
       ) +
       (f ? " · " + L("pierwsze ≥80%: ", "first ≥80%: ") + new Date(f).toLocaleDateString() : "") +
       '</span></div><ul class="hc">' +
-      row(1, "Scope", docs >= 5, L(docs + " stron docs (cel 5–8)", docs + " doc pages (goal 5–8)")) +
+      row(
+        1,
+        "Scope",
+        cnt ? cnt - cn.length >= Math.min(5, cnt) : null,
+        cnt
+          ? L("pojęcia rozumiane: ", "concepts understood: ") + (cnt - cn.length) + "/" + cnt + miss(cn)
+          : L("brak modułu pojęć", "no concept module")
+      ) +
       row(
         2,
         L("Reguły", "Rules"),
-        nc.t > 0 && nc.k * 2 >= nc.t,
-        L("notatki „Umiem”: ", "notes known: ") + nc.k + "/" + nc.t
+        mt ? !cm.length : null,
+        mt
+          ? L("„Must have” umiem: ", "“Must have” known: ") + (mt - cm.length) + "/" + mt + miss(cm)
+          : L("brak reguł", "no rules")
       ) +
       row(
         3,
