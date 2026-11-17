@@ -10,7 +10,7 @@
   /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
   var REFS = ["http", "api", "graphql", "postman", "egzamin"];
   /* Sections of a category; "all" shows only the first two. */
-  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn", "overview"];
+  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn", "overview", "status"];
   /* Sections of Postęp; the first one has no hash suffix. */
   var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
@@ -2198,10 +2198,132 @@
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
     if (sec === "info") renderInfo(S.dom);
     if (sec === "overview") renderOverview(S.dom);
+    if (sec === "status") renderStatus(S.dom);
     if (sec === "katas") renderF();
     if (sec === "learn") renderLearn(S.dom);
   }
   /* ---------- Przegląd: one bird's-eye page per category (OVERVIEW), modelled on the IS v1 overview ---------- */
+  /* Retake health check: the 7-point category template, each point judged from progress already saved.
+     The first time a category reaches 80% is kept under its own key, so level 3 can ask for a repeat 48 h later. */
+  function renderStatus(d) {
+    var t = 0,
+      r = 0,
+      ep = [0, 0],
+      lim = [0, 0],
+      wrong = [],
+      first = {};
+    try {
+      first = JSON.parse(localStorage.getItem("status.v1")) || {};
+    } catch (e) {}
+    if (!first || typeof first !== "object") first = {};
+    Q.forEach(function (q, i) {
+      if (q.d !== d) return;
+      var a = S.ans[i] !== undefined,
+        ok = a && isRight(i, S.ans[i]);
+      t++;
+      if (ok) r++;
+      if (a && !ok) wrong.push(q.q);
+      if (/\/api\//.test(q.q + " " + q.o.join(" "))) {
+        ep[1]++;
+        if (ok) ep[0]++;
+      }
+      if (
+        (q.h || []).some(function (h) {
+          return /^(400|404|429)$/.test(String(h));
+        })
+      ) {
+        lim[1]++;
+        if (ok) lim[0]++;
+      }
+    });
+    var docs = catDocs(d, {}).length,
+      nc = noteCount(d) || { k: 0, t: 0 },
+      sc = t ? Math.round((r / t) * 100) : 0,
+      now = Date.now(),
+      f = typeof first[d] === "number" ? first[d] : 0;
+    if (sc >= 80 && !f) {
+      first[d] = f = now;
+      try {
+        localStorage.setItem("status.v1", JSON.stringify(first));
+      } catch (e) {}
+    }
+    var lv = sc >= 80 ? (now - f >= 48 * 3600e3 ? 3 : 2) : nc.k || r ? 1 : 0,
+      calc = d === "pricing" || d === "checkout";
+    function row(n, name, ok, info) {
+      return (
+        '<li class="hc-' +
+        (ok === null ? "na" : ok ? "ok" : "no") +
+        '"><b>' +
+        (ok === null ? "–" : ok ? "✓" : "✗") +
+        "</b><span><strong>" +
+        n +
+        ". " +
+        esc(name) +
+        "</strong> " +
+        esc(info) +
+        "</span></li>"
+      );
+    }
+    $("#cs-status").innerHTML =
+      '<div class="hc-lv"><span class="hc-n">' +
+      lv +
+      "/3</span><span>" +
+      esc(
+        [
+          L("nie ruszone", "not started"),
+          L("czytane, bez wyniku ≥80%", "read, no ≥80% score"),
+          L("≥80% raz, powtórz po 48 h", "≥80% once, repeat after 48 h"),
+          L("gotowe: ≥80% po 48 h", "done: ≥80% after 48 h")
+        ][lv]
+      ) +
+      (f ? " · " + L("pierwsze ≥80%: ", "first ≥80%: ") + new Date(f).toLocaleDateString() : "") +
+      '</span></div><ul class="hc">' +
+      row(1, "Scope", docs >= 5, L(docs + " stron docs (cel 5–8)", docs + " doc pages (goal 5–8)")) +
+      row(
+        2,
+        L("Reguły", "Rules"),
+        nc.t > 0 && nc.k * 2 >= nc.t,
+        L("notatki „Umiem”: ", "notes known: ") + nc.k + "/" + nc.t
+      ) +
+      row(
+        3,
+        L("Endpointy", "Endpoints"),
+        ep[0] >= 5 || (ep[1] > 0 && ep[0] === ep[1]),
+        L("dobrze: ", "right: ") + ep[0] + "/" + ep[1]
+      ) +
+      row(
+        4,
+        L("Limity 429/400/404", "Limits 429/400/404"),
+        lim[1] ? lim[0] === lim[1] : null,
+        lim[1] ? L("dobrze: ", "right: ") + lim[0] + "/" + lim[1] : L("brak pytań", "no questions")
+      ) +
+      row(
+        5,
+        L("Pułapki", "Traps"),
+        r > 0 && !wrong.length,
+        L("błędne odpowiedzi: ", "wrong answers: ") + wrong.length
+      ) +
+      row(
+        6,
+        L("Liczenie", "Calculation"),
+        calc ? null : null,
+        calc ? L("policz 1 cenę ręcznie", "work out 1 price by hand") : L("nie dotyczy", "n/a")
+      ) +
+      row(7, L("Dowód", "Proof"), lv >= 3, L("wynik ", "score ") + sc + "% (" + r + "/" + t + ")") +
+      "</ul>" +
+      (wrong.length
+        ? "<h3>" +
+          L("Złapały mnie", "Caught me") +
+          '</h3><ol class="hc-w">' +
+          wrong
+            .slice(0, 3)
+            .map(function (q) {
+              return "<li>" + esc(q) + "</li>";
+            })
+            .join("") +
+          "</ol>"
+        : "");
+  }
   function renderOverview(d) {
     var el = $("#cs-overview"),
       o = OVERVIEW[d],
