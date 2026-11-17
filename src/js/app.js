@@ -2012,14 +2012,14 @@
     var lall = lProgAll(),
       cc = counts();
     cc.per.all = { t: Q.length, a: cc.ans, r: cc.right };
-    /* Fill = share of the category answered; colour = score on those answers (green ≥90, yellow 60–89, red <60). */
+    /* Fill = share of the category answered; colour: green only when ≥90% of ALL its questions are right, else yellow (score ≥60) or red. */
     function scoreAttr(d) {
       var c = cc.per[d];
       if (!c || !c.a) return "";
       var sc = Math.round((c.r / c.a) * 100);
       return (
         ' data-sc="' +
-        (sc >= 90 ? "g" : sc >= 60 ? "y" : "r") +
+        (c.r / c.t >= 0.9 ? "g" : sc >= 60 ? "y" : "r") +
         '" style="--fill:' +
         Math.round((c.a / c.t) * 100) +
         '%"'
