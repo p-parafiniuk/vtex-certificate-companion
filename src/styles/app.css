@@ -6503,3 +6503,99 @@ code.uri .up {
     top: -21px;
   }
 }
+
+.hc-lv {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.hc-n {
+  font-size: 2em;
+  font-weight: 700;
+}
+.hc {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.hc li,
+.hc-why {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.hc summary {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  cursor: pointer;
+  list-style: none;
+}
+.hc summary::-webkit-details-marker,
+.hc-why summary::-webkit-details-marker {
+  display: none;
+}
+.hc summary > span:nth-child(2) {
+  flex: 1;
+}
+.hc details p,
+.hc-why p {
+  margin: 0;
+  padding: 0 12px 12px 36px;
+  color: var(--muted);
+}
+.hc-why summary {
+  padding: 10px 12px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+}
+.hc-why p {
+  padding-left: 12px;
+}
+.hc-i {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  font: italic 700 12px/1 serif;
+  opacity: 0.6;
+}
+.hc details[open] .hc-i,
+.hc summary:hover .hc-i {
+  opacity: 1;
+}
+.hc-ok b {
+  color: var(--ok);
+}
+.hc-no b {
+  color: var(--bad);
+}
+.hc-na {
+  opacity: 0.7;
+}
+.hc-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 4px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+.hc-dot.hc-g {
+  background: var(--ok);
+}
+.hc-dot.hc-y {
+  background: var(--k3);
+}
+.hc-dot.hc-r {
+  background: var(--bad);
+}
+.hc-w {
+  padding-left: 1.4em;
+}

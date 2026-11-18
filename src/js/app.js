@@ -10,7 +10,7 @@
   /* Ściągi: one main tab over these views; each keeps its own hash (#http, #api, #graphql, #postman, #egzamin). */
   var REFS = ["http", "api", "graphql", "postman", "egzamin"];
   /* Sections of a category; "all" shows only the first two. */
-  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn", "overview"];
+  var CSECS = ["pytania", "katas", "info", "api", "docs", "learn", "overview", "status"];
   /* Sections of Postęp; the first one has no hash suffix. */
   var PSECS = ["przeglad", "odznaki", "wynik", "karty", "symulacje"];
   var VIEWS = TABS.concat(["focus"]);
@@ -78,6 +78,7 @@
       [0, 0]
     ],
     conf: true,
+    beta: false,
     lc: []
   };
   /* Note blocks are not keyed by index (they may be reordered), so "Umiem" is stored by category and heading. */
@@ -909,6 +910,7 @@
           S.cal[k] = [Math.min(x && x[0] >>> 0, n) || 0, n];
         });
       if (raw.conf === false) S.conf = false;
+      if (raw.beta === true) S.beta = true;
       /* lc: confidence levels of the last answer to show, 0 = answered without one; empty = no filter */
       if (Array.isArray(raw.lc))
         [0, 1, 2, 3].forEach(function (k) {
@@ -2174,9 +2176,17 @@
   function renderCat() {
     var all = S.dom === "all",
       sec = NAV.cur.sec || "pytania";
+    if (sec === "status" && (!S.beta || all)) sec = "pytania";
     CSECS.forEach(function (k, i) {
       $("#cs-" + k).hidden = k !== sec;
-      $("#ct-" + k).hidden = k === "learn" ? !LMOD[S.dom] : k === "overview" ? !OVERVIEW[S.dom] : all && i > 1;
+      $("#ct-" + k).hidden =
+        k === "status"
+          ? !S.beta || all
+          : k === "learn"
+            ? !LMOD[S.dom]
+            : k === "overview"
+              ? !OVERVIEW[S.dom]
+              : all && i > 1;
       $("#ct-" + k).setAttribute("aria-selected", k === sec);
       $("#ct-" + k).tabIndex = k === sec ? 0 : -1;
     });
@@ -2198,10 +2208,211 @@
     if (sec === "docs") renderDocs(S.dom, NAV.cur);
     if (sec === "info") renderInfo(S.dom);
     if (sec === "overview") renderOverview(S.dom);
+    if (S.beta && !all) renderStatus(S.dom, sec !== "status");
     if (sec === "katas") renderF();
     if (sec === "learn") renderLearn(S.dom);
   }
   /* ---------- Przegląd: one bird's-eye page per category (OVERVIEW), modelled on the IS v1 overview ---------- */
+  /* Retake health check: the 7-point category template, each point judged from progress already saved.
+     The first time a category reaches 80% is kept under its own key, so level 3 can ask for a repeat 48 h later. */
+  function renderStatus(d, badgeOnly) {
+    var t = 0,
+      r = 0,
+      ep = [0, 0],
+      lim = [0, 0],
+      wrong = [],
+      first = {};
+    try {
+      first = JSON.parse(localStorage.getItem("status.v1")) || {};
+    } catch (e) {}
+    if (!first || typeof first !== "object") first = {};
+    Q.forEach(function (q, i) {
+      if (q.d !== d) return;
+      var a = S.ans[i] !== undefined,
+        ok = a && isRight(i, S.ans[i]);
+      t++;
+      if (ok) r++;
+      if (a && !ok) wrong.push(q.q);
+      if (/\/api\//.test(q.q + " " + q.o.join(" "))) {
+        ep[1]++;
+        if (ok) ep[0]++;
+      }
+      if (
+        (q.h || []).some(function (h) {
+          return /^(400|404|429)$/.test(String(h));
+        })
+      ) {
+        lim[1]++;
+        if (ok) lim[0]++;
+      }
+    });
+    /* Scope = concepts (learn nodes) understood to L2+, rules = "must have" points marked known: what you grasp, not page counts. */
+    var cn = [],
+      cm = [],
+      cnt = 0,
+      mt = 0;
+    (LMOD[d] || []).forEach(function (m) {
+      m.nodes.forEach(function (n) {
+        cnt++;
+        if ((S.learn.n[m.id + "." + n.id] || {}).lv < 2 || !S.learn.n[m.id + "." + n.id]) cn.push(n.label);
+      });
+      (m.acc.must || []).forEach(function (pt) {
+        mt++;
+        if (!S.learn.a[m.id + "|must|" + pt[0]]) cm.push(pt[0]);
+      });
+    });
+    function miss(a) {
+      return a.length ? " · " + L("brakuje: ", "missing: ") + a.slice(0, 2).join("; ") + (a.length > 2 ? "…" : "") : "";
+    }
+    var sc = t ? Math.round((r / t) * 100) : 0,
+      now = Date.now(),
+      f = typeof first[d] === "number" ? first[d] : 0;
+    if (sc >= 80 && !f) {
+      first[d] = f = now;
+      try {
+        localStorage.setItem("status.v1", JSON.stringify(first));
+      } catch (e) {}
+    }
+    var lv = sc >= 80 ? (now - f >= 48 * 3600e3 ? 3 : 2) : cnt > cn.length || mt > cm.length || r ? 1 : 0,
+      calc = d === "pricing" || d === "checkout";
+    var oks = [],
+      WHY = [
+        L(
+          "Czy znasz mapę tematu. Liczy pojęcia z zakładki Schematy, które przeszedłeś co najmniej do L2: wiesz, co to jest i dlaczego tak działa. Bez tej mapy każdy dystraktor brzmi równie wiarygodnie. ✓ od 5 pojęć (albo wszystkich, gdy jest ich mniej).",
+          "Do you know the map of the topic? Counts the concepts in Schemas you have taken to at least L2: what it is and why it works. ✓ from 5 concepts (or all, when there are fewer)."
+        ),
+        L(
+          "Reguły „Must have” to fakty, o które egzamin pyta najczęściej. Zaznacz „Umiem” w Schematach dopiero, gdy wytłumaczysz regułę w 3 zdaniach bez notatek. ✓ gdy umiesz wszystkie.",
+          "“Must have” rules are the facts the exam asks most. Mark “Known” in Schemas only once you can explain the rule in 3 sentences without notes. ✓ when all are known."
+        ),
+        L(
+          "Pytania z konkretną ścieżką /api/… sprawdzają metodę i wersję: PUT czy POST, catalog czy catalog_system, v1 czy v2. To najczęstszy typ pułapki. ✓ gdy masz dobrze 5 takich pytań albo wszystkie.",
+          "Questions with a concrete /api/… path test the method and version: PUT or POST, catalog or catalog_system, v1 or v2. ✓ with 5 right, or all of them."
+        ),
+        L(
+          "Pytania z kodami 400, 404 i 429: kiedy API odrzuca żądanie i jak reagujesz (Retry-After, backoff z jitterem, batch). Z tego budujesz też odpowiedzi otwarte. ✓ gdy wszystkie są dobrze.",
+          "Questions with codes 400, 404 and 429: when the API rejects a request and how you react (Retry-After, backoff with jitter, batching). ✓ when all are right."
+        ),
+        L(
+          "Każda błędna odpowiedź to dystraktor, który Cię złapał. Lista na dole pokazuje pierwsze 3. Wróć do nich w Pytaniach, aż znikną. ✓ gdy nie masz żadnej błędnej.",
+          "Every wrong answer is a distractor that caught you. The list below shows the first 3; redo them in Questions until they are gone. ✓ with no wrong answers."
+        ),
+        L(
+          "Tylko Pricing i Checkout: egzamin każe policzyć cenę (koszt × (1 + marża), cena stała, promocja). Policz jeden przykład na kartce. Aplikacja tego nie sprawdza, więc nie ma ✓.",
+          "Pricing and Checkout only: the exam asks you to work out a price (cost × (1 + markup), fixed price, promotion). Do one by hand; the app cannot check it."
+        ),
+        L(
+          "Poziom 2: ≥80% wszystkich pytań kategorii. Poziom 3: nadal ≥80% co najmniej 48 h po pierwszym razie, czyli wiedza przetrwała, a nie tylko świeża pamięć. ✓ na poziomie 3.",
+          "Level 2: ≥80% of all the category's questions. Level 3: still ≥80% at least 48 h after the first time, so it stuck. ✓ at level 3."
+        )
+      ];
+    function row(n, name, ok, info) {
+      if (ok !== null) oks.push(ok);
+      return (
+        '<li class="hc-' +
+        (ok === null ? "na" : ok ? "ok" : "no") +
+        '"><details><summary><b>' +
+        (ok === null ? "–" : ok ? "✓" : "✗") +
+        "</b><span><strong>" +
+        n +
+        ". " +
+        esc(name) +
+        "</strong> " +
+        fmt(info) +
+        '</span><span class="hc-i" title="' +
+        esc(L("Po co ten punkt", "Why this point")) +
+        '">i</span></summary><p>' +
+        esc(WHY[n - 1]) +
+        "</p></details></li>"
+      );
+    }
+    var h =
+      '<details class="hc-why"><summary><span class="hc-i">i</span> ' +
+      esc(L("Po co jest Status?", "What is Status for?")) +
+      "</summary><p>" +
+      esc(
+        L(
+          "To health check przed retake. Zamiast „chyba umiem” dostajesz 7 punktów szablonu kategorii, ocenionych z Twojego postępu: pojęć i reguł ze Schematów oraz odpowiedzi na pytania. Czerwone pokazuje, gdzie uczyć się dalej. Kategoria jest gotowa na poziomie 3/3: ≥80% dwa razy, w odstępie 48 h. Kliknij punkt, żeby zobaczyć, co dokładnie sprawdza.",
+          "A health check before the retake. Instead of “I think I know it” you get the category's 7-point template, judged from your progress: concepts and rules in Schemas and your answers. Red shows where to study next. A category is ready at level 3/3: ≥80% twice, 48 h apart. Open a point to see what it checks."
+        )
+      ) +
+      '</p></details><div class="hc-lv"><span class="hc-n">' +
+      lv +
+      "/3</span><span>" +
+      esc(
+        [
+          L("nie ruszone", "not started"),
+          L("czytane, bez wyniku ≥80%", "read, no ≥80% score"),
+          L("≥80% raz, powtórz po 48 h", "≥80% once, repeat after 48 h"),
+          L("gotowe: ≥80% po 48 h", "done: ≥80% after 48 h")
+        ][lv]
+      ) +
+      (f ? " · " + L("pierwsze ≥80%: ", "first ≥80%: ") + new Date(f).toLocaleDateString() : "") +
+      '</span></div><ul class="hc">' +
+      row(
+        1,
+        "Scope",
+        cnt ? cnt - cn.length >= Math.min(5, cnt) : null,
+        cnt
+          ? L("pojęcia rozumiane: ", "concepts understood: ") + (cnt - cn.length) + "/" + cnt + miss(cn)
+          : L("brak modułu pojęć", "no concept module")
+      ) +
+      row(
+        2,
+        L("Reguły", "Rules"),
+        mt ? !cm.length : null,
+        mt
+          ? L("„Must have” umiem: ", "“Must have” known: ") + (mt - cm.length) + "/" + mt + miss(cm)
+          : L("brak reguł", "no rules")
+      ) +
+      row(
+        3,
+        L("Endpointy", "Endpoints"),
+        ep[0] >= 5 || (ep[1] > 0 && ep[0] === ep[1]),
+        L("dobrze: ", "right: ") + ep[0] + "/" + ep[1]
+      ) +
+      row(
+        4,
+        L("Limity 429/400/404", "Limits 429/400/404"),
+        lim[1] ? lim[0] === lim[1] : null,
+        lim[1] ? L("dobrze: ", "right: ") + lim[0] + "/" + lim[1] : L("brak pytań", "no questions")
+      ) +
+      row(
+        5,
+        L("Pułapki", "Traps"),
+        r > 0 && !wrong.length,
+        L("błędne odpowiedzi: ", "wrong answers: ") + wrong.length
+      ) +
+      row(
+        6,
+        L("Liczenie", "Calculation"),
+        calc ? null : null,
+        calc ? L("policz 1 cenę ręcznie", "work out 1 price by hand") : L("nie dotyczy", "n/a")
+      ) +
+      row(7, L("Dowód", "Proof"), lv >= 3, L("wynik ", "score ") + sc + "% (" + r + "/" + t + ")") +
+      "</ul>" +
+      (wrong.length
+        ? "<h3>" +
+          L("Złapały mnie", "Caught me") +
+          '</h3><ol class="hc-w">' +
+          wrong
+            .slice(0, 3)
+            .map(function (q) {
+              return "<li>" + esc(q) + "</li>";
+            })
+            .join("") +
+          "</ol>"
+        : "");
+    var good = oks.filter(Boolean).length,
+      col = lv >= 3 || (oks.length && good === oks.length) ? "g" : good * 2 >= oks.length && good ? "y" : "r";
+    $("#ct-status").innerHTML =
+      'Status <span class="hc-dot hc-' +
+      col +
+      '" role="img" aria-label="' +
+      esc(good + "/" + oks.length + " ✓") +
+      '"></span>';
+    if (!badgeOnly) $("#cs-status").innerHTML = h;
+  }
   function renderOverview(d) {
     var el = $("#cs-overview"),
       o = OVERVIEW[d],
@@ -6254,6 +6465,7 @@
         b.setAttribute("aria-pressed", b.dataset.langSet === S.lang);
       });
     $("#set-conf").checked = S.conf;
+    $("#set-beta").checked = S.beta;
     $("#set-hide").checked = S.hide;
     $("#set-min").value = S.simMin;
     $("#set-prac").checked = S.simPrac;
@@ -6280,7 +6492,8 @@
     if (t.id === "set-conf") {
       S.conf = t.checked;
       renderQ();
-    } else if (t.id === "set-hide") S.hide = t.checked;
+    } else if (t.id === "set-beta") S.beta = t.checked;
+    else if (t.id === "set-hide") S.hide = t.checked;
     else if (t.id === "set-prac") S.simPrac = t.checked;
     else if (t.id === "set-min") {
       var m = Math.round(+t.value);
